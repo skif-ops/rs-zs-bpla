@@ -1,0 +1,7362 @@
+{
+  "components": [
+    {
+      "designator": "C19",
+      "comment": "22 uF 10 V X5R",
+      "footprint": "C_0805_2012Metric",
+      "lib_ref": "C19_GRM21BR61A226ME44L",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C20",
+      "comment": "10 uF 10 V X5R",
+      "footprint": "C_0603_1608Metric",
+      "lib_ref": "C20_GRM188R61A106KE69D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MIC"
+        }
+      ]
+    },
+    {
+      "designator": "J_PWR",
+      "comment": "43045-1202",
+      "footprint": "",
+      "lib_ref": "J_PWR_43045-1202",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "3V8_MODEM",
+          "net": "3V8_MODEM"
+        },
+        {
+          "pin": "2",
+          "name": "GND_MODEM",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "3",
+          "name": "3V3_DIGITAL",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "GND_DIGITAL",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "5",
+          "name": "1V8_MIC",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "6",
+          "name": "GND_MIC",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "7",
+          "name": "PWR_GOOD",
+          "net": "PWR_GOOD"
+        },
+        {
+          "pin": "8",
+          "name": "FAULT",
+          "net": "FAULT"
+        },
+        {
+          "pin": "9",
+          "name": "EN_MODEM",
+          "net": "EN_MODEM"
+        },
+        {
+          "pin": "10",
+          "name": "EN_AUX",
+          "net": "EN_AUX"
+        },
+        {
+          "pin": "11",
+          "name": "I2C2_SCL",
+          "net": "I2C2_SCL_BUS"
+        },
+        {
+          "pin": "12",
+          "name": "I2C2_SDA",
+          "net": "I2C2_SDA_BUS"
+        }
+      ]
+    },
+    {
+      "designator": "R103",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R103_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "FAULT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "PWR_FAULT"
+        }
+      ]
+    },
+    {
+      "designator": "C1",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C1_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C2",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C2_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C3",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C3_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C4",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C4_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C5",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C5_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C6",
+      "comment": "10 uF 10 V X5R",
+      "footprint": "C_0603_1608Metric",
+      "lib_ref": "C6_GRM188R61A106KE69D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C7",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C7_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C8",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C8_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C9",
+      "comment": "1 uF 16 V X5R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C9_GRM155R61C105KA12D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C10",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C10_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "VREF+"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C11",
+      "comment": "1 uF 16 V X5R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C11_GRM155R61C105KA12D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "VREF+"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C12",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C12_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C13",
+      "comment": "10 uF 10 V X5R",
+      "footprint": "C_0603_1608Metric",
+      "lib_ref": "C13_GRM188R61A106KE69D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C14",
+      "comment": "2.2 uF 10 V X5R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C14_GRM155R61A225KE15D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "VCORE_1V1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C15",
+      "comment": "2.2 uF 10 V X5R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C15_GRM155R61A225KE15D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "VCORE_1V1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C16",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C16_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "VCORE_1V1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C17",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C17_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "VCORE_1V1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C18",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C18_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "NRST"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "L1",
+      "comment": "2.2 uH 20%",
+      "footprint": "L_1210_3225Metric",
+      "lib_ref": "L1_LQH32PN2R2NN0L",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SMPS_SW"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "VCORE_1V1"
+        }
+      ]
+    },
+    {
+      "designator": "R1",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R1_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "NRST"
+        }
+      ]
+    },
+    {
+      "designator": "R2",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R2_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "BOOT0"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R3",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R3_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "HW_REV0"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R4",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R4_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "HW_REV0"
+        }
+      ]
+    },
+    {
+      "designator": "R5",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R5_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "HW_REV1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R6",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R6_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "HW_REV1"
+        }
+      ]
+    },
+    {
+      "designator": "U1",
+      "comment": "STM32U585VIT6Q",
+      "footprint": "",
+      "lib_ref": "U1_STM32U585VIT6Q",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "PE2",
+          "net": "SIM_MUX_EN"
+        },
+        {
+          "pin": "2",
+          "name": "PE3",
+          "net": "SIM1_DET"
+        },
+        {
+          "pin": "3",
+          "name": "PE4",
+          "net": "PDM_DATA4"
+        },
+        {
+          "pin": "4",
+          "name": "PE5",
+          "net": "SIM2_DET"
+        },
+        {
+          "pin": "5",
+          "name": "PE6",
+          "net": "BLE_EN"
+        },
+        {
+          "pin": "6",
+          "name": "VBAT",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "7",
+          "name": "PC13",
+          "net": "SD_DET"
+        },
+        {
+          "pin": "8",
+          "name": "PC14-OSC32_IN (PC14)",
+          "net": "LSE_IN"
+        },
+        {
+          "pin": "9",
+          "name": "PC15-OSC32_OUT (PC15)",
+          "net": "NetU1_9"
+        },
+        {
+          "pin": "10",
+          "name": "VSS",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "11",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "12",
+          "name": "PH0-OSC_IN (PH0)",
+          "net": "NetU1_12"
+        },
+        {
+          "pin": "13",
+          "name": "PH1-OSC_OUT (PH1)",
+          "net": "NetU1_13"
+        },
+        {
+          "pin": "14",
+          "name": "NRST",
+          "net": "NRST"
+        },
+        {
+          "pin": "15",
+          "name": "PC0",
+          "net": "TEST_UART_RX_U1"
+        },
+        {
+          "pin": "16",
+          "name": "PC1",
+          "net": "TEST_UART_TX_U1"
+        },
+        {
+          "pin": "17",
+          "name": "PC2",
+          "net": "LORA_DIO1"
+        },
+        {
+          "pin": "18",
+          "name": "PC3",
+          "net": "NetU1_18"
+        },
+        {
+          "pin": "19",
+          "name": "VSSA",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "20",
+          "name": "VREF+",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "21",
+          "name": "VDDA",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "22",
+          "name": "PA0",
+          "net": "GNSS_PPS_U1"
+        },
+        {
+          "pin": "23",
+          "name": "PA1",
+          "net": "NetU1_23"
+        },
+        {
+          "pin": "24",
+          "name": "PA2",
+          "net": "GNSS_TX_U1"
+        },
+        {
+          "pin": "25",
+          "name": "PA3",
+          "net": "GNSS_RX_U1"
+        },
+        {
+          "pin": "26",
+          "name": "VSS",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "27",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "28",
+          "name": "PA4",
+          "net": "LORA_NSS_U1"
+        },
+        {
+          "pin": "29",
+          "name": "PA5",
+          "net": "LORA_SCK_U1"
+        },
+        {
+          "pin": "30",
+          "name": "PA6",
+          "net": "LORA_MISO_U1"
+        },
+        {
+          "pin": "31",
+          "name": "PA7",
+          "net": "LORA_MOSI_U1"
+        },
+        {
+          "pin": "32",
+          "name": "PB0",
+          "net": "NetU1_32"
+        },
+        {
+          "pin": "33",
+          "name": "PB1",
+          "net": "PDM_DATA1"
+        },
+        {
+          "pin": "34",
+          "name": "PB2",
+          "net": "BLE_DFU_REQ"
+        },
+        {
+          "pin": "35",
+          "name": "PE7",
+          "net": "PDM_DATA3"
+        },
+        {
+          "pin": "36",
+          "name": "PE8",
+          "net": "NetU1_36"
+        },
+        {
+          "pin": "37",
+          "name": "PE9",
+          "net": "PDM_CLK"
+        },
+        {
+          "pin": "38",
+          "name": "PE10",
+          "net": "NOR_CLK_U1"
+        },
+        {
+          "pin": "39",
+          "name": "PE11",
+          "net": "NOR_NCS_U2"
+        },
+        {
+          "pin": "40",
+          "name": "PE12",
+          "net": "NOR_IO0_U1"
+        },
+        {
+          "pin": "41",
+          "name": "PE13",
+          "net": "NOR_IO1_U1"
+        },
+        {
+          "pin": "42",
+          "name": "PE14",
+          "net": "NOR_IO2_U1"
+        },
+        {
+          "pin": "43",
+          "name": "PE15",
+          "net": "NOR_IO3_U1"
+        },
+        {
+          "pin": "44",
+          "name": "PB10",
+          "net": "BLE_TX_U1"
+        },
+        {
+          "pin": "45",
+          "name": "PB11",
+          "net": "BLE_RX_U1"
+        },
+        {
+          "pin": "46",
+          "name": "VLXSMPS",
+          "net": "SMPS_SW"
+        },
+        {
+          "pin": "47",
+          "name": "VDDSMPS",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "48",
+          "name": "VSSSMPS",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "49",
+          "name": "VDD11",
+          "net": "VCORE_1V1"
+        },
+        {
+          "pin": "50",
+          "name": "VSS",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "51",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "52",
+          "name": "PB13",
+          "net": "I2C2_SCL_U1"
+        },
+        {
+          "pin": "53",
+          "name": "PB14",
+          "net": "I2C2_SDA_U1"
+        },
+        {
+          "pin": "54",
+          "name": "PB15",
+          "net": "LORA_TXEN"
+        },
+        {
+          "pin": "55",
+          "name": "PD8",
+          "net": "LORA_RXEN"
+        },
+        {
+          "pin": "56",
+          "name": "PD9",
+          "net": "LORA_BUSY"
+        },
+        {
+          "pin": "57",
+          "name": "PD10",
+          "net": "LORA_RESET_N"
+        },
+        {
+          "pin": "58",
+          "name": "PD11",
+          "net": "CELL_PWRKEY_CMD"
+        },
+        {
+          "pin": "59",
+          "name": "PD12",
+          "net": "CELL_RESET_N_CMD"
+        },
+        {
+          "pin": "60",
+          "name": "PD13",
+          "net": "CELL_STATUS_U16"
+        },
+        {
+          "pin": "61",
+          "name": "PD14",
+          "net": "CELL_DTR_U16"
+        },
+        {
+          "pin": "62",
+          "name": "PD15",
+          "net": "CELL_RI_U16"
+        },
+        {
+          "pin": "63",
+          "name": "PC6",
+          "net": "ACCEL_INT"
+        },
+        {
+          "pin": "64",
+          "name": "PC7",
+          "net": "TAMPER_IN_U1"
+        },
+        {
+          "pin": "65",
+          "name": "PC8",
+          "net": "SD_D0_U1"
+        },
+        {
+          "pin": "66",
+          "name": "PC9",
+          "net": "SD_D1_U1"
+        },
+        {
+          "pin": "67",
+          "name": "PA8",
+          "net": "MIC_WAKE"
+        },
+        {
+          "pin": "68",
+          "name": "PA9",
+          "net": "USB_VBUS_SENSE"
+        },
+        {
+          "pin": "69",
+          "name": "PA10",
+          "net": "NetU1_69"
+        },
+        {
+          "pin": "70",
+          "name": "PA11",
+          "net": "USB_DM_U1"
+        },
+        {
+          "pin": "71",
+          "name": "PA12",
+          "net": "USB_DP_U1"
+        },
+        {
+          "pin": "72",
+          "name": "PA13 (JTMS/SWDIO)",
+          "net": "SWDIO"
+        },
+        {
+          "pin": "73",
+          "name": "VDDUSB",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "74",
+          "name": "VSS",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "75",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "76",
+          "name": "PA14 (JTCK/SWCLK)",
+          "net": "SWCLK"
+        },
+        {
+          "pin": "77",
+          "name": "PA15 (JTDI)",
+          "net": "AAD_CFG"
+        },
+        {
+          "pin": "78",
+          "name": "PC10",
+          "net": "SD_D2_U1"
+        },
+        {
+          "pin": "79",
+          "name": "PC11",
+          "net": "SD_D3_U1"
+        },
+        {
+          "pin": "80",
+          "name": "PC12",
+          "net": "SD_CK_U1"
+        },
+        {
+          "pin": "81",
+          "name": "PD0",
+          "net": "PWR_GOOD"
+        },
+        {
+          "pin": "82",
+          "name": "PD1",
+          "net": "PWR_FAULT"
+        },
+        {
+          "pin": "83",
+          "name": "PD2",
+          "net": "SD_CMD_U1"
+        },
+        {
+          "pin": "84",
+          "name": "PD3",
+          "net": "NetU1_84"
+        },
+        {
+          "pin": "85",
+          "name": "PD4",
+          "net": "EN_MODEM"
+        },
+        {
+          "pin": "86",
+          "name": "PD5",
+          "net": "EN_AUX"
+        },
+        {
+          "pin": "87",
+          "name": "PD6",
+          "net": "PDM_DATA2"
+        },
+        {
+          "pin": "88",
+          "name": "PD7",
+          "net": "NetU1_88"
+        },
+        {
+          "pin": "89",
+          "name": "PB3 (JTDO/TRACESWO)",
+          "net": "NetU1_89"
+        },
+        {
+          "pin": "90",
+          "name": "PB4 (NJTRST)",
+          "net": "NetU1_90"
+        },
+        {
+          "pin": "91",
+          "name": "PB5",
+          "net": "NetU1_91"
+        },
+        {
+          "pin": "92",
+          "name": "PB6",
+          "net": "CELL_TX_U16"
+        },
+        {
+          "pin": "93",
+          "name": "PB7",
+          "net": "CELL_RX_U16"
+        },
+        {
+          "pin": "94",
+          "name": "PH3-BOOT0",
+          "net": "BOOT0"
+        },
+        {
+          "pin": "95",
+          "name": "PB8",
+          "net": "REV_STRAP0"
+        },
+        {
+          "pin": "96",
+          "name": "PB9",
+          "net": "REV_STRAP1"
+        },
+        {
+          "pin": "97",
+          "name": "PE0",
+          "net": "SIM_MUX_SEL"
+        },
+        {
+          "pin": "98",
+          "name": "VDD11",
+          "net": "VCORE_1V1"
+        },
+        {
+          "pin": "99",
+          "name": "VSS",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "100",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "X1",
+      "comment": "32.768 kHz full-swing LVCMOS",
+      "footprint": "",
+      "lib_ref": "X1_SiT1552AI-JE-DCC-32.768D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "LSE_IN"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C27",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C27_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C28",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C28_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C29",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C29_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C30",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C30_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MIC"
+        }
+      ]
+    },
+    {
+      "designator": "C31",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C31_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C32",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C32_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "J_MIC1",
+      "comment": "504050-0691",
+      "footprint": "",
+      "lib_ref": "J_MIC1_504050-0691",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1V8_MIC",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "3",
+          "name": "PDM_CLK",
+          "net": "PDM_CLK_1V8_FANOUT"
+        },
+        {
+          "pin": "4",
+          "name": "PDM_DATA1",
+          "net": "PDM_DATA1_1V8"
+        },
+        {
+          "pin": "5",
+          "name": "MIC_WAKE1",
+          "net": "MIC_WAKE1"
+        },
+        {
+          "pin": "6",
+          "name": "AAD_CFG",
+          "net": "AAD_CFG_1V8_FANOUT"
+        }
+      ]
+    },
+    {
+      "designator": "J_MIC2",
+      "comment": "504050-0691",
+      "footprint": "",
+      "lib_ref": "J_MIC2_504050-0691",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1V8_MIC",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "3",
+          "name": "PDM_CLK",
+          "net": "PDM_CLK_1V8_FANOUT"
+        },
+        {
+          "pin": "4",
+          "name": "PDM_DATA2",
+          "net": "PDM_DATA2_1V8"
+        },
+        {
+          "pin": "5",
+          "name": "MIC_WAKE2",
+          "net": "MIC_WAKE2"
+        },
+        {
+          "pin": "6",
+          "name": "AAD_CFG",
+          "net": "AAD_CFG_1V8_FANOUT"
+        }
+      ]
+    },
+    {
+      "designator": "J_MIC3",
+      "comment": "504050-0691",
+      "footprint": "",
+      "lib_ref": "J_MIC3_504050-0691",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1V8_MIC",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "3",
+          "name": "PDM_CLK",
+          "net": "PDM_CLK_1V8_FANOUT"
+        },
+        {
+          "pin": "4",
+          "name": "PDM_DATA3",
+          "net": "PDM_DATA3_1V8"
+        },
+        {
+          "pin": "5",
+          "name": "MIC_WAKE3",
+          "net": "MIC_WAKE3"
+        },
+        {
+          "pin": "6",
+          "name": "AAD_CFG",
+          "net": "AAD_CFG_1V8_FANOUT"
+        }
+      ]
+    },
+    {
+      "designator": "J_MIC4",
+      "comment": "504050-0691",
+      "footprint": "",
+      "lib_ref": "J_MIC4_504050-0691",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1V8_MIC",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "3",
+          "name": "PDM_CLK",
+          "net": "PDM_CLK_1V8_FANOUT"
+        },
+        {
+          "pin": "4",
+          "name": "PDM_DATA4",
+          "net": "PDM_DATA4_1V8"
+        },
+        {
+          "pin": "5",
+          "name": "MIC_WAKE4",
+          "net": "MIC_WAKE4"
+        },
+        {
+          "pin": "6",
+          "name": "AAD_CFG",
+          "net": "AAD_CFG_1V8_FANOUT"
+        }
+      ]
+    },
+    {
+      "designator": "R17",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R17_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "PDM_CLK_1V8_U7"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "PDM_CLK_1V8_FANOUT"
+        }
+      ]
+    },
+    {
+      "designator": "R18",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R18_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "AAD_CFG_1V8_U7"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "AAD_CFG_1V8_FANOUT"
+        }
+      ]
+    },
+    {
+      "designator": "R19",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R19_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "MIC_WAKE1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MIC"
+        }
+      ]
+    },
+    {
+      "designator": "R20",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R20_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "MIC_WAKE2"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MIC"
+        }
+      ]
+    },
+    {
+      "designator": "R21",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R21_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "MIC_WAKE3"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MIC"
+        }
+      ]
+    },
+    {
+      "designator": "R22",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R22_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "MIC_WAKE4"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MIC"
+        }
+      ]
+    },
+    {
+      "designator": "R23",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R23_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "MIC_WAKE"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "U7",
+      "comment": "SN74AXC8T245PWR",
+      "footprint": "",
+      "lib_ref": "U7_SN74AXC8T245PWR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "VCCA",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "DIR1",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "3",
+          "name": "A1",
+          "net": "PDM_DATA1_1V8"
+        },
+        {
+          "pin": "4",
+          "name": "A2",
+          "net": "PDM_DATA2_1V8"
+        },
+        {
+          "pin": "5",
+          "name": "A3",
+          "net": "PDM_DATA3_1V8"
+        },
+        {
+          "pin": "6",
+          "name": "A4",
+          "net": "PDM_DATA4_1V8"
+        },
+        {
+          "pin": "7",
+          "name": "A5",
+          "net": "PDM_CLK_1V8_U7"
+        },
+        {
+          "pin": "8",
+          "name": "A6",
+          "net": "AAD_CFG_1V8_U7"
+        },
+        {
+          "pin": "9",
+          "name": "A7",
+          "net": "NetU7_9"
+        },
+        {
+          "pin": "10",
+          "name": "A8",
+          "net": "NetU7_10"
+        },
+        {
+          "pin": "11",
+          "name": "DIR2",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "12",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "13",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "14",
+          "name": "B8",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "15",
+          "name": "B7",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "16",
+          "name": "B6",
+          "net": "AAD_CFG"
+        },
+        {
+          "pin": "17",
+          "name": "B5",
+          "net": "PDM_CLK"
+        },
+        {
+          "pin": "18",
+          "name": "B4",
+          "net": "PDM_DATA4"
+        },
+        {
+          "pin": "19",
+          "name": "B3",
+          "net": "PDM_DATA3"
+        },
+        {
+          "pin": "20",
+          "name": "B2",
+          "net": "PDM_DATA2"
+        },
+        {
+          "pin": "21",
+          "name": "B1",
+          "net": "PDM_DATA1"
+        },
+        {
+          "pin": "22",
+          "name": "OE",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "23",
+          "name": "VCCB",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "24",
+          "name": "VCCB",
+          "net": "3V3_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "U17",
+      "comment": "SN74LVC32APWR",
+      "footprint": "",
+      "lib_ref": "U17_SN74LVC32APWR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1A",
+          "net": "MIC_WAKE1"
+        },
+        {
+          "pin": "2",
+          "name": "1B",
+          "net": "MIC_WAKE2"
+        },
+        {
+          "pin": "3",
+          "name": "1Y",
+          "net": "MIC_WAKE12_OR_1V8"
+        },
+        {
+          "pin": "4",
+          "name": "2A",
+          "net": "MIC_WAKE3"
+        },
+        {
+          "pin": "5",
+          "name": "2B",
+          "net": "MIC_WAKE4"
+        },
+        {
+          "pin": "6",
+          "name": "2Y",
+          "net": "MIC_WAKE34_OR_1V8"
+        },
+        {
+          "pin": "7",
+          "name": "GND",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "8",
+          "name": "3Y",
+          "net": "MIC_WAKE_OR_1V8"
+        },
+        {
+          "pin": "9",
+          "name": "3A",
+          "net": "MIC_WAKE12_OR_1V8"
+        },
+        {
+          "pin": "10",
+          "name": "3B",
+          "net": "MIC_WAKE34_OR_1V8"
+        },
+        {
+          "pin": "11",
+          "name": "4Y",
+          "net": "NetU17_11"
+        },
+        {
+          "pin": "12",
+          "name": "4A",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "13",
+          "name": "4B",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "14",
+          "name": "VCC",
+          "net": "1V8_MIC"
+        }
+      ]
+    },
+    {
+      "designator": "U18",
+      "comment": "SN74AXC1T45DRLR",
+      "footprint": "",
+      "lib_ref": "U18_SN74AXC1T45DRLR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "VCCA",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "3",
+          "name": "A",
+          "net": "MIC_WAKE_OR_1V8"
+        },
+        {
+          "pin": "4",
+          "name": "B",
+          "net": "MIC_WAKE"
+        },
+        {
+          "pin": "5",
+          "name": "DIR",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "6",
+          "name": "VCCB",
+          "net": "3V3_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "U19",
+      "comment": "4 channel 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "U19_TPD4E05U06DQAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "PDM_CLK_1V8_FANOUT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "PDM_DATA1_1V8"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "MIC_WAKE1"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "AAD_CFG_1V8_FANOUT"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "NetU19_6"
+        },
+        {
+          "pin": "7",
+          "name": "7",
+          "net": "NetU19_7"
+        },
+        {
+          "pin": "8",
+          "name": "8",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "9",
+          "name": "9",
+          "net": "NetU19_9"
+        },
+        {
+          "pin": "10",
+          "name": "10",
+          "net": "NetU19_10"
+        }
+      ]
+    },
+    {
+      "designator": "U20",
+      "comment": "4 channel 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "U20_TPD4E05U06DQAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "PDM_CLK_1V8_FANOUT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "PDM_DATA2_1V8"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "MIC_WAKE2"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "AAD_CFG_1V8_FANOUT"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "NetU20_6"
+        },
+        {
+          "pin": "7",
+          "name": "7",
+          "net": "NetU20_7"
+        },
+        {
+          "pin": "8",
+          "name": "8",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "9",
+          "name": "9",
+          "net": "NetU20_9"
+        },
+        {
+          "pin": "10",
+          "name": "10",
+          "net": "NetU20_10"
+        }
+      ]
+    },
+    {
+      "designator": "U21",
+      "comment": "4 channel 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "U21_TPD4E05U06DQAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "PDM_CLK_1V8_FANOUT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "PDM_DATA3_1V8"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "MIC_WAKE3"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "AAD_CFG_1V8_FANOUT"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "NetU21_6"
+        },
+        {
+          "pin": "7",
+          "name": "7",
+          "net": "NetU21_7"
+        },
+        {
+          "pin": "8",
+          "name": "8",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "9",
+          "name": "9",
+          "net": "NetU21_9"
+        },
+        {
+          "pin": "10",
+          "name": "10",
+          "net": "NetU21_10"
+        }
+      ]
+    },
+    {
+      "designator": "U22",
+      "comment": "4 channel 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "U22_TPD4E05U06DQAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "PDM_CLK_1V8_FANOUT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "PDM_DATA4_1V8"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "MIC_WAKE4"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "AAD_CFG_1V8_FANOUT"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "NetU22_6"
+        },
+        {
+          "pin": "7",
+          "name": "7",
+          "net": "NetU22_7"
+        },
+        {
+          "pin": "8",
+          "name": "8",
+          "net": "GND_MIC"
+        },
+        {
+          "pin": "9",
+          "name": "9",
+          "net": "NetU22_9"
+        },
+        {
+          "pin": "10",
+          "name": "10",
+          "net": "NetU22_10"
+        }
+      ]
+    },
+    {
+      "designator": "C60",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C60_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C61",
+      "comment": "10 uF 10 V X5R",
+      "footprint": "C_0603_1608Metric",
+      "lib_ref": "C61_GRM188R61A106KE69D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C62",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C62_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C63",
+      "comment": "10 nF 16 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C63_GRM155R71C103KA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_ANT_SHORT_N"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C64",
+      "comment": "47 pF 25 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C64_GRM1555C1E470JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_RF_ANT_BIASED"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_RF_DC_BLOCK"
+        }
+      ]
+    },
+    {
+      "designator": "C65",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C65_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_ANT_BIAS_RAW"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "D4",
+      "comment": "5.5 V unidirectional 0.5 pF RF ESD",
+      "footprint": "",
+      "lib_ref": "D4_TPD1E05U06DYAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_RF_ANT_BIASED"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "FL1",
+      "comment": "1582.4 MHz wideband GNSS SAW",
+      "footprint": "",
+      "lib_ref": "FL1_ABSES5AF-L100KM",
+      "pins": [
+        {
+          "pin": "A",
+          "name": "A",
+          "net": "GNSS_RF_FILTERED"
+        },
+        {
+          "pin": "B",
+          "name": "B",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "C",
+          "name": "C",
+          "net": "GNSS_RF_DC_BLOCK"
+        },
+        {
+          "pin": "D",
+          "name": "D",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "E",
+          "name": "E",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "J9",
+      "comment": "U.FL-R-SMT-1(60)",
+      "footprint": "",
+      "lib_ref": "J9_U.FL-R-SMT-1_60",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "SIGNAL",
+          "net": "GNSS_RF_ANT_BIASED"
+        },
+        {
+          "pin": "SHIELD",
+          "name": "SHELL",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "L2",
+      "comment": "27 nH 5%",
+      "footprint": "L_0402_1005Metric",
+      "lib_ref": "L2_LQW15AN27NJ00D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_ANT_SHORT_N"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_RF_ANT_BIASED"
+        }
+      ]
+    },
+    {
+      "designator": "Q4",
+      "comment": "Complementary N and P channel 20 V",
+      "footprint": "",
+      "lib_ref": "Q4_Si1016X-T1-GE3",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_ANT_OFF_N"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GNSS_ANT_SWITCHED"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "GNSS_ANT_BIAS_RAW"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "GNSS_ANT_GATE"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "GNSS_ANT_GATE"
+        }
+      ]
+    },
+    {
+      "designator": "R56",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R56_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_RX_U9"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_RX_U1"
+        }
+      ]
+    },
+    {
+      "designator": "R57",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R57_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_TX_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_TX_U9"
+        }
+      ]
+    },
+    {
+      "designator": "R58",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R58_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_PPS_U9"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_PPS_U1"
+        }
+      ]
+    },
+    {
+      "designator": "R59",
+      "comment": "560 Ohm 5% 0.1 W",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R59_ERJ-2GEJ561X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_ANT_SWITCHED"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_ANT_DIV"
+        }
+      ]
+    },
+    {
+      "designator": "R60",
+      "comment": "100 kOhm 5% 0.1 W",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R60_ERJ-2GEJ104X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_ANT_DIV"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R61",
+      "comment": "100 kOhm 5% 0.1 W",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R61_ERJ-2GEJ104X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_ANT_BIAS_RAW"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_ANT_GATE"
+        }
+      ]
+    },
+    {
+      "designator": "R62",
+      "comment": "10 Ohm 5% 0.25 W",
+      "footprint": "R_1206_3216Metric",
+      "lib_ref": "R62_ERJ-8GEYJ100V",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_ANT_SWITCHED"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_ANT_SHORT_N"
+        }
+      ]
+    },
+    {
+      "designator": "U5",
+      "comment": "Single rail-to-rail low-power op amp",
+      "footprint": "",
+      "lib_ref": "U5_LT6000IDCB_TRMPBF",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "GNSS_ANT_DIV"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GNSS_ANT_SHORT_N"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GNSS_ANT_BIAS_RAW"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "GNSS_ANT_BIAS_RAW"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "GNSS_ANT_DETECT"
+        },
+        {
+          "pin": "EP",
+          "name": "EP",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "U9",
+      "comment": "MAX-M10S-00B",
+      "footprint": "",
+      "lib_ref": "U9_MAX-M10S-00B",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "TXD",
+          "net": "GNSS_RX_U9"
+        },
+        {
+          "pin": "3",
+          "name": "RXD",
+          "net": "GNSS_TX_U9"
+        },
+        {
+          "pin": "4",
+          "name": "TIMEPULSE",
+          "net": "GNSS_PPS_U9"
+        },
+        {
+          "pin": "5",
+          "name": "EXTINT",
+          "net": "NetU9_5"
+        },
+        {
+          "pin": "6",
+          "name": "V_BCKP",
+          "net": "NetU9_6"
+        },
+        {
+          "pin": "7",
+          "name": "V_IO",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "8",
+          "name": "VCC",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "9",
+          "name": "RESET_N",
+          "net": "NetU9_9"
+        },
+        {
+          "pin": "10",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "11",
+          "name": "RF_IN",
+          "net": "GNSS_RF_FILTERED"
+        },
+        {
+          "pin": "12",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "13",
+          "name": "LNA_EN",
+          "net": "GNSS_ANT_OFF_N"
+        },
+        {
+          "pin": "14",
+          "name": "VCC_RF",
+          "net": "GNSS_ANT_BIAS_RAW"
+        },
+        {
+          "pin": "15",
+          "name": "VIO_SEL",
+          "net": "NetU9_15"
+        },
+        {
+          "pin": "16",
+          "name": "SDA",
+          "net": "GNSS_ANT_DETECT"
+        },
+        {
+          "pin": "17",
+          "name": "SCL",
+          "net": "GNSS_ANT_SHORT_N"
+        },
+        {
+          "pin": "18",
+          "name": "SAFEBOOT_N",
+          "net": "NetU9_18"
+        }
+      ]
+    },
+    {
+      "designator": "C33",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C33_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "U8_VDD_EXT_1V8"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C34",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C34_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C35",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C35_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C36",
+      "comment": "100 uF 6.3 V 15 mOhm polymer",
+      "footprint": "",
+      "lib_ref": "C36_T520D107M006ATE015",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C37",
+      "comment": "220 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C37_GRM155R71E224KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C38",
+      "comment": "47 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C38_GRM155R71E473KA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C39",
+      "comment": "150 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C39_GRM1555C1H151JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C40",
+      "comment": "100 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C40_GRM1555C1H101JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C41",
+      "comment": "68 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C41_GRM1555C1H680JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C42",
+      "comment": "33 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C42_GRM1555C1H330JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C43",
+      "comment": "10 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C43_GRM1555C1H100JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C44",
+      "comment": "100 uF 6.3 V 15 mOhm polymer",
+      "footprint": "",
+      "lib_ref": "C44_T520D107M006ATE015",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_RF"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C45",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C45_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_RF"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C46",
+      "comment": "33 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C46_GRM1555C1H330JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_RF"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C47",
+      "comment": "10 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C47_GRM1555C1H100JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_RF"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C48",
+      "comment": "10 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C48_GRM155R71E103KA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "U8_PWRKEY_N"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C49",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C49_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C50",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C50_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM1_VDD_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C51",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C51_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM2_VDD_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C52",
+      "comment": "10 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C52_GRM155R71E103KA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM1_DET"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C53",
+      "comment": "10 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C53_GRM155R71E103KA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM2_DET"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C54",
+      "comment": "33 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C54_GRM1555C1H330JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM1_RST_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C55",
+      "comment": "33 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C55_GRM1555C1H330JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM1_CLK_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C56",
+      "comment": "33 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C56_GRM1555C1H330JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM1_DATA_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C57",
+      "comment": "33 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C57_GRM1555C1H330JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM2_RST_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C58",
+      "comment": "33 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C58_GRM1555C1H330JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM2_CLK_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C59",
+      "comment": "33 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C59_GRM1555C1H330JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM2_DATA_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C79",
+      "comment": "10 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C79_GRM1555C1H100JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_RF"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "C80",
+      "comment": "10 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C80_GRM1555C1H100JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_RF_ANT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "D1",
+      "comment": "5 V unidirectional 150 W TVS",
+      "footprint": "",
+      "lib_ref": "D1_PESD5V0S1UL",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "D2",
+      "comment": "5 V unidirectional 150 W TVS",
+      "footprint": "",
+      "lib_ref": "D2_PESD5V0S1UL",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM_RF"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "D3",
+      "comment": "5 V bidirectional 0.2 pF RF ESD",
+      "footprint": "",
+      "lib_ref": "D3_PESD5V0C1BSF",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_RF_ANT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "D10",
+      "comment": "5.5 V 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "D10_TPD1E05U06DYAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_USB_VBUS"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "FB1",
+      "comment": "600 Ohm at 100 MHz",
+      "footprint": "L_1206_3216Metric",
+      "lib_ref": "FB1_BLM31KN601SN1L",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "3V8_MODEM_BB"
+        }
+      ]
+    },
+    {
+      "designator": "J6",
+      "comment": "2336582-1",
+      "footprint": "",
+      "lib_ref": "J6_2336582-1",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "C1_VCC",
+          "net": "SIM1_VDD_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "C2_RST",
+          "net": "SIM1_RST_CONN"
+        },
+        {
+          "pin": "3",
+          "name": "C3_CLK",
+          "net": "SIM1_CLK_CONN"
+        },
+        {
+          "pin": "4",
+          "name": "C5_GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "5",
+          "name": "C6_VPP",
+          "net": "NetJ6_5"
+        },
+        {
+          "pin": "6",
+          "name": "C7_IO",
+          "net": "SIM1_DATA_CONN"
+        },
+        {
+          "pin": "7",
+          "name": "CD",
+          "net": "SIM1_DET"
+        },
+        {
+          "pin": "SHIELD",
+          "name": "SHELL",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "J7",
+      "comment": "2336582-1",
+      "footprint": "",
+      "lib_ref": "J7_2336582-1",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "C1_VCC",
+          "net": "SIM2_VDD_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "C2_RST",
+          "net": "SIM2_RST_CONN"
+        },
+        {
+          "pin": "3",
+          "name": "C3_CLK",
+          "net": "SIM2_CLK_CONN"
+        },
+        {
+          "pin": "4",
+          "name": "C5_GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "5",
+          "name": "C6_VPP",
+          "net": "NetJ7_5"
+        },
+        {
+          "pin": "6",
+          "name": "C7_IO",
+          "net": "SIM2_DATA_CONN"
+        },
+        {
+          "pin": "7",
+          "name": "CD",
+          "net": "SIM2_DET"
+        },
+        {
+          "pin": "SHIELD",
+          "name": "SHELL",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "J8",
+      "comment": "U.FL-R-SMT-1(60)",
+      "footprint": "",
+      "lib_ref": "J8_U.FL-R-SMT-1_60",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "SIGNAL",
+          "net": "CELL_RF_ANT"
+        },
+        {
+          "pin": "SHIELD",
+          "name": "SHELL",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "Q1",
+      "comment": "MMBT3904,215",
+      "footprint": "",
+      "lib_ref": "Q1_MMBT3904_215",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "B",
+          "net": "Q1_BASE"
+        },
+        {
+          "pin": "2",
+          "name": "E",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "3",
+          "name": "C",
+          "net": "U8_PWRKEY_N"
+        }
+      ]
+    },
+    {
+      "designator": "Q2",
+      "comment": "MMBT3904,215",
+      "footprint": "",
+      "lib_ref": "Q2_MMBT3904_215",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "B",
+          "net": "Q2_BASE"
+        },
+        {
+          "pin": "2",
+          "name": "E",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "3",
+          "name": "C",
+          "net": "U8_RESET_N"
+        }
+      ]
+    },
+    {
+      "designator": "Q3",
+      "comment": "MMBT3904,215",
+      "footprint": "",
+      "lib_ref": "Q3_MMBT3904_215",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "B",
+          "net": "Q3_BASE"
+        },
+        {
+          "pin": "2",
+          "name": "E",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "3",
+          "name": "C",
+          "net": "U13_EN_N"
+        }
+      ]
+    },
+    {
+      "designator": "R24",
+      "comment": "4.7 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R24_ERJ-2RKF4701X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_PWRKEY_CMD"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "Q1_BASE"
+        }
+      ]
+    },
+    {
+      "designator": "R25",
+      "comment": "47 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R25_ERJ-2RKF4702X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "Q1_BASE"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "R26",
+      "comment": "4.7 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R26_ERJ-2RKF4701X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_RESET_N_CMD"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "Q2_BASE"
+        }
+      ]
+    },
+    {
+      "designator": "R27",
+      "comment": "47 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R27_ERJ-2RKF4702X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "Q2_BASE"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "R28",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R28_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_TX_U16"
+        }
+      ]
+    },
+    {
+      "designator": "R29",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R29_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_DTR_U16"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "R30",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R30_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "U8_VDD_EXT_1V8"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "U8_MAIN_TXD_1V8"
+        }
+      ]
+    },
+    {
+      "designator": "R31",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R31_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "U8_VDD_EXT_1V8"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "U8_MAIN_RI_1V8"
+        }
+      ]
+    },
+    {
+      "designator": "R32",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R32_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_RX_U16"
+        }
+      ]
+    },
+    {
+      "designator": "R33",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R33_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_RI_U16"
+        }
+      ]
+    },
+    {
+      "designator": "R34",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R34_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_STATUS_U16"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "R35",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R35_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_USB_BOOT_1V8"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "R36",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R36_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_DBG_TXD_U8"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_DBG_TXD_TP"
+        }
+      ]
+    },
+    {
+      "designator": "R37",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R37_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_DBG_RXD_TP"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_DBG_RXD_U8"
+        }
+      ]
+    },
+    {
+      "designator": "R38",
+      "comment": "1 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R38_ERJ-2RKF1001X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_USB_BOOT_TP"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_USB_BOOT_1V8"
+        }
+      ]
+    },
+    {
+      "designator": "R39",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R39_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_USB_DP_U8"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_USB_DP_TP"
+        }
+      ]
+    },
+    {
+      "designator": "R40",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R40_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_USB_DM_U8"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_USB_DM_TP"
+        }
+      ]
+    },
+    {
+      "designator": "R41",
+      "comment": "1 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R41_ERJ-2RKF1001X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "U8_VDD_EXT_1V8"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_DBG_VREF_TP"
+        }
+      ]
+    },
+    {
+      "designator": "R42",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R42_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V8_MODEM"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "3V8_MODEM_RF"
+        }
+      ]
+    },
+    {
+      "designator": "R43",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R43_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_RF"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_RF_ANT"
+        }
+      ]
+    },
+    {
+      "designator": "R44",
+      "comment": "47 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R44_ERJ-2RKF4702X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "U13_EN_N"
+        }
+      ]
+    },
+    {
+      "designator": "R45",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R45_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM_MUX_SEL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "R46",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R46_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM_MUX_EN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "Q3_BASE"
+        }
+      ]
+    },
+    {
+      "designator": "R47",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R47_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "Q3_BASE"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "R48",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R48_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SIM1_DET"
+        }
+      ]
+    },
+    {
+      "designator": "R49",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R49_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SIM2_DET"
+        }
+      ]
+    },
+    {
+      "designator": "R50",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R50_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM1_RST_MUX"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SIM1_RST_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "R51",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R51_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM1_CLK_MUX"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SIM1_CLK_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "R52",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R52_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM1_DATA_MUX"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SIM1_DATA_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "R53",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R53_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM2_RST_MUX"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SIM2_RST_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "R54",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R54_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM2_CLK_MUX"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SIM2_CLK_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "R55",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R55_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SIM2_DATA_MUX"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SIM2_DATA_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "TP_CELL_DBG",
+      "comment": "TEST_PADS",
+      "footprint": "",
+      "lib_ref": "TP_CELL_DBG_TEST_PADS",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "VREF_1V8",
+          "net": "U8_VDD_EXT_1V8"
+        },
+        {
+          "pin": "2",
+          "name": "DUT_TX",
+          "net": "CELL_DBG_TXD_TP"
+        },
+        {
+          "pin": "3",
+          "name": "DUT_RX",
+          "net": "CELL_DBG_RXD_TP"
+        },
+        {
+          "pin": "4",
+          "name": "USB_BOOT",
+          "net": "CELL_USB_BOOT_TP"
+        },
+        {
+          "pin": "5",
+          "name": "GND",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "TP_CELL_USB",
+      "comment": "TEST_PADS",
+      "footprint": "",
+      "lib_ref": "TP_CELL_USB_TEST_PADS",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "HOST_VBUS",
+          "net": "CELL_USB_VBUS"
+        },
+        {
+          "pin": "2",
+          "name": "USB_DP",
+          "net": "CELL_USB_DP_TP"
+        },
+        {
+          "pin": "3",
+          "name": "USB_DM",
+          "net": "CELL_USB_DM_TP"
+        },
+        {
+          "pin": "4",
+          "name": "GND",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "U8",
+      "comment": "BG95-M3",
+      "footprint": "",
+      "lib_ref": "U8_BG95-M3",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "PSM_IND",
+          "net": "NetU8_1"
+        },
+        {
+          "pin": "2",
+          "name": "ADC1",
+          "net": "NetU8_2"
+        },
+        {
+          "pin": "3",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "4",
+          "name": "PCM_CLK",
+          "net": "NetU8_4"
+        },
+        {
+          "pin": "5",
+          "name": "PCM_SYNC",
+          "net": "NetU8_5"
+        },
+        {
+          "pin": "6",
+          "name": "PCM_DIN",
+          "net": "NetU8_6"
+        },
+        {
+          "pin": "7",
+          "name": "PCM_DOUT",
+          "net": "NetU8_7"
+        },
+        {
+          "pin": "8",
+          "name": "USB_VBUS",
+          "net": "CELL_USB_VBUS"
+        },
+        {
+          "pin": "9",
+          "name": "USB_DP",
+          "net": "CELL_USB_DP_U8"
+        },
+        {
+          "pin": "10",
+          "name": "USB_DM",
+          "net": "CELL_USB_DM_U8"
+        },
+        {
+          "pin": "11",
+          "name": "RESERVED",
+          "net": "NetU8_11"
+        },
+        {
+          "pin": "12",
+          "name": "RESERVED",
+          "net": "NetU8_12"
+        },
+        {
+          "pin": "13",
+          "name": "RESERVED",
+          "net": "NetU8_13"
+        },
+        {
+          "pin": "14",
+          "name": "RESERVED",
+          "net": "NetU8_14"
+        },
+        {
+          "pin": "15",
+          "name": "PWRKEY",
+          "net": "U8_PWRKEY_N"
+        },
+        {
+          "pin": "16",
+          "name": "RESERVED",
+          "net": "NetU8_16"
+        },
+        {
+          "pin": "17",
+          "name": "RESET_N",
+          "net": "U8_RESET_N"
+        },
+        {
+          "pin": "18",
+          "name": "W_DISABLE#",
+          "net": "NetU8_18"
+        },
+        {
+          "pin": "19",
+          "name": "AP_READY",
+          "net": "NetU8_19"
+        },
+        {
+          "pin": "20",
+          "name": "STATUS",
+          "net": "U8_STATUS_1V8"
+        },
+        {
+          "pin": "21",
+          "name": "NET_STATUS",
+          "net": "NetU8_21"
+        },
+        {
+          "pin": "22",
+          "name": "DBG_RXD",
+          "net": "CELL_DBG_RXD_U8"
+        },
+        {
+          "pin": "23",
+          "name": "DBG_TXD",
+          "net": "CELL_DBG_TXD_U8"
+        },
+        {
+          "pin": "24",
+          "name": "ADC0",
+          "net": "NetU8_24"
+        },
+        {
+          "pin": "25",
+          "name": "GPIO1",
+          "net": "NetU8_25"
+        },
+        {
+          "pin": "26",
+          "name": "GPIO2",
+          "net": "NetU8_26"
+        },
+        {
+          "pin": "27",
+          "name": "GNSS_TXD",
+          "net": "NetU8_27"
+        },
+        {
+          "pin": "28",
+          "name": "GNSS_RXD",
+          "net": "NetU8_28"
+        },
+        {
+          "pin": "29",
+          "name": "VDD_EXT",
+          "net": "U8_VDD_EXT_1V8"
+        },
+        {
+          "pin": "30",
+          "name": "MAIN_DTR",
+          "net": "U8_MAIN_DTR_1V8"
+        },
+        {
+          "pin": "31",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "32",
+          "name": "VBAT_BB",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "33",
+          "name": "VBAT_BB",
+          "net": "3V8_MODEM_BB"
+        },
+        {
+          "pin": "34",
+          "name": "MAIN_RXD",
+          "net": "U8_MAIN_RXD_1V8"
+        },
+        {
+          "pin": "35",
+          "name": "MAIN_TXD",
+          "net": "U8_MAIN_TXD_1V8"
+        },
+        {
+          "pin": "36",
+          "name": "MAIN_CTS",
+          "net": "NetU8_36"
+        },
+        {
+          "pin": "37",
+          "name": "MAIN_RTS",
+          "net": "NetU8_37"
+        },
+        {
+          "pin": "38",
+          "name": "MAIN_DCD",
+          "net": "NetU8_38"
+        },
+        {
+          "pin": "39",
+          "name": "MAIN_RI",
+          "net": "U8_MAIN_RI_1V8"
+        },
+        {
+          "pin": "40",
+          "name": "I2C_SCL",
+          "net": "NetU8_40"
+        },
+        {
+          "pin": "41",
+          "name": "I2C_SDA",
+          "net": "NetU8_41"
+        },
+        {
+          "pin": "42",
+          "name": "USIM_DET",
+          "net": "NetU8_42"
+        },
+        {
+          "pin": "43",
+          "name": "USIM_VDD",
+          "net": "CELL_USIM_VDD_1V8"
+        },
+        {
+          "pin": "44",
+          "name": "USIM_RST",
+          "net": "CELL_USIM_RST_1V8"
+        },
+        {
+          "pin": "45",
+          "name": "USIM_DATA",
+          "net": "CELL_USIM_DATA_1V8"
+        },
+        {
+          "pin": "46",
+          "name": "USIM_CLK",
+          "net": "CELL_USIM_CLK_1V8"
+        },
+        {
+          "pin": "47",
+          "name": "USIM_GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "48",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "49",
+          "name": "ANT_GNSS",
+          "net": "NetU8_49"
+        },
+        {
+          "pin": "50",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "51",
+          "name": "GNSS_LNA_EN",
+          "net": "NetU8_51"
+        },
+        {
+          "pin": "52",
+          "name": "VBAT_RF",
+          "net": "3V8_MODEM_RF"
+        },
+        {
+          "pin": "53",
+          "name": "VBAT_RF",
+          "net": "3V8_MODEM_RF"
+        },
+        {
+          "pin": "54",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "55",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "56",
+          "name": "ANT_WIFI",
+          "net": "NetU8_56"
+        },
+        {
+          "pin": "57",
+          "name": "RESERVED",
+          "net": "NetU8_57"
+        },
+        {
+          "pin": "58",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "59",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "60",
+          "name": "ANT_MAIN",
+          "net": "CELL_RF"
+        },
+        {
+          "pin": "61",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "62",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "63",
+          "name": "RESERVED",
+          "net": "NetU8_63"
+        },
+        {
+          "pin": "64",
+          "name": "GPIO3",
+          "net": "NetU8_64"
+        },
+        {
+          "pin": "65",
+          "name": "GPIO4",
+          "net": "NetU8_65"
+        },
+        {
+          "pin": "66",
+          "name": "GPIO5",
+          "net": "NetU8_66"
+        },
+        {
+          "pin": "67",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "68",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "69",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "70",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "71",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "72",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "73",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "74",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "75",
+          "name": "USB_BOOT",
+          "net": "CELL_USB_BOOT_1V8"
+        },
+        {
+          "pin": "76",
+          "name": "RESERVED",
+          "net": "NetU8_76"
+        },
+        {
+          "pin": "77",
+          "name": "RESERVED",
+          "net": "NetU8_77"
+        },
+        {
+          "pin": "78",
+          "name": "RESERVED",
+          "net": "NetU8_78"
+        },
+        {
+          "pin": "79",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "80",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "81",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "82",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "83",
+          "name": "GRFC1",
+          "net": "NetU8_83"
+        },
+        {
+          "pin": "84",
+          "name": "GRFC2",
+          "net": "NetU8_84"
+        },
+        {
+          "pin": "85",
+          "name": "GPIO6",
+          "net": "NetU8_85"
+        },
+        {
+          "pin": "86",
+          "name": "GPIO7",
+          "net": "NetU8_86"
+        },
+        {
+          "pin": "87",
+          "name": "GPIO8",
+          "net": "NetU8_87"
+        },
+        {
+          "pin": "88",
+          "name": "GPIO9",
+          "net": "NetU8_88"
+        },
+        {
+          "pin": "89",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "90",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "91",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "92",
+          "name": "RESERVED",
+          "net": "NetU8_92"
+        },
+        {
+          "pin": "93",
+          "name": "RESERVED",
+          "net": "NetU8_93"
+        },
+        {
+          "pin": "94",
+          "name": "RESERVED",
+          "net": "NetU8_94"
+        },
+        {
+          "pin": "95",
+          "name": "RESERVED",
+          "net": "NetU8_95"
+        },
+        {
+          "pin": "96",
+          "name": "PON_TRIG",
+          "net": "NetU8_96"
+        },
+        {
+          "pin": "97",
+          "name": "RESERVED",
+          "net": "NetU8_97"
+        },
+        {
+          "pin": "98",
+          "name": "RESERVED",
+          "net": "NetU8_98"
+        },
+        {
+          "pin": "99",
+          "name": "RESERVED",
+          "net": "NetU8_99"
+        },
+        {
+          "pin": "100",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "101",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "102",
+          "name": "GND",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "U13",
+      "comment": "TS3A27518EPWR",
+      "footprint": "",
+      "lib_ref": "U13_TS3A27518EPWR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "NC2",
+          "net": "SIM1_RST_MUX"
+        },
+        {
+          "pin": "2",
+          "name": "NC1",
+          "net": "SIM1_VDD_CONN"
+        },
+        {
+          "pin": "3",
+          "name": "N.C.",
+          "net": "NetU13_3"
+        },
+        {
+          "pin": "4",
+          "name": "COM1",
+          "net": "CELL_USIM_VDD_1V8"
+        },
+        {
+          "pin": "5",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "6",
+          "name": "COM2",
+          "net": "CELL_USIM_RST_1V8"
+        },
+        {
+          "pin": "7",
+          "name": "COM3",
+          "net": "CELL_USIM_CLK_1V8"
+        },
+        {
+          "pin": "8",
+          "name": "VCC",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "9",
+          "name": "COM4",
+          "net": "CELL_USIM_VDD_1V8"
+        },
+        {
+          "pin": "10",
+          "name": "COM5",
+          "net": "CELL_USIM_DATA_1V8"
+        },
+        {
+          "pin": "11",
+          "name": "NO1",
+          "net": "SIM2_VDD_CONN"
+        },
+        {
+          "pin": "12",
+          "name": "COM6",
+          "net": "CELL_USIM_VDD_1V8"
+        },
+        {
+          "pin": "13",
+          "name": "NO2",
+          "net": "SIM2_RST_MUX"
+        },
+        {
+          "pin": "14",
+          "name": "IN2",
+          "net": "SIM_MUX_SEL"
+        },
+        {
+          "pin": "15",
+          "name": "NO3",
+          "net": "SIM2_CLK_MUX"
+        },
+        {
+          "pin": "16",
+          "name": "NO6",
+          "net": "SIM2_VDD_CONN"
+        },
+        {
+          "pin": "17",
+          "name": "NO4",
+          "net": "SIM2_VDD_CONN"
+        },
+        {
+          "pin": "18",
+          "name": "NO5",
+          "net": "SIM2_DATA_MUX"
+        },
+        {
+          "pin": "19",
+          "name": "NC5",
+          "net": "SIM1_DATA_MUX"
+        },
+        {
+          "pin": "20",
+          "name": "EN",
+          "net": "U13_EN_N"
+        },
+        {
+          "pin": "21",
+          "name": "NC4",
+          "net": "SIM1_VDD_CONN"
+        },
+        {
+          "pin": "22",
+          "name": "NC6",
+          "net": "SIM1_VDD_CONN"
+        },
+        {
+          "pin": "23",
+          "name": "NC3",
+          "net": "SIM1_CLK_MUX"
+        },
+        {
+          "pin": "24",
+          "name": "IN1",
+          "net": "SIM_MUX_SEL"
+        }
+      ]
+    },
+    {
+      "designator": "U14",
+      "comment": "ESDALC6V1-5P6",
+      "footprint": "",
+      "lib_ref": "U14_ESDALC6V1-5P6",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "I/O1",
+          "net": "SIM1_VDD_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "3",
+          "name": "I/O2",
+          "net": "SIM1_RST_CONN"
+        },
+        {
+          "pin": "4",
+          "name": "I/O3",
+          "net": "SIM1_CLK_CONN"
+        },
+        {
+          "pin": "5",
+          "name": "I/O4",
+          "net": "SIM1_DATA_CONN"
+        },
+        {
+          "pin": "6",
+          "name": "I/O5",
+          "net": "SIM1_DET"
+        }
+      ]
+    },
+    {
+      "designator": "U15",
+      "comment": "ESDALC6V1-5P6",
+      "footprint": "",
+      "lib_ref": "U15_ESDALC6V1-5P6",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "I/O1",
+          "net": "SIM2_VDD_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "3",
+          "name": "I/O2",
+          "net": "SIM2_RST_CONN"
+        },
+        {
+          "pin": "4",
+          "name": "I/O3",
+          "net": "SIM2_CLK_CONN"
+        },
+        {
+          "pin": "5",
+          "name": "I/O4",
+          "net": "SIM2_DATA_CONN"
+        },
+        {
+          "pin": "6",
+          "name": "I/O5",
+          "net": "SIM2_DET"
+        }
+      ]
+    },
+    {
+      "designator": "U16",
+      "comment": "SN74AXC8T245PWR",
+      "footprint": "",
+      "lib_ref": "U16_SN74AXC8T245PWR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "VCCA",
+          "net": "U8_VDD_EXT_1V8"
+        },
+        {
+          "pin": "2",
+          "name": "DIR1",
+          "net": "U8_VDD_EXT_1V8"
+        },
+        {
+          "pin": "3",
+          "name": "A1",
+          "net": "U8_MAIN_TXD_1V8"
+        },
+        {
+          "pin": "4",
+          "name": "A2",
+          "net": "U8_STATUS_1V8"
+        },
+        {
+          "pin": "5",
+          "name": "A3",
+          "net": "U8_MAIN_RI_1V8"
+        },
+        {
+          "pin": "6",
+          "name": "A4",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "7",
+          "name": "A5",
+          "net": "U8_MAIN_RXD_1V8"
+        },
+        {
+          "pin": "8",
+          "name": "A6",
+          "net": "U8_MAIN_DTR_1V8"
+        },
+        {
+          "pin": "9",
+          "name": "A7",
+          "net": "NetU16_9"
+        },
+        {
+          "pin": "10",
+          "name": "A8",
+          "net": "NetU16_10"
+        },
+        {
+          "pin": "11",
+          "name": "DIR2",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "12",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "13",
+          "name": "GND",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "14",
+          "name": "B8",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "15",
+          "name": "B7",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "16",
+          "name": "B6",
+          "net": "CELL_DTR_U16"
+        },
+        {
+          "pin": "17",
+          "name": "B5",
+          "net": "CELL_TX_U16"
+        },
+        {
+          "pin": "18",
+          "name": "B4",
+          "net": "NetU16_18"
+        },
+        {
+          "pin": "19",
+          "name": "B3",
+          "net": "CELL_RI_U16"
+        },
+        {
+          "pin": "20",
+          "name": "B2",
+          "net": "CELL_STATUS_U16"
+        },
+        {
+          "pin": "21",
+          "name": "B1",
+          "net": "CELL_RX_U16"
+        },
+        {
+          "pin": "22",
+          "name": "OE",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "23",
+          "name": "VCCB",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "24",
+          "name": "VCCB",
+          "net": "3V3_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "U26",
+      "comment": "2 channel 0.7 pF USB ESD",
+      "footprint": "",
+      "lib_ref": "U26_TPD2EUSB30DRTR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_USB_DP_TP"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_USB_DM_TP"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_MODEM"
+        }
+      ]
+    },
+    {
+      "designator": "U27",
+      "comment": "4 channel 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "U27_TPD4E05U06DQAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "CELL_DBG_TXD_TP"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "CELL_DBG_RXD_TP"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "CELL_DBG_VREF_TP"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "CELL_USB_BOOT_TP"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "NetU27_6"
+        },
+        {
+          "pin": "7",
+          "name": "7",
+          "net": "NetU27_7"
+        },
+        {
+          "pin": "8",
+          "name": "8",
+          "net": "GND_MODEM"
+        },
+        {
+          "pin": "9",
+          "name": "9",
+          "net": "NetU27_9"
+        },
+        {
+          "pin": "10",
+          "name": "10",
+          "net": "NetU27_10"
+        }
+      ]
+    },
+    {
+      "designator": "C66",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C66_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C67",
+      "comment": "10 uF 10 V X5R",
+      "footprint": "C_0603_1608Metric",
+      "lib_ref": "C67_GRM188R61A106KE69D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C68",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C68_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_RESET_N"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C69",
+      "comment": "10 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C69_GRM1555C1H100JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_RF_MODULE"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C70",
+      "comment": "10 pF 50 V C0G",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C70_GRM1555C1H100JA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_RF_ANT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "D5",
+      "comment": "5 V bidirectional 0.2 pF RF ESD",
+      "footprint": "",
+      "lib_ref": "D5_PESD5V0C1BSF",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_RF_ANT"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "J10",
+      "comment": "U.FL-R-SMT-1(60)",
+      "footprint": "",
+      "lib_ref": "J10_U.FL-R-SMT-1_60",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "SIGNAL",
+          "net": "LORA_RF_ANT"
+        },
+        {
+          "pin": "SHIELD",
+          "name": "SHELL",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R63",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R63_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_TXEN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R64",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R64_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_RXEN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R65",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R65_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_DIO1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R66",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R66_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_BUSY"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R67",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R67_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "LORA_RESET_N"
+        }
+      ]
+    },
+    {
+      "designator": "R68",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R68_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "LORA_NSS_U10"
+        }
+      ]
+    },
+    {
+      "designator": "R69",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R69_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_NSS_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "LORA_NSS_U10"
+        }
+      ]
+    },
+    {
+      "designator": "R70",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R70_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_SCK_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "LORA_SCK_U10"
+        }
+      ]
+    },
+    {
+      "designator": "R71",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R71_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_MOSI_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "LORA_MOSI_U10"
+        }
+      ]
+    },
+    {
+      "designator": "R72",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R72_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_MISO_U10"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "LORA_MISO_U1"
+        }
+      ]
+    },
+    {
+      "designator": "R73",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R73_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "LORA_RF_MODULE"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "LORA_RF_ANT"
+        }
+      ]
+    },
+    {
+      "designator": "U10",
+      "comment": "E22-900M22S",
+      "footprint": "",
+      "lib_ref": "U10_E22-900M22S",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "3",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "5",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "6",
+          "name": "RXEN",
+          "net": "LORA_RXEN"
+        },
+        {
+          "pin": "7",
+          "name": "TXEN",
+          "net": "LORA_TXEN"
+        },
+        {
+          "pin": "8",
+          "name": "DIO2",
+          "net": "NetU10_8"
+        },
+        {
+          "pin": "9",
+          "name": "VCC",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "10",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "11",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "12",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "13",
+          "name": "DIO1",
+          "net": "LORA_DIO1"
+        },
+        {
+          "pin": "14",
+          "name": "BUSY",
+          "net": "LORA_BUSY"
+        },
+        {
+          "pin": "15",
+          "name": "NRST",
+          "net": "LORA_RESET_N"
+        },
+        {
+          "pin": "16",
+          "name": "MISO",
+          "net": "LORA_MISO_U10"
+        },
+        {
+          "pin": "17",
+          "name": "MOSI",
+          "net": "LORA_MOSI_U10"
+        },
+        {
+          "pin": "18",
+          "name": "SCK",
+          "net": "LORA_SCK_U10"
+        },
+        {
+          "pin": "19",
+          "name": "NSS",
+          "net": "LORA_NSS_U10"
+        },
+        {
+          "pin": "20",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "21",
+          "name": "ANT",
+          "net": "LORA_RF_MODULE"
+        },
+        {
+          "pin": "22",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C71",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C71_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C72",
+      "comment": "10 uF 10 V X5R",
+      "footprint": "C_0603_1608Metric",
+      "lib_ref": "C72_GRM188R61A106KE69D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C73",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C73_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R74",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R74_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "BLE_RX_U11"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "BLE_RX_U1"
+        }
+      ]
+    },
+    {
+      "designator": "R75",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R75_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "BLE_TX_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "BLE_TX_U11"
+        }
+      ]
+    },
+    {
+      "designator": "R76",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R76_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "BLE_DFU_REQ"
+        }
+      ]
+    },
+    {
+      "designator": "R77",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R77_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "BLE_EN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R78",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R78_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "NRF_RESET_N"
+        }
+      ]
+    },
+    {
+      "designator": "TP_BLE_SWD",
+      "comment": "TEST_PADS",
+      "footprint": "",
+      "lib_ref": "TP_BLE_SWD_TEST_PADS",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "VTREF",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "SWDIO",
+          "net": "NRF_SWDIO"
+        },
+        {
+          "pin": "3",
+          "name": "SWDCLK",
+          "net": "NRF_SWCLK"
+        },
+        {
+          "pin": "4",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "U6",
+      "comment": "Single non-inverting open-drain buffer",
+      "footprint": "",
+      "lib_ref": "U6_SN74LVC1G07DBVR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "NetU6_1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "BLE_EN"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "NRF_RESET_N"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "3V3_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "U11",
+      "comment": "MDBT50Q-P1MV2",
+      "footprint": "",
+      "lib_ref": "U11_MDBT50Q-P1MV2",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "3",
+          "name": "P1.10",
+          "net": "NetU11_3"
+        },
+        {
+          "pin": "4",
+          "name": "P1.11",
+          "net": "NetU11_4"
+        },
+        {
+          "pin": "5",
+          "name": "P1.12",
+          "net": "NetU11_5"
+        },
+        {
+          "pin": "6",
+          "name": "P1.13",
+          "net": "NetU11_6"
+        },
+        {
+          "pin": "7",
+          "name": "P1.14",
+          "net": "NetU11_7"
+        },
+        {
+          "pin": "8",
+          "name": "P1.15",
+          "net": "NetU11_8"
+        },
+        {
+          "pin": "9",
+          "name": "P0.03/AIN1",
+          "net": "NetU11_9"
+        },
+        {
+          "pin": "10",
+          "name": "P0.29/AIN5",
+          "net": "NetU11_10"
+        },
+        {
+          "pin": "11",
+          "name": "P0.02/AIN0",
+          "net": "NetU11_11"
+        },
+        {
+          "pin": "12",
+          "name": "P0.31/AIN7",
+          "net": "NetU11_12"
+        },
+        {
+          "pin": "13",
+          "name": "P0.28/AIN4",
+          "net": "NetU11_13"
+        },
+        {
+          "pin": "14",
+          "name": "P0.30/AIN6",
+          "net": "NetU11_14"
+        },
+        {
+          "pin": "15",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "16",
+          "name": "P0.27",
+          "net": "NetU11_16"
+        },
+        {
+          "pin": "17",
+          "name": "P0.00/XL1",
+          "net": "NetU11_17"
+        },
+        {
+          "pin": "18",
+          "name": "P0.01/XL2",
+          "net": "NetU11_18"
+        },
+        {
+          "pin": "19",
+          "name": "P0.26",
+          "net": "NetU11_19"
+        },
+        {
+          "pin": "20",
+          "name": "P0.04/AIN2",
+          "net": "NetU11_20"
+        },
+        {
+          "pin": "21",
+          "name": "P0.05/AIN3",
+          "net": "NetU11_21"
+        },
+        {
+          "pin": "22",
+          "name": "P0.06",
+          "net": "BLE_RX_U11"
+        },
+        {
+          "pin": "23",
+          "name": "P0.07/TRACECLK",
+          "net": "NetU11_23"
+        },
+        {
+          "pin": "24",
+          "name": "P0.08",
+          "net": "BLE_TX_U11"
+        },
+        {
+          "pin": "25",
+          "name": "P1.08",
+          "net": "NetU11_25"
+        },
+        {
+          "pin": "26",
+          "name": "P1.09/TRACEDATA3",
+          "net": "NetU11_26"
+        },
+        {
+          "pin": "27",
+          "name": "P0.11/TRACEDATA2",
+          "net": "NetU11_27"
+        },
+        {
+          "pin": "28",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "29",
+          "name": "P0.12/TRACEDATA1",
+          "net": "NetU11_29"
+        },
+        {
+          "pin": "30",
+          "name": "VDDH",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "31",
+          "name": "DCCH",
+          "net": "NetU11_31"
+        },
+        {
+          "pin": "32",
+          "name": "VBUS",
+          "net": "NetU11_32"
+        },
+        {
+          "pin": "33",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "34",
+          "name": "D-",
+          "net": "NetU11_34"
+        },
+        {
+          "pin": "35",
+          "name": "D+",
+          "net": "NetU11_35"
+        },
+        {
+          "pin": "36",
+          "name": "P0.14",
+          "net": "NetU11_36"
+        },
+        {
+          "pin": "37",
+          "name": "P0.13",
+          "net": "NetU11_37"
+        },
+        {
+          "pin": "38",
+          "name": "P0.16",
+          "net": "NetU11_38"
+        },
+        {
+          "pin": "39",
+          "name": "P0.15",
+          "net": "BLE_DFU_REQ"
+        },
+        {
+          "pin": "40",
+          "name": "P0.18/nRESET",
+          "net": "NRF_RESET_N"
+        },
+        {
+          "pin": "41",
+          "name": "P0.17",
+          "net": "NetU11_41"
+        },
+        {
+          "pin": "42",
+          "name": "P0.19",
+          "net": "NetU11_42"
+        },
+        {
+          "pin": "43",
+          "name": "P0.21",
+          "net": "NetU11_43"
+        },
+        {
+          "pin": "44",
+          "name": "P0.20",
+          "net": "NetU11_44"
+        },
+        {
+          "pin": "45",
+          "name": "P0.23",
+          "net": "NetU11_45"
+        },
+        {
+          "pin": "46",
+          "name": "P0.22",
+          "net": "NetU11_46"
+        },
+        {
+          "pin": "47",
+          "name": "P1.00/TRACEDATA0",
+          "net": "NetU11_47"
+        },
+        {
+          "pin": "48",
+          "name": "P0.24",
+          "net": "NetU11_48"
+        },
+        {
+          "pin": "49",
+          "name": "P0.25",
+          "net": "NetU11_49"
+        },
+        {
+          "pin": "50",
+          "name": "P1.02",
+          "net": "NetU11_50"
+        },
+        {
+          "pin": "51",
+          "name": "SWDIO",
+          "net": "NRF_SWDIO"
+        },
+        {
+          "pin": "52",
+          "name": "P0.09/NFC1",
+          "net": "NetU11_52"
+        },
+        {
+          "pin": "53",
+          "name": "SWDCLK",
+          "net": "NRF_SWCLK"
+        },
+        {
+          "pin": "54",
+          "name": "P0.10/NFC2",
+          "net": "NetU11_54"
+        },
+        {
+          "pin": "55",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "56",
+          "name": "P1.04",
+          "net": "NetU11_56"
+        },
+        {
+          "pin": "57",
+          "name": "P1.06",
+          "net": "NetU11_57"
+        },
+        {
+          "pin": "58",
+          "name": "P1.07",
+          "net": "NetU11_58"
+        },
+        {
+          "pin": "59",
+          "name": "P1.05",
+          "net": "NetU11_59"
+        },
+        {
+          "pin": "60",
+          "name": "P1.03",
+          "net": "NetU11_60"
+        },
+        {
+          "pin": "61",
+          "name": "P1.01",
+          "net": "NetU11_61"
+        }
+      ]
+    },
+    {
+      "designator": "C21",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C21_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C22",
+      "comment": "1 uF 16 V X5R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C22_GRM155R61C105KA12D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C23",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C23_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C24",
+      "comment": "10 uF 10 V X5R",
+      "footprint": "C_0603_1608Metric",
+      "lib_ref": "C24_GRM188R61A106KE69D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C25",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C25_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C26",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C26_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C74",
+      "comment": "100 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C74_GRM155R71E104KE14D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C75",
+      "comment": "10 uF 10 V X5R",
+      "footprint": "C_0603_1608Metric",
+      "lib_ref": "C75_GRM188R61A106KE69D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C76",
+      "comment": "10 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C76_GRM155R71E103KA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_DET"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "C78",
+      "comment": "10 nF 25 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C78_GRM155R71E103KA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "TAMPER_IN_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "D9",
+      "comment": "5.5 V 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "D9_TPD1E05U06DYAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "TAMPER_IN_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "D11",
+      "comment": "5.5 V 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "D11_TPD1E05U06DYAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "J12",
+      "comment": "MEM2052-00-195-00-A",
+      "footprint": "",
+      "lib_ref": "J12_MEM2052-00-195-00-A",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "DAT2",
+          "net": "SD_D2_CARD"
+        },
+        {
+          "pin": "2",
+          "name": "CD/DAT3",
+          "net": "SD_D3_CARD"
+        },
+        {
+          "pin": "3",
+          "name": "CMD",
+          "net": "SD_CMD_CARD"
+        },
+        {
+          "pin": "4",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "5",
+          "name": "CLK",
+          "net": "SD_CK_CARD"
+        },
+        {
+          "pin": "6",
+          "name": "VSS",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "7",
+          "name": "DAT0",
+          "net": "SD_D0_CARD"
+        },
+        {
+          "pin": "8",
+          "name": "DAT1",
+          "net": "SD_D1_CARD"
+        },
+        {
+          "pin": "CD",
+          "name": "CARD_DETECT",
+          "net": "SD_DET"
+        },
+        {
+          "pin": "SHIELD",
+          "name": "SHELL",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "J13",
+      "comment": "504050-0291",
+      "footprint": "",
+      "lib_ref": "J13_504050-0291",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "TAMPER",
+          "net": "TAMPER_IN_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "RETURN",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R7",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R7_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "NOR_NCS_U2"
+        }
+      ]
+    },
+    {
+      "designator": "R8",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R8_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "NOR_CLK_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "NOR_CLK_U2"
+        }
+      ]
+    },
+    {
+      "designator": "R9",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R9_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "NOR_IO0_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "NOR_IO0_U2"
+        }
+      ]
+    },
+    {
+      "designator": "R10",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R10_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "NOR_IO1_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "NOR_IO1_U2"
+        }
+      ]
+    },
+    {
+      "designator": "R11",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R11_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "NOR_IO2_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "NOR_IO2_U2"
+        }
+      ]
+    },
+    {
+      "designator": "R12",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R12_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "NOR_IO3_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "NOR_IO3_U2"
+        }
+      ]
+    },
+    {
+      "designator": "R13",
+      "comment": "2.2 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R13_ERJ-2RKF2201X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "I2C2_SCL_BUS"
+        }
+      ]
+    },
+    {
+      "designator": "R14",
+      "comment": "2.2 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R14_ERJ-2RKF2201X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "I2C2_SDA_BUS"
+        }
+      ]
+    },
+    {
+      "designator": "R15",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R15_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "I2C2_SCL_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "I2C2_SCL_BUS"
+        }
+      ]
+    },
+    {
+      "designator": "R16",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R16_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "I2C2_SDA_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "I2C2_SDA_BUS"
+        }
+      ]
+    },
+    {
+      "designator": "R79",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R79_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_CK_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_CK_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R80",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R80_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_CMD_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_CMD_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R81",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R81_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_D0_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D0_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R82",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R82_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_D1_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D1_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R83",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R83_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_D2_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D2_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R84",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R84_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_D3_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D3_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R85",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R85_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_CMD_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R86",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R86_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D0_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R87",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R87_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D1_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R88",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R88_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D2_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R89",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R89_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D3_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "R90",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R90_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_DET"
+        }
+      ]
+    },
+    {
+      "designator": "R99",
+      "comment": "10 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R99_ERJ-2RKF1002X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "TAMPER_IN_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "R100",
+      "comment": "1 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R100_ERJ-2RKF1001X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "TAMPER_IN_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "TAMPER_IN_U1"
+        }
+      ]
+    },
+    {
+      "designator": "U2",
+      "comment": "W25Q512JVFIQ",
+      "footprint": "",
+      "lib_ref": "U2_W25Q512JVFIQ",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "/HOLD or /RESET (IO3)",
+          "net": "NOR_IO3_U2"
+        },
+        {
+          "pin": "2",
+          "name": "VCC",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "3",
+          "name": "/RESET",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "N/C",
+          "net": "NetU2_4"
+        },
+        {
+          "pin": "5",
+          "name": "N/C",
+          "net": "NetU2_5"
+        },
+        {
+          "pin": "6",
+          "name": "N/C",
+          "net": "NetU2_6"
+        },
+        {
+          "pin": "7",
+          "name": "/CS",
+          "net": "NOR_NCS_U2"
+        },
+        {
+          "pin": "8",
+          "name": "DO (IO1)",
+          "net": "NOR_IO1_U2"
+        },
+        {
+          "pin": "9",
+          "name": "/WP (IO2)",
+          "net": "NOR_IO2_U2"
+        },
+        {
+          "pin": "10",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "11",
+          "name": "N/C",
+          "net": "NetU2_11"
+        },
+        {
+          "pin": "12",
+          "name": "N/C",
+          "net": "NetU2_12"
+        },
+        {
+          "pin": "13",
+          "name": "N/C",
+          "net": "NetU2_13"
+        },
+        {
+          "pin": "14",
+          "name": "N/C",
+          "net": "NetU2_14"
+        },
+        {
+          "pin": "15",
+          "name": "DI (IO0)",
+          "net": "NOR_IO0_U2"
+        },
+        {
+          "pin": "16",
+          "name": "CLK",
+          "net": "NOR_CLK_U2"
+        }
+      ]
+    },
+    {
+      "designator": "U3",
+      "comment": "LIS2DW12TR",
+      "footprint": "",
+      "lib_ref": "U3_LIS2DW12TR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "SCL/SPC",
+          "net": "I2C2_SCL_BUS"
+        },
+        {
+          "pin": "2",
+          "name": "CS",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "3",
+          "name": "SDO/SA0",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "SDA/SDI/SDO",
+          "net": "I2C2_SDA_BUS"
+        },
+        {
+          "pin": "5",
+          "name": "NC",
+          "net": "NetU3_5"
+        },
+        {
+          "pin": "6",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "7",
+          "name": "RES",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "8",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "9",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "10",
+          "name": "VDD_IO",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "11",
+          "name": "INT2",
+          "net": "NetU3_11"
+        },
+        {
+          "pin": "12",
+          "name": "INT1",
+          "net": "ACCEL_INT"
+        }
+      ]
+    },
+    {
+      "designator": "U4",
+      "comment": "STTS22HTR",
+      "footprint": "",
+      "lib_ref": "U4_STTS22HTR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "SCL",
+          "net": "I2C2_SCL_BUS"
+        },
+        {
+          "pin": "2",
+          "name": "ALERT / INT",
+          "net": "NetU4_2"
+        },
+        {
+          "pin": "3",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "Addr",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "5",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "6",
+          "name": "SDA",
+          "net": "I2C2_SDA_BUS"
+        },
+        {
+          "pin": "EP",
+          "name": "Exposed pad",
+          "net": "NetU4_EP"
+        }
+      ]
+    },
+    {
+      "designator": "U12",
+      "comment": "SDCIT2/32GB",
+      "footprint": "",
+      "lib_ref": "U12_SDCIT2_32GB",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "DAT2",
+          "net": "SD_D2_CARD"
+        },
+        {
+          "pin": "2",
+          "name": "CD/DAT3",
+          "net": "SD_D3_CARD"
+        },
+        {
+          "pin": "3",
+          "name": "CMD",
+          "net": "SD_CMD_CARD"
+        },
+        {
+          "pin": "4",
+          "name": "VDD",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "5",
+          "name": "CLK",
+          "net": "SD_CK_CARD"
+        },
+        {
+          "pin": "6",
+          "name": "VSS",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "7",
+          "name": "DAT0",
+          "net": "SD_D0_CARD"
+        },
+        {
+          "pin": "8",
+          "name": "DAT1",
+          "net": "SD_D1_CARD"
+        }
+      ]
+    },
+    {
+      "designator": "U23",
+      "comment": "4 channel 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "U23_TPD4E05U06DQAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_D2_CARD"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D3_CARD"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "SD_CMD_CARD"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "SD_CK_CARD"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "NetU23_6"
+        },
+        {
+          "pin": "7",
+          "name": "7",
+          "net": "NetU23_7"
+        },
+        {
+          "pin": "8",
+          "name": "8",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "9",
+          "name": "9",
+          "net": "NetU23_9"
+        },
+        {
+          "pin": "10",
+          "name": "10",
+          "net": "NetU23_10"
+        }
+      ]
+    },
+    {
+      "designator": "U24",
+      "comment": "4 channel 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "U24_TPD4E05U06DQAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "SD_D0_CARD"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "SD_D1_CARD"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "4",
+          "name": "4",
+          "net": "SD_DET"
+        },
+        {
+          "pin": "5",
+          "name": "5",
+          "net": "NetU24_5"
+        },
+        {
+          "pin": "6",
+          "name": "6",
+          "net": "NetU24_6"
+        },
+        {
+          "pin": "7",
+          "name": "7",
+          "net": "NetU24_7"
+        },
+        {
+          "pin": "8",
+          "name": "8",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "9",
+          "name": "9",
+          "net": "NetU24_9"
+        },
+        {
+          "pin": "10",
+          "name": "10",
+          "net": "NetU24_10"
+        }
+      ]
+    },
+    {
+      "designator": "C77",
+      "comment": "4.7 nF 100 V X7R",
+      "footprint": "C_0402_1005Metric",
+      "lib_ref": "C77_GRM155R72A472KA01D",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_SHIELD"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "D6",
+      "comment": "5.5 V 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "D6_TPD1E05U06DYAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_VBUS_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "D7",
+      "comment": "5.5 V 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "D7_TPD1E05U06DYAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_CC1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "D8",
+      "comment": "5.5 V 0.5 pF ESD",
+      "footprint": "",
+      "lib_ref": "D8_TPD1E05U06DYAR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_CC2"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "J11",
+      "comment": "USB4105-GF-A-120",
+      "footprint": "",
+      "lib_ref": "J11_USB4105-GF-A-120",
+      "pins": [
+        {
+          "pin": "A1",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "A4",
+          "name": "VBUS",
+          "net": "USB_VBUS_CONN"
+        },
+        {
+          "pin": "A5",
+          "name": "CC1",
+          "net": "USB_CC1"
+        },
+        {
+          "pin": "A6",
+          "name": "D+",
+          "net": "USB_DP_CONN"
+        },
+        {
+          "pin": "A7",
+          "name": "D-",
+          "net": "USB_DM_CONN"
+        },
+        {
+          "pin": "A8",
+          "name": "SBU1",
+          "net": "NetJ11_A8"
+        },
+        {
+          "pin": "A9",
+          "name": "VBUS",
+          "net": "USB_VBUS_CONN"
+        },
+        {
+          "pin": "A12",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "B1",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "B4",
+          "name": "VBUS",
+          "net": "USB_VBUS_CONN"
+        },
+        {
+          "pin": "B5",
+          "name": "CC2",
+          "net": "USB_CC2"
+        },
+        {
+          "pin": "B6",
+          "name": "D+",
+          "net": "USB_DP_CONN"
+        },
+        {
+          "pin": "B7",
+          "name": "D-",
+          "net": "USB_DM_CONN"
+        },
+        {
+          "pin": "B8",
+          "name": "SBU2",
+          "net": "NetJ11_B8"
+        },
+        {
+          "pin": "B9",
+          "name": "VBUS",
+          "net": "USB_VBUS_CONN"
+        },
+        {
+          "pin": "B12",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "SHIELD",
+          "name": "SHELL",
+          "net": "USB_SHIELD"
+        }
+      ]
+    },
+    {
+      "designator": "R91",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R91_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_DP_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "USB_DP_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "R92",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R92_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_DM_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "USB_DM_CONN"
+        }
+      ]
+    },
+    {
+      "designator": "R93",
+      "comment": "5.1 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R93_ERJ-2RKF5101X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_CC1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R94",
+      "comment": "5.1 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R94_ERJ-2RKF5101X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_CC2"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R95",
+      "comment": "1 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R95_ERJ-2RKF1001X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_VBUS_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "USB_VBUS_SENSE"
+        }
+      ]
+    },
+    {
+      "designator": "R96",
+      "comment": "100 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R96_ERJ-2RKF1003X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_VBUS_SENSE"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R97",
+      "comment": "1 MOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R97_ERJ-2RKF1004X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_SHIELD"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R98",
+      "comment": "0 Ohm",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R98_ERJ-2GE0R00X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_SHIELD"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "R101",
+      "comment": "22 Ohm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R101_ERJ-2RKF22R0X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "TEST_UART_TX_U1"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "TEST_UART_TX_TP"
+        }
+      ]
+    },
+    {
+      "designator": "R102",
+      "comment": "1 kOhm 1%",
+      "footprint": "R_0402_1005Metric",
+      "lib_ref": "R102_ERJ-2RKF1001X",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "TEST_UART_RX_TP"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "TEST_UART_RX_U1"
+        }
+      ]
+    },
+    {
+      "designator": "TP_EOL",
+      "comment": "TEST_PADS",
+      "footprint": "",
+      "lib_ref": "TP_EOL_TEST_PADS",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "VTREF_3V3",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "3",
+          "name": "VSENSE_3V8",
+          "net": "3V8_MODEM"
+        },
+        {
+          "pin": "4",
+          "name": "VSENSE_1V8",
+          "net": "1V8_MIC"
+        },
+        {
+          "pin": "5",
+          "name": "DUT_TX",
+          "net": "TEST_UART_TX_TP"
+        },
+        {
+          "pin": "6",
+          "name": "DUT_RX",
+          "net": "TEST_UART_RX_TP"
+        },
+        {
+          "pin": "7",
+          "name": "PWR_GOOD",
+          "net": "PWR_GOOD"
+        },
+        {
+          "pin": "8",
+          "name": "FAULT",
+          "net": "FAULT"
+        },
+        {
+          "pin": "9",
+          "name": "BOOT0",
+          "net": "BOOT0"
+        },
+        {
+          "pin": "10",
+          "name": "REV0",
+          "net": "REV_STRAP0"
+        },
+        {
+          "pin": "11",
+          "name": "REV1",
+          "net": "REV_STRAP1"
+        },
+        {
+          "pin": "12",
+          "name": "I2C_SCL",
+          "net": "I2C2_SCL_BUS"
+        },
+        {
+          "pin": "13",
+          "name": "I2C_SDA",
+          "net": "I2C2_SDA_BUS"
+        }
+      ]
+    },
+    {
+      "designator": "TP_MCU_SWD",
+      "comment": "TEST_PADS",
+      "footprint": "",
+      "lib_ref": "TP_MCU_SWD_TEST_PADS",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "VTREF",
+          "net": "3V3_DIGITAL"
+        },
+        {
+          "pin": "2",
+          "name": "SWDIO",
+          "net": "SWDIO"
+        },
+        {
+          "pin": "3",
+          "name": "SWCLK",
+          "net": "SWCLK"
+        },
+        {
+          "pin": "4",
+          "name": "NRST",
+          "net": "NRST"
+        },
+        {
+          "pin": "5",
+          "name": "GND",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    },
+    {
+      "designator": "U25",
+      "comment": "2 channel 0.7 pF USB ESD",
+      "footprint": "",
+      "lib_ref": "U25_TPD2EUSB30DRTR",
+      "pins": [
+        {
+          "pin": "1",
+          "name": "1",
+          "net": "USB_DP_CONN"
+        },
+        {
+          "pin": "2",
+          "name": "2",
+          "net": "USB_DM_CONN"
+        },
+        {
+          "pin": "3",
+          "name": "3",
+          "net": "GND_DIGITAL"
+        }
+      ]
+    }
+  ],
+  "count": 248,
+  "limit": 1000,
+  "limit_hit": false,
+  "skipped_nil": 0
+}

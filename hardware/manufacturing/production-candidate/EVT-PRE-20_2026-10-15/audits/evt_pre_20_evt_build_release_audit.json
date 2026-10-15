@@ -1,0 +1,438 @@
+{
+  "schema": "dioneya-evt-build-release-audit-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "program": "2 x EVT-20 + 1 bench station",
+  "gate": "hardware/EVT_BUILD_RELEASE_GATE_REV_A.md",
+  "evt_build_release": {
+    "ready": false,
+    "status": "BLOCKED",
+    "meaning": "design-complete handoff to PCB/PCBA fabrication, housing manufacture and station assembly; physical EVT evidence is collected on the built lot",
+    "blockers": [
+      "production_bom_qg2: production BOM QG-2 BLOCKED (2 findings)",
+      "system_ots_documentary_procurement_identity: ERROR",
+      "pcb_main_human_readable_hierarchy_internal_equivalence: ERROR",
+      "pcb_main_hierarchy_native_erc_pdf_evidence: commit-bound KiCad 9 ERC/PDF evidence PENDING",
+      "pcb_main_hierarchy_independent_human_review: independent human hierarchy review PENDING",
+      "pcb_pwr_human_readable_hierarchy_internal_equivalence: ERROR",
+      "pcb_pwr_hierarchy_native_erc_pdf_evidence: commit-bound KiCad 9 ERC/PDF evidence PASS",
+      "pcb_pwr_hierarchy_independent_human_review: independent human hierarchy review PASS",
+      "pcb_pwr_input_protection_qualification_packet: ERROR",
+      "pcb_pwr_fitted_2d_placement_clearance: ERROR; live trace_items=842 zones=33",
+      "pcb_pwr_pre_route_constraint_coverage: ERROR; live trace_items=842 zones=33",
+      "pcb_pwr_hot_loop_006_application: ERROR",
+      "pcb_pwr_shunt_bulk_007_application: ERROR",
+      "pcb_pwr_c13_c12_008_application: ERROR",
+      "pcb_pwr_3v8_output_bulk_010_application: ERROR",
+      "pcb_pwr_c13_c11_009_application: ERROR",
+      "pcb_pwr_conservative_evt_numeric_routing_basis: ERROR",
+      "pcb_pwr_dim_003_request_packet: ERROR",
+      "pcb_pwr_dim_003_acceptance: 0/18 responses accepted",
+      "pcb_pwr_stackup_copper_request_packet: ERROR",
+      "pcb_pwr_stackup_copper_acceptance: accepted_rows=0/24 external_reply_required=false stackup=NONE",
+      "harness_controlled_preliminary_packet: ERROR; supplier responses=MISSING/16",
+      "pcb_main_rf_si_return_path_control: historical ECO_REQUIRED finding and cellular L2 proposal remain hash-bound after bounded application",
+      "pcb_main_gnss_rf_eco_control: historical FL1/C64-only GNSS RF ECO-001 proposal remains hash-bound after bounded application",
+      "pcb_main_rf_remediation_application_control: ERROR",
+      "pcb_main_cellular_l2_return_acceptance: PCB-MAIN-RF-RETURN-001 acceptance/application is incomplete",
+      "pcb_main_gnss_rf_placement_routeability: PCB-MAIN-GNSS-RF-ECO-001 acceptance/application is incomplete",
+      "pcb_main_review_b_release: OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
+      "pcb_pwr_review_b_release: OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_DIM_003_AND_EVT_STACKUP_GEOMETRY_ACCEPTED_ROUTING_PENDING",
+      "pcb_mic_manufacturing_handoff_packet: SOURCE_CHANGED_REGENERATE_OUTPUTS_AND_REPEAT_REVIEW",
+      "pcb_mic_fabrication_release: status=ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED; Review A=REPEAT_REQUIRED_AFTER_ACOUSTIC_CLEARANCE_ECO; Review B=REOPENED_AFTER_ACOUSTIC_CLEARANCE_ECO",
+      "mechanical_dimensions: open: DIM-001, DIM-006, DIM-008, DIM-009, DIM-010, DIM-011, DIM-012, DIM-014S",
+      "PCB-MAIN EVT CAM package is not ready: hardware/manufacturing/evt-build-release/SHA256SUMS.json",
+      "PCB-PWR EVT CAM package is not ready: hardware/manufacturing/evt-build-release/SHA256SUMS.json",
+      "PCB-MIC EVT CAM package is not ready: hardware/manufacturing/evt-build-release/SHA256SUMS.json",
+      "PCBA assembler part map is incomplete: 253 fitted lines unmapped",
+      "BOM has 202 lines with desk-closable open status (review A, derating, tolerance)",
+      "station mechanical/installation BOM is incomplete: HOUSING_PART, CABLE_GLAND, ACOUSTIC_MEMBRANE, SEAL, FASTENER, THREADED_INSERT, INTER_MODULE_FUSE, POWER_CABLE, MOUNT",
+      "no complete housing manufacturing package (3D print or vacuum casting): 3d_print missing: master STEP, print files STL/3MF, drawing PDF, housing BOM, printer profile; vacuum_casting missing: master STEP, drawing PDF, housing BOM"
+    ]
+  },
+  "moved_to_evt_physical_scope": [
+    "pcb_pwr_input_protection_release",
+    "harness_manufacturing_release"
+  ],
+  "base_hardware_design_release": "BLOCKED",
+  "base_purchase_release": "BLOCKED",
+  "checks": [
+    {
+      "name": "controlled_procurement_scenarios",
+      "pass": true,
+      "detail": "procurement quantities 4, 10 and 20 with maximum serial capacity 20",
+      "source": "base"
+    },
+    {
+      "name": "customer_commercial_procurement_boundary",
+      "pass": true,
+      "detail": "stock, price, MOQ, payment and delivery are non-blocking customer actions; exact MPN, checkout DFM and physical EVT gates remain mandatory; external replies do not",
+      "source": "base"
+    },
+    {
+      "name": "production_bom_qg2",
+      "pass": false,
+      "detail": "production BOM QG-2 BLOCKED (2 findings)",
+      "source": "base"
+    },
+    {
+      "name": "system_ots_documentary_procurement_identity",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_layer_count_authority",
+      "pass": true,
+      "detail": "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_human_readable_hierarchy_internal_equivalence",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_hierarchy_native_erc_pdf_evidence",
+      "pass": false,
+      "detail": "commit-bound KiCad 9 ERC/PDF evidence PENDING",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_hierarchy_independent_human_review",
+      "pass": false,
+      "detail": "independent human hierarchy review PENDING",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_ti_primary_source_binding",
+      "pass": true,
+      "detail": "LMR604403SRAKR U3 adjustable/U4 fixed and LM74700 VCAP primary evidence PASS",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_human_readable_hierarchy_internal_equivalence",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_hierarchy_native_erc_pdf_evidence",
+      "pass": false,
+      "detail": "commit-bound KiCad 9 ERC/PDF evidence PASS",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_hierarchy_independent_human_review",
+      "pass": false,
+      "detail": "independent human hierarchy review PASS",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_input_protection_qualification_packet",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_fitted_2d_placement_clearance",
+      "pass": false,
+      "detail": "ERROR; live trace_items=842 zones=33",
+      "source": "base-reevaluated"
+    },
+    {
+      "name": "pcb_pwr_pre_route_constraint_coverage",
+      "pass": false,
+      "detail": "ERROR; live trace_items=842 zones=33",
+      "source": "base-reevaluated"
+    },
+    {
+      "name": "pcb_pwr_hot_loop_006_application",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_shunt_bulk_007_application",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_c13_c12_008_application",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_3v8_output_bulk_010_application",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_c13_c11_009_application",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_conservative_evt_numeric_routing_basis",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_dim_003_request_packet",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_dim_003_acceptance",
+      "pass": false,
+      "detail": "0/18 responses accepted",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_stackup_copper_request_packet",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_stackup_copper_acceptance",
+      "pass": false,
+      "detail": "accepted_rows=0/24 external_reply_required=false stackup=NONE",
+      "source": "base"
+    },
+    {
+      "name": "harness_controlled_preliminary_packet",
+      "pass": false,
+      "detail": "ERROR; supplier responses=MISSING/16",
+      "source": "base"
+    },
+    {
+      "name": "pcb-main_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "source": "base"
+    },
+    {
+      "name": "pcb-main_routing_presence",
+      "pass": true,
+      "detail": "segments=765 vias=304 zones=12",
+      "source": "base"
+    },
+    {
+      "name": "pcb-mic_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "source": "base"
+    },
+    {
+      "name": "pcb-mic_routing_presence",
+      "pass": true,
+      "detail": "segments=27 vias=5 zones=0",
+      "source": "base"
+    },
+    {
+      "name": "pcb-pwr_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "source": "base"
+    },
+    {
+      "name": "pcb-pwr_routing_presence",
+      "pass": true,
+      "detail": "segments=575 vias=267 zones=33",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_placement_clearance",
+      "pass": true,
+      "detail": "state=PASS confirmed=0 screening=0 mounting_confirmed=0 mounting_screening=0 tool_confirmed=0 tool_screening=0",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_public_numeric_routing_basis",
+      "pass": true,
+      "detail": "JLC06161H-3313 EVT stackup RF=0.1509 mm USB=0.1537/0.2032 mm; external reply not required",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_rf_si_return_path_control",
+      "pass": false,
+      "detail": "historical ECO_REQUIRED finding and cellular L2 proposal remain hash-bound after bounded application",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_gnss_rf_eco_control",
+      "pass": false,
+      "detail": "historical FL1/C64-only GNSS RF ECO-001 proposal remains hash-bound after bounded application",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_rf_remediation_application_control",
+      "pass": false,
+      "detail": "ERROR",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_cellular_l2_return_acceptance",
+      "pass": false,
+      "detail": "PCB-MAIN-RF-RETURN-001 acceptance/application is incomplete",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_gnss_rf_placement_routeability",
+      "pass": false,
+      "detail": "PCB-MAIN-GNSS-RF-ECO-001 acceptance/application is incomplete",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_rf_si_return_path_repeat_review",
+      "pass": true,
+      "detail": "PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_stackup_impedance_request_packet",
+      "pass": true,
+      "detail": "EVT_PUBLIC_STANDARD_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_stackup_impedance_acceptance",
+      "pass": true,
+      "detail": "22/22 engineering-baseline closures; JLC06161H-3313 selected",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_assembler_dfm_stencil_request_packet",
+      "pass": true,
+      "detail": "EVT_STANDARD_PCBA_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_assembler_dfm_stencil_acceptance",
+      "pass": true,
+      "detail": "accepted=14/14 assembler/site selected by customer at order time",
+      "source": "base"
+    },
+    {
+      "name": "pcb_main_review_b_release",
+      "pass": false,
+      "detail": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
+      "source": "base"
+    },
+    {
+      "name": "pcb_pwr_review_b_release",
+      "pass": false,
+      "detail": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_DIM_003_AND_EVT_STACKUP_GEOMETRY_ACCEPTED_ROUTING_PENDING",
+      "source": "base"
+    },
+    {
+      "name": "pcb_mic_release_status_control",
+      "pass": true,
+      "detail": "ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED",
+      "source": "base"
+    },
+    {
+      "name": "pcb_mic_mechanical_authority_traceability",
+      "pass": true,
+      "detail": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+      "source": "base"
+    },
+    {
+      "name": "pcb_mic_manufacturing_handoff_packet",
+      "pass": false,
+      "detail": "SOURCE_CHANGED_REGENERATE_OUTPUTS_AND_REPEAT_REVIEW",
+      "source": "base"
+    },
+    {
+      "name": "pcb_mic_fabrication_release",
+      "pass": false,
+      "detail": "status=ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED; Review A=REPEAT_REQUIRED_AFTER_ACOUSTIC_CLEARANCE_ECO; Review B=REOPENED_AFTER_ACOUSTIC_CLEARANCE_ECO",
+      "source": "base"
+    },
+    {
+      "name": "mechanical_dimensions",
+      "pass": false,
+      "detail": "open: DIM-001, DIM-006, DIM-008, DIM-009, DIM-010, DIM-011, DIM-012, DIM-014S",
+      "source": "base-reevaluated"
+    },
+    {
+      "name": "customer_commercial_rfq_fields",
+      "pass": true,
+      "detail": "non-blocking customer fields remain blank in 25 sourcing rows",
+      "source": "base"
+    },
+    {
+      "name": "pcb-main_evt_cam_package",
+      "pass": false,
+      "detail": "open: hardware/manufacturing/evt-build-release/SHA256SUMS.json",
+      "source": "evt-build"
+    },
+    {
+      "name": "pcb-pwr_evt_cam_package",
+      "pass": false,
+      "detail": "open: hardware/manufacturing/evt-build-release/SHA256SUMS.json",
+      "source": "evt-build"
+    },
+    {
+      "name": "pcb-mic_evt_cam_package",
+      "pass": false,
+      "detail": "open: hardware/manufacturing/evt-build-release/SHA256SUMS.json",
+      "source": "evt-build"
+    },
+    {
+      "name": "pcb-main_pads_within_outline",
+      "pass": true,
+      "detail": "all pads inside the board outline",
+      "source": "evt-build"
+    },
+    {
+      "name": "pcb-pwr_pads_within_outline",
+      "pass": true,
+      "detail": "all pads inside the board outline",
+      "source": "evt-build"
+    },
+    {
+      "name": "pcb-mic_pads_within_outline",
+      "pass": true,
+      "detail": "all pads inside the board outline",
+      "source": "evt-build"
+    },
+    {
+      "name": "evt_pcba_assembler_part_map",
+      "pass": false,
+      "detail": "253/253 fitted PCBA lines lack LCSC ID or CONSIGNED mode",
+      "source": "evt-build"
+    },
+    {
+      "name": "evt_bom_paper_closure",
+      "pass": false,
+      "detail": "202 BOM lines await desk closure",
+      "source": "evt-build"
+    },
+    {
+      "name": "evt_station_mechanical_bom",
+      "pass": false,
+      "detail": "missing categories: HOUSING_PART, CABLE_GLAND, ACOUSTIC_MEMBRANE, SEAL, FASTENER, THREADED_INSERT, INTER_MODULE_FUSE, POWER_CABLE, MOUNT",
+      "source": "evt-build"
+    },
+    {
+      "name": "evt_ots_temperature_coverage",
+      "pass": true,
+      "detail": "system OTS items cover the EVT range -20..+60 C or are accepted EVT exceptions; accepted: MPPT-TEMP: ACCEPTED_FOR_EVT: SBS050150200 rated -10..+60 C; EVT test EVT-ENV-BATT-COLD must show charge inhibit at battery temperature < 0 C and the MPPT fallback to its internal sensor between -20 and -10 C",
+      "source": "evt-build"
+    },
+    {
+      "name": "evt_housing_manufacturing_package",
+      "pass": false,
+      "detail": "3d_print missing: master STEP, print files STL/3MF, drawing PDF, housing BOM, printer profile; vacuum_casting missing: master STEP, drawing PDF, housing BOM",
+      "source": "evt-build"
+    }
+  ]
+}

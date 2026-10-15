@@ -1,0 +1,686 @@
+[
+  {
+    "net": "GND_DIGITAL",
+    "pos": [
+      82.5825,
+      21.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "GND_DIGITAL",
+    "pos": [
+      57.75,
+      52.55
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      56.5,
+      38.05
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      40.175,
+      31.7
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      61.35,
+      25.35
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      14.4,
+      27.75
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      44.25,
+      29.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      44.25,
+      26.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      26.9,
+      29.175
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      44.25,
+      34.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      18.675,
+      28.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      46.5,
+      37.7
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V3_DIGITAL",
+    "pos": [
+      45.6069,
+      20.562
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SD_D2_CARD",
+    "pos": [
+      90.325,
+      23.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SD_CMD_CARD",
+    "pos": [
+      83.325,
+      24.25
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "LORA_DIO1",
+    "pos": [
+      64.925,
+      53.75
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "GNSS_ANT_BIAS_RAW",
+    "pos": [
+      61.7,
+      65.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "GNSS_ANT_BIAS_RAW",
+    "pos": [
+      49.0,
+      51.825
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SD_D1_CARD",
+    "pos": [
+      86.825,
+      24.25
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SIM1_DET",
+    "pos": [
+      43.8,
+      24.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SIM1_DET",
+    "pos": [
+      23.2,
+      19.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SIM2_DET",
+    "pos": [
+      44.75,
+      25.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "LSE_IN",
+    "pos": [
+      44.75,
+      27.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "NRST",
+    "pos": [
+      62.0,
+      28.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "LORA_SCK_U1",
+    "pos": [
+      47.55,
+      37.25
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "PDM_CLK",
+    "pos": [
+      51.5,
+      37.8
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "PDM_CLK",
+    "pos": [
+      62.0,
+      46.3
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "VCORE_1V1",
+    "pos": [
+      57.5,
+      37.75
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "VCORE_1V1",
+    "pos": [
+      47.0,
+      22.7
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "VCORE_1V1",
+    "pos": [
+      52.848,
+      39.9654
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "LORA_TXEN",
+    "pos": [
+      65.5,
+      54.9
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "CELL_PWRKEY_CMD",
+    "pos": [
+      59.75,
+      32.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "ACCEL_INT",
+    "pos": [
+      65.75,
+      29.7375
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SD_D0_U1",
+    "pos": [
+      87.85,
+      23.05
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SD_D1_U1",
+    "pos": [
+      84.4,
+      24.2
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SD_D1_U1",
+    "pos": [
+      60.1,
+      28.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "AAD_CFG",
+    "pos": [
+      57.5,
+      22.1
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "PWR_FAULT",
+    "pos": [
+      55.0,
+      22.1
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "PDM_DATA2",
+    "pos": [
+      52.5,
+      21.9
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V8_MODEM_RF",
+    "pos": [
+      29.1,
+      41.4
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "U8_VDD_EXT_1V8",
+    "pos": [
+      47.325,
+      30.6
+    ],
+    "pad_layers": [
+      [
+        "B.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "CELL_DBG_RXD_TP",
+    "pos": [
+      40.5825,
+      64.45
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "USB_CC1",
+    "pos": [
+      43.25,
+      7.355
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "USB_DP_CONN",
+    "pos": [
+      41.25,
+      7.355
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "USB_DP_CONN",
+    "pos": [
+      42.4,
+      8.8
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "USB_DP_CONN",
+    "pos": [
+      42.25,
+      7.355
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "USB_DM_CONN",
+    "pos": [
+      41.6,
+      8.7
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SIM1_RST_CONN",
+    "pos": [
+      24.075,
+      16.7
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "SIM1_RST_CONN",
+    "pos": [
+      21.195,
+      20.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "GNSS_ANT_SHORT_N",
+    "pos": [
+      61.0,
+      58.425
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "NOR_IO1_U2",
+    "pos": [
+      71.35,
+      35.8
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "LORA_SCK_U10",
+    "pos": [
+      63.9,
+      27.3
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "GNSS_ANT_SWITCHED",
+    "pos": [
+      52.8,
+      51.25
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "GNSS_ANT_SWITCHED",
+    "pos": [
+      60.4,
+      65.5
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "3V8_MODEM",
+    "pos": [
+      38.5,
+      52.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "PDM_DATA1_1V8",
+    "pos": [
+      8.2,
+      37.95
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  },
+  {
+    "net": "PDM_DATA1_1V8",
+    "pos": [
+      56.5,
+      43.0
+    ],
+    "pad_layers": [
+      [
+        "F.Cu"
+      ]
+    ]
+  }
+]

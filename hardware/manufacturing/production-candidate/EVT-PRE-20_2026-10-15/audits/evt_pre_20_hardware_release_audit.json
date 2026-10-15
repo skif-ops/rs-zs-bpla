@@ -1,0 +1,752 @@
+{
+  "schema": "dioneya-hardware-production-release-audit-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "scope": {
+    "included": [
+      "BOM",
+      "PCB-MAIN",
+      "PCB-MIC",
+      "PCB-PWR",
+      "mechanics",
+      "harness",
+      "supplier_DFM",
+      "purchase_lot"
+    ],
+    "excluded": [
+      "application_firmware",
+      "server",
+      "Android",
+      "customer_supplier_selection",
+      "supplier_stock",
+      "commercial_price",
+      "MOQ",
+      "payment_terms",
+      "freight",
+      "destination_delivery"
+    ],
+    "software_rule": "software is included only when an explicit hardware interface or production-test dependency requires it"
+  },
+  "hardware_design_release": {
+    "ready": false,
+    "status": "BLOCKED",
+    "blockers": [
+      "production BOM QG-2 remains BLOCKED: native PCB-MAIN schematic, physical overlay/ground-domain tokens or declared schematic-derived BOM provenance are incomplete: hierarchy source hash drift: PCB-MAIN.kicad_sch; (kicad_sch, 1V8_MIC, 3V3_DIGITAL, 3V8_MODEM, 3V8_MODEM_BB, 3V8_MODEM_RF, AAD_CFG_1V8_FANOUT, AAD_CFG_1V8_U7, ABSES5AF-L100KM, ACCEL_INT, BG95-M3, BLE_DFU_REQ, BLE_EN, BLE_RX_U1, BLE_RX_U11, BLE_TX_U1, BLE_TX_U11, BLM31KN601SN1L, BOOT0, CELL_DBG_RXD_TP, CELL_DBG_RXD_U8, CELL_DBG_TXD_TP, CELL_DBG_TXD_U8, CELL_DBG_VREF_TP, CELL_DTR_U16, CELL_PWRKEY_CMD, CELL_RESET_N_CMD, CELL_RF, CELL_RF_ANT, CELL_RI_U16, CELL_RX_U16, CELL_STATUS_U16, CELL_TX_U16, CELL_USB_BOOT_TP, CELL_USB_DM_TP, CELL_USB_DM_U8, CELL_USB_DP_TP, CELL_USB_DP_U8, CELL_USB_VBUS, CELL_USIM_CLK_1V8, CELL_USIM_DATA_1V8, CELL_USIM_RST_1V8, CELL_USIM_VDD_1V8, E22-900M22S, EN_AUX, EN_MODEM, ERJ-2GE0R00X, ERJ-2GEJ104X, ERJ-2GEJ561X, ERJ-2RKF1001X, ERJ-2RKF1002X, ERJ-2RKF1003X, ERJ-2RKF1004X, ERJ-2RKF2201X, ERJ-2RKF22R0X, ERJ-2RKF4701X, ERJ-2RKF4702X, ERJ-2RKF5101X, ERJ-8GEYJ100V, ESDALC6V1-5P6, FAULT, GND_DIGITAL, GND_MIC, GND_MODEM, GNSS_ANT_BIAS_RAW, GNSS_ANT_DETECT, GNSS_ANT_DIV, GNSS_ANT_GATE, GNSS_ANT_OFF_N, GNSS_ANT_SHORT_N, GNSS_ANT_SWITCHED, GNSS_PPS_U1, GNSS_PPS_U9, GNSS_RF_ANT_BIASED, GNSS_RF_DC_BLOCK, GNSS_RF_FILTERED, GNSS_RX_U1, GNSS_RX_U9, GNSS_TX_U1, GNSS_TX_U9, GRM1555C1E470JA01D, GRM1555C1H100JA01D, GRM1555C1H101JA01D, GRM1555C1H151JA01D, GRM1555C1H330JA01D, GRM1555C1H680JA01D, GRM155R61A225KE15D, GRM155R61C105KA12D, GRM155R71C103KA01D, GRM155R71E103KA01D, GRM155R71E104KE14D, GRM155R71E224KE14D, GRM155R71E473KA01D, GRM155R72A472KA01D, GRM188R61A106KE69D, GRM21BR61A226ME44L, HW_REV0, HW_REV1, I2C2_SCL_BUS, I2C2_SCL_U1, I2C2_SDA_BUS, I2C2_SDA_U1, LIS2DW12TR, LORA_BUSY, LORA_DIO1, LORA_MISO_U1, LORA_MISO_U10, LORA_MOSI_U1, LORA_MOSI_U10, LORA_NSS_U1, LORA_NSS_U10, LORA_RESET_N, LORA_RF_ANT, LORA_RF_MODULE, LORA_RXEN, LORA_SCK_U1, LORA_SCK_U10, LORA_TXEN, LQH32PN2R2NN0L, LQW15AN27NJ00D, LSE_IN, LT6000IDCB#TRMPBF, MAX-M10S-00B, MDBT50Q-P1MV2, MIC_WAKE, MIC_WAKE1, MIC_WAKE12_OR_1V8, MIC_WAKE2, MIC_WAKE3, MIC_WAKE34_OR_1V8, MIC_WAKE4, MIC_WAKE_OR_1V8, MMBT3904,215, NOR_CLK_U1, NOR_CLK_U2, NOR_IO0_U1, NOR_IO0_U2, NOR_IO1_U1, NOR_IO1_U2, NOR_IO2_U1, NOR_IO2_U2, NOR_IO3_U1, NOR_IO3_U2, NOR_NCS_U2, NRF_RESET_N, NRF_SWCLK, NRF_SWDIO, NRST, PDM_CLK_1V8_FANOUT, PDM_CLK_1V8_U7, PDM_DATA1_1V8, PDM_DATA2_1V8, PDM_DATA3_1V8, PDM_DATA4_1V8, PESD5V0C1BSF, PESD5V0S1UL, PWR_FAULT, PWR_GOOD, Q1_BASE, Q2_BASE, Q3_BASE, REV_STRAP0, REV_STRAP1, SDCIT2/32GB, SD_CK_CARD, SD_CK_U1, SD_CMD_CARD, SD_CMD_U1, SD_D0_CARD, SD_D0_U1, SD_D1_CARD, SD_D1_U1, SD_D2_CARD, SD_D2_U1, SD_D3_CARD, SD_D3_U1, SD_DET, SIM1_CLK_CONN, SIM1_CLK_MUX, SIM1_DATA_CONN, SIM1_DATA_MUX, SIM1_DET, SIM1_RST_CONN, SIM1_RST_MUX, SIM1_VDD_CONN, SIM2_CLK_CONN, SIM2_CLK_MUX, SIM2_DATA_CONN, SIM2_DATA_MUX, SIM2_DET, SIM2_RST_CONN, SIM2_RST_MUX, SIM2_VDD_CONN, SIM_MUX_EN, SIM_MUX_SEL, SMPS_SW, SN74AXC1T45DRLR, SN74AXC8T245PWR, SN74LVC1G07DBVR, SN74LVC32APWR, STM32U585VIT6Q, STTS22HTR, SWCLK, SWDIO, Si1016X-T1-GE3, SiT1552AI-JE-DCC-32.768D, T520D107M006ATE015, TAMPER_IN_CONN, TAMPER_IN_U1, TEST_UART_RX_TP, TEST_UART_RX_U1, TEST_UART_TX_TP, TEST_UART_TX_U1, TPD1E05U06DYAR, TPD2EUSB30DRTR, TPD4E05U06DQAR, TS3A27518EPWR, U13_EN_N, U8_MAIN_DTR_1V8, U8_MAIN_RI_1V8, U8_MAIN_RXD_1V8, U8_MAIN_TXD_1V8, U8_PWRKEY_N, U8_RESET_N, U8_STATUS_1V8, U8_VDD_EXT_1V8, USB_CC1, USB_CC2, USB_DM_CONN, USB_DM_U1, USB_DP_CONN, USB_DP_U1, USB_SHIELD, USB_VBUS_CONN, USB_VBUS_SENSE, VCORE_1V1, VREF+, W25Q512JVFIQ | system OTS documentary purchase identity is missing or inconsistent: Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 323, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 269, in main\n    require(record_hash in record_md, \"machine-record hash missing from Markdown\")\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 41, in require\n    raise RuntimeError(message)\nRuntimeError: machine-record hash missing from Markdown",
+      "exact system OTS documentary purchase identity is incomplete or inconsistent",
+      "PCB-MAIN ten-page hierarchy or exact 247-position/1077-physical-pad net equivalence has regressed",
+      "PCB-MAIN hierarchy still requires commit-bound KiCad 9 ERC/PDF evidence",
+      "PCB-MAIN hierarchy independent human acceptance remains open",
+      "PCB-PWR five-page hierarchy or exact 62-position pad/net equivalence has regressed",
+      "PCB-PWR hierarchy still requires commit-bound KiCad 9 ERC/PDF evidence",
+      "PCB-PWR hierarchy independent human acceptance remains open",
+      "PCB-PWR fuse/TVS input-protection qualification packet is incomplete or inconsistent",
+      "PCB-PWR input-protection release remains open: native value ECO=False; qualification evidence=0/20 PASS",
+      "PCB-PWR fitted-component 2D placement clearance has regressed",
+      "PCB-PWR routing constraint authority is incomplete or its bounded-routing interlock drifted",
+      "PCB-PWR hot-loop 006 application differs from the exact accepted board",
+      "PCB-PWR shunt-bulk 007 application differs from the exact accepted board",
+      "PCB-PWR C13-to-C12 008 application differs from the exact accepted board",
+      "PCB-PWR 3V8 output bulk 010 application differs from the exact accepted board",
+      "PCB-PWR C13-to-C11 009 application differs from the exact accepted board",
+      "PCB-PWR bounded 35 um numeric EVT routing basis is missing, drifted or over-released",
+      "PCB-PWR controlled DIM-003 mechanical-freeze request packet is not ready",
+      "PCB-PWR DIM-003 EVT acceptance evidence is incomplete or inconsistent: 0/18 attributable responses accepted",
+      "PCB-PWR EVT public stackup/calculated-geometry packet is not ready",
+      "PCB-PWR stackup/copper acceptance remains open: 0/24 responses and public stackup or calculated numeric geometry is not accepted",
+      "EVT harness drawing, lengths, wire AVL or build baseline is incomplete",
+      "harness manufacturing release remains open: ",
+      "PCB-MAIN RF/SI return-path review or bounded remediation control is missing",
+      "PCB-MAIN GNSS RF placement/routeability proposal control is missing",
+      "PCB-MAIN accepted cellular/GNSS RF remediations are not deterministically composed and bounded",
+      "PCB-MAIN cellular RF lacks an accepted and applied GND_MODEM L2 return plane",
+      "PCB-MAIN GNSS RF placement/routeability ECO acceptance/application remains open",
+      "PCB-MAIN Review B/DRC/CAM/DFM release is not complete",
+      "PCB-PWR serial mechanics/routing/DRC/CAM/DFM Review B release is not complete",
+      "PCB-MIC controlled manufacturing handoff packet is not ready",
+      "PCB-MIC Review B/CAM/DFM and manufacturing release are not complete",
+      "mechanical release inputs remain open: DIM-001, DIM-005, DIM-006, DIM-007, DIM-008, DIM-009, DIM-010, DIM-011, DIM-012, DIM-013, DIM-014S, DIM-015, DIM-016"
+    ]
+  },
+  "purchase_release": {
+    "ready": false,
+    "status": "BLOCKED",
+    "meaning": "engineering handoff for customer-owned procurement; not an executed purchase order",
+    "owner": "CUSTOMER",
+    "commercial_quote_or_availability_required": false,
+    "job_specific_technical_manufacturing_responses_required": false,
+    "selected_station_quantity": 20,
+    "blockers": [
+      "production BOM QG-2 remains BLOCKED: native PCB-MAIN schematic, physical overlay/ground-domain tokens or declared schematic-derived BOM provenance are incomplete: hierarchy source hash drift: PCB-MAIN.kicad_sch; (kicad_sch, 1V8_MIC, 3V3_DIGITAL, 3V8_MODEM, 3V8_MODEM_BB, 3V8_MODEM_RF, AAD_CFG_1V8_FANOUT, AAD_CFG_1V8_U7, ABSES5AF-L100KM, ACCEL_INT, BG95-M3, BLE_DFU_REQ, BLE_EN, BLE_RX_U1, BLE_RX_U11, BLE_TX_U1, BLE_TX_U11, BLM31KN601SN1L, BOOT0, CELL_DBG_RXD_TP, CELL_DBG_RXD_U8, CELL_DBG_TXD_TP, CELL_DBG_TXD_U8, CELL_DBG_VREF_TP, CELL_DTR_U16, CELL_PWRKEY_CMD, CELL_RESET_N_CMD, CELL_RF, CELL_RF_ANT, CELL_RI_U16, CELL_RX_U16, CELL_STATUS_U16, CELL_TX_U16, CELL_USB_BOOT_TP, CELL_USB_DM_TP, CELL_USB_DM_U8, CELL_USB_DP_TP, CELL_USB_DP_U8, CELL_USB_VBUS, CELL_USIM_CLK_1V8, CELL_USIM_DATA_1V8, CELL_USIM_RST_1V8, CELL_USIM_VDD_1V8, E22-900M22S, EN_AUX, EN_MODEM, ERJ-2GE0R00X, ERJ-2GEJ104X, ERJ-2GEJ561X, ERJ-2RKF1001X, ERJ-2RKF1002X, ERJ-2RKF1003X, ERJ-2RKF1004X, ERJ-2RKF2201X, ERJ-2RKF22R0X, ERJ-2RKF4701X, ERJ-2RKF4702X, ERJ-2RKF5101X, ERJ-8GEYJ100V, ESDALC6V1-5P6, FAULT, GND_DIGITAL, GND_MIC, GND_MODEM, GNSS_ANT_BIAS_RAW, GNSS_ANT_DETECT, GNSS_ANT_DIV, GNSS_ANT_GATE, GNSS_ANT_OFF_N, GNSS_ANT_SHORT_N, GNSS_ANT_SWITCHED, GNSS_PPS_U1, GNSS_PPS_U9, GNSS_RF_ANT_BIASED, GNSS_RF_DC_BLOCK, GNSS_RF_FILTERED, GNSS_RX_U1, GNSS_RX_U9, GNSS_TX_U1, GNSS_TX_U9, GRM1555C1E470JA01D, GRM1555C1H100JA01D, GRM1555C1H101JA01D, GRM1555C1H151JA01D, GRM1555C1H330JA01D, GRM1555C1H680JA01D, GRM155R61A225KE15D, GRM155R61C105KA12D, GRM155R71C103KA01D, GRM155R71E103KA01D, GRM155R71E104KE14D, GRM155R71E224KE14D, GRM155R71E473KA01D, GRM155R72A472KA01D, GRM188R61A106KE69D, GRM21BR61A226ME44L, HW_REV0, HW_REV1, I2C2_SCL_BUS, I2C2_SCL_U1, I2C2_SDA_BUS, I2C2_SDA_U1, LIS2DW12TR, LORA_BUSY, LORA_DIO1, LORA_MISO_U1, LORA_MISO_U10, LORA_MOSI_U1, LORA_MOSI_U10, LORA_NSS_U1, LORA_NSS_U10, LORA_RESET_N, LORA_RF_ANT, LORA_RF_MODULE, LORA_RXEN, LORA_SCK_U1, LORA_SCK_U10, LORA_TXEN, LQH32PN2R2NN0L, LQW15AN27NJ00D, LSE_IN, LT6000IDCB#TRMPBF, MAX-M10S-00B, MDBT50Q-P1MV2, MIC_WAKE, MIC_WAKE1, MIC_WAKE12_OR_1V8, MIC_WAKE2, MIC_WAKE3, MIC_WAKE34_OR_1V8, MIC_WAKE4, MIC_WAKE_OR_1V8, MMBT3904,215, NOR_CLK_U1, NOR_CLK_U2, NOR_IO0_U1, NOR_IO0_U2, NOR_IO1_U1, NOR_IO1_U2, NOR_IO2_U1, NOR_IO2_U2, NOR_IO3_U1, NOR_IO3_U2, NOR_NCS_U2, NRF_RESET_N, NRF_SWCLK, NRF_SWDIO, NRST, PDM_CLK_1V8_FANOUT, PDM_CLK_1V8_U7, PDM_DATA1_1V8, PDM_DATA2_1V8, PDM_DATA3_1V8, PDM_DATA4_1V8, PESD5V0C1BSF, PESD5V0S1UL, PWR_FAULT, PWR_GOOD, Q1_BASE, Q2_BASE, Q3_BASE, REV_STRAP0, REV_STRAP1, SDCIT2/32GB, SD_CK_CARD, SD_CK_U1, SD_CMD_CARD, SD_CMD_U1, SD_D0_CARD, SD_D0_U1, SD_D1_CARD, SD_D1_U1, SD_D2_CARD, SD_D2_U1, SD_D3_CARD, SD_D3_U1, SD_DET, SIM1_CLK_CONN, SIM1_CLK_MUX, SIM1_DATA_CONN, SIM1_DATA_MUX, SIM1_DET, SIM1_RST_CONN, SIM1_RST_MUX, SIM1_VDD_CONN, SIM2_CLK_CONN, SIM2_CLK_MUX, SIM2_DATA_CONN, SIM2_DATA_MUX, SIM2_DET, SIM2_RST_CONN, SIM2_RST_MUX, SIM2_VDD_CONN, SIM_MUX_EN, SIM_MUX_SEL, SMPS_SW, SN74AXC1T45DRLR, SN74AXC8T245PWR, SN74LVC1G07DBVR, SN74LVC32APWR, STM32U585VIT6Q, STTS22HTR, SWCLK, SWDIO, Si1016X-T1-GE3, SiT1552AI-JE-DCC-32.768D, T520D107M006ATE015, TAMPER_IN_CONN, TAMPER_IN_U1, TEST_UART_RX_TP, TEST_UART_RX_U1, TEST_UART_TX_TP, TEST_UART_TX_U1, TPD1E05U06DYAR, TPD2EUSB30DRTR, TPD4E05U06DQAR, TS3A27518EPWR, U13_EN_N, U8_MAIN_DTR_1V8, U8_MAIN_RI_1V8, U8_MAIN_RXD_1V8, U8_MAIN_TXD_1V8, U8_PWRKEY_N, U8_RESET_N, U8_STATUS_1V8, U8_VDD_EXT_1V8, USB_CC1, USB_CC2, USB_DM_CONN, USB_DM_U1, USB_DP_CONN, USB_DP_U1, USB_SHIELD, USB_VBUS_CONN, USB_VBUS_SENSE, VCORE_1V1, VREF+, W25Q512JVFIQ | system OTS documentary purchase identity is missing or inconsistent: Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 323, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 269, in main\n    require(record_hash in record_md, \"machine-record hash missing from Markdown\")\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 41, in require\n    raise RuntimeError(message)\nRuntimeError: machine-record hash missing from Markdown",
+      "exact system OTS documentary purchase identity is incomplete or inconsistent",
+      "PCB-MAIN ten-page hierarchy or exact 247-position/1077-physical-pad net equivalence has regressed",
+      "PCB-MAIN hierarchy still requires commit-bound KiCad 9 ERC/PDF evidence",
+      "PCB-MAIN hierarchy independent human acceptance remains open",
+      "PCB-PWR five-page hierarchy or exact 62-position pad/net equivalence has regressed",
+      "PCB-PWR hierarchy still requires commit-bound KiCad 9 ERC/PDF evidence",
+      "PCB-PWR hierarchy independent human acceptance remains open",
+      "PCB-PWR fuse/TVS input-protection qualification packet is incomplete or inconsistent",
+      "PCB-PWR input-protection release remains open: native value ECO=False; qualification evidence=0/20 PASS",
+      "PCB-PWR fitted-component 2D placement clearance has regressed",
+      "PCB-PWR routing constraint authority is incomplete or its bounded-routing interlock drifted",
+      "PCB-PWR hot-loop 006 application differs from the exact accepted board",
+      "PCB-PWR shunt-bulk 007 application differs from the exact accepted board",
+      "PCB-PWR C13-to-C12 008 application differs from the exact accepted board",
+      "PCB-PWR 3V8 output bulk 010 application differs from the exact accepted board",
+      "PCB-PWR C13-to-C11 009 application differs from the exact accepted board",
+      "PCB-PWR bounded 35 um numeric EVT routing basis is missing, drifted or over-released",
+      "PCB-PWR controlled DIM-003 mechanical-freeze request packet is not ready",
+      "PCB-PWR DIM-003 EVT acceptance evidence is incomplete or inconsistent: 0/18 attributable responses accepted",
+      "PCB-PWR EVT public stackup/calculated-geometry packet is not ready",
+      "PCB-PWR stackup/copper acceptance remains open: 0/24 responses and public stackup or calculated numeric geometry is not accepted",
+      "EVT harness drawing, lengths, wire AVL or build baseline is incomplete",
+      "harness manufacturing release remains open: ",
+      "PCB-MAIN RF/SI return-path review or bounded remediation control is missing",
+      "PCB-MAIN GNSS RF placement/routeability proposal control is missing",
+      "PCB-MAIN accepted cellular/GNSS RF remediations are not deterministically composed and bounded",
+      "PCB-MAIN cellular RF lacks an accepted and applied GND_MODEM L2 return plane",
+      "PCB-MAIN GNSS RF placement/routeability ECO acceptance/application remains open",
+      "PCB-MAIN Review B/DRC/CAM/DFM release is not complete",
+      "PCB-PWR serial mechanics/routing/DRC/CAM/DFM Review B release is not complete",
+      "PCB-MIC controlled manufacturing handoff packet is not ready",
+      "PCB-MIC Review B/CAM/DFM and manufacturing release are not complete",
+      "mechanical release inputs remain open: DIM-001, DIM-005, DIM-006, DIM-007, DIM-008, DIM-009, DIM-010, DIM-011, DIM-012, DIM-013, DIM-014S, DIM-015, DIM-016"
+    ]
+  },
+  "boards": {
+    "PCB-MAIN": {
+      "files": {
+        "schematic": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_sch",
+        "board": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_pcb",
+        "project": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_pro"
+      },
+      "missing": [],
+      "copper": {
+        "segments": 765,
+        "vias": 304,
+        "zones": 12
+      },
+      "routing_present": true
+    },
+    "PCB-MIC": {
+      "files": {
+        "schematic": "hardware\\kicad\\native\\PCB-MIC\\PCB-MIC.kicad_sch",
+        "board": "hardware\\kicad\\native\\PCB-MIC\\PCB-MIC.kicad_pcb",
+        "project": "hardware\\kicad\\native\\PCB-MIC\\PCB-MIC.kicad_pro"
+      },
+      "missing": [],
+      "copper": {
+        "segments": 27,
+        "vias": 5,
+        "zones": 0
+      },
+      "routing_present": true
+    },
+    "PCB-PWR": {
+      "files": {
+        "schematic": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_sch",
+        "board": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_pcb",
+        "project": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_pro"
+      },
+      "missing": [],
+      "copper": {
+        "segments": 575,
+        "vias": 267,
+        "zones": 33
+      },
+      "routing_present": true
+    }
+  },
+  "bom_qg2": {
+    "gate": "QG-2",
+    "status": "BLOCKED",
+    "production_bom_complete": false,
+    "checks": [
+      {
+        "name": "procurement_lots_4_10_20",
+        "pass": true,
+        "detail": "engineering and procurement BOM quantities independently reconcile for 4, 10 and 20 stations"
+      },
+      {
+        "name": "program_procurement_2x20_plus_1",
+        "pass": true,
+        "detail": "41-station program demand reconciles as two EVT-20 lots plus one bench with two reserve pools"
+      },
+      {
+        "name": "main_active_mpn_freeze",
+        "pass": true,
+        "detail": "all active MAIN MPNs match"
+      },
+      {
+        "name": "main_passive_support_authority_bom",
+        "pass": true,
+        "detail": "all 211 MAIN-AUTH-010 identities values populations ratings and physical pins are represented"
+      },
+      {
+        "name": "power_identity_and_refdes",
+        "pass": true,
+        "detail": "power IC/protection identity and RefDes match"
+      },
+      {
+        "name": "power_passive_authority_bom",
+        "pass": true,
+        "detail": "all 39 BOM passives/net-ties match authority; 10 DFT pads remain non-procured"
+      },
+      {
+        "name": "mic_native_component_identity",
+        "pass": true,
+        "detail": "four native PCB-MIC fitted identities match"
+      },
+      {
+        "name": "mic_native_exact_orderable_mpn",
+        "pass": true,
+        "detail": "single native KiCad-9 PCB-MIC source binds exact MK1/J1 identities and controlled footprints"
+      },
+      {
+        "name": "fitted_line_exact_fields",
+        "pass": true,
+        "detail": "all fitted lines have exact identity/package/rating"
+      },
+      {
+        "name": "build_to_print_internal_article_identity",
+        "pass": true,
+        "detail": "eight internal BOM identities and EVT order specifications are controlled while customer-selected supplier and quote fields remain open"
+      },
+      {
+        "name": "passive_values",
+        "pass": true,
+        "detail": "all passive values are explicit"
+      },
+      {
+        "name": "bom_dispositions_released",
+        "pass": true,
+        "detail": "all BOM identities and customer-owned procurement scopes are controlled"
+      },
+      {
+        "name": "power_schematic_refdes_coverage",
+        "pass": true,
+        "detail": "all PCB-PWR passive/net-tie RefDes represented"
+      },
+      {
+        "name": "power_cap_bank_native_expansion",
+        "pass": true,
+        "detail": "all power capacitors have individual native RefDes"
+      },
+      {
+        "name": "main_capture_status_control",
+        "pass": true,
+        "detail": "PCB-MAIN capture status is explicit and release-blocked"
+      },
+      {
+        "name": "main_capture_authority_complete",
+        "pass": true,
+        "detail": "PCB-MAIN capture authority is complete"
+      },
+      {
+        "name": "main_native_schematic_source",
+        "pass": false,
+        "detail": "native PCB-MAIN schematic, physical overlay/ground-domain tokens or declared schematic-derived BOM provenance are incomplete: hierarchy source hash drift: PCB-MAIN.kicad_sch; (kicad_sch, 1V8_MIC, 3V3_DIGITAL, 3V8_MODEM, 3V8_MODEM_BB, 3V8_MODEM_RF, AAD_CFG_1V8_FANOUT, AAD_CFG_1V8_U7, ABSES5AF-L100KM, ACCEL_INT, BG95-M3, BLE_DFU_REQ, BLE_EN, BLE_RX_U1, BLE_RX_U11, BLE_TX_U1, BLE_TX_U11, BLM31KN601SN1L, BOOT0, CELL_DBG_RXD_TP, CELL_DBG_RXD_U8, CELL_DBG_TXD_TP, CELL_DBG_TXD_U8, CELL_DBG_VREF_TP, CELL_DTR_U16, CELL_PWRKEY_CMD, CELL_RESET_N_CMD, CELL_RF, CELL_RF_ANT, CELL_RI_U16, CELL_RX_U16, CELL_STATUS_U16, CELL_TX_U16, CELL_USB_BOOT_TP, CELL_USB_DM_TP, CELL_USB_DM_U8, CELL_USB_DP_TP, CELL_USB_DP_U8, CELL_USB_VBUS, CELL_USIM_CLK_1V8, CELL_USIM_DATA_1V8, CELL_USIM_RST_1V8, CELL_USIM_VDD_1V8, E22-900M22S, EN_AUX, EN_MODEM, ERJ-2GE0R00X, ERJ-2GEJ104X, ERJ-2GEJ561X, ERJ-2RKF1001X, ERJ-2RKF1002X, ERJ-2RKF1003X, ERJ-2RKF1004X, ERJ-2RKF2201X, ERJ-2RKF22R0X, ERJ-2RKF4701X, ERJ-2RKF4702X, ERJ-2RKF5101X, ERJ-8GEYJ100V, ESDALC6V1-5P6, FAULT, GND_DIGITAL, GND_MIC, GND_MODEM, GNSS_ANT_BIAS_RAW, GNSS_ANT_DETECT, GNSS_ANT_DIV, GNSS_ANT_GATE, GNSS_ANT_OFF_N, GNSS_ANT_SHORT_N, GNSS_ANT_SWITCHED, GNSS_PPS_U1, GNSS_PPS_U9, GNSS_RF_ANT_BIASED, GNSS_RF_DC_BLOCK, GNSS_RF_FILTERED, GNSS_RX_U1, GNSS_RX_U9, GNSS_TX_U1, GNSS_TX_U9, GRM1555C1E470JA01D, GRM1555C1H100JA01D, GRM1555C1H101JA01D, GRM1555C1H151JA01D, GRM1555C1H330JA01D, GRM1555C1H680JA01D, GRM155R61A225KE15D, GRM155R61C105KA12D, GRM155R71C103KA01D, GRM155R71E103KA01D, GRM155R71E104KE14D, GRM155R71E224KE14D, GRM155R71E473KA01D, GRM155R72A472KA01D, GRM188R61A106KE69D, GRM21BR61A226ME44L, HW_REV0, HW_REV1, I2C2_SCL_BUS, I2C2_SCL_U1, I2C2_SDA_BUS, I2C2_SDA_U1, LIS2DW12TR, LORA_BUSY, LORA_DIO1, LORA_MISO_U1, LORA_MISO_U10, LORA_MOSI_U1, LORA_MOSI_U10, LORA_NSS_U1, LORA_NSS_U10, LORA_RESET_N, LORA_RF_ANT, LORA_RF_MODULE, LORA_RXEN, LORA_SCK_U1, LORA_SCK_U10, LORA_TXEN, LQH32PN2R2NN0L, LQW15AN27NJ00D, LSE_IN, LT6000IDCB#TRMPBF, MAX-M10S-00B, MDBT50Q-P1MV2, MIC_WAKE, MIC_WAKE1, MIC_WAKE12_OR_1V8, MIC_WAKE2, MIC_WAKE3, MIC_WAKE34_OR_1V8, MIC_WAKE4, MIC_WAKE_OR_1V8, MMBT3904,215, NOR_CLK_U1, NOR_CLK_U2, NOR_IO0_U1, NOR_IO0_U2, NOR_IO1_U1, NOR_IO1_U2, NOR_IO2_U1, NOR_IO2_U2, NOR_IO3_U1, NOR_IO3_U2, NOR_NCS_U2, NRF_RESET_N, NRF_SWCLK, NRF_SWDIO, NRST, PDM_CLK_1V8_FANOUT, PDM_CLK_1V8_U7, PDM_DATA1_1V8, PDM_DATA2_1V8, PDM_DATA3_1V8, PDM_DATA4_1V8, PESD5V0C1BSF, PESD5V0S1UL, PWR_FAULT, PWR_GOOD, Q1_BASE, Q2_BASE, Q3_BASE, REV_STRAP0, REV_STRAP1, SDCIT2/32GB, SD_CK_CARD, SD_CK_U1, SD_CMD_CARD, SD_CMD_U1, SD_D0_CARD, SD_D0_U1, SD_D1_CARD, SD_D1_U1, SD_D2_CARD, SD_D2_U1, SD_D3_CARD, SD_D3_U1, SD_DET, SIM1_CLK_CONN, SIM1_CLK_MUX, SIM1_DATA_CONN, SIM1_DATA_MUX, SIM1_DET, SIM1_RST_CONN, SIM1_RST_MUX, SIM1_VDD_CONN, SIM2_CLK_CONN, SIM2_CLK_MUX, SIM2_DATA_CONN, SIM2_DATA_MUX, SIM2_DET, SIM2_RST_CONN, SIM2_RST_MUX, SIM2_VDD_CONN, SIM_MUX_EN, SIM_MUX_SEL, SMPS_SW, SN74AXC1T45DRLR, SN74AXC8T245PWR, SN74LVC1G07DBVR, SN74LVC32APWR, STM32U585VIT6Q, STTS22HTR, SWCLK, SWDIO, Si1016X-T1-GE3, SiT1552AI-JE-DCC-32.768D, T520D107M006ATE015, TAMPER_IN_CONN, TAMPER_IN_U1, TEST_UART_RX_TP, TEST_UART_RX_U1, TEST_UART_TX_TP, TEST_UART_TX_U1, TPD1E05U06DYAR, TPD2EUSB30DRTR, TPD4E05U06DQAR, TS3A27518EPWR, U13_EN_N, U8_MAIN_DTR_1V8, U8_MAIN_RI_1V8, U8_MAIN_RXD_1V8, U8_MAIN_TXD_1V8, U8_PWRKEY_N, U8_RESET_N, U8_STATUS_1V8, U8_VDD_EXT_1V8, USB_CC1, USB_CC2, USB_DM_CONN, USB_DM_U1, USB_DP_CONN, USB_DP_U1, USB_SHIELD, USB_VBUS_CONN, USB_VBUS_SENSE, VCORE_1V1, VREF+, W25Q512JVFIQ"
+      },
+      {
+        "name": "main_review_a_complete",
+        "pass": true,
+        "detail": "PCB-MAIN Review A complete with required evidence"
+      },
+      {
+        "name": "system_ots_documentary_procurement_identity",
+        "pass": false,
+        "detail": "system OTS documentary purchase identity is missing or inconsistent: Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 323, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 269, in main\n    require(record_hash in record_md, \"machine-record hash missing from Markdown\")\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 41, in require\n    raise RuntimeError(message)\nRuntimeError: machine-record hash missing from Markdown"
+      },
+      {
+        "name": "system_sku_release",
+        "pass": true,
+        "detail": "system SKUs and build-to-print article identities are controlled"
+      }
+    ],
+    "blockers": [
+      "native PCB-MAIN schematic, physical overlay/ground-domain tokens or declared schematic-derived BOM provenance are incomplete: hierarchy source hash drift: PCB-MAIN.kicad_sch; (kicad_sch, 1V8_MIC, 3V3_DIGITAL, 3V8_MODEM, 3V8_MODEM_BB, 3V8_MODEM_RF, AAD_CFG_1V8_FANOUT, AAD_CFG_1V8_U7, ABSES5AF-L100KM, ACCEL_INT, BG95-M3, BLE_DFU_REQ, BLE_EN, BLE_RX_U1, BLE_RX_U11, BLE_TX_U1, BLE_TX_U11, BLM31KN601SN1L, BOOT0, CELL_DBG_RXD_TP, CELL_DBG_RXD_U8, CELL_DBG_TXD_TP, CELL_DBG_TXD_U8, CELL_DBG_VREF_TP, CELL_DTR_U16, CELL_PWRKEY_CMD, CELL_RESET_N_CMD, CELL_RF, CELL_RF_ANT, CELL_RI_U16, CELL_RX_U16, CELL_STATUS_U16, CELL_TX_U16, CELL_USB_BOOT_TP, CELL_USB_DM_TP, CELL_USB_DM_U8, CELL_USB_DP_TP, CELL_USB_DP_U8, CELL_USB_VBUS, CELL_USIM_CLK_1V8, CELL_USIM_DATA_1V8, CELL_USIM_RST_1V8, CELL_USIM_VDD_1V8, E22-900M22S, EN_AUX, EN_MODEM, ERJ-2GE0R00X, ERJ-2GEJ104X, ERJ-2GEJ561X, ERJ-2RKF1001X, ERJ-2RKF1002X, ERJ-2RKF1003X, ERJ-2RKF1004X, ERJ-2RKF2201X, ERJ-2RKF22R0X, ERJ-2RKF4701X, ERJ-2RKF4702X, ERJ-2RKF5101X, ERJ-8GEYJ100V, ESDALC6V1-5P6, FAULT, GND_DIGITAL, GND_MIC, GND_MODEM, GNSS_ANT_BIAS_RAW, GNSS_ANT_DETECT, GNSS_ANT_DIV, GNSS_ANT_GATE, GNSS_ANT_OFF_N, GNSS_ANT_SHORT_N, GNSS_ANT_SWITCHED, GNSS_PPS_U1, GNSS_PPS_U9, GNSS_RF_ANT_BIASED, GNSS_RF_DC_BLOCK, GNSS_RF_FILTERED, GNSS_RX_U1, GNSS_RX_U9, GNSS_TX_U1, GNSS_TX_U9, GRM1555C1E470JA01D, GRM1555C1H100JA01D, GRM1555C1H101JA01D, GRM1555C1H151JA01D, GRM1555C1H330JA01D, GRM1555C1H680JA01D, GRM155R61A225KE15D, GRM155R61C105KA12D, GRM155R71C103KA01D, GRM155R71E103KA01D, GRM155R71E104KE14D, GRM155R71E224KE14D, GRM155R71E473KA01D, GRM155R72A472KA01D, GRM188R61A106KE69D, GRM21BR61A226ME44L, HW_REV0, HW_REV1, I2C2_SCL_BUS, I2C2_SCL_U1, I2C2_SDA_BUS, I2C2_SDA_U1, LIS2DW12TR, LORA_BUSY, LORA_DIO1, LORA_MISO_U1, LORA_MISO_U10, LORA_MOSI_U1, LORA_MOSI_U10, LORA_NSS_U1, LORA_NSS_U10, LORA_RESET_N, LORA_RF_ANT, LORA_RF_MODULE, LORA_RXEN, LORA_SCK_U1, LORA_SCK_U10, LORA_TXEN, LQH32PN2R2NN0L, LQW15AN27NJ00D, LSE_IN, LT6000IDCB#TRMPBF, MAX-M10S-00B, MDBT50Q-P1MV2, MIC_WAKE, MIC_WAKE1, MIC_WAKE12_OR_1V8, MIC_WAKE2, MIC_WAKE3, MIC_WAKE34_OR_1V8, MIC_WAKE4, MIC_WAKE_OR_1V8, MMBT3904,215, NOR_CLK_U1, NOR_CLK_U2, NOR_IO0_U1, NOR_IO0_U2, NOR_IO1_U1, NOR_IO1_U2, NOR_IO2_U1, NOR_IO2_U2, NOR_IO3_U1, NOR_IO3_U2, NOR_NCS_U2, NRF_RESET_N, NRF_SWCLK, NRF_SWDIO, NRST, PDM_CLK_1V8_FANOUT, PDM_CLK_1V8_U7, PDM_DATA1_1V8, PDM_DATA2_1V8, PDM_DATA3_1V8, PDM_DATA4_1V8, PESD5V0C1BSF, PESD5V0S1UL, PWR_FAULT, PWR_GOOD, Q1_BASE, Q2_BASE, Q3_BASE, REV_STRAP0, REV_STRAP1, SDCIT2/32GB, SD_CK_CARD, SD_CK_U1, SD_CMD_CARD, SD_CMD_U1, SD_D0_CARD, SD_D0_U1, SD_D1_CARD, SD_D1_U1, SD_D2_CARD, SD_D2_U1, SD_D3_CARD, SD_D3_U1, SD_DET, SIM1_CLK_CONN, SIM1_CLK_MUX, SIM1_DATA_CONN, SIM1_DATA_MUX, SIM1_DET, SIM1_RST_CONN, SIM1_RST_MUX, SIM1_VDD_CONN, SIM2_CLK_CONN, SIM2_CLK_MUX, SIM2_DATA_CONN, SIM2_DATA_MUX, SIM2_DET, SIM2_RST_CONN, SIM2_RST_MUX, SIM2_VDD_CONN, SIM_MUX_EN, SIM_MUX_SEL, SMPS_SW, SN74AXC1T45DRLR, SN74AXC8T245PWR, SN74LVC1G07DBVR, SN74LVC32APWR, STM32U585VIT6Q, STTS22HTR, SWCLK, SWDIO, Si1016X-T1-GE3, SiT1552AI-JE-DCC-32.768D, T520D107M006ATE015, TAMPER_IN_CONN, TAMPER_IN_U1, TEST_UART_RX_TP, TEST_UART_RX_U1, TEST_UART_TX_TP, TEST_UART_TX_U1, TPD1E05U06DYAR, TPD2EUSB30DRTR, TPD4E05U06DQAR, TS3A27518EPWR, U13_EN_N, U8_MAIN_DTR_1V8, U8_MAIN_RI_1V8, U8_MAIN_RXD_1V8, U8_MAIN_TXD_1V8, U8_PWRKEY_N, U8_RESET_N, U8_STATUS_1V8, U8_VDD_EXT_1V8, USB_CC1, USB_CC2, USB_DM_CONN, USB_DM_U1, USB_DP_CONN, USB_DP_U1, USB_SHIELD, USB_VBUS_CONN, USB_VBUS_SENSE, VCORE_1V1, VREF+, W25Q512JVFIQ",
+      "system OTS documentary purchase identity is missing or inconsistent: Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 323, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 269, in main\n    require(record_hash in record_md, \"machine-record hash missing from Markdown\")\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 41, in require\n    raise RuntimeError(message)\nRuntimeError: machine-record hash missing from Markdown"
+    ],
+    "system_ots_procurement_identity": {
+      "status": "ERROR",
+      "error": "Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 323, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 269, in main\n    require(record_hash in record_md, \"machine-record hash missing from Markdown\")\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 41, in require\n    raise RuntimeError(message)\nRuntimeError: machine-record hash missing from Markdown"
+    }
+  },
+  "system_ots_procurement_identity": {
+    "status": "ERROR",
+    "error": "Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 323, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 269, in main\n    require(record_hash in record_md, \"machine-record hash missing from Markdown\")\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_evt_system_ots_procurement_identity_rev_a.py\", line 41, in require\n    raise RuntimeError(message)\nRuntimeError: machine-record hash missing from Markdown"
+  },
+  "pcb_layer_count_authority": {
+    "schema": "dioneya-pcb-layer-count-authority-audit-v1",
+    "configuration": "EVT-PRE-20 Rev.A",
+    "status": "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED",
+    "manufacturing_release": false,
+    "authority": "hardware\\PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
+    "native_boards": {
+      "PCB-MAIN": {
+        "path": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_pcb",
+        "layers": [
+          "F.Cu",
+          "In1.Cu",
+          "In2.Cu",
+          "In3.Cu",
+          "In4.Cu",
+          "B.Cu"
+        ],
+        "copper_layers": 6,
+        "thickness_mm": 1.6
+      },
+      "PCB-PWR": {
+        "path": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_pcb",
+        "layers": [
+          "F.Cu",
+          "In1.Cu",
+          "In2.Cu",
+          "B.Cu"
+        ],
+        "copper_layers": 4,
+        "thickness_mm": 1.6
+      },
+      "PCB-MIC": {
+        "path": "hardware\\kicad\\native\\PCB-MIC\\PCB-MIC.kicad_pcb",
+        "layers": [
+          "F.Cu",
+          "B.Cu"
+        ],
+        "copper_layers": 2,
+        "thickness_mm": 1.0
+      }
+    },
+    "controlled_counts": {
+      "PCB-MAIN": 6,
+      "PCB-PWR": 4,
+      "PCB-MIC": 2
+    },
+    "open_interlocks": {
+      "PCB-MAIN": "routing; native DRC; CAM; independent Review B; EVT validation",
+      "PCB-PWR": "routing; native DRC; CAM; plus70C thermal EVT; independent Review B; series mechanical revalidation",
+      "PCB-MIC": "native DRC; CAM; first-panel acoustic inspection; independent Review B"
+    }
+  },
+  "pcb_main_hierarchy": {
+    "status": "ERROR",
+    "error": "Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_pcb_main_hierarchy_rev_a.py\", line 18, in <module>\n    from kiutils.board import Board\nModuleNotFoundError: No module named 'kiutils'"
+  },
+  "pcb_main_public_numeric_routing_basis": {
+    "schema": "dioneya-pcb-main-routing-design-basis-audit-v2",
+    "configuration": "EVT-PRE-20 Rev.A",
+    "board": "PCB-MAIN",
+    "status": "PASS_PUBLIC_STANDARD_SELECTED_AS_EVT_JOB_STACKUP_NOT_FOR_MANUFACTURE",
+    "stackup_id": "JLC06161H-3313",
+    "rf_50ohm_trace_width_mm": 0.1509,
+    "usb_90ohm_trace_width_mm": 0.1537,
+    "usb_90ohm_pair_gap_mm": 0.2032,
+    "external_reply_required": false,
+    "manufacturing_release": false
+  },
+  "pcb_pwr_hierarchy": {
+    "status": "ERROR",
+    "error": "Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_pcb_pwr_hierarchy_rev_a.py\", line 11, in <module>\n    from kiutils.board import Board\nModuleNotFoundError: No module named 'kiutils'"
+  },
+  "pcb_pwr_input_protection": {
+    "status": "ERROR",
+    "error": "Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_pcb_pwr_input_protection_rev_a.py\", line 488, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_pcb_pwr_input_protection_rev_a.py\", line 113, in main\n    require(source_control.get(\"evidence_sha256\") == source_evidence_sha256,\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_pcb_pwr_input_protection_rev_a.py\", line 52, in require\n    raise RuntimeError(message)\nRuntimeError: source-control evidence SHA-256 drift"
+  },
+  "pcb_pwr_dim_003": {
+    "status": "ERROR",
+    "error": "Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_pcb_pwr_dim_003_request_rev_a.py\", line 19, in <module>\n    from kiutils.board import Board\nModuleNotFoundError: No module named 'kiutils'"
+  },
+  "pcb_pwr_stackup_copper": {
+    "status": "ERROR",
+    "error": "Traceback (most recent call last):\n  File \"F:\\Проекты\\Codex\\rs-zs-bpla-evt-pre-20\\tools\\audit_pcb_pwr_stackup_copper_request_rev_a.py\", line 20, in <module>\n    from kiutils.board import Board\nModuleNotFoundError: No module named 'kiutils'"
+  },
+  "harness": {
+    "status": "ERROR",
+    "error": "Harness manufacturing drawing: FAIL\n- accepted harness authority input missing: hardware\\reviews\\EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
+  },
+  "checks": [
+    {
+      "name": "controlled_procurement_scenarios",
+      "pass": true,
+      "detail": "procurement quantities 4, 10 and 20 with maximum serial capacity 20",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "customer_commercial_procurement_boundary",
+      "pass": true,
+      "detail": "stock, price, MOQ, payment and delivery are non-blocking customer actions; exact MPN, checkout DFM and physical EVT gates remain mandatory; external replies do not",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "production_bom_qg2",
+      "pass": false,
+      "detail": "production BOM QG-2 BLOCKED (2 findings)",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "system_ots_documentary_procurement_identity",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_layer_count_authority",
+      "pass": true,
+      "detail": "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_human_readable_hierarchy_internal_equivalence",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_main_hierarchy_native_erc_pdf_evidence",
+      "pass": false,
+      "detail": "commit-bound KiCad 9 ERC/PDF evidence PENDING",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_main_hierarchy_independent_human_review",
+      "pass": false,
+      "detail": "independent human hierarchy review PENDING",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_ti_primary_source_binding",
+      "pass": true,
+      "detail": "LMR604403SRAKR U3 adjustable/U4 fixed and LM74700 VCAP primary evidence PASS",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_human_readable_hierarchy_internal_equivalence",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_hierarchy_native_erc_pdf_evidence",
+      "pass": false,
+      "detail": "commit-bound KiCad 9 ERC/PDF evidence PASS",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_hierarchy_independent_human_review",
+      "pass": false,
+      "detail": "independent human hierarchy review PASS",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_input_protection_qualification_packet",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_input_protection_release",
+      "pass": false,
+      "detail": "native ECO=False; qualification=0/20 PASS",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_fitted_2d_placement_clearance",
+      "pass": false,
+      "detail": "MISSING",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_pre_route_constraint_coverage",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_hot_loop_006_application",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_shunt_bulk_007_application",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_c13_c12_008_application",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_3v8_output_bulk_010_application",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_c13_c11_009_application",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_conservative_evt_numeric_routing_basis",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_dim_003_request_packet",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_dim_003_acceptance",
+      "pass": false,
+      "detail": "0/18 responses accepted",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_stackup_copper_request_packet",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_stackup_copper_acceptance",
+      "pass": false,
+      "detail": "accepted_rows=0/24 external_reply_required=false stackup=NONE",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "harness_controlled_preliminary_packet",
+      "pass": false,
+      "detail": "ERROR; supplier responses=MISSING/16",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "harness_manufacturing_release",
+      "pass": false,
+      "detail": "controlled preliminary; 0 release blockers",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb-main_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-main_routing_presence",
+      "pass": true,
+      "detail": "segments=765 vias=304 zones=12",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-mic_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-mic_routing_presence",
+      "pass": true,
+      "detail": "segments=27 vias=5 zones=0",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-pwr_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-pwr_routing_presence",
+      "pass": true,
+      "detail": "segments=575 vias=267 zones=33",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_placement_clearance",
+      "pass": true,
+      "detail": "state=PASS confirmed=0 screening=0 mounting_confirmed=0 mounting_screening=0 tool_confirmed=0 tool_screening=0",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_public_numeric_routing_basis",
+      "pass": true,
+      "detail": "JLC06161H-3313 EVT stackup RF=0.1509 mm USB=0.1537/0.2032 mm; external reply not required",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_rf_si_return_path_control",
+      "pass": false,
+      "detail": "historical ECO_REQUIRED finding and cellular L2 proposal remain hash-bound after bounded application",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_main_gnss_rf_eco_control",
+      "pass": false,
+      "detail": "historical FL1/C64-only GNSS RF ECO-001 proposal remains hash-bound after bounded application",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_main_rf_remediation_application_control",
+      "pass": false,
+      "detail": "ERROR",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_main_cellular_l2_return_acceptance",
+      "pass": false,
+      "detail": "PCB-MAIN-RF-RETURN-001 acceptance/application is incomplete",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_main_gnss_rf_placement_routeability",
+      "pass": false,
+      "detail": "PCB-MAIN-GNSS-RF-ECO-001 acceptance/application is incomplete",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_main_rf_si_return_path_repeat_review",
+      "pass": true,
+      "detail": "PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_stackup_impedance_request_packet",
+      "pass": true,
+      "detail": "EVT_PUBLIC_STANDARD_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_stackup_impedance_acceptance",
+      "pass": true,
+      "detail": "22/22 engineering-baseline closures; JLC06161H-3313 selected",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_assembler_dfm_stencil_request_packet",
+      "pass": true,
+      "detail": "EVT_STANDARD_PCBA_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_assembler_dfm_stencil_acceptance",
+      "pass": true,
+      "detail": "accepted=14/14 assembler/site selected by customer at order time",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_review_b_release",
+      "pass": false,
+      "detail": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_review_b_release",
+      "pass": false,
+      "detail": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_DIM_003_AND_EVT_STACKUP_GEOMETRY_ACCEPTED_ROUTING_PENDING",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_mic_release_status_control",
+      "pass": true,
+      "detail": "ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_mic_mechanical_authority_traceability",
+      "pass": true,
+      "detail": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_mic_manufacturing_handoff_packet",
+      "pass": false,
+      "detail": "SOURCE_CHANGED_REGENERATE_OUTPUTS_AND_REPEAT_REVIEW",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_mic_fabrication_release",
+      "pass": false,
+      "detail": "status=ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED; Review A=REPEAT_REQUIRED_AFTER_ACOUSTIC_CLEARANCE_ECO; Review B=REOPENED_AFTER_ACOUSTIC_CLEARANCE_ECO",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "mechanical_dimensions",
+      "pass": false,
+      "detail": "open: DIM-001, DIM-005, DIM-006, DIM-007, DIM-008, DIM-009, DIM-010, DIM-011, DIM-012, DIM-013, DIM-014S, DIM-015, DIM-016",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "purchase_lot_selection",
+      "pass": true,
+      "detail": "selected quantity 20",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "customer_commercial_rfq_fields",
+      "pass": true,
+      "detail": "non-blocking customer fields remain blank in 25 sourcing rows",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    }
+  ]
+}

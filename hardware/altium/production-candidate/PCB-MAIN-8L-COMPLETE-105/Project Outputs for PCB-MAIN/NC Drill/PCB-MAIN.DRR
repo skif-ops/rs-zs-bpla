@@ -1,0 +1,22 @@
+----------------------------------------------------------------------------------------------------------------------------------
+NCDrill File Report For: PCB-MAIN.PcbDoc   15.10.2026  23:05:40
+----------------------------------------------------------------------------------------------------------------------------------
+
+Layer Pair : F.Cu to B.Cu
+ASCII Plated RoundHoles File : PCB-MAIN-RoundHoles-Plated.TXT
+ASCII Plated SlotHoles File : PCB-MAIN-SlotHoles-Plated.TXT
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T1      0.15mm (6mil)                                             Round             274       PTH        926.40mm (36.47inch)
+T2      0.3mm (12mil)                                             Round             579       PTH        1730.19mm (68.12inch)
+T3      0.6mm (24mil)                                             Slot              4         PTH        38.14mm (1.50inch)
+T4      0.65mm (26mil)                                            Round             2         PTH        5.78mm (0.23inch)
+T5      1.02mm (40mil)                                            Round             12        PTH        36.00mm (1.42inch)
+T6      1.2mm (47mil)                                             Round             12        PTH        71.12mm (2.80inch)
+T7      3mm (118mil)                                              Round             2         PTH        10.70mm (0.42inch)
+T8      3.2mm (126mil)                                            Round             4         PTH        262.00mm (10.31inch)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              889
+
+Total Processing Time (hh:mm:ss) : 00:00:00

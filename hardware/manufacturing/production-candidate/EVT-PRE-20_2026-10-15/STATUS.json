@@ -1,0 +1,29 @@
+{
+  "schema": "dioneya-evt-pre-20-full-production-candidate-v1",
+  "date": "2026-10-15",
+  "branch": "evt-pre-20",
+  "release_status": "PRODUCTION_CANDIDATE_HOLD_FOR_DFM",
+  "manufacturing_authorized": false,
+  "boards": {
+    "PCB-MAIN": {
+      "altium_compile_errors": 0,
+      "altium_compile_warnings": 146,
+      "altium_drc_violations": 3,
+      "copper_layers": 8
+    },
+    "PCB-PWR": {
+      "altium_compile_errors": 0,
+      "altium_compile_warnings": 31,
+      "altium_drc_violations": 0,
+      "copper_layers": 4
+    },
+    "PCB-MIC": {
+      "altium_drc_violations": 0,
+      "copper_layers": 2,
+      "source_review_state": "SOURCE_CHANGED_REGENERATE_OUTPUTS_AND_REPEAT_REVIEW"
+    }
+  },
+  "hardware_audit": "BLOCKED",
+  "evt_build_release_audit": "BLOCKED",
+  "archive_name": "EVT-PRE-20_FULL_PRODUCTION_CANDIDATE_2026-10-15.zip"
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "dioneya-pcb-main-candidate-release-v1",
+  "board": "PCB-MAIN",
+  "revision": "B",
+  "date": "2026-09-30",
+  "status_ru": "Трассировка завершена. Официальные возможности JLCPCB покрывают базис заказа; при заказе выбрать стек и POFV, сверить производственные файлы и оформить отклонения через ECO.",
+  "status_en": "Routing complete. Published JLCPCB capabilities cover the order baseline; select stack and POFV at order, verify production files and process deviations through ECO.",
+  "board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "kicad_version": "10.0.6",
+  "copper_layers": 8,
+  "drc_errors": 0,
+  "unconnected": 0,
+  "drc_warnings": 30,
+  "warning_types": {
+    "via_dangling": 7,
+    "silk_over_copper": 23
+  },
+  "schematic_parity_warnings": 601,
+  "schematic_parity_disposition_ru": "601 предупреждение совпадает с исходной платой 104; новых расхождений нет. Преобладают расхождения имен полей/посадочных мест и иерархический префикс цепей.",
+  "schematic_parity_disposition_en": "All 601 warnings match source candidate 104; no new discrepancy. Predominantly field/footprint names and hierarchical net prefix.",
+  "erc_violations": 0,
+  "pad_geometry_position_net_equal_to_104": true,
+  "reference_changes_from_104": {
+    "J_PWR": "J_PWR1",
+    "TP_BLE_SWD": "TP_BLE_SWD1",
+    "TP_CELL_DBG": "TP_CELL_DBG1",
+    "TP_CELL_USB": "TP_CELL_USB1",
+    "TP_EOL": "TP_EOL1",
+    "TP_MCU_SWD": "TP_MCU_SWD1"
+  },
+  "via_in_pad_count": 57,
+  "fill_and_cap_via_count": 74,
+  "official_supplier_screen": "fab/JLCPCB_OFFICIAL_CAPABILITY_SCREEN_REV_B_105.json",
+  "dfm_open_ru": [
+    "Выбор стека при заказе и фиксация межслойных диэлектриков и импедансов",
+    "Сверка 74 заполненных и закрытых медью переходов по координатам, включая 57 в SMD-площадках",
+    "Проверка импеданса, отверстий и уменьшенных контактных площадок J6/J7/J11",
+    "Проверка BOM, DNP, полярности, ориентации и образца монтажа"
+  ],
+  "dfm_open_en": [
+    "Select order stack and record dielectrics and impedance targets",
+    "Verify all 74 fill/cap via coordinates, including 57 in SMD pads",
+    "Check impedance, drills and adjusted J6/J7/J11 pads",
+    "Review BOM, DNP, polarity, orientation and first article assembly"
+  ],
+  "controlled_fab_job": "fab/gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-job.gbrjob",
+  "fabrication_stack_request": "fab/STACKUP_REQUEST.json"
+}

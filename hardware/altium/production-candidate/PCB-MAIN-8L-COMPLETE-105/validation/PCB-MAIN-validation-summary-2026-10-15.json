@@ -1,0 +1,66 @@
+{
+  "schema": "dioneya-main8l-altium-production-candidate-v1",
+  "date": "2026-10-15",
+  "release_status": "PRODUCTION_CANDIDATE_HOLD_FOR_DFM",
+  "manufacturing_authorized": false,
+  "source": {
+    "git_commit": "592f955d88570dcbb5eb41d59848db05aac84f88",
+    "git_path": "hardware/kicad/candidates/PCB-MAIN-8L-COMPLETE-105",
+    "revision": "B",
+    "copper_layers": 8
+  },
+  "altium": {
+    "compile_success": true,
+    "compile_errors": 0,
+    "compile_warnings": 146,
+    "warning_categories": {
+      "Missing component models": 64,
+      "Nets with no driving source": 43,
+      "Nets with possible connection problems": 39
+    },
+    "components": 251,
+    "pads": 1143,
+    "vias": 853,
+    "nets": 185,
+    "pcb_sha256": "BFA1355CFE70B9794507C58FFD22923FBAEB3234DECDDB595796E8C0441141CF",
+    "drc_violations": 3
+  },
+  "kicad": {
+    "version": "10.0.6",
+    "erc_violations": 0,
+    "drc_errors": 0,
+    "unconnected_items": 0,
+    "drc_warnings": 30,
+    "warning_categories": {
+      "via_dangling": 7,
+      "silk_over_copper": 23
+    }
+  },
+  "conversion_parity": {
+    "route_segments": "5969/5969",
+    "physical_paths": "5856/5856",
+    "wrong_copper_layers": 0,
+    "components": "251/251",
+    "pads": "1143/1143",
+    "vias": "853/853",
+    "net_names": "185/185",
+    "equivalent_after_joining_collinear_splits": true
+  },
+  "outputs": {
+    "gerber_x2_copper_layers": 8,
+    "nc_drill": true,
+    "pick_place": true,
+    "ipc_d_356a": true,
+    "step": true,
+    "documentation_pdf_pages": 21,
+    "compiled_bom_components": 248,
+    "compiled_bom_groups": 67
+  },
+  "open_gates": [
+    "Three Altium Net Antennae via warnings require design disposition.",
+    "Fabricator stackup and controlled-impedance confirmation are open.",
+    "The global procurement BOM still identifies PCB-MAIN as six-layer and must be reconciled to this eight-layer candidate.",
+    "The Altium compiled BOM has 248 schematic components while the board has 251 component objects; mechanical/non-electrical objects require disposition.",
+    "RF/GNSS/cellular, DFM, Review B, assembly polarity/DNP and first-article checks remain open."
+  ]
+}

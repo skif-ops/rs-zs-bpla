@@ -1,0 +1,119 @@
+{
+  "Header": {
+    "GenerationSoftware": {
+      "Vendor": "KiCad",
+      "Application": "Pcbnew",
+      "Version": "10.0.6"
+    },
+    "CreationDate": "2026-09-29T22:29:41+03:00"
+  },
+  "GeneralSpecs": {
+    "ProjectId": {
+      "Name": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B",
+      "GUID": "5043422d-4d41-4494-9e5f-384c5f434f4d",
+      "Revision": "B"
+    },
+    "Size": {
+      "X": 110.1,
+      "Y": 75.1
+    },
+    "LayerNumber": 8,
+    "BoardThickness": 1.6,
+    "Finish": "ENIG"
+  },
+  "DesignRules": [
+    {
+      "Layers": "Outer",
+      "PadToPad": 0.1,
+      "PadToTrack": 0.1,
+      "TrackToTrack": 0.1,
+      "MinLineWidth": 0.1
+    },
+    {
+      "Layers": "Inner",
+      "PadToPad": 0.0,
+      "PadToTrack": 0.0,
+      "TrackToTrack": 0.1,
+      "MinLineWidth": 0.1,
+      "TrackToRegion": 0.1,
+      "RegionToRegion": 0.1
+    }
+  ],
+  "FilesAttributes": [
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-F_Cu.gtl",
+      "FileFunction": "Copper,L1,Top",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In1_Cu.g1",
+      "FileFunction": "Copper,L2,Inr",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In2_Cu.g2",
+      "FileFunction": "Copper,L3,Inr",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In3_Cu.g3",
+      "FileFunction": "Copper,L4,Inr",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In4_Cu.g4",
+      "FileFunction": "Copper,L5,Inr",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In5_Cu.g5",
+      "FileFunction": "Copper,L6,Inr",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In6_Cu.g6",
+      "FileFunction": "Copper,L7,Inr",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-B_Cu.gbl",
+      "FileFunction": "Copper,L8,Bot",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-F_Paste.gtp",
+      "FileFunction": "SolderPaste,Top",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-B_Paste.gbp",
+      "FileFunction": "SolderPaste,Bot",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-F_Silkscreen.gto",
+      "FileFunction": "Legend,Top",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-B_Silkscreen.gbo",
+      "FileFunction": "Legend,Bot",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-F_Mask.gts",
+      "FileFunction": "SolderMask,Top",
+      "FilePolarity": "Negative"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-B_Mask.gbs",
+      "FileFunction": "SolderMask,Bot",
+      "FilePolarity": "Negative"
+    },
+    {
+      "Path": "PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-Edge_Cuts.gm1",
+      "FileFunction": "Profile",
+      "FilePolarity": "Positive"
+    }
+  ]
+}
