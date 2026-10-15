@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-evt-pre-20-production-candidate-record-v1",
+  "date": "2026-10-16",
+  "branch": "evt-pre-20",
+  "archive_source_commit": "ba16d9968064b95e9b657c5245129443496234bf",
+  "release_status": "PRODUCTION_CANDIDATE_HOLD_FOR_ENGINEERING_CLOSURE",
+  "manufacturing_authorized": false,
+  "archive_name": "EVT-PRE-20_FULL_PRODUCTION_CANDIDATE_2026-10-16.zip",
+  "archive_bytes": 24438596,
+  "archive_sha256": "DCFB935C96FDBAF156F449658976D024986703DEC3459ACC1EB1C16881475802",
+  "payload_file_count": 1069,
+  "verification": {
+    "directory_manifest": true,
+    "zip_crc": true,
+    "zip_payload_hashes": true,
+    "path_confinement": true
+  },
+  "board_release": {
+    "PCB-MAIN": "BLOCKED_6L_DRC_203_ERRORS_499_UNCONNECTED_AND_8L_AUTHORITY_CONFLICT",
+    "PCB-PWR": "HOLD_REVIEW_B_OPEN",
+    "PCB-MIC": "HOLD_REVIEW_A_B_REPEAT_REQUIRED"
+  }
+}

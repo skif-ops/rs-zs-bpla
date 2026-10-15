@@ -1,0 +1,16 @@
+{
+  "schema": "dioneya-evt-pre-20-external-archive-v1",
+  "release_directory": "F:\\Проекты\\Codex\\release-packages\\EVT-PRE-20_FULL_PRODUCTION_CANDIDATE_2026-10-16",
+  "archive": "F:\\Проекты\\Codex\\release-packages\\EVT-PRE-20_FULL_PRODUCTION_CANDIDATE_2026-10-16.zip",
+  "archive_bytes": 24438596,
+  "archive_sha256": "DCFB935C96FDBAF156F449658976D024986703DEC3459ACC1EB1C16881475802",
+  "payload_file_count": 1069,
+  "zip_member_count": 1070,
+  "directory_manifest_verified": true,
+  "zip_crc_verified": true,
+  "zip_payload_hashes_verified": true,
+  "path_confinement_verified": true,
+  "source_commit": "ba16d9968064b95e9b657c5245129443496234bf",
+  "release_status": "PRODUCTION_CANDIDATE_HOLD_FOR_ENGINEERING_CLOSURE",
+  "manufacturing_authorized": false
+}
