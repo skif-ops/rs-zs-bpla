@@ -1,0 +1,5 @@
+﻿Comment,Designator,Footprint,LCSC Part #,Manufacturer,Manufacturer Part Number,Item ID,Procurement Status
+Digital bottom-port PDM MEMS microphone,MK1,LGA-CAV-5 3.5x2.65x0.98 mm,,TDK InvenSense,MMICT5838-00-012,MK1,SELECTED_PENDING_SAMPLE
+100 nF 25 V X7R,PCB-MIC:C1 x4,0402 1005 metric,,TDK,CGA2B3X7R1E104K050BB,C-MIC,SELECTED_PENDING_SAMPLE
+6-position microphone leaf board header,PCB-MIC:J1 x4,Pico-Lock 1.50 mm 6-circuit right-angle SMT,,Molex,5040500691,J-MIC,MECHANICAL_AUTHORITY_FROZEN_PENDING_SI_AAD
+0 ohm,PCB-MIC:R1 x4,0402 1005 metric,,Panasonic Industry,ERJ-2GE0R00X,R-MIC,SELECTED_POPULATED_BASELINE_PENDING_SI
