@@ -25,5 +25,9 @@
   },
   "hardware_audit": "BLOCKED",
   "evt_build_release_audit": "BLOCKED",
-  "archive_name": "EVT-PRE-20_FULL_PRODUCTION_CANDIDATE_2026-10-15.zip"
+  "archive_name": "EVT-PRE-20_FULL_PRODUCTION_CANDIDATE_2026-10-15.zip",
+  "content_commit": "80dd64000d66d9eb9994174210eb55aee0d3d3be",
+  "archive_sha256": "2FE5A516EAD16640FC3497D51C20CBBB0B825DF061010AA32B22BC1D8A3480D8",
+  "archive_bytes": 21106455,
+  "archive_file_count": 854
 }
