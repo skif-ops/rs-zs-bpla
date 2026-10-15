@@ -1,0 +1,48 @@
+{
+  "schema": "dioneya-evt-pre-20-altium-diagnostic-bundle-v1",
+  "date": "2026-10-15",
+  "branch": "evt-pre-20",
+  "release_status": "NOT_FOR_MANUFACTURE",
+  "strict_hardware_audit": "BLOCKED",
+  "boards": {
+    "PCB-MIC": {
+      "altium_compile_errors": 0,
+      "altium_drc_warnings": 0,
+      "altium_drc_rule_violations": 0,
+      "connectivity_physical_pins": "17/17",
+      "connectivity_nets": "7/7",
+      "altium_output_copper_layers": 2,
+      "manufacturing_release": "BLOCKED"
+    },
+    "PCB-PWR": {
+      "altium_compile_errors": 0,
+      "altium_compile_warnings": 31,
+      "altium_drc_warnings": 0,
+      "altium_drc_rule_violations": 0,
+      "connectivity_physical_pins": "161/161",
+      "connectivity_multi_pin_nets": "31/31",
+      "altium_output_copper_layers": 4,
+      "native_kicad_drc_warnings": 7,
+      "manufacturing_release": "BLOCKED"
+    },
+    "PCB-MAIN": {
+      "altium_compile_errors": 0,
+      "altium_compile_warnings": 146,
+      "altium_drc_warnings": 0,
+      "altium_drc_rule_violations": 421,
+      "connectivity_physical_pins": "1074/1074",
+      "source_kicad_copper_layers": 6,
+      "altium_output_copper_layers": 2,
+      "native_kicad_drc_violations": 667,
+      "native_kicad_unconnected_items": 499,
+      "native_kicad_schematic_parity_items": 601,
+      "manufacturing_release": "BLOCKED"
+    }
+  },
+  "known_output_limitations": [
+    "No valid newly generated Altium documentation PDF: Board Stack Report required Microsoft Excel and the PDF script then failed with a source-array exception.",
+    "No fresh approved Altium BOM: the OutJob has no approved BOM template; bundled BOM files are tracked reference artifacts with audit-reported evidence/hash drift.",
+    "Gerber layer selection must be reviewed in Altium before any regeneration because Altium 26 did not reliably persist it across every imported project.",
+    "PCB-MAIN Altium output is two-layer while the KiCad source is six-layer."
+  ]
+}

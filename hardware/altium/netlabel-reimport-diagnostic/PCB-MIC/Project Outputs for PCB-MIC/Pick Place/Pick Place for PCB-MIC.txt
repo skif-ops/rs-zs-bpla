@@ -1,0 +1,19 @@
+Altium Designer Pick and Place Locations
+F:\2AC9~1\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\netlabel-reimport-diagnostic\PCB-MIC\Project Outputs for PCB-MIC\Pick Place\Pick Place for PCB-MIC.txt
+
+========================================================================================================================
+File Design Information:
+
+Date:       15.10.26
+Time:       15:15
+Revision:   b371b04ff5c3550c4d6eb5949c89a93a5decc770
+Variant:    No variations
+Units used: mil
+
+Designator Comment Layer    Footprint         Center-X(mil) Center-Y(mil) Rotation Description                                                                                                                                                                                                                                                      
+H2         Comment TopLayer ""                787.402       210.630       0        ""                                                                                                                                                                                                                                                               
+H1         Comment TopLayer ""                157.480       210.630       0        ""                                                                                                                                                                                                                                                               
+R1         Comment TopLayer R_0402_1005Metric 442.913       450.787       270      "Resistor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator"  
+J1         Comment TopLayer Molex_5040500691  472.441       669.291       180      ""                                                                                                                                                                                                                                                               
+C1         Comment TopLayer C_0402_1005Metric 555.118       344.488       0        "Capacitor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator" 
+MK1        Comment TopLayer T5838_RevA        472.441       236.220       0        ""                                                                                                                                                                                                                                                               

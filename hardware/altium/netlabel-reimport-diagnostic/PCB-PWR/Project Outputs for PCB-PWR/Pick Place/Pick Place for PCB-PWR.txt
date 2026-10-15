@@ -1,0 +1,76 @@
+Altium Designer Pick and Place Locations
+\Project Outputs for PCB-PWR\Pick Place\Pick Place for PCB-PWR.txt
+
+========================================================================================================================
+File Design Information:
+
+Date:       15.10.26
+Time:       15:24
+Revision:   Not in VersionControl
+Variant:    No variations
+Units used: mil
+
+Designator Comment Layer    Footprint                            Center-X(mil) Center-Y(mil) Rotation Description              
+TP4        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1284.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+TP5        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1384.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+U5         Comment TopLayer TI_DBV0005A_SOT23-5                  2929.134      551.181       0        DIONEA_PCB_PWR_REV_A     
+C14        Comment TopLayer C_1210_3225Metric                    2913.386      1968.504      0        DIONEA_PCB_PWR_REV_A     
+L1         Comment TopLayer Coilcraft_XAL7030_472                2460.630      1811.024      180      DIONEA_PCB_PWR_REV_A     
+R12        Comment TopLayer R_0402_1005Metric                    2696.850      433.071       0        DIONEA_PCB_PWR_REV_A     
+C8         Comment TopLayer C_0603_1608Metric                    2948.819      236.220       0        DIONEA_PCB_PWR_REV_A     
+R5         Comment TopLayer R_0402_1005Metric                    2185.039      1535.433      0        DIONEA_PCB_PWR_REV_A     
+U4         Comment TopLayer LMR60440_RAK0009A                    2165.354      708.268       90       DIONEA_PCB_PWR_REV_A     
+J2         Comment TopLayer Molex_43045-1202_MicroFit-12_RA      3218.110      492.126       270      DIONEA_PCB_PWR_REV_A     
+TP3        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1184.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+C15        Comment TopLayer C_1210_3225Metric                    2716.535      1692.913      0        DIONEA_PCB_PWR_REV_A     
+C9         Comment TopLayer C_0603_1608Metric                    629.921       1309.055      0        DIONEA_PCB_PWR_REV_A     
+R8         Comment TopLayer R_0402_1005Metric                    2066.929      433.071       0        DIONEA_PCB_PWR_REV_A     
+TP10       Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1884.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+R1         Comment TopLayer R_0402_1005Metric                    2204.724      1614.173      0        DIONEA_PCB_PWR_REV_A     
+TP1        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          984.252       157.480       0        DIONEA_PCB_PWR_REV_A     
+C11        Comment TopLayer C_1210_3225Metric                    1929.134      1811.024      0        DIONEA_PCB_PWR_REV_A     
+C19        Comment TopLayer C_1210_3225Metric                    2913.386      698.819       0        DIONEA_PCB_PWR_REV_A     
+D1         Comment TopLayer D_SMB                                570.866       1023.622      90       DIONEA_PCB_PWR_REV_A     
+R15        Comment TopLayer R_0402_1005Metric                    2401.575      1555.118      0        DIONEA_PCB_PWR_REV_A     
+C2         Comment TopLayer C_0402_1005Metric                    1909.449      1496.063      0        DIONEA_PCB_PWR_REV_A     
+C3         Comment TopLayer C_1210_3225Metric                    2716.535      1968.504      0        DIONEA_PCB_PWR_REV_A     
+F1         Comment TopLayer Fuse_1206_3216Metric                 511.811       1220.472      0        DIONEA_PCB_PWR_REV_A     
+C5         Comment TopLayer C_1210_3225Metric                    2716.535      866.142       0        DIONEA_PCB_PWR_REV_A     
+U2         Comment TopLayer TI_DGS0010A_VSSOP10                  1732.284      1456.693      0        DIONEA_PCB_PWR_REV_A     
+R9         Comment TopLayer R_0402_1005Metric                    2165.354      433.071       0        DIONEA_PCB_PWR_REV_A     
+R14        Comment TopLayer R_0402_1005Metric                    2937.008      78.740        0        DIONEA_PCB_PWR_REV_A     
+L2         Comment TopLayer Coilcraft_XAL7030_472                2460.630      708.661       180      DIONEA_PCB_PWR_REV_A     
+R4         Comment TopLayer R_0402_1005Metric                    2086.614      1535.433      0        DIONEA_PCB_PWR_REV_A     
+H1         Comment TopLayer MountingHole_M3_3.4_EVT              196.850       2165.354      0        DIONEA_PCB_PWR_EVT_MOUNT 
+U3         Comment TopLayer LMR60440_RAK0009A                    2165.354      1810.630      90       DIONEA_PCB_PWR_REV_A     
+R13        Comment TopLayer R_0402_1005Metric                    2937.008      137.795       0        DIONEA_PCB_PWR_REV_A     
+C18        Comment TopLayer C_1210_3225Metric                    2716.535      590.551       0        DIONEA_PCB_PWR_REV_A     
+RSH1       Comment TopLayer Vishay_WSK2512_4T_T1.19mm            1437.008      1141.732      0        DIONEA_PCB_PWR_REV_A     
+TP2        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1084.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+Q1         Comment TopLayer CSD18540Q5B_DNK                      1060.236      1181.102      0        DIONEA_PCB_PWR_REV_A     
+R11        Comment TopLayer R_0402_1005Metric                    2598.425      433.071       0        DIONEA_PCB_PWR_REV_A     
+TP8        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1684.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+TP9        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1784.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+C13        Comment TopLayer CP_Elec_6.3x7.7                      1850.394      1102.362      0        DIONEA_PCB_PWR_REV_A     
+R2         Comment TopLayer R_0402_1005Metric                    2303.150      1614.173      0        DIONEA_PCB_PWR_REV_A     
+H4         Comment TopLayer MountingHole_M3_3.4_EVT              196.850       196.850       0        DIONEA_PCB_PWR_EVT_MOUNT 
+J1         Comment TopLayer Molex_43045-0213_MicroFit-2_Vertical 236.220       1200.787      0        DIONEA_PCB_PWR_REV_A     
+TP6        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1484.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+C20        Comment TopLayer C_0603_1608Metric                    2061.024      1811.024      90       DIONEA_PCB_PWR_REV_A     
+U1         Comment TopLayer TI_DBV0006A_SOT23-6                  787.402       1181.102      0        DIONEA_PCB_PWR_REV_A     
+C17        Comment TopLayer C_1210_3225Metric                    2913.386      866.142       0        DIONEA_PCB_PWR_REV_A     
+R3         Comment TopLayer R_0402_1005Metric                    1988.189      1614.173      0        DIONEA_PCB_PWR_REV_A     
+H2         Comment TopLayer MountingHole_M3_3.4_EVT              3228.347      2165.354      0        DIONEA_PCB_PWR_EVT_MOUNT 
+C10        Comment TopLayer C_1210_3225Metric                    1338.583      1338.583      0        DIONEA_PCB_PWR_REV_A     
+C7         Comment TopLayer C_0603_1608Metric                    2929.134      393.701       0        DIONEA_PCB_PWR_REV_A     
+R10        Comment TopLayer R_0402_1005Metric                    2283.465      511.811       0        DIONEA_PCB_PWR_REV_A     
+C6         Comment TopLayer C_0402_1005Metric                    2275.591      707.480       270      DIONEA_PCB_PWR_REV_A     
+C16        Comment TopLayer C_1210_3225Metric                    2913.386      1692.913      0        DIONEA_PCB_PWR_REV_A     
+H3         Comment TopLayer MountingHole_M3_3.4_EVT              2677.165      196.850       0        DIONEA_PCB_PWR_EVT_MOUNT 
+TP7        Comment TopLayer TestPoint_DFT_1.7mm_NoPaste          1584.252      157.480       0        DIONEA_PCB_PWR_REV_A     
+C4         Comment TopLayer C_0402_1005Metric                    2275.591      1809.842      270      DIONEA_PCB_PWR_REV_A     
+C1         Comment TopLayer C_0402_1005Metric                    787.402       1338.583      0        DIONEA_PCB_PWR_REV_A     
+C21        Comment TopLayer C_0603_1608Metric                    2061.024      708.661       90       DIONEA_PCB_PWR_REV_A     
+R7         Comment TopLayer R_0402_1005Metric                    1968.504      511.811       0        DIONEA_PCB_PWR_REV_A     
+C12        Comment TopLayer C_1210_3225Metric                    1929.134      708.661       0        DIONEA_PCB_PWR_REV_A     
+R6         Comment TopLayer R_0402_1005Metric                    1889.764      1633.858      0        DIONEA_PCB_PWR_REV_A     

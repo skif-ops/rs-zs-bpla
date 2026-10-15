@@ -1,0 +1,200 @@
+*************************************************************
+FileName = PCB-MIC.GBR
+AutoAperture = True
+*************************************************************
+Generating : F.Cu
+      File : PCB-MIC_Copper_Signal_Top.gbr
+
+    Adding Layer      : F.Cu
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D10
+    D11
+    D12
+    D13
+    D14
+    D15
+    D16
+    D17
+    D18
+    D19
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+    D36
+    D37
+    D38
+    D39
+*************************************************************
+
+*************************************************************
+Generating : B.Cu
+      File : PCB-MIC_Copper_Signal_Bot.gbr
+
+    Adding Layer      : B.Cu
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D37
+    D38
+    D39
+    D40
+    D41
+*************************************************************
+
+*************************************************************
+Generating : F.SilkS
+      File : PCB-MIC_Legend_Top.gbr
+
+    Adding Layer      : F.SilkS
+
+
+Used DCodes :
+    D42
+*************************************************************
+
+*************************************************************
+Generating : B.SilkS
+      File : PCB-MIC_Legend_Bot.gbr
+
+    Adding Layer      : B.SilkS
+
+
+Used DCodes :
+*************************************************************
+
+*************************************************************
+Generating : F.Mask
+      File : PCB-MIC_Soldermask_Top.gbr
+
+    Adding Layer      : F.Mask
+
+    Adding Layer      : F.Cu
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D10
+    D11
+    D12
+    D13
+    D14
+    D15
+    D16
+    D17
+    D18
+    D19
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D37
+    D38
+*************************************************************
+
+*************************************************************
+Generating : B.Mask
+      File : PCB-MIC_Soldermask_Bot.gbr
+
+    Adding Layer      : B.Mask
+
+    Adding Layer      : B.Cu
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D37
+    D38
+*************************************************************
+
+*************************************************************
+Generating : F.Paste
+      File : PCB-MIC_Paste_Top.gbr
+
+    Adding Layer      : F.Paste
+
+    Adding Layer      : F.Cu
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D10
+    D11
+    D12
+    D13
+    D42
+    D43
+    D44
+*************************************************************
+
+*************************************************************
+Generating : B.Paste
+      File : PCB-MIC_Paste_Bot.gbr
+
+    Adding Layer      : B.Paste
+
+    Adding Layer      : B.Cu
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+*************************************************************
+
+*************************************************************
+Generating : Profile
+      File : PCB-MIC_Profile.gbr
+
+
+Used DCodes :
+    D45
+*************************************************************
+
+*************************************************************
+Generating : Non-plated through-hole drill file
+      File : PCB-MIC_NPTH_Drill.gbr
+
+
+Used DCodes :
+*************************************************************
+
+*************************************************************
+Generating : Plated through-hole drill file
+      File : PCB-MIC_PTH_Drill.gbr
+
+
+Used DCodes :
+    D46
+    D47
+    D48
+*************************************************************
+
