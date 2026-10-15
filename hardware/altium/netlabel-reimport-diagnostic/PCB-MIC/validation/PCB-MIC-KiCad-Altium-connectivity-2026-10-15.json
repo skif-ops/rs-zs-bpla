@@ -1,0 +1,182 @@
+{
+  "kicad_source": "F:\\2AC9~1\\Codex\\rs-zs-bpla-evt-pre-20\\hardware\\altium\\netlabel-reimport-diagnostic\\PCB-MIC\\validation\\PCB-MIC-KiCad-current.xml",
+  "altium_project": {
+    "project_name": "PCB-MIC.PrjPcb",
+    "project_path": "F:\\2AC9~1\\Codex\\rs-zs-bpla-evt-pre-20\\hardware\\altium\\netlabel-reimport-diagnostic\\PCB-MIC\\PCB-MIC.PrjPcb"
+  },
+  "kicad_net_count": 7,
+  "altium_net_count": 7,
+  "kicad_pin_count": 17,
+  "altium_pin_count": 17,
+  "pin_mismatches": [],
+  "net_mismatches": [],
+  "pass": true,
+  "kicad_nets": {
+    "1V8_MIC": [
+      [
+        "C1",
+        "1"
+      ],
+      [
+        "J1",
+        "1"
+      ],
+      [
+        "MK1",
+        "7"
+      ]
+    ],
+    "AAD_CFG": [
+      [
+        "J1",
+        "6"
+      ],
+      [
+        "MK1",
+        "5"
+      ]
+    ],
+    "GND": [
+      [
+        "C1",
+        "2"
+      ],
+      [
+        "J1",
+        "2"
+      ],
+      [
+        "MK1",
+        "2"
+      ],
+      [
+        "MK1",
+        "3"
+      ]
+    ],
+    "MIC_WAKE": [
+      [
+        "J1",
+        "5"
+      ],
+      [
+        "MK1",
+        "4"
+      ]
+    ],
+    "PDM_CLK": [
+      [
+        "J1",
+        "3"
+      ],
+      [
+        "MK1",
+        "6"
+      ]
+    ],
+    "PDM_DATA": [
+      [
+        "J1",
+        "4"
+      ],
+      [
+        "R1",
+        "1"
+      ]
+    ],
+    "PDM_DATA_MIC": [
+      [
+        "MK1",
+        "1"
+      ],
+      [
+        "R1",
+        "2"
+      ]
+    ]
+  },
+  "altium_nets": {
+    "1V8_MIC": [
+      [
+        "C1",
+        "1"
+      ],
+      [
+        "J1",
+        "1"
+      ],
+      [
+        "MK1",
+        "7"
+      ]
+    ],
+    "GND": [
+      [
+        "C1",
+        "2"
+      ],
+      [
+        "J1",
+        "2"
+      ],
+      [
+        "MK1",
+        "2"
+      ],
+      [
+        "MK1",
+        "3"
+      ]
+    ],
+    "PDM_CLK": [
+      [
+        "J1",
+        "3"
+      ],
+      [
+        "MK1",
+        "6"
+      ]
+    ],
+    "PDM_DATA": [
+      [
+        "J1",
+        "4"
+      ],
+      [
+        "R1",
+        "1"
+      ]
+    ],
+    "MIC_WAKE": [
+      [
+        "J1",
+        "5"
+      ],
+      [
+        "MK1",
+        "4"
+      ]
+    ],
+    "AAD_CFG": [
+      [
+        "J1",
+        "6"
+      ],
+      [
+        "MK1",
+        "5"
+      ]
+    ],
+    "PDM_DATA_MIC": [
+      [
+        "MK1",
+        "1"
+      ],
+      [
+        "R1",
+        "2"
+      ]
+    ]
+  }
+}

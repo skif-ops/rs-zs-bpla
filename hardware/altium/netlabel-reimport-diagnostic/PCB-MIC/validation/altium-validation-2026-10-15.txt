@@ -1,33 +1,45 @@
-PCB-MIC acoustic-clearance ECO verification
+PCB-MIC conversion and acoustic-clearance ECO verification
 Date: 2026-10-15
-Tool: Altium Designer 26.10.1 Trial; KiCad 10.0 CLI
+Tools: Altium Designer 26.10.1 Trial; KiCad 10.0.6 CLI
 Status: NOT FOR MANUFACTURE
 
 Controlled source hashes
 ------------------------
-KiCad board: BA2AF99FE3B0B850A2801B9B73F1333D48C55A56D59E91187495D5E95910D93A
+KiCad schematic: 96F57C309B968E3300FE53A0548FDFBA53004C11AE1231A30F99948CE35ED55A
+KiCad board: 8CFBDA5B4DB2632392F5AB95B3948BB2471205865E9FDD754EFA5662F9F097A8
 KiCad project: 6E408ECBE38FF0C1D8D29C93D6AA284271E7F8300B3F4AAF2C42B169601D68AB
 KiCad rules: F3DEB4CA6169AA1FF40B5A02BE31A0EB624E570ABE906C804F1C6DA894C4D6B9
+KiCad symbol library: 1261C5FD0E5CE37DA913669E478EF71CF7CA35E43BDB8A5655A583DF7B4E646B
 T5838 footprint: 213BB0BD9E5E3E8B31AEADF044F643FAAE2D0BF808FC60C56BFE9A90DD07753C
+Altium schematic: 1681B8916B9EECFFACF8C5E1608A598D65FF91CF1E11A5AC4BA9C1F2A83FD936
 Altium board: 5694BA909348205998DAA8E907407898A46A35665A23B05F51CD2E193DCD3A7E
 
 KiCad checks
 -------------
+Schematic ERC violations: 0
 Board DRC violations: 0
 Unconnected items: 0
-Schematic-parity items: 55
-Board report: PCB-MIC-KiCad-DRC-2026-10-15.json
-Parity report: PCB-MIC-KiCad-DRC-parity-2026-10-15.json
+Schematic-parity items: 0
+Reports: PCB-MIC-KiCad-ERC-parity-2026-10-15.json and PCB-MIC-KiCad-DRC-parity-2026-10-15.json
 
 Altium checks
 --------------
-Fresh DRC time: 12:50:38 Europe/Moscow
-Warnings: 0
-Rule violations: 0
+Fresh project compile: PASS; 0 compiler messages.
+Board file is byte-identical to the PCB-MIC board checked by Altium DRC at 12:50:38 Europe/Moscow.
+Altium DRC warnings: 0
+Altium DRC rule violations: 0
 Acoustic 0.10 mm rule violations: 0
 MK1 manufacturer-copper 0.125 mm rule violations: 0
 General 0.20 mm rule violations: 0
-Reports: PCB-MIC-Altium-DRC-2026-10-15.drc and .html
+Reports: PCB-MIC-Altium-DRC-2026-10-15.drc and PCB-MIC-Altium-DRC-2026-10-15.html
+
+KiCad-to-Altium connectivity
+----------------------------
+Result: PASS.
+Nets: 7/7; component pins: 17/17.
+Pin-to-net mismatches: 0; net membership mismatches: 0.
+J1 has the six physical pins present in both formats; obsolete imported pins 7 and 8 were removed.
+Evidence: PCB-MIC-KiCad-Altium-connectivity-2026-10-15.json
 
 Semantic delta verification
 ---------------------------
@@ -47,9 +59,8 @@ Routes 27/27; vias 5/5; components 6/6; pads 53/53; nets 7/7; outline 4/4.
 
 Remaining gates
 ---------------
-The 55 KiCad schematic-parity findings remain open.
-CAM outputs were not regenerated.
-Review A/Review B must be repeated against the new source hash.
+CAM outputs were not regenerated after the verified schematic correction.
+Review A/Review B must be repeated against the new source hashes.
 Mask, paste, keepout, fabrication drawing, acoustic path, first-panel and physical EVT checks remain open.
+The repository-wide EVT-PRE-20 strict audit still has blockers outside this PCB-MIC correction.
 No manufacturing-equivalence or manufacturing-release claim is made.
-
