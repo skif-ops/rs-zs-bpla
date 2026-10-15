@@ -1,0 +1,37 @@
+{
+  "schema": "dioneya-kicad-altium-connectivity-comparison-v1",
+  "board": "PCB-PWR",
+  "date": "2026-10-15",
+  "kicad_source": "F:\\2AC9~1\\Codex\\rs-zs-bpla-evt-pre-20\\hardware\\altium\\netlabel-reimport-diagnostic\\PCB-PWR\\validation\\PCB-PWR-KiCad-base.xml",
+  "altium_project": {
+    "project_name": "PCB-PWR.PrjPcb",
+    "project_path": "F:\\2AC9~1\\Codex\\rs-zs-bpla-evt-pre-20\\hardware\\altium\\netlabel-reimport-diagnostic\\PCB-PWR\\PCB-PWR.PrjPcb"
+  },
+  "comparison_policy": {
+    "virtual_erc_source_flags": "excluded because #FLG symbols are off-board, out-of-BOM, and have no footprint",
+    "single_pin_nets": "compared by physical ref/pin membership because KiCad and Altium assign different generated names",
+    "all_multi_pin_nets": "net name and complete physical ref/pin membership must match"
+  },
+  "counts": {
+    "kicad_physical_pins": 161,
+    "altium_physical_pins": 161,
+    "kicad_multi_pin_nets": 31,
+    "altium_multi_pin_nets": 31,
+    "kicad_single_pin_nets": 1,
+    "altium_single_pin_nets": 1
+  },
+  "ignored_virtual_pins": [
+    "#FLG01-1",
+    "#FLG02-1",
+    "#FLG03-1"
+  ],
+  "single_pin_aliases": {
+    "U5-4": {
+      "kicad": "unconnected-(U5-NC-Pad4)",
+      "altium": "NetU5_4"
+    }
+  },
+  "pin_mismatches": [],
+  "multi_pin_net_mismatches": [],
+  "pass": true
+}

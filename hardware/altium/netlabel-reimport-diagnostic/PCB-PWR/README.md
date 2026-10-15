@@ -10,16 +10,20 @@ KiCad 10.0.6 verified the prepared copy before import: PCB-PWR 32/32 source-to-p
 
 `validation/PCB-PWR-Protel2.NET` is the Altium **Design → Netlist For Project → Protel2** export generated from this import. `validation/PCB-PWR-KiCad-base.xml` is the baseline KiCad netlist. The reproducible comparison script `../../compare_compiled_netlists.py` produced `validation/schematic-netlist-comparison.json`:
 
-- All 160 physical component ref/pin identifiers occur in both netlists.
-- All 31 physical pin-to-net partitions and all 31 net names match exactly.
-- KiCad's 32nd net is the intentionally unconnected single pin `U5-4`, which Altium omitted under its default single-pin netlist setting.
+- All 161 physical component ref/pin identifiers occur in both compiled designs.
+- All 31 multi-pin net names and complete ref/pin memberships match exactly.
+- The 32nd net is the intentionally unconnected single pin `U5-4`; KiCad names it `unconnected-(U5-NC-Pad4)` and Altium names it `NetU5_4`. The comparison treats generated single-pin names as aliases and verifies the physical member instead.
 - Altium additionally lists the three virtual ERC source flags `#FLG01`, `#FLG02`, `#FLG03` on `VBAT_SYS`, `GND_PWR`, `3V3_DIGITAL`. In the original KiCad source they are marked off-board and out-of-BOM, without footprints. They are excluded from the physical comparison and must remain absent from PCB/BOM.
+
+The fresh bridge-based comparison on 2026-10-15 is recorded in `validation/PCB-PWR-KiCad-Altium-connectivity-2026-10-15.json`. It reports 161/161 physical pins, 31/31 multi-pin nets, one matching single-pin physical membership, zero pin mismatches and zero multi-pin net mismatches.
 
 The first Altium validation at 17:12:52 reported 7 errors, 33 warnings and one cross-reference notice. Its `Net Identifier Scope` was `Automatic (Based on project contents)`. In a separate F: working copy, the only electrical-connectivity setting changed to `Hierarchical (Sheet entry <-> port connections, power ports global)` (`HierarchyMode=2`). The repeat validation at 17:36:44 reported **Compile successful, no errors found** with 28 warnings. The earlier four duplicate-net errors, three open-collector/power-pin errors, and four multiple-net-name warnings disappeared. This isolates the imported project's automatic scope selection as the cause of those compiler errors; it does not establish PCB release readiness.
 
 The Protel2 netlist was regenerated after that setting change at 17:40:06 and compared again against both baseline and prepared KiCad XML netlists. All 160 physical pins, 31 physical net partitions, and 31 physical net names still match exactly. The comparison JSON files reflect this regenerated output.
 
-The remaining 28 warnings comprise 14 electrical-pin/unspecified-port type checks, 11 nets reported with no driving source, and three missing-footprint warnings for virtual `#FLG` ERC symbols. The virtual flags are intentionally off-board and absent from the BOM in KiCad. The port/pin types and the eleven driver warnings require per-net review; they have not been suppressed. The copied `PCB-PWR.PrjPcb` stores local relative output/log paths for portability. The live imported project remains in its original F: import folder and was not moved.
+The fresh explicit project validation on 2026-10-15 reports **zero errors and 31 warnings**: 14 electrical-pin/unspecified-port checks, 12 nets reported with no driving source, three missing-footprint warnings for virtual `#FLG` ERC symbols, one floating-input warning and one intentionally unconnected `U5-4` warning. The former duplicate-net, multiple-name and single-pin errors are absent. The virtual flags are intentionally off-board and absent from the BOM in KiCad. The other warnings remain visible and unsuppressed pending per-net electrical review. See `validation/altium-validation-2026-10-15.txt`.
+
+KiCad 10.0.6 was also rerun on the current native source on 2026-10-15. ERC reports zero violations. PCB DRC reports zero unconnected items and seven `silk_over_copper` warnings at U1, U2, U3, U4, U5, Q1 and RSH1; these warnings remain open and are captured in `validation/PCB-PWR-KiCad-DRC-2026-10-15.json`. The Altium PCB DRC remains the saved zero-warning, zero-violation result after the NetTie repair. The differing native/Altium silkscreen rule results are a manufacturing-review item, so this diagnostic project remains not for manufacture.
 
 The root SchDoc sheet symbols, sheet entries, net labels, and wires are identical between the previous and new imports in all 82 normalized records. The new child sheets contain the extra labels.
 
