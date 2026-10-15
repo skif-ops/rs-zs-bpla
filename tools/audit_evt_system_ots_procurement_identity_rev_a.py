@@ -303,7 +303,7 @@ def main() -> int:
         "hardware_design_release": False,
         "purchase_release": False,
         "manufacturing_release": False,
-        "record": str(RECORD.relative_to(ROOT)),
+        "record": RECORD.relative_to(ROOT).as_posix(),
         "record_sha256": record_hash,
     }
     output = args.output if args.output.is_absolute() else ROOT / args.output

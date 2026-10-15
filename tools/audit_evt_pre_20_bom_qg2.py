@@ -28,6 +28,12 @@ def read(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(source))
 
 
+def source_sha256(path: Path) -> str:
+    """Hash KiCad text with repository LF semantics on every host."""
+    data = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
+
+
 def run_json_audit(script_name: str) -> dict[str, object]:
     with tempfile.TemporaryDirectory(prefix="evt-pre-20-bom-qg2-") as temp_dir:
         output = Path(temp_dir) / "audit.json"
@@ -481,7 +487,7 @@ def main() -> int:
             path = main_native.parent / relative
             if not path.is_file():
                 raise ValueError(f"missing hierarchy source: {relative}")
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            digest = source_sha256(path)
             if digest != source.get("sha256"):
                 raise ValueError(f"hierarchy source hash drift: {relative}")
             native_sources.append(path)

@@ -121,6 +121,12 @@ def require(ok: bool, message: str) -> None:
         raise RuntimeError(message)
 
 
+def source_sha256(path: Path) -> str:
+    """Hash KiCad text with repository LF semantics on every host."""
+    data = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
+
+
 def board_ref(footprint) -> str:
     if footprint.properties.get("Reference"):
         return str(footprint.properties["Reference"])
@@ -465,7 +471,7 @@ def main() -> int:
             "PCB-MAIN hierarchy evidence source-hash register drift")
     for filename, expected_sha256 in expected_source_sha256.items():
         path = args.schematic.parent / filename
-        actual_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+        actual_sha256 = source_sha256(path)
         require(actual_sha256 == expected_sha256,
                 f"PCB-MAIN hierarchy evidence source drift: {filename} "
                 f"{actual_sha256} != {expected_sha256}")
