@@ -265,7 +265,7 @@ def main() -> int:
     require("DEC-057 and DEC-059" in decision["Impact"],
             "DEC-066 supersession boundary missing")
 
-    record_hash = sha256(RECORD)
+    record_hash = hashlib.sha256(RECORD.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
     require(record_hash in record_md, "machine-record hash missing from Markdown")
     for item_id, (_, mpn, _, _) in EXPECTED.items():
         require(item_id in record_md and mpn in record_md,

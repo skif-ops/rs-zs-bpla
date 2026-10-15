@@ -139,7 +139,7 @@ def audit() -> dict[str, Any]:
     ], "official source drift")
 
     binding = basis["source_binding"]
-    require(binding["native_board"] == str(BOARD.relative_to(ROOT)),
+    require(binding["native_board"] == BOARD.relative_to(ROOT).as_posix(),
             "native board path drift")
     expected_bindings = {
         "capture_nets": CAPTURE,
@@ -149,7 +149,7 @@ def audit() -> dict[str, Any]:
         "rule_manifest": RULES,
     }
     for key, path in expected_bindings.items():
-        require(binding[key] == str(path.relative_to(ROOT)), f"{key} path drift")
+        require(binding[key] == path.relative_to(ROOT).as_posix(), f"{key} path drift")
         require(binding[f"{key}_sha256"] == sha256(path), f"{key} SHA-256 drift")
 
     board = Board.from_file(str(historical_basis_board(BOARD)), encoding="utf-8")
@@ -316,9 +316,9 @@ def audit() -> dict[str, Any]:
         require(boundary[field] is False, f"{field} was incorrectly promoted")
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     trace = status.get("evt_routing_basis", {})
-    require(trace.get("record") == str(RECORD.relative_to(ROOT)) and
-            trace.get("machine_contract") == str(BASIS.relative_to(ROOT)) and
-            trace.get("rule_manifest") == str(RULES.relative_to(ROOT)) and
+    require(trace.get("record") == RECORD.relative_to(ROOT).as_posix() and
+            trace.get("machine_contract") == BASIS.relative_to(ROOT).as_posix() and
+            trace.get("rule_manifest") == RULES.relative_to(ROOT).as_posix() and
             trace.get("generator") ==
             "tools/generate_pcb_pwr_evt_route_rules_rev_a.py" and
             trace.get("independent_audit") ==

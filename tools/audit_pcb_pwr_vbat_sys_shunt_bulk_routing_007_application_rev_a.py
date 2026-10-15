@@ -65,7 +65,7 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
     assert route["active_board_semantic_sha256"] == SEMANTIC_SHA
     assert route["authoritative_board_modified"] is True
     assert route["exact_candidate_byte_identity"] is True
-    assert route["application"] == str(APPLICATION.relative_to(ROOT))
+    assert route["application"] == APPLICATION.relative_to(ROOT).as_posix()
     assert route["routing_complete"] is False
     assert route["review_b_complete"] is False
     assert route["manufacturing_release"] is False

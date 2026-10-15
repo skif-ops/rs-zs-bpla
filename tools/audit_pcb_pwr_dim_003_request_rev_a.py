@@ -133,7 +133,7 @@ def require(condition: bool, message: str) -> None:
 
 
 def relative(path: Path) -> str:
-    return str(path.resolve().relative_to(ROOT))
+    return path.resolve().relative_to(ROOT).as_posix()
 
 
 def sha256(path: Path) -> str:
