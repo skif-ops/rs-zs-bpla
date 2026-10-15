@@ -452,7 +452,7 @@ def static_audit() -> dict[str, object]:
     capture_status = json.loads(CAPTURE_STATUS.read_text(encoding="utf-8"))
     evidence = capture_status.get("review_b", {}).get("evidence", {})
     require(
-        evidence.get("rf_si_return_path_review") == str(REVIEW.relative_to(ROOT))
+        evidence.get("rf_si_return_path_review") == REVIEW.relative_to(ROOT).as_posix()
         and evidence.get("rf_si_return_path_review_record") ==
         "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.md"
         and evidence.get("rf_si_return_path_review_audit") ==
@@ -460,9 +460,9 @@ def static_audit() -> dict[str, object]:
         and evidence.get("rf_si_return_path_status") ==
         "PASS_BOUNDED_REMEDIATIONS_COMBINED_KICAD9_GATE_FINAL_SI_AND_REVIEW_B_OPEN"
         and evidence.get("rf_return_001_candidate") ==
-        str(CANDIDATE.relative_to(ROOT))
+        CANDIDATE.relative_to(ROOT).as_posix()
         and evidence.get("rf_return_001_candidate_record") ==
-        str(PROPOSAL.relative_to(ROOT))
+        PROPOSAL.relative_to(ROOT).as_posix()
         and evidence.get("rf_return_001_candidate_review") ==
         "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md"
         and evidence.get("rf_return_001_status") ==

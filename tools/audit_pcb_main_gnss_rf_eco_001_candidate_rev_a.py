@@ -528,9 +528,9 @@ def static_audit() -> dict[str, object]:
     capture = json.loads(CAPTURE_STATUS.read_text(encoding="utf-8"))
     evidence = capture.get("review_b", {}).get("evidence", {})
     require(
-        evidence.get("gnss_rf_eco_001_candidate") == str(CANDIDATE.relative_to(ROOT))
-        and evidence.get("gnss_rf_eco_001_candidate_record") == str(PROPOSAL.relative_to(ROOT))
-        and evidence.get("gnss_rf_eco_001_candidate_review") == str(PROPOSAL_RECORD.relative_to(ROOT))
+        evidence.get("gnss_rf_eco_001_candidate") == CANDIDATE.relative_to(ROOT).as_posix()
+        and evidence.get("gnss_rf_eco_001_candidate_record") == PROPOSAL.relative_to(ROOT).as_posix()
+        and evidence.get("gnss_rf_eco_001_candidate_review") == PROPOSAL_RECORD.relative_to(ROOT).as_posix()
         and evidence.get("gnss_rf_eco_001_status") ==
         "APPROVED_APPLIED_EXACT_REVIEWED_DELTA_WITH_CELLULAR_L2_ZONE_COMBINED_GATE_PASS"
         and capture.get("manufacturing_release") is False,

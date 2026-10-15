@@ -307,7 +307,7 @@ def static_audit() -> dict[str, object]:
         and applied.get("combined_machine_gate_status") ==
         "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
         and gnss_application.get("combined_machine_gate_review") ==
-        str(REPEAT_REVIEW.relative_to(ROOT))
+        REPEAT_REVIEW.relative_to(ROOT).as_posix()
         and gnss_application.get("routing_complete") is False
         and gnss_application.get("rf_si_review_complete") is False
         and gnss_application.get("review_b_complete") is False
