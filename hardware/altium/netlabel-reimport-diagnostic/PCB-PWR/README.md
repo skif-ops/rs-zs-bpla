@@ -60,4 +60,4 @@ This closes the three PCB-PWR DRC violations. It does not by itself establish ma
 - fabrication testpoint report: top and bottom layers, metric units, relative origin, CSV and IPC-D-356A enabled;
 - release-managed output: disabled.
 
-This is a verified configuration only. Its outputs were not generated and no manufacturing archive was released because the blockers documented below remain open. Running it now would create diagnostic data, not an approved production package.
+The current fixed `PCB-PWR.PcbDoc` now has generated Gerber X2, NC Drill, Pick&Place, DRC and STEP outputs. Their source hashes and individual SHA-256 values are recorded in `validation/PCB-PWR-Altium-current-source-output-manifest-2026-10-16.json`. The Altium OutJob did not emit the BOM, assembly PDF or standalone IPC-D-356, so the full EVT candidate retains the controlled KiCad versions alongside Altium CAM. Review B and the other blockers below remain open; fabrication is not authorized.

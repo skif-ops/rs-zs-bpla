@@ -1,0 +1,227 @@
+{
+  "schema": "dioneya-altium-current-source-output-manifest-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "generated_local": "2026-10-15T15:24:55+03:00",
+  "altium_version": "26.10.1 Trial",
+  "status": "CURRENT_SOURCE_OUTPUTS_GENERATED_DRC_PASS_REVIEW_B_OPEN",
+  "manufacturing_authorized": false,
+  "source_binding": [
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/PCB-PWR.PrjPcb",
+      "bytes": 34822,
+      "last_write_local": "2026-10-16T00:50:16",
+      "sha256": "05A363F79B1A00D3FBD168C44520B8EA3D053D053B81D71FCB8FF86A30BC85C9"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/PCB-PWR.PcbDoc",
+      "bytes": 2434048,
+      "last_write_local": "2026-10-15T12:11:43",
+      "sha256": "A02842AD4D3DAAEA759E7A9589B0FF52A17E4782EA2FE594AA9528475FEDE9E8"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/EVT-PRE-20_PCB-PWR.OutJob",
+      "bytes": 10613,
+      "last_write_local": "2026-10-15T00:17:58",
+      "sha256": "87C54817C2C9E1E781B4E10341FFB64CB664FB440E560C32A8AEF207B046F262"
+    }
+  ],
+  "validation": {
+    "project_compile": {
+      "success": true,
+      "errors": 0,
+      "warnings": 31,
+      "report": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/validation/altium-validation-2026-10-15.txt",
+      "note": "The OutJob was added after validation; the schematic/PCB document set and HierarchyMode=2 are unchanged."
+    },
+    "pcb_drc": {
+      "warnings": 0,
+      "rule_violations": 0,
+      "report": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/DRC/PCB-PWR.html",
+      "report_sha256": "22FD4C96D274DD1A532E268F8D7EF4BA07B53AB21F642C5AFFAD1497560A81B5"
+    },
+    "required_output_subset_present": {
+      "gerber_top": true,
+      "gerber_inner_1": true,
+      "gerber_inner_2": true,
+      "gerber_bottom": true,
+      "profile": true,
+      "plated_drill": true,
+      "pick_place": true,
+      "step": true,
+      "drc": true
+    },
+    "all_required_output_subset_present": true,
+    "pcb_saved_before_all_listed_cam_outputs": true
+  },
+  "outputs": [
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/DRC/PCB-PWR.html",
+      "bytes": 13523,
+      "last_write_local": "2026-10-15T15:24:54",
+      "sha256": "22FD4C96D274DD1A532E268F8D7EF4BA07B53AB21F642C5AFFAD1497560A81B5"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/ExportSTEP/PCB-PWR.step",
+      "bytes": 10812,
+      "last_write_local": "2026-10-15T15:24:55",
+      "sha256": "33828E5A1634DAE7670D811C975FEA06D91A879068EC9CD0CFC5977C506A72CF"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR-macro.APR_LIB",
+      "bytes": 15568,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "D484202A62A7B28C7CA2A9D7FF9288A0AF21A04F681BF3CF75ED8ECE5899D58E"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR.apr",
+      "bytes": 4800,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "9005D2DAC5830238BC36EACDF4D35F38D420C8CE6C0123154FFAAE8A03C59348"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR.EXTREP",
+      "bytes": 1401,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "AAA8BB90954BF052A682B99FE0023CBC7F2BC2A1350E7355E9DCCC06F033D7A7"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR.REP",
+      "bytes": 5257,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "0069F425DB1369FD9732E91D4622EF4FC6630B0DC6D268E9AACD11BC4922A3B1"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Copper_Signal_1.gbr",
+      "bytes": 47082,
+      "last_write_local": "2026-10-15T15:24:49",
+      "sha256": "0A8BB8FB12429C5E1F52C4B1A1295C9EB84ED4B4534B963C8FD1C3C884ACE696"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Copper_Signal_2.gbr",
+      "bytes": 47063,
+      "last_write_local": "2026-10-15T15:24:49",
+      "sha256": "3055851B77D0D138BEA4A3F79C878814E51CD9E684F8119C7083DD448DE330AC"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Copper_Signal_Bot.gbr",
+      "bytes": 85655,
+      "last_write_local": "2026-10-15T15:24:49",
+      "sha256": "DFC475C70255398C78480B277064C6093B58B72F4D763C77E58C160E507090E7"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Copper_Signal_Top.gbr",
+      "bytes": 221343,
+      "last_write_local": "2026-10-15T15:24:48",
+      "sha256": "DEA9D4BD87A80B935F623B39FEE6DB835F127F084FF14C5CE48A8DD671A9153B"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Legend_Bot.gbr",
+      "bytes": 341,
+      "last_write_local": "2026-10-15T15:24:50",
+      "sha256": "4A86E9BC16643C3C1AF0E328E3783FD9E8C60FAA9155F4EF27C0DA33DB86E799"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Legend_Top.gbr",
+      "bytes": 275126,
+      "last_write_local": "2026-10-15T15:24:50",
+      "sha256": "CC516661E90280AC5051424AA25140E6B59AB9BC79FE17E107910A844BC6FC46"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_NPTH_Drill.gbr",
+      "bytes": 351,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "34EF4DA619811EA3C06CBE04202B666FF7FAA4CA2DA4E358F38F941CC341FFF9"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Paste_Bot.gbr",
+      "bytes": 338,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "866F4EE60B48DE4D165EFD7A7C14481B85B8BCC86B95E7E62A8B1695A9047E70"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Paste_Top.gbr",
+      "bytes": 17630,
+      "last_write_local": "2026-10-15T15:24:51",
+      "sha256": "1B2B0AEF1CC8D9C18F3D8DA95BE5686EE60120D305849ACFF52CE600705B8347"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Profile.gbr",
+      "bytes": 452,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "B6E61057AC2792D50A2701718874F965C72C9722903D9FFCE4391C449E30D74F"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_PTH_Drill.gbr",
+      "bytes": 8337,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "BA60DDDD4A0ED18A5B62507A8051A927A7B87FEBAE44F1B61FDC53FCEDFFD97B"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Soldermask_Bot.gbr",
+      "bytes": 1823,
+      "last_write_local": "2026-10-15T15:24:51",
+      "sha256": "FF8C00322E5B8AE93D6C6C8EB2E3524D5FAAB92FAA9BF50AABC5BD649A8F8566"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/GerberX2/PCB-PWR_Soldermask_Top.gbr",
+      "bytes": 13753,
+      "last_write_local": "2026-10-15T15:24:50",
+      "sha256": "9360BB8174467872E6B4BB7ACD3DE09B77CE5BF84A55A2770E5B0CC84E4E1277"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/NC Drill/PCB-PWR.DRR",
+      "bytes": 1546,
+      "last_write_local": "2026-10-15T15:24:53",
+      "sha256": "6640F378A07061DC9D10A3057D699418B6387EE916E5C56A82391E3E6C157B2B"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/NC Drill/PCB-PWR.LDP",
+      "bytes": 223,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "D5944BA3258F22F1AAC68EBA606B6E098D6A8FABAD8E02EA788D8D8B0A6E6006"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/NC Drill/PCB-PWR.TXT",
+      "bytes": 3620,
+      "last_write_local": "2026-10-15T15:24:52",
+      "sha256": "D775FCBC05175A8C6C4D12A053749EAFBC573CBA3AF4616F7BD330C7AA57FD7A"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/Pick Place/Pick Place for PCB-PWR.txt",
+      "bytes": 8640,
+      "last_write_local": "2026-10-15T15:24:53",
+      "sha256": "861AEA7CE7504704C65CD5BE772B4B6D4DBE483633F8FAB401C55A47C9EFF909"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/Status Report.Txt",
+      "bytes": 248,
+      "last_write_local": "2026-10-15T15:24:55",
+      "sha256": "19D80B802EEDF54E7F6004B8A97F1288BD19506B0B194F67152EAF2128E60EB9"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/Test Points/Fabrication Testpoint Report for PCB-PWR.csv",
+      "bytes": 60,
+      "last_write_local": "2026-10-15T15:24:53",
+      "sha256": "AABFEEBDFA3FFBFF546E005FA8E77DD819C6BB88E61002020CDC3BB4B030A1B7"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/Test Points/Fabrication Testpoint Report for PCB-PWR.ipc",
+      "bytes": 34399,
+      "last_write_local": "2026-10-15T15:24:53",
+      "sha256": "76E002DF49AC6155CB6F97F3E597A91B40859E30E65A2EBF16F324C825146610"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/Project Outputs for PCB-PWR/Test Points/Fabrication Testpoint Report for PCB-PWR.REP",
+      "bytes": 8332,
+      "last_write_local": "2026-10-15T15:24:53",
+      "sha256": "6847D48E647FD418411FA4B1807DE1A637CFF7DF28055CBD3792FA4F7D167478"
+    }
+  ],
+  "limits": [
+    "The 31 unsuppressed schematic warnings require per-net electrical disposition.",
+    "KiCad reports seven silk-over-copper warnings that remain a manufacturing review item.",
+    "Input-protection qualification, stackup/copper confirmation, DFM and independent Review B remain open.",
+    "The OutJob did not emit a BOM, assembly drawing PDF or a standalone IPC-D-356 netlist; the full EVT candidate keeps the controlled KiCad versions alongside Altium CAM."
+  ]
+}

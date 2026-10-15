@@ -40,6 +40,9 @@
     "Pad mask and keepout review remains open",
     "Stackup and controlled-impedance review remains open",
     "Schematic warnings and cross-board release gates remain open",
-    "Manufacturing outputs have not yet been regenerated from this fixed board"
-  ]
+    "Current Altium CAM is generated and hash-bound; BOM, assembly PDF and standalone IPC-D-356 remain supplied from the controlled KiCad output set"
+  ],
+  "current_source_output_manifest": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/validation/PCB-PWR-Altium-current-source-output-manifest-2026-10-16.json",
+  "manufacturing_outputs_generated": true,
+  "manufacturing_authorized": false
 }
