@@ -181,6 +181,7 @@ def summarize(source: Counter, imported: Counter, limit=5):
         "source_layers": dict(sorted(Counter({layer: sum(n for (key, lay), n in source.items() if lay == layer) for key, layer in source}).items())),
         "imported_layers": dict(sorted(Counter({str(layer): sum(n for (key, lay), n in imported.items() if lay == layer) for key, layer in imported}).items())),
         "missing_examples": [str(key) for key in list(missing)[:limit]],
+        "added_examples": [str(key) for key in list(added)[:limit]],
         "wrong_layer_examples": [str(key) for key in list(wrong_layer)[:limit]],
     }
 

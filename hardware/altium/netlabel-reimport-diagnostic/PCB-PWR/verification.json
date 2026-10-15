@@ -1,10 +1,10 @@
 {
   "PCB-PWR": {
     "source_route_count": 575,
-    "imported_route_count": 575,
+    "imported_route_count": 578,
     "geometry_width_net_matches": 575,
     "source_routes_missing": 0,
-    "imported_routes_extra": 0,
+    "imported_routes_extra": 3,
     "correct_copper_layer": 575,
     "incorrect_copper_layer": 0,
     "source_layers": {
@@ -12,13 +12,18 @@
       "F.Cu": 440
     },
     "imported_layers": {
-      "1": 440,
+      "1": 443,
       "32": 135
     },
     "missing_examples": [],
+    "added_examples": [
+      "(((74.6, 11.48), (75.1, 11.48)), 0.25, 'GND_PWR')",
+      "(((76.1, 11.48), (76.6, 11.48)), 0.25, 'GND_DIGITAL')",
+      "(((74.6, 19.88), (75.1, 19.88)), 0.25, 'GND_MODEM')"
+    ],
     "wrong_layer_examples": [],
     "source_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
-    "imported_board": "F:/Проекты/Codex/altium-netlabel-reimport-test/PCB-PWR/PCB-PWR.PcbDoc",
+    "imported_board": "hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/PCB-PWR.PcbDoc",
     "transform": {
       "x_offset_mm": 0.0,
       "y_reflection_sum_mm": 60.0

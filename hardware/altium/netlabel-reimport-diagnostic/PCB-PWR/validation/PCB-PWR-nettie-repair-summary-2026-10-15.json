@@ -1,0 +1,45 @@
+{
+  "status": "PASS_DRC_ZERO_WITH_CONTROLLED_ALTIUM_ADAPTER_STUBS",
+  "date": "2026-10-15",
+  "altium_version": "26.10.1 Trial",
+  "source_kicad_files_modified": false,
+  "previous_pcbdoc_sha256": "5929EB250F8C898C89E4007716955041FB9B28D545ECB3B1E100AFA4798F5718",
+  "fixed_pcbdoc_sha256": "A02842AD4D3DAAEA759E7A9589B0FF52A17E4782EA2FE594AA9528475FEDE9E8",
+  "drc": {
+    "warnings": 0,
+    "rule_violations": 0,
+    "unrouted": 0,
+    "report_drc_sha256": "F08EB4BDDAEDCB63B0528AFAC8364932DABCF3B1BF0E6192F1E909437167F5D1",
+    "report_html_sha256": "26E4BF3D6556E7A6FDCF677D8AACF48079A8FB336025BD86FE812EC582C7F6CB"
+  },
+  "geometry": {
+    "tracks_before": 1062,
+    "tracks_after": 1065,
+    "added_tracks": 3,
+    "removed_tracks": 0,
+    "pads": 210,
+    "vias": 267,
+    "components": 66,
+    "polygons": 28,
+    "native_routed_segments": 575,
+    "native_segments_matched": 575,
+    "native_segments_missing": 0,
+    "wrong_copper_layers": 0
+  },
+  "repair": {
+    "reason": "Altium polygon pour kept clearance around three same-net NetTie pads after KiCad import",
+    "approach": "Three 0.25 mm x 0.50 mm same-net Top Layer stubs directed away from the opposite-net sibling pad and wholly inside the corresponding native KiCad filled zone",
+    "nets": [
+      "GND_MODEM",
+      "GND_DIGITAL",
+      "GND_PWR"
+    ]
+  },
+  "remaining_limitations": [
+    "Full manufacturing equivalence is not established",
+    "Pad mask and keepout review remains open",
+    "Stackup and controlled-impedance review remains open",
+    "Schematic warnings and cross-board release gates remain open",
+    "Manufacturing outputs have not yet been regenerated from this fixed board"
+  ]
+}
