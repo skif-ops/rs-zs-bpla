@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------
-Gerber File Extension Report For: PCB-MAIN.GBR   15.10.2026  15:33:39
+Gerber File Extension Report For: PCB-MAIN.GBR   15.10.2026  16:23:29
 ------------------------------------------------------------------------------------------
 
 
@@ -7,6 +7,10 @@ Gerber File Extension Report For: PCB-MAIN.GBR   15.10.2026  15:33:39
 Layer Extension     Layer Description                      
 ------------------------------------------------------------------------------------------
 .gbr                F.Cu                                    
+.gbr                In1.Cu                                  
+.gbr                In2.Cu                                  
+.gbr                In3.Cu                                  
+.gbr                In4.Cu                                  
 .gbr                B.Cu                                    
 .gbr                F.SilkS                                 
 .gbr                B.SilkS                                 
@@ -15,4 +19,6 @@ Layer Extension     Layer Description
 .gbr                F.Paste                                 
 .gbr                B.Paste                                 
 .gbr                Profile                                 
+.gbr                Non-plated through-hole drill file      
+.gbr                Plated through-hole drill file          
 ------------------------------------------------------------------------------------------

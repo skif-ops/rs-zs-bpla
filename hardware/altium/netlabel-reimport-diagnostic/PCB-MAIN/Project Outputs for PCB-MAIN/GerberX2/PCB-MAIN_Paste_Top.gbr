@@ -3,7 +3,7 @@ G04 Layer_Color=8421504*
 G04 Board_Origin=0|0*
 %FSLAX45Y45*%
 %MOMM*%
-%TF.SameCoordinates,06CAA95B-0DA0-4751-91E1-055B9DB94546*%
+%TF.SameCoordinates,0A6B9F3C-43C0-4176-A7DB-F995D99AF7FA*%
 %TF.FilePolarity,Positive*%
 %TF.FileFunction,Paste,Top*%
 %TF.Part,Single*%
@@ -334,17 +334,6 @@ G04:AMPARAMS|DCode=69|XSize=0.6mm|YSize=1mm|CornerRadius=0.06mm|HoleSize=0mm|Usa
 %ADD72R,0.60000X0.40000*%
 %ADD73R,0.40000X0.60000*%
 %TA.AperFunction,OtherPad,Pad D1-Un2 (14.285mm,32.775mm)*%
-G04:AMPARAMS|DCode=103|XSize=0.3mm|YSize=0.6mm|CornerRadius=0.0495mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
-%AMROUNDEDRECTD103*
-21,1,0.30000,0.50100,0,0,0.0*
-21,1,0.20100,0.60000,0,0,0.0*
-1,1,0.09900,0.10050,-0.25050*
-1,1,0.09900,-0.10050,-0.25050*
-1,1,0.09900,-0.10050,0.25050*
-1,1,0.09900,0.10050,0.25050*
-%
-%ADD103ROUNDEDRECTD103*%
-%TA.AperFunction,OtherPad,Pad D1-Un1 (13.585mm,32.775mm)*%
 G04:AMPARAMS|DCode=104|XSize=0.3mm|YSize=0.6mm|CornerRadius=0.0495mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD104*
 21,1,0.30000,0.50100,0,0,0.0*
@@ -355,18 +344,18 @@ G04:AMPARAMS|DCode=104|XSize=0.3mm|YSize=0.6mm|CornerRadius=0.0495mm|HoleSize=0m
 1,1,0.09900,0.10050,0.25050*
 %
 %ADD104ROUNDEDRECTD104*%
-%TA.AperFunction,OtherPad,Pad U19-Un2 (12.852mm,36.525mm)*%
-G04:AMPARAMS|DCode=105|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
+%TA.AperFunction,OtherPad,Pad D1-Un1 (13.585mm,32.775mm)*%
+G04:AMPARAMS|DCode=105|XSize=0.3mm|YSize=0.6mm|CornerRadius=0.0495mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD105*
-21,1,0.56500,0.25920,0,0,0.0*
-21,1,0.46420,0.36000,0,0,0.0*
-1,1,0.10080,0.23210,-0.12960*
-1,1,0.10080,-0.23210,-0.12960*
-1,1,0.10080,-0.23210,0.12960*
-1,1,0.10080,0.23210,0.12960*
+21,1,0.30000,0.50100,0,0,0.0*
+21,1,0.20100,0.60000,0,0,0.0*
+1,1,0.09900,0.10050,-0.25050*
+1,1,0.09900,-0.10050,-0.25050*
+1,1,0.09900,-0.10050,0.25050*
+1,1,0.09900,0.10050,0.25050*
 %
 %ADD105ROUNDEDRECTD105*%
-%TA.AperFunction,OtherPad,Pad U19-Un1 (12.017mm,36.525mm)*%
+%TA.AperFunction,OtherPad,Pad U19-Un2 (12.852mm,36.525mm)*%
 G04:AMPARAMS|DCode=106|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD106*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -377,21 +366,9 @@ G04:AMPARAMS|DCode=106|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD106ROUNDEDRECTD106*%
-%TA.AperFunction,OtherPad,Pad Q3-Un3 (32.185mm,57.025mm)*%
-%ADD107R,0.60000X0.50000*%
-%TA.AperFunction,OtherPad,Pad Q3-Un2 (30.185mm,56.075mm)*%
-%ADD108R,0.60000X0.50000*%
-%TA.AperFunction,OtherPad,Pad Q3-Un1 (30.185mm,57.975mm)*%
-%ADD109R,0.60000X0.50000*%
-%TA.AperFunction,OtherPad,Pad J9-Un3 (57.66mm,5.55mm)*%
-%ADD110R,2.00000X0.90000*%
-%TA.AperFunction,OtherPad,Pad J9-Un2 (57.66mm,8.5mm)*%
-%ADD111R,2.00000X0.90000*%
-%TA.AperFunction,OtherPad,Pad J9-Un1 (56.135mm,7.025mm)*%
-%ADD112R,0.85000X0.80000*%
-%TA.AperFunction,OtherPad,Pad U27-Un2 (45.102mm,10.025mm)*%
-G04:AMPARAMS|DCode=113|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
-%AMROUNDEDRECTD113*
+%TA.AperFunction,OtherPad,Pad U19-Un1 (12.017mm,36.525mm)*%
+G04:AMPARAMS|DCode=107|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
+%AMROUNDEDRECTD107*
 21,1,0.56500,0.25920,0,0,0.0*
 21,1,0.46420,0.36000,0,0,0.0*
 1,1,0.10080,0.23210,-0.12960*
@@ -399,8 +376,20 @@ G04:AMPARAMS|DCode=113|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,-0.23210,0.12960*
 1,1,0.10080,0.23210,0.12960*
 %
-%ADD113ROUNDEDRECTD113*%
-%TA.AperFunction,OtherPad,Pad U27-Un1 (44.267mm,10.025mm)*%
+%ADD107ROUNDEDRECTD107*%
+%TA.AperFunction,OtherPad,Pad Q3-Un3 (32.185mm,57.025mm)*%
+%ADD108R,0.60000X0.50000*%
+%TA.AperFunction,OtherPad,Pad Q3-Un2 (30.185mm,56.075mm)*%
+%ADD109R,0.60000X0.50000*%
+%TA.AperFunction,OtherPad,Pad Q3-Un1 (30.185mm,57.975mm)*%
+%ADD110R,0.60000X0.50000*%
+%TA.AperFunction,OtherPad,Pad J9-Un3 (57.66mm,5.55mm)*%
+%ADD111R,2.00000X0.90000*%
+%TA.AperFunction,OtherPad,Pad J9-Un2 (57.66mm,8.5mm)*%
+%ADD112R,2.00000X0.90000*%
+%TA.AperFunction,OtherPad,Pad J9-Un1 (56.135mm,7.025mm)*%
+%ADD113R,0.85000X0.80000*%
+%TA.AperFunction,OtherPad,Pad U27-Un2 (45.102mm,10.025mm)*%
 G04:AMPARAMS|DCode=114|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD114*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -411,21 +400,9 @@ G04:AMPARAMS|DCode=114|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD114ROUNDEDRECTD114*%
-%TA.AperFunction,OtherPad,Pad J8-Un3 (20.16mm,2.05mm)*%
-%ADD115R,2.00000X0.90000*%
-%TA.AperFunction,OtherPad,Pad J8-Un2 (20.16mm,5mm)*%
-%ADD116R,2.00000X0.90000*%
-%TA.AperFunction,OtherPad,Pad J8-Un1 (18.635mm,3.525mm)*%
-%ADD117R,0.85000X0.80000*%
-%TA.AperFunction,OtherPad,Pad Q2-Un3 (22.685mm,43.025mm)*%
-%ADD118R,0.60000X0.50000*%
-%TA.AperFunction,OtherPad,Pad Q2-Un2 (20.685mm,42.075mm)*%
-%ADD119R,0.60000X0.50000*%
-%TA.AperFunction,OtherPad,Pad Q2-Un1 (20.685mm,43.975mm)*%
-%ADD120R,0.60000X0.50000*%
-%TA.AperFunction,OtherPad,Pad U22-Un2 (104.852mm,21.025mm)*%
-G04:AMPARAMS|DCode=121|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
-%AMROUNDEDRECTD121*
+%TA.AperFunction,OtherPad,Pad U27-Un1 (44.267mm,10.025mm)*%
+G04:AMPARAMS|DCode=115|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
+%AMROUNDEDRECTD115*
 21,1,0.56500,0.25920,0,0,0.0*
 21,1,0.46420,0.36000,0,0,0.0*
 1,1,0.10080,0.23210,-0.12960*
@@ -433,8 +410,20 @@ G04:AMPARAMS|DCode=121|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,-0.23210,0.12960*
 1,1,0.10080,0.23210,0.12960*
 %
-%ADD121ROUNDEDRECTD121*%
-%TA.AperFunction,OtherPad,Pad U22-Un1 (104.017mm,21.025mm)*%
+%ADD115ROUNDEDRECTD115*%
+%TA.AperFunction,OtherPad,Pad J8-Un3 (20.16mm,2.05mm)*%
+%ADD116R,2.00000X0.90000*%
+%TA.AperFunction,OtherPad,Pad J8-Un2 (20.16mm,5mm)*%
+%ADD117R,2.00000X0.90000*%
+%TA.AperFunction,OtherPad,Pad J8-Un1 (18.635mm,3.525mm)*%
+%ADD118R,0.85000X0.80000*%
+%TA.AperFunction,OtherPad,Pad Q2-Un3 (22.685mm,43.025mm)*%
+%ADD119R,0.60000X0.50000*%
+%TA.AperFunction,OtherPad,Pad Q2-Un2 (20.685mm,42.075mm)*%
+%ADD120R,0.60000X0.50000*%
+%TA.AperFunction,OtherPad,Pad Q2-Un1 (20.685mm,43.975mm)*%
+%ADD121R,0.60000X0.50000*%
+%TA.AperFunction,OtherPad,Pad U22-Un2 (104.852mm,21.025mm)*%
 G04:AMPARAMS|DCode=122|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD122*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -445,18 +434,18 @@ G04:AMPARAMS|DCode=122|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD122ROUNDEDRECTD122*%
-%TA.AperFunction,OtherPad,Pad D2-Un2 (14.285mm,34.025mm)*%
-G04:AMPARAMS|DCode=123|XSize=0.3mm|YSize=0.6mm|CornerRadius=0.0495mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
+%TA.AperFunction,OtherPad,Pad U22-Un1 (104.017mm,21.025mm)*%
+G04:AMPARAMS|DCode=123|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD123*
-21,1,0.30000,0.50100,0,0,0.0*
-21,1,0.20100,0.60000,0,0,0.0*
-1,1,0.09900,0.10050,-0.25050*
-1,1,0.09900,-0.10050,-0.25050*
-1,1,0.09900,-0.10050,0.25050*
-1,1,0.09900,0.10050,0.25050*
+21,1,0.56500,0.25920,0,0,0.0*
+21,1,0.46420,0.36000,0,0,0.0*
+1,1,0.10080,0.23210,-0.12960*
+1,1,0.10080,-0.23210,-0.12960*
+1,1,0.10080,-0.23210,0.12960*
+1,1,0.10080,0.23210,0.12960*
 %
 %ADD123ROUNDEDRECTD123*%
-%TA.AperFunction,OtherPad,Pad D2-Un1 (13.585mm,34.025mm)*%
+%TA.AperFunction,OtherPad,Pad D2-Un2 (14.285mm,34.025mm)*%
 G04:AMPARAMS|DCode=124|XSize=0.3mm|YSize=0.6mm|CornerRadius=0.0495mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD124*
 21,1,0.30000,0.50100,0,0,0.0*
@@ -467,24 +456,24 @@ G04:AMPARAMS|DCode=124|XSize=0.3mm|YSize=0.6mm|CornerRadius=0.0495mm|HoleSize=0m
 1,1,0.09900,0.10050,0.25050*
 %
 %ADD124ROUNDEDRECTD124*%
-%TA.AperFunction,OtherPad,Pad J10-Un3 (78.16mm,2.05mm)*%
-%ADD125R,2.00000X0.90000*%
-%TA.AperFunction,OtherPad,Pad J10-Un2 (78.16mm,5mm)*%
-%ADD126R,2.00000X0.90000*%
-%TA.AperFunction,OtherPad,Pad J10-Un1 (76.635mm,3.525mm)*%
-%ADD127R,0.85000X0.80000*%
-%TA.AperFunction,OtherPad,Pad U21-Un2 (96.102mm,9.775mm)*%
-G04:AMPARAMS|DCode=128|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
-%AMROUNDEDRECTD128*
-21,1,0.56500,0.25920,0,0,0.0*
-21,1,0.46420,0.36000,0,0,0.0*
-1,1,0.10080,0.23210,-0.12960*
-1,1,0.10080,-0.23210,-0.12960*
-1,1,0.10080,-0.23210,0.12960*
-1,1,0.10080,0.23210,0.12960*
+%TA.AperFunction,OtherPad,Pad D2-Un1 (13.585mm,34.025mm)*%
+G04:AMPARAMS|DCode=125|XSize=0.3mm|YSize=0.6mm|CornerRadius=0.0495mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
+%AMROUNDEDRECTD125*
+21,1,0.30000,0.50100,0,0,0.0*
+21,1,0.20100,0.60000,0,0,0.0*
+1,1,0.09900,0.10050,-0.25050*
+1,1,0.09900,-0.10050,-0.25050*
+1,1,0.09900,-0.10050,0.25050*
+1,1,0.09900,0.10050,0.25050*
 %
-%ADD128ROUNDEDRECTD128*%
-%TA.AperFunction,OtherPad,Pad U21-Un1 (95.267mm,9.775mm)*%
+%ADD125ROUNDEDRECTD125*%
+%TA.AperFunction,OtherPad,Pad J10-Un3 (78.16mm,2.05mm)*%
+%ADD126R,2.00000X0.90000*%
+%TA.AperFunction,OtherPad,Pad J10-Un2 (78.16mm,5mm)*%
+%ADD127R,2.00000X0.90000*%
+%TA.AperFunction,OtherPad,Pad J10-Un1 (76.635mm,3.525mm)*%
+%ADD128R,0.85000X0.80000*%
+%TA.AperFunction,OtherPad,Pad U21-Un2 (96.102mm,9.775mm)*%
 G04:AMPARAMS|DCode=129|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD129*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -495,7 +484,7 @@ G04:AMPARAMS|DCode=129|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD129ROUNDEDRECTD129*%
-%TA.AperFunction,OtherPad,Pad U20-Un2 (42.352mm,13.025mm)*%
+%TA.AperFunction,OtherPad,Pad U21-Un1 (95.267mm,9.775mm)*%
 G04:AMPARAMS|DCode=130|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD130*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -506,7 +495,7 @@ G04:AMPARAMS|DCode=130|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD130ROUNDEDRECTD130*%
-%TA.AperFunction,OtherPad,Pad U20-Un1 (41.517mm,13.025mm)*%
+%TA.AperFunction,OtherPad,Pad U20-Un2 (42.352mm,13.025mm)*%
 G04:AMPARAMS|DCode=131|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD131*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -517,7 +506,7 @@ G04:AMPARAMS|DCode=131|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD131ROUNDEDRECTD131*%
-%TA.AperFunction,OtherPad,Pad U24-Un2 (92.102mm,54.025mm)*%
+%TA.AperFunction,OtherPad,Pad U20-Un1 (41.517mm,13.025mm)*%
 G04:AMPARAMS|DCode=132|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD132*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -528,7 +517,7 @@ G04:AMPARAMS|DCode=132|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD132ROUNDEDRECTD132*%
-%TA.AperFunction,OtherPad,Pad U24-Un1 (91.267mm,54.025mm)*%
+%TA.AperFunction,OtherPad,Pad U24-Un2 (92.102mm,54.025mm)*%
 G04:AMPARAMS|DCode=133|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD133*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -539,7 +528,7 @@ G04:AMPARAMS|DCode=133|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD133ROUNDEDRECTD133*%
-%TA.AperFunction,OtherPad,Pad U23-Un2 (87.102mm,54.025mm)*%
+%TA.AperFunction,OtherPad,Pad U24-Un1 (91.267mm,54.025mm)*%
 G04:AMPARAMS|DCode=134|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD134*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -550,7 +539,7 @@ G04:AMPARAMS|DCode=134|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD134ROUNDEDRECTD134*%
-%TA.AperFunction,OtherPad,Pad U23-Un1 (86.267mm,54.025mm)*%
+%TA.AperFunction,OtherPad,Pad U23-Un2 (87.102mm,54.025mm)*%
 G04:AMPARAMS|DCode=135|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
 %AMROUNDEDRECTD135*
 21,1,0.56500,0.25920,0,0,0.0*
@@ -561,12 +550,23 @@ G04:AMPARAMS|DCode=135|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize
 1,1,0.10080,0.23210,0.12960*
 %
 %ADD135ROUNDEDRECTD135*%
+%TA.AperFunction,OtherPad,Pad U23-Un1 (86.267mm,54.025mm)*%
+G04:AMPARAMS|DCode=136|XSize=0.565mm|YSize=0.36mm|CornerRadius=0.0504mm|HoleSize=0mm|Usage=FLASHONLY|Rotation=0.000|XOffset=0mm|YOffset=0mm|HoleType=Round|Shape=RoundedRectangle|*
+%AMROUNDEDRECTD136*
+21,1,0.56500,0.25920,0,0,0.0*
+21,1,0.46420,0.36000,0,0,0.0*
+1,1,0.10080,0.23210,-0.12960*
+1,1,0.10080,-0.23210,-0.12960*
+1,1,0.10080,-0.23210,0.12960*
+1,1,0.10080,0.23210,0.12960*
+%
+%ADD136ROUNDEDRECTD136*%
 %TA.AperFunction,OtherPad,Pad Q1-Un3 (19.685mm,43.025mm)*%
-%ADD136R,0.60000X0.50000*%
-%TA.AperFunction,OtherPad,Pad Q1-Un2 (17.685mm,42.075mm)*%
 %ADD137R,0.60000X0.50000*%
-%TA.AperFunction,OtherPad,Pad Q1-Un1 (17.685mm,43.975mm)*%
+%TA.AperFunction,OtherPad,Pad Q1-Un2 (17.685mm,42.075mm)*%
 %ADD138R,0.60000X0.50000*%
+%TA.AperFunction,OtherPad,Pad Q1-Un1 (17.685mm,43.975mm)*%
+%ADD139R,0.60000X0.50000*%
 D10*
 X5851000Y5902500D02*
 D03*
@@ -2595,113 +2595,113 @@ X10858500D02*
 D03*
 X10968500D02*
 D03*
-D103*
+D104*
 X1428500Y3277500D02*
 D03*
-D104*
-X1358500D02*
-D03*
 D105*
-X1285250Y3652500D02*
+X1358500D02*
 D03*
 D106*
-X1201750D02*
+X1285250Y3652500D02*
 D03*
 D107*
-X3218500Y5702500D02*
+X1201750D02*
 D03*
 D108*
-X3018500Y5607500D02*
+X3218500Y5702500D02*
 D03*
 D109*
-Y5797500D02*
+X3018500Y5607500D02*
 D03*
 D110*
-X5766000Y555000D02*
+Y5797500D02*
 D03*
 D111*
-Y850000D02*
+X5766000Y555000D02*
 D03*
 D112*
-X5613500Y702500D02*
+Y850000D02*
 D03*
 D113*
-X4510250Y1002500D02*
+X5613500Y702500D02*
 D03*
 D114*
-X4426750D02*
+X4510250Y1002500D02*
 D03*
 D115*
-X2016000Y205000D02*
+X4426750D02*
 D03*
 D116*
-Y500000D02*
+X2016000Y205000D02*
 D03*
 D117*
-X1863500Y352500D02*
-D03*
-D118*
-X2268500Y4302500D02*
-D03*
-D119*
-X2068500Y4207500D02*
-D03*
-D120*
-Y4397500D02*
-D03*
-D121*
-X10485250Y2102500D02*
-D03*
-D122*
-X10401750D02*
-D03*
-D123*
-X1428500Y3402500D02*
-D03*
-D124*
-X1358500D02*
-D03*
-D125*
-X7816000Y205000D02*
-D03*
-D126*
 Y500000D02*
 D03*
-D127*
-X7663500Y352500D02*
+D118*
+X1863500Y352500D02*
 D03*
-D128*
-X9610250Y977500D02*
+D119*
+X2268500Y4302500D02*
 D03*
-D129*
-X9526750D02*
+D120*
+X2068500Y4207500D02*
 D03*
-D130*
-X4235250Y1302500D02*
-D03*
-D131*
-X4151750D02*
-D03*
-D132*
-X9210250Y5402500D02*
-D03*
-D133*
-X9126750D02*
-D03*
-D134*
-X8710250D02*
-D03*
-D135*
-X8626750D02*
-D03*
-D136*
-X1968500Y4302500D02*
-D03*
-D137*
-X1768500Y4207500D02*
-D03*
-D138*
+D121*
 Y4397500D02*
 D03*
-%TF.MD5,1bb928855e62cf475160c82ac8bd7eba*%
+D122*
+X10485250Y2102500D02*
+D03*
+D123*
+X10401750D02*
+D03*
+D124*
+X1428500Y3402500D02*
+D03*
+D125*
+X1358500D02*
+D03*
+D126*
+X7816000Y205000D02*
+D03*
+D127*
+Y500000D02*
+D03*
+D128*
+X7663500Y352500D02*
+D03*
+D129*
+X9610250Y977500D02*
+D03*
+D130*
+X9526750D02*
+D03*
+D131*
+X4235250Y1302500D02*
+D03*
+D132*
+X4151750D02*
+D03*
+D133*
+X9210250Y5402500D02*
+D03*
+D134*
+X9126750D02*
+D03*
+D135*
+X8710250D02*
+D03*
+D136*
+X8626750D02*
+D03*
+D137*
+X1968500Y4302500D02*
+D03*
+D138*
+X1768500Y4207500D02*
+D03*
+D139*
+Y4397500D02*
+D03*
+%TF.MD5,57b506f8f3c7d7028303bea4e27bf55d*%
 M02*

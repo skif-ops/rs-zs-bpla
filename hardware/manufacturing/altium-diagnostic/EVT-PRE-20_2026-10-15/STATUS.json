@@ -32,17 +32,18 @@
       "altium_drc_rule_violations": 421,
       "connectivity_physical_pins": "1074/1074",
       "source_kicad_copper_layers": 6,
-      "altium_output_copper_layers": 2,
+      "altium_output_copper_layers": 6,
       "native_kicad_drc_violations": 667,
       "native_kicad_unconnected_items": 499,
       "native_kicad_schematic_parity_items": 601,
-      "manufacturing_release": "BLOCKED"
+      "manufacturing_release": "BLOCKED",
+      "altium_board_copper_layers": 6
     }
   },
   "known_output_limitations": [
     "No valid newly generated Altium documentation PDF: Board Stack Report required Microsoft Excel and the PDF script then failed with a source-array exception.",
     "No fresh approved Altium BOM: the OutJob has no approved BOM template; bundled BOM files are tracked reference artifacts with audit-reported evidence/hash drift.",
     "Gerber layer selection must be reviewed in Altium before any regeneration because Altium 26 did not reliably persist it across every imported project.",
-    "PCB-MAIN Altium output is two-layer while the KiCad source is six-layer."
+    "PCB-MAIN now has six-layer Altium Gerber X2 output, but it remains diagnostic because Altium DRC reports 421 unrouted violations and the release gates remain open."
   ]
 }

@@ -1,0 +1,128 @@
+{
+  "schema": "dioneya-pcb-main-gerber-x2-validation-v1",
+  "date": "2026-10-15",
+  "source_board": {
+    "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MAIN/PCB-MAIN.PcbDoc",
+    "sha256": "F6FE323D4B07A00C2C708C8B4843D40BBB0724266BEEE569E699C5A96E6AE3FC",
+    "matches_repair_copy": true
+  },
+  "gerber_x2": {
+    "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MAIN/Project Outputs for PCB-MAIN/GerberX2",
+    "file_count": 19,
+    "copper_layer_count": 6,
+    "copper_layers": [
+      "F.Cu",
+      "In1.Cu",
+      "In2.Cu",
+      "In3.Cu",
+      "In4.Cu",
+      "B.Cu"
+    ],
+    "files": [
+      {
+        "name": "PCB-MAIN-macro.APR_LIB",
+        "bytes": 23262,
+        "sha256": "B001867D4F039C84528B8293F7572CE7DD2579B42B41F61AA5F0ACF35BB64321"
+      },
+      {
+        "name": "PCB-MAIN.apr",
+        "bytes": 5925,
+        "sha256": "786A8CBDB39470F4D654CE41BBCA8F67B528507B0E1A89D7441B75032A20E15D"
+      },
+      {
+        "name": "PCB-MAIN.EXTREP",
+        "bytes": 1526,
+        "sha256": "DFB26A9F56F0FA181D091C6C904B068B3D315267196BA20637DB897065D4AAD7"
+      },
+      {
+        "name": "PCB-MAIN.REP",
+        "bytes": 7044,
+        "sha256": "6E24588F15AD4A9488C6AD21BF4938052EF42399FC9E3F9D656C7D050715578E"
+      },
+      {
+        "name": "PCB-MAIN_Copper_Signal_1.gbr",
+        "bytes": 81057,
+        "sha256": "299213E5D8914D1EAC9E7B4CCEF1603D57D684062CC74D24AA1D2435DB1AA449",
+        "x2_file_function": "%TF.FileFunction,Copper,L2,Inr,Signal*%"
+      },
+      {
+        "name": "PCB-MAIN_Copper_Signal_2.gbr",
+        "bytes": 118480,
+        "sha256": "16F5BD9B3A330F7C3BA9A548C6EB3B78B0B3E0A0EB045C760AE8C3CDD96A8D44",
+        "x2_file_function": "%TF.FileFunction,Copper,L3,Inr,Signal*%"
+      },
+      {
+        "name": "PCB-MAIN_Copper_Signal_3.gbr",
+        "bytes": 11365,
+        "sha256": "6306C7493BE0973C8611EEE036B83786E1159886946D9A84C0EEF64524F9968B",
+        "x2_file_function": "%TF.FileFunction,Copper,L4,Inr,Signal*%"
+      },
+      {
+        "name": "PCB-MAIN_Copper_Signal_4.gbr",
+        "bytes": 91808,
+        "sha256": "484AA587F3220956FA6325BBC6DB357C690B1D22B4FAA45F89F6E3726AFDF082",
+        "x2_file_function": "%TF.FileFunction,Copper,L5,Inr,Signal*%"
+      },
+      {
+        "name": "PCB-MAIN_Copper_Signal_Bot.gbr",
+        "bytes": 16855,
+        "sha256": "AC4D8267E998AE0B638C054B72E438B1E46892B61EBF678AA2E11FE2C736888B",
+        "x2_file_function": "%TF.FileFunction,Copper,L6,Bot,Signal*%"
+      },
+      {
+        "name": "PCB-MAIN_Copper_Signal_Top.gbr",
+        "bytes": 72282,
+        "sha256": "4DC70EBB139532B6AC5F7216ABD6BC8333FF667637A89CE65E057DECAF1E8DC6",
+        "x2_file_function": "%TF.FileFunction,Copper,L1,Top,Signal*%"
+      },
+      {
+        "name": "PCB-MAIN_Legend_Bot.gbr",
+        "bytes": 341,
+        "sha256": "A94CA7278DBC1A86A6F5F352E4D9CB593F5B32029F5A4DEEF36A81DE09DA68B3"
+      },
+      {
+        "name": "PCB-MAIN_Legend_Top.gbr",
+        "bytes": 1575585,
+        "sha256": "A75BF25FF137F1062826B3178B3E2D8B7221F52272865A228B6ED3A9FC8D477C"
+      },
+      {
+        "name": "PCB-MAIN_NPTH_Drill.gbr",
+        "bytes": 351,
+        "sha256": "DCD644934736756B4550939F53548DBF8A2B8BDCCF52E8FD334A372ED5043A81"
+      },
+      {
+        "name": "PCB-MAIN_Paste_Bot.gbr",
+        "bytes": 338,
+        "sha256": "4F27DB0BDB743A7E920AD6F81E6643F8971151E50B02171457A8DDA43D89796D"
+      },
+      {
+        "name": "PCB-MAIN_Paste_Top.gbr",
+        "bytes": 46972,
+        "sha256": "C784E40142CA6FDAF6DC6B12169237FBFA951FFA6C4EA7F5E718DEF95FD8DE80"
+      },
+      {
+        "name": "PCB-MAIN_Profile.gbr",
+        "bytes": 725,
+        "sha256": "BF5E9628AE6B26AFF442D52C5BF982F61C56C5CEC564037ACCAF58050549B6DE"
+      },
+      {
+        "name": "PCB-MAIN_PTH_Drill.gbr",
+        "bytes": 9948,
+        "sha256": "3FF59F275F996BB320296934F32E39AA394821B1B1E8E125CA225FF7D02EC1B8"
+      },
+      {
+        "name": "PCB-MAIN_Soldermask_Bot.gbr",
+        "bytes": 3235,
+        "sha256": "F8880EA3565727D086D8C3DB53F0C0EF50DE982356B6E9F36E4F90875E47D00D"
+      },
+      {
+        "name": "PCB-MAIN_Soldermask_Top.gbr",
+        "bytes": 40095,
+        "sha256": "6A0726D57DA6D6793851D5F711AF0F38E8ED0B0C6EF0AF78BE88D09637492489"
+      }
+    ],
+    "validation": "PASS"
+  },
+  "manufacturing_release": "BLOCKED",
+  "blocking_reason": "Altium DRC reports 421 unrouted violations; RF, power, stackup authority, mechanics, CAM/DFM, and Review B remain open."
+}
