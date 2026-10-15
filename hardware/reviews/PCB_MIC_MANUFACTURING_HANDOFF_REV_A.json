@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MIC",
   "revision": "A",
-  "status": "ACOUSTIC_CLEARANCE_ECO_APPLIED_DRC_PASS_REVIEW_B_REOPENED_NOT_FOR_MANUFACTURE",
+  "status": "CURRENT_ALTIUM_OUTPUTS_GENERATED_DRC_PASS_REVIEW_A_B_OPEN_NOT_FOR_MANUFACTURE",
   "authority_inputs": [
     "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
     "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_dru",
@@ -141,12 +141,11 @@
     "adhesive_conformal_coating_keepout_acceptance": "CLOSED_BY_CONTROLLED_ACOUSTIC_KEEPOUT",
     "blocker_critical_dfm_closure": "CLOSED_FOR_EVT_BASELINE",
     "complete": true,
-    "current_source_cam_valid": false,
+    "current_source_cam_valid": true,
     "current_source_review_binding": false
   },
   "remaining_non_vendor_gates": [
-    "repeat Review A and Review B against the acoustic-clearance ECO source hash",
-    "regenerate and verify CAM and assembly outputs from the current source",
+    "repeat Review A and Review B against the acoustic-clearance ECO and Altium source hashes",
     "resolve 55 KiCad schematic-parity findings",
     "membrane and cavity tolerance-stack freeze",
     "assembled acoustic inspection and physical EVT calibration",
@@ -158,5 +157,13 @@
     "fabrication_authorized": false,
     "review_a_current_source_complete": false
   },
-  "current_source_outputs_generated": false
+  "current_source_outputs_generated": true,
+  "altium_current_source_output_manifest": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/validation/PCB-MIC-Altium-current-source-output-manifest-2026-10-16.json",
+  "altium_source_binding": {
+    "project_sha256": "99C726A2D8513287A1A679AFB75DAE9552A8B1C4D6BE56AFB3497FA3249EB94C",
+    "pcbdoc_sha256": "CDBF994E1D2B6B59E83BE48C7D5D0B525D889B1509148C2DA42C2E7522C423C0",
+    "outjob_sha256": "9089C119380A5D26D87584B17FC25177F541968AB0FE7A01A590B46A3550187F",
+    "drc_warnings": 0,
+    "drc_rule_violations": 0
+  }
 }

@@ -1,11 +1,11 @@
 Altium Designer Pick and Place Locations
-F:\2AC9~1\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\netlabel-reimport-diagnostic\PCB-MIC\Project Outputs for PCB-MIC\Pick Place\Pick Place for PCB-MIC.txt
+F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\netlabel-reimport-diagnostic\PCB-MIC\Project Outputs for PCB-MIC\Pick Place\Pick Place for PCB-MIC.txt
 
 ========================================================================================================================
 File Design Information:
 
-Date:       15.10.26
-Time:       15:15
+Date:       16.10.26
+Time:       00:38
 Revision:   b371b04ff5c3550c4d6eb5949c89a93a5decc770
 Variant:    No variations
 Units used: mil

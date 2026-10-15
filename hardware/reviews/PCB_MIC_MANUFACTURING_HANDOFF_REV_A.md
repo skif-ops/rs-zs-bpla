@@ -1,6 +1,6 @@
 # PCB-MIC Rev.A manufacturing handoff
 
-Status: `ACOUSTIC CLEARANCE ECO APPLIED / KICAD+ALTIUM DRC PASS / REVIEW A+B REPEAT REQUIRED / NOT FOR MANUFACTURE`
+Status: `CURRENT ALTIUM OUTPUTS GENERATED / DRC PASS / REVIEW A+B REPEAT REQUIRED / NOT FOR MANUFACTURE`
 
 Decision `2026-10-15`: PCB-MIC acoustic-clearance ECO-001 was applied to the native KiCad source and the Altium verification board. Fresh KiCad and Altium board DRC are clean. The 55 KiCad schematic-parity findings, regenerated CAM, repeated Review A/Review B binding, first-panel bore inspection and physical EVT remain mandatory.
 
@@ -59,7 +59,7 @@ Excellon drill, IPC-356, pick-and-place CSV, manufacturing BOM, assembly/fabrica
 PDF and board-sized F.Cu/B.Cu review SVGs. Every file must match the archive SHA-256
 manifest. The PCB Native Gate artifact also carries the handoff audit, this packet,
 the machine contract and the engineering-closure register under `PCB-MIC/`.
-No controlled candidate output has been regenerated from ECO-001. The prior outputs remain historical evidence for their recorded source hash. Current-source outputs remain blocked until CAM regeneration and repeated Review A/Review B.
+The current Altium board now has a fresh zero-warning, zero-violation DRC and regenerated Gerber X2, NC Drill, Pick&Place and STEP outputs. Their hashes and source binding are recorded in `hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/validation/PCB-MIC-Altium-current-source-output-manifest-2026-10-16.json`. The Altium OutJob did not emit the BOM, assembly PDF or standalone IPC-D-356, so the full candidate retains those controlled KiCad outputs alongside Altium CAM. Review A/Review B binding remains open.
 
 ## Panelization and depanel response
 
@@ -95,6 +95,6 @@ non-blocking. They are not claimed factory replies. A checkout DFM error,
 first-panel defect or source change remains open until dispositioned through the
 project ECO process.
 
-The standard-process DFM rows remain accepted as engineering-baseline closures, but the current design source has changed. Earlier Review A and copper-return signatures remain historical evidence only for their recorded board hash. The current board requires repeated Review A/Review B, regenerated CAM and archive verification.
+The standard-process DFM rows remain accepted as engineering-baseline closures, but the current design source has changed. Earlier Review A and copper-return signatures remain historical evidence only for their recorded board hash. The current board has regenerated and checksum-bound Altium CAM, but it still requires repeated Review A/Review B against the current source hashes.
 
 The 55 KiCad schematic-parity findings, membrane/cavity tolerance stack, assembled acoustic inspection, physical EVT calibration, first-panel bore inspection and manufacturing release remain separate blocking gates.

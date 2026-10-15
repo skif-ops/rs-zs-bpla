@@ -1,20 +1,9 @@
 ------------------------------------------------------------------------------------------
-Gerber File Extension Report For: PCB-MIC.GBR   15.10.2026  15:15:21
+Gerber File Extension Report For: PCB-MIC.GBR   16.10.2026  0:38:03
 ------------------------------------------------------------------------------------------
 
 
 ------------------------------------------------------------------------------------------
 Layer Extension     Layer Description                      
 ------------------------------------------------------------------------------------------
-.gbr                F.Cu                                    
-.gbr                B.Cu                                    
-.gbr                F.SilkS                                 
-.gbr                B.SilkS                                 
-.gbr                F.Mask                                  
-.gbr                B.Mask                                  
-.gbr                F.Paste                                 
-.gbr                B.Paste                                 
-.gbr                Profile                                 
-.gbr                Non-plated through-hole drill file      
-.gbr                Plated through-hole drill file          
 ------------------------------------------------------------------------------------------
