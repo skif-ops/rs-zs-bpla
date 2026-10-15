@@ -1,0 +1,930 @@
+{
+  "schema": "pcb-mic-acoustic-eco-semantic-compare-v1",
+  "pass": true,
+  "inputs": {
+    "original_layout_model": "hardware\\altium\\netlabel-reimport-diagnostic\\PCB-MIC\\validation\\PCB-MIC-Altium-layout-original-2026-10-15.json",
+    "original_layout_model_sha256": "807DC6E2E76A144A50F5477C7311E611B323CC4E076E588B498A9072C5747A2B",
+    "final_layout_model": "hardware\\altium\\netlabel-reimport-diagnostic\\PCB-MIC\\validation\\PCB-MIC-Altium-layout-final-2026-10-15.json",
+    "final_layout_model_sha256": "6047E061EB2FC016CBA9BEAAA201C4BAD90C402086DDD19C46BBA68098994C59"
+  },
+  "checks": [
+    {
+      "name": "board_geometry_and_stack_unchanged",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "components_unchanged",
+      "pass": true,
+      "detail": {
+        "count": 6
+      }
+    },
+    {
+      "name": "classes_unchanged",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "exactly_32_mk1_pad3_fragments_changed",
+      "pass": true,
+      "detail": {
+        "total_pads": 53,
+        "changed_pads": 32
+      }
+    },
+    {
+      "name": "mk1_pad3_fragments_moved_radially_outward_0p010mm",
+      "pass": true,
+      "detail": {
+        "center_mm": [
+          11.999998224999999,
+          5.349998824999999
+        ],
+        "before_radius_mm": [
+          0.6624989185011725,
+          0.6625013328452467
+        ],
+        "after_radius_mm": [
+          0.6724981617131539,
+          0.6725017460616693
+        ],
+        "radial_delta_mm": [
+          0.009998537637341598,
+          0.010000649573373654
+        ]
+      }
+    },
+    {
+      "name": "exactly_two_gnd_track_endpoints_changed",
+      "pass": true,
+      "detail": {
+        "total_copper_objects": 106,
+        "changed_objects": 2
+      }
+    },
+    {
+      "name": "only_expected_rule_records_changed",
+      "pass": true,
+      "detail": {
+        "added": [
+          "MK1_Manufacturer_Copper_0p125mm"
+        ],
+        "removed": [],
+        "modified": [
+          "Clearence 0,2_NetClass",
+          "MK1_Internal_Acoustic_ClearanceInComponent('MK1')MK1_Internal_Acoustic_ClearanceInComponent('MK1')InComponent('MK1')MK1_Internal_Acoustic_Clearance"
+        ]
+      }
+    },
+    {
+      "name": "clearance_rule_scopes_values_and_priorities_match_baseline",
+      "pass": true,
+      "detail": {
+        "acoustic": {
+          "name": "MK1_Internal_Acoustic_ClearanceInComponent('MK1')MK1_Internal_Acoustic_ClearanceInComponent('MK1')InComponent('MK1')MK1_Internal_Acoustic_Clearance",
+          "kind": 0,
+          "enabled": true,
+          "priority": 1,
+          "scope1": "IsPad && (Name = 'MK1-3')",
+          "scope2": "IsPad && (Name = 'MK1-Un1')",
+          "descriptor": "Clearance Constraint (Gap=0.1mm) (IsPad && (Name = 'MK1-3')),(IsPad && (Name = 'MK1-Un1'))"
+        },
+        "local_manufacturer": {
+          "name": "MK1_Manufacturer_Copper_0p125mm",
+          "kind": 0,
+          "enabled": true,
+          "priority": 2,
+          "scope1": "IsPad && (Name = 'MK1-3')",
+          "scope2": "IsPad && InComponent('MK1') && (Name <> 'MK1-3') && (Name <> 'MK1-Un1')",
+          "descriptor": "Clearance Constraint (Gap=0.125mm) (IsPad && (Name = 'MK1-3')),(IsPad && InComponent('MK1') && (Name <> 'MK1-3') && (Name <> 'MK1-Un1'))"
+        },
+        "global": {
+          "name": "Clearence 0,2_NetClass",
+          "kind": 0,
+          "enabled": true,
+          "priority": 3,
+          "scope1": "InNetClass('Default')",
+          "scope2": "All",
+          "descriptor": "Clearance Constraint (Gap=0.2mm) (InNetClass('Default')),(All)"
+        }
+      }
+    }
+  ],
+  "pad_deltas": [
+    {
+      "index": 19,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4985236,
+        2106299
+      ],
+      "after_coord": [
+        4989173,
+        2106299
+      ],
+      "before_mm": [
+        12.66249944,
+        5.349999459999999
+      ],
+      "after_mm": [
+        12.67249942,
+        5.349999459999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 20,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4980224,
+        2055414
+      ],
+      "after_coord": [
+        4984085,
+        2054646
+      ],
+      "before_mm": [
+        12.64976896,
+        5.22075156
+      ],
+      "after_mm": [
+        12.659575899999998,
+        5.218800839999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 21,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4980224,
+        2157184
+      ],
+      "after_coord": [
+        4984085,
+        2157952
+      ],
+      "before_mm": [
+        12.64976896,
+        5.47924736
+      ],
+      "after_mm": [
+        12.659575899999998,
+        5.4811980799999995
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 22,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4965381,
+        2006485
+      ],
+      "after_coord": [
+        4969018,
+        2004978
+      ],
+      "before_mm": [
+        12.612067739999999,
+        5.0964719
+      ],
+      "after_mm": [
+        12.621305719999999,
+        5.092644119999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 23,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4965381,
+        2206113
+      ],
+      "after_coord": [
+        4969018,
+        2207620
+      ],
+      "before_mm": [
+        12.612067739999999,
+        5.60352702
+      ],
+      "after_mm": [
+        12.621305719999999,
+        5.6073547999999995
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 24,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4941278,
+        1961391
+      ],
+      "after_coord": [
+        4944551,
+        1959204
+      ],
+      "before_mm": [
+        12.55084612,
+        4.98193314
+      ],
+      "after_mm": [
+        12.55915954,
+        4.976378159999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 25,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4941278,
+        2251206
+      ],
+      "after_coord": [
+        4944552,
+        2253393
+      ],
+      "before_mm": [
+        12.55084612,
+        5.718063239999999
+      ],
+      "after_mm": [
+        12.559162079999998,
+        5.72361822
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 26,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4908841,
+        1921866
+      ],
+      "after_coord": [
+        4911625,
+        1919082
+      ],
+      "before_mm": [
+        12.468456139999999,
+        4.88153964
+      ],
+      "after_mm": [
+        12.475527499999998,
+        4.874468279999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 27,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4908841,
+        2290731
+      ],
+      "after_coord": [
+        4911625,
+        2293515
+      ],
+      "before_mm": [
+        12.468456139999999,
+        5.818456739999999
+      ],
+      "after_mm": [
+        12.475527499999998,
+        5.8255281
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 28,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4869316,
+        1889429
+      ],
+      "after_coord": [
+        4871503,
+        1886155
+      ],
+      "before_mm": [
+        12.36806264,
+        4.799149659999999
+      ],
+      "after_mm": [
+        12.37361762,
+        4.790833699999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 29,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4869316,
+        2323168
+      ],
+      "after_coord": [
+        4871503,
+        2326442
+      ],
+      "before_mm": [
+        12.36806264,
+        5.90084672
+      ],
+      "after_mm": [
+        12.37361762,
+        5.90916268
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 30,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4824223,
+        1865326
+      ],
+      "after_coord": [
+        4825730,
+        1861689
+      ],
+      "before_mm": [
+        12.253526419999998,
+        4.73792804
+      ],
+      "after_mm": [
+        12.2573542,
+        4.72869006
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 31,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4824223,
+        2347271
+      ],
+      "after_coord": [
+        4825730,
+        2350908
+      ],
+      "before_mm": [
+        12.253526419999998,
+        5.962068339999999
+      ],
+      "after_mm": [
+        12.2573542,
+        5.971306319999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 32,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4775294,
+        1850484
+      ],
+      "after_coord": [
+        4776062,
+        1846623
+      ],
+      "before_mm": [
+        12.12924676,
+        4.70022936
+      ],
+      "after_mm": [
+        12.131197479999999,
+        4.69042242
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 33,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4775294,
+        2362114
+      ],
+      "after_coord": [
+        4776062,
+        2365975
+      ],
+      "before_mm": [
+        12.12924676,
+        5.99976956
+      ],
+      "after_mm": [
+        12.131197479999999,
+        6.0095765
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 34,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4724409,
+        1845472
+      ],
+      "after_coord": [
+        4724409,
+        1841535
+      ],
+      "before_mm": [
+        11.99999886,
+        4.68749888
+      ],
+      "after_mm": [
+        11.99999886,
+        4.6774989
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 35,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4724409,
+        2367126
+      ],
+      "after_coord": [
+        4724409,
+        2371063
+      ],
+      "before_mm": [
+        11.99999886,
+        6.01250004
+      ],
+      "after_mm": [
+        11.99999886,
+        6.02250002
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 36,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4673524,
+        1850484
+      ],
+      "after_coord": [
+        4672756,
+        1846623
+      ],
+      "before_mm": [
+        11.870750959999999,
+        4.70022936
+      ],
+      "after_mm": [
+        11.868800239999999,
+        4.69042242
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 37,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4673524,
+        2362114
+      ],
+      "after_coord": [
+        4672756,
+        2365975
+      ],
+      "before_mm": [
+        11.870750959999999,
+        5.99976956
+      ],
+      "after_mm": [
+        11.868800239999999,
+        6.0095765
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 38,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4624595,
+        1865326
+      ],
+      "after_coord": [
+        4623088,
+        1861689
+      ],
+      "before_mm": [
+        11.7464713,
+        4.73792804
+      ],
+      "after_mm": [
+        11.74264352,
+        4.72869006
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 39,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4624595,
+        2347271
+      ],
+      "after_coord": [
+        4623088,
+        2350908
+      ],
+      "before_mm": [
+        11.7464713,
+        5.962068339999999
+      ],
+      "after_mm": [
+        11.74264352,
+        5.971306319999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 40,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4579501,
+        1889429
+      ],
+      "after_coord": [
+        4577314,
+        1886156
+      ],
+      "before_mm": [
+        11.63193254,
+        4.799149659999999
+      ],
+      "after_mm": [
+        11.62637756,
+        4.79083624
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 41,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4579501,
+        2323168
+      ],
+      "after_coord": [
+        4577314,
+        2326441
+      ],
+      "before_mm": [
+        11.63193254,
+        5.90084672
+      ],
+      "after_mm": [
+        11.62637756,
+        5.90916014
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 42,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4539976,
+        1921866
+      ],
+      "after_coord": [
+        4537192,
+        1919082
+      ],
+      "before_mm": [
+        11.531539039999998,
+        4.88153964
+      ],
+      "after_mm": [
+        11.524467679999999,
+        4.874468279999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 43,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4539976,
+        2290731
+      ],
+      "after_coord": [
+        4537192,
+        2293515
+      ],
+      "before_mm": [
+        11.531539039999998,
+        5.818456739999999
+      ],
+      "after_mm": [
+        11.524467679999999,
+        5.8255281
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 44,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4507539,
+        1961391
+      ],
+      "after_coord": [
+        4504265,
+        1959204
+      ],
+      "before_mm": [
+        11.44914906,
+        4.98193314
+      ],
+      "after_mm": [
+        11.440833099999999,
+        4.976378159999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 45,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4507539,
+        2251206
+      ],
+      "after_coord": [
+        4504265,
+        2253393
+      ],
+      "before_mm": [
+        11.44914906,
+        5.718063239999999
+      ],
+      "after_mm": [
+        11.440833099999999,
+        5.72361822
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 46,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4483436,
+        2006485
+      ],
+      "after_coord": [
+        4479799,
+        2004978
+      ],
+      "before_mm": [
+        11.387927439999999,
+        5.0964719
+      ],
+      "after_mm": [
+        11.378689459999999,
+        5.092644119999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 47,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4483436,
+        2206113
+      ],
+      "after_coord": [
+        4479799,
+        2207620
+      ],
+      "before_mm": [
+        11.387927439999999,
+        5.60352702
+      ],
+      "after_mm": [
+        11.378689459999999,
+        5.6073547999999995
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 48,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4468594,
+        2055414
+      ],
+      "after_coord": [
+        4464733,
+        2054646
+      ],
+      "before_mm": [
+        11.350228759999998,
+        5.22075156
+      ],
+      "after_mm": [
+        11.34042182,
+        5.218800839999999
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 49,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4468594,
+        2157184
+      ],
+      "after_coord": [
+        4464733,
+        2157952
+      ],
+      "before_mm": [
+        11.350228759999998,
+        5.47924736
+      ],
+      "after_mm": [
+        11.34042182,
+        5.4811980799999995
+      ],
+      "only_xy_changed": true
+    },
+    {
+      "index": 50,
+      "component": "MK1",
+      "pad": "3",
+      "before_coord": [
+        4463582,
+        2106299
+      ],
+      "after_coord": [
+        4459645,
+        2106299
+      ],
+      "before_mm": [
+        11.337498279999998,
+        5.349999459999999
+      ],
+      "after_mm": [
+        11.327498299999998,
+        5.349999459999999
+      ],
+      "only_xy_changed": true
+    }
+  ],
+  "track_deltas": [
+    {
+      "index": 51,
+      "before": {
+        "k": "track",
+        "v": [
+          5000000,
+          2106299,
+          5905512,
+          2106299,
+          118110
+        ],
+        "layer": "TopLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      "after": {
+        "k": "track",
+        "v": [
+          5019685,
+          2106299,
+          5905512,
+          2106299,
+          118110
+        ],
+        "layer": "TopLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      "before_mm": [
+        12.7,
+        5.349999459999999,
+        15.000000479999999,
+        5.349999459999999,
+        0.29999939999999997
+      ],
+      "after_mm": [
+        12.749999899999999,
+        5.349999459999999,
+        15.000000479999999,
+        5.349999459999999,
+        0.29999939999999997
+      ],
+      "only_geometry_changed": true
+    },
+    {
+      "index": 53,
+      "before": {
+        "k": "track",
+        "v": [
+          4476378,
+          2598425,
+          4606299,
+          2342519,
+          62992
+        ],
+        "layer": "TopLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      "after": {
+        "k": "track",
+        "v": [
+          4476378,
+          2598425,
+          4604331,
+          2346457,
+          62992
+        ],
+        "layer": "TopLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      "before_mm": [
+        11.370000119999998,
+        6.599999499999999,
+        11.699999459999999,
+        5.949998259999999,
+        0.15999967999999998
+      ],
+      "after_mm": [
+        11.370000119999998,
+        6.599999499999999,
+        11.69500074,
+        5.96000078,
+        0.15999967999999998
+      ],
+      "only_geometry_changed": true
+    }
+  ],
+  "limits": [
+    "This check compares the semantic model exposed by Altium for board, components, pads, copper, rules and classes.",
+    "DRC results and schematic-to-PCB parity are separate release gates."
+  ]
+}

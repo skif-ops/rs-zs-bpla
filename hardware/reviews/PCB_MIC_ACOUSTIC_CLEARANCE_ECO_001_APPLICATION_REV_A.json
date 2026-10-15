@@ -1,0 +1,79 @@
+{
+  "schema": "dioneya-pcb-mic-acoustic-clearance-eco-application-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MIC",
+  "eco_id": "PCB_MIC_ACOUSTIC_CLEARANCE_ECO_001",
+  "date": "2026-10-15",
+  "status": "APPLIED_DRC_PASS_REVIEW_A_B_REPEAT_REQUIRED_NOT_FOR_MANUFACTURE",
+  "requirements_mm": {
+    "general_clearance": 0.2,
+    "mk1_manufacturer_copper_clearance": 0.125,
+    "mk1_pad3_to_acoustic_npth_exception": 0.1
+  },
+  "changes": {
+    "mk1_pad3_fragments": {
+      "count": 32,
+      "before_nominal_radius_mm": 0.6625,
+      "after_nominal_radius_mm": 0.6725,
+      "radial_delta_mm": 0.01
+    },
+    "gnd_track_endpoints": [
+      {
+        "before_mm": [12.7, 16.649999],
+        "after_mm": [12.75, 16.649999],
+        "resulting_hole_clearance_mm": 0.2000002
+      },
+      {
+        "before_mm": [11.7, 16.05],
+        "after_mm": [11.695, 16.04],
+        "resulting_hole_clearance_mm": 0.2020013
+      }
+    ]
+  },
+  "source_hashes": {
+    "kicad_board": "BA2AF99FE3B0B850A2801B9B73F1333D48C55A56D59E91187495D5E95910D93A",
+    "kicad_project": "6E408ECBE38FF0C1D8D29C93D6AA284271E7F8300B3F4AAF2C42B169601D68AB",
+    "kicad_rules": "F3DEB4CA6169AA1FF40B5A02BE31A0EB624E570ABE906C804F1C6DA894C4D6B9",
+    "t5838_footprint": "213BB0BD9E5E3E8B31AEADF044F643FAAE2D0BF808FC60C56BFE9A90DD07753C",
+    "altium_board": "5694BA909348205998DAA8E907407898A46A35665A23B05F51CD2E193DCD3A7E"
+  },
+  "verification": {
+    "kicad_board_drc": {
+      "violations": 0,
+      "unconnected_items": 0,
+      "report": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/validation/PCB-MIC-KiCad-DRC-2026-10-15.json"
+    },
+    "kicad_schematic_parity": {
+      "items": 55,
+      "status": "OPEN_BLOCKER",
+      "report": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/validation/PCB-MIC-KiCad-DRC-parity-2026-10-15.json"
+    },
+    "altium_drc": {
+      "warnings": 0,
+      "violations": 0,
+      "report_drc": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/validation/PCB-MIC-Altium-DRC-2026-10-15.drc",
+      "report_html": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/validation/PCB-MIC-Altium-DRC-2026-10-15.html"
+    },
+    "semantic_compare": {
+      "pass": true,
+      "checks_passed": 8,
+      "checks_total": 8,
+      "report": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/validation/PCB-MIC-acoustic-ECO-semantic-compare-2026-10-15.json"
+    },
+    "kicad_to_altium": {
+      "routes": "27/27",
+      "vias": "5/5",
+      "components": "6/6",
+      "pads": "53/53",
+      "nets": "7/7",
+      "outline": "4/4"
+    }
+  },
+  "release_interlock": {
+    "review_a_current_source_complete": false,
+    "review_b_current_source_complete": false,
+    "cam_regenerated": false,
+    "manufacturing_release": false,
+    "fabrication_authorized": false
+  }
+}

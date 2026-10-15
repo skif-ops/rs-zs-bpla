@@ -1,0 +1,57 @@
+{
+  "file": "F:\\\u041f\u0440\u043e\u0435\u043a\u0442\u044b\\Codex\\tools\\eda-agent-runtime\\workspace\\PCB-MIC.acoustic-eco-test.PcbDoc",
+  "sha256_before": "57F6F52981506828906E4EDD9844A90EAC9A99EFEC16115C61BFBA847B33724B",
+  "sha256_after": "BDE0BFD5241507D6479B16596A6952654A8D1B8DAF99AC8E7C17A5FC4A8B850B",
+  "pad_fragments_moved": 32,
+  "pad_radius_delta_mm": 0.01,
+  "pad_radius_after_mil_min": 26.476262060682384,
+  "pad_radius_after_mil_max": 26.47652881995307,
+  "ordinary_gnd_track_hole_clearance_mm": [
+    0.20000020000019417,
+    0.2020012598533331
+  ],
+  "tracks_after": [
+    {
+      "X1": "501.9685",
+      "Y1": "210.6299",
+      "X2": "590.5512",
+      "Y2": "210.6299",
+      "Width": "11.811",
+      "Layer": "TopLayer",
+      "Net.Name": "GND"
+    },
+    {
+      "X1": "447.6378",
+      "Y1": "259.8425",
+      "X2": "460.4331",
+      "Y2": "234.6457",
+      "Width": "6.2992",
+      "Layer": "TopLayer",
+      "Net.Name": "GND"
+    }
+  ],
+  "acoustic_clearance_rule": {
+    "name": "MK1_Internal_Acoustic_ClearanceInComponent('MK1')MK1_Internal_Acoustic_ClearanceInComponent('MK1')InComponent('MK1')MK1_Internal_Acoustic_Clearance",
+    "rule_kind": 0,
+    "enabled": true,
+    "priority": 1,
+    "scope_1": "IsPad && (Name = 'MK1-3')",
+    "scope_2": "IsPad && (Name = 'MK1-Un1')",
+    "comment": "EVT-PRE-20: 0.10 mm only between MK1 pad 3 manufacturer land and the 0.8 mm acoustic NPTH",
+    "descriptor": "Clearance Constraint (Gap=0.1mm) (IsPad && (Name = 'MK1-3')),(IsPad && (Name = 'MK1-Un1'))",
+    "gap_mm": 0.0999998
+  },
+  "save_result": {
+    "file_path": "F:\\\u001f@>5:BK\\Codex\\tools\\eda-agent-runtime\\workspace\\PCB-MIC.acoustic-eco-test.PcbDoc",
+    "saved": true,
+    "was_modified": true,
+    "reason": ""
+  },
+  "active_after_save": {
+    "file_name": "PCB-MIC.acoustic-eco-test.PcbDoc",
+    "file_path": "F:\\\u001f@>5:BK\\Codex\\tools\\eda-agent-runtime\\workspace\\PCB-MIC.acoustic-eco-test.PcbDoc",
+    "document_kind": "PCB",
+    "modified": false
+  },
+  "next_required_check": "fresh modal Altium batch DRC"
+}

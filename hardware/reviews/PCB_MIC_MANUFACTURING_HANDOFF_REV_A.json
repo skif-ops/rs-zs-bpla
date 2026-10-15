@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MIC",
   "revision": "A",
-  "status": "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_NOT_FOR_MANUFACTURE",
+  "status": "ACOUSTIC_CLEARANCE_ECO_APPLIED_DRC_PASS_REVIEW_B_REOPENED_NOT_FOR_MANUFACTURE",
   "authority_inputs": [
     "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
     "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_dru",
@@ -15,10 +15,15 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
-    "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+    "native_board_sha256": "BA2AF99FE3B0B850A2801B9B73F1333D48C55A56D59E91187495D5E95910D93A",
     "repeat_review_a_commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
     "copper_return_decision_commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
-    "copper_return_acceptance_state_commit_sha": "8aa4a3d21b55956625db643e22436f248f75b258"
+    "copper_return_acceptance_state_commit_sha": "8aa4a3d21b55956625db643e22436f248f75b258",
+    "historical_reviewed_native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+    "native_project_sha256": "6E408ECBE38FF0C1D8D29C93D6AA284271E7F8300B3F4AAF2C42B169601D68AB",
+    "native_rules_sha256": "F3DEB4CA6169AA1FF40B5A02BE31A0EB624E570ABE906C804F1C6DA894C4D6B9",
+    "t5838_footprint_sha256": "213BB0BD9E5E3E8B31AEADF044F643FAAE2D0BF808FC60C56BFE9A90DD07753C",
+    "acoustic_clearance_eco": "hardware/reviews/PCB_MIC_ACOUSTIC_CLEARANCE_ECO_001_APPLICATION_REV_A.json"
   },
   "board_contract": {
     "coordinate_origin": "LOWER_LEFT_OF_BOARD_OUTLINE",
@@ -135,9 +140,14 @@
     "panelization_depanel_acceptance": "CLOSED_BY_STANDARD_PROCESS_FIRST_ARTICLE_CHECK",
     "adhesive_conformal_coating_keepout_acceptance": "CLOSED_BY_CONTROLLED_ACOUSTIC_KEEPOUT",
     "blocker_critical_dfm_closure": "CLOSED_FOR_EVT_BASELINE",
-    "complete": true
+    "complete": true,
+    "current_source_cam_valid": false,
+    "current_source_review_binding": false
   },
   "remaining_non_vendor_gates": [
+    "repeat Review A and Review B against the acoustic-clearance ECO source hash",
+    "regenerate and verify CAM and assembly outputs from the current source",
+    "resolve 55 KiCad schematic-parity findings",
     "membrane and cavity tolerance-stack freeze",
     "assembled acoustic inspection and physical EVT calibration",
     "independent Review-B signature and manufacturing release"
@@ -145,6 +155,8 @@
   "release_interlock": {
     "review_b_complete": false,
     "manufacturing_release": false,
-    "fabrication_authorized": false
-  }
+    "fabrication_authorized": false,
+    "review_a_current_source_complete": false
+  },
+  "current_source_outputs_generated": false
 }

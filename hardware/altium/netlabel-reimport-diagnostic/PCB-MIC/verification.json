@@ -16,9 +16,10 @@
       "32": 8
     },
     "missing_examples": [],
+    "added_examples": [],
     "wrong_layer_examples": [],
     "source_board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
-    "imported_board": "F:/Проекты/Codex/altium-mic-diagnostic-test/PCB-MIC.PcbDoc",
+    "imported_board": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/PCB-MIC.PcbDoc",
     "transform": {
       "x_offset_mm": 0.0,
       "y_reflection_sum_mm": 22.0

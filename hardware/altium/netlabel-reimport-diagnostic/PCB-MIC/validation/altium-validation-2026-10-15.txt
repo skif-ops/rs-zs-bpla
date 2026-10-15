@@ -1,0 +1,55 @@
+PCB-MIC acoustic-clearance ECO verification
+Date: 2026-10-15
+Tool: Altium Designer 26.10.1 Trial; KiCad 10.0 CLI
+Status: NOT FOR MANUFACTURE
+
+Controlled source hashes
+------------------------
+KiCad board: BA2AF99FE3B0B850A2801B9B73F1333D48C55A56D59E91187495D5E95910D93A
+KiCad project: 6E408ECBE38FF0C1D8D29C93D6AA284271E7F8300B3F4AAF2C42B169601D68AB
+KiCad rules: F3DEB4CA6169AA1FF40B5A02BE31A0EB624E570ABE906C804F1C6DA894C4D6B9
+T5838 footprint: 213BB0BD9E5E3E8B31AEADF044F643FAAE2D0BF808FC60C56BFE9A90DD07753C
+Altium board: 5694BA909348205998DAA8E907407898A46A35665A23B05F51CD2E193DCD3A7E
+
+KiCad checks
+-------------
+Board DRC violations: 0
+Unconnected items: 0
+Schematic-parity items: 55
+Board report: PCB-MIC-KiCad-DRC-2026-10-15.json
+Parity report: PCB-MIC-KiCad-DRC-parity-2026-10-15.json
+
+Altium checks
+--------------
+Fresh DRC time: 12:50:38 Europe/Moscow
+Warnings: 0
+Rule violations: 0
+Acoustic 0.10 mm rule violations: 0
+MK1 manufacturer-copper 0.125 mm rule violations: 0
+General 0.20 mm rule violations: 0
+Reports: PCB-MIC-Altium-DRC-2026-10-15.drc and .html
+
+Semantic delta verification
+---------------------------
+Result: PASS, eight checks.
+Board outline and layer stack unchanged.
+Components and net classes unchanged.
+Exactly 32 of 53 pads changed; all are MK1 pad 3 and only X/Y changed.
+Nominal pad-3 fragment radius: 0.6625 mm -> 0.6725 mm.
+Exactly two of 106 copper objects changed; both are GND tracks.
+No rule removed. One local 0.125 mm rule added.
+Existing-rule changes are limited to the acoustic scope and general-rule priority.
+Evidence: PCB-MIC-acoustic-ECO-semantic-compare-2026-10-15.json
+
+KiCad-to-Altium geometry
+------------------------
+Routes 27/27; vias 5/5; components 6/6; pads 53/53; nets 7/7; outline 4/4.
+
+Remaining gates
+---------------
+The 55 KiCad schematic-parity findings remain open.
+CAM outputs were not regenerated.
+Review A/Review B must be repeated against the new source hash.
+Mask, paste, keepout, fabrication drawing, acoustic path, first-panel and physical EVT checks remain open.
+No manufacturing-equivalence or manufacturing-release claim is made.
+

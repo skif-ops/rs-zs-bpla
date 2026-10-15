@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MIC",
-  "release_state": "REVIEW_A_PASS",
+  "release_state": "ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED",
   "manufacturing_release": false,
   "authoritative_inputs": [
     "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
@@ -55,7 +55,13 @@
       "artifacts/kicad-native/PCB-MIC/manufacturing-handoff/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
       "artifacts/kicad-native/PCB-MIC/manufacturing-handoff/PCB_MIC_DFM_RESPONSE_REV_A.csv"
     ],
-    "routing_status": "EXPLICIT_LOCAL_RETURN_REVIEW_A_SIGNED_REVIEW_B_OPEN"
+    "routing_status": "EXPLICIT_LOCAL_RETURN_REVIEW_A_SIGNED_REVIEW_B_OPEN",
+    "current_controlled_hashes": {
+      "board_sha256": "BA2AF99FE3B0B850A2801B9B73F1333D48C55A56D59E91187495D5E95910D93A",
+      "project_sha256": "6E408ECBE38FF0C1D8D29C93D6AA284271E7F8300B3F4AAF2C42B169601D68AB",
+      "rules_sha256": "F3DEB4CA6169AA1FF40B5A02BE31A0EB624E570ABE906C804F1C6DA894C4D6B9",
+      "t5838_footprint_sha256": "213BB0BD9E5E3E8B31AEADF044F643FAAE2D0BF808FC60C56BFE9A90DD07753C"
+    }
   },
   "component_contract": {
     "microphone": "TDK InvenSense MMICT5838-00-012",
@@ -76,8 +82,8 @@
     "status": "DIM_004_CLOSED"
   },
   "review_a": {
-    "complete": true,
-    "status": "PASS",
+    "complete": false,
+    "status": "REPEAT_REQUIRED_AFTER_ACOUSTIC_CLEARANCE_ECO",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
     "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
     "geometry_audit_status": "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
@@ -170,18 +176,20 @@
       "review_b_preflight_audit_sha256": "5b5b392aa2c16c731d51a04531d82205e2bb83e12d73b43e8dacf58c647502b6",
       "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
       "sha256_manifest_sha256": "b60faa4ad917af0ceaa137fe7f5ca9447e01226420c1ca0f8fdba4d2c3e98aa8"
-    }
+    },
+    "current_source_sha256": "BA2AF99FE3B0B850A2801B9B73F1333D48C55A56D59E91187495D5E95910D93A",
+    "historical_approval_preserved_for_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031"
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_REMAINING_REVIEW_B_GATES_AFTER_COPPER_RETURN_ACCEPTANCE",
+    "status": "REOPENED_AFTER_ACOUSTIC_CLEARANCE_ECO",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_B_CHECKLIST_REV_A.md",
     "reviewer": null,
     "date": null,
     "commit_sha": null,
     "copper_return_gate": {
-      "complete": true,
-      "status": "PASS_ACCEPT_COPPER_RETURN_REVIEW_B_REMAINS_OPEN",
+      "complete": false,
+      "status": "HISTORICAL_PASS_SOURCE_CHANGED_REPEAT_REQUIRED",
       "packet": "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md",
       "audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
       "drawings": [
@@ -328,11 +336,12 @@
       "decision": "ACCEPT_COPPER_RETURN",
       "decision_evidence_commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
       "review_b_complete": false,
-      "manufacturing_release": false
+      "manufacturing_release": false,
+      "historical_acceptance_preserved": true
     },
     "internal_preflight": {
-      "complete": true,
-      "status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+      "complete": false,
+      "status": "STALE_AFTER_ACOUSTIC_CLEARANCE_ECO_REGENERATE_REQUIRED",
       "archived_report_status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
       "evidence_role": "COPPER_RETURN_DECISION_INPUT_REVIEW_B_OPEN",
       "evidence_commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
@@ -370,9 +379,9 @@
       "manufacturing_release": false
     },
     "manufacturing_handoff": {
-      "complete": true,
-      "status": "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED",
-      "internal_packet_complete": true,
+      "complete": false,
+      "status": "SOURCE_CHANGED_REGENERATE_OUTPUTS_AND_REPEAT_REVIEW",
+      "internal_packet_complete": false,
       "packet": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
       "machine_contract": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
       "response_register": "hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv",
@@ -397,5 +406,12 @@
       "per-board sensitivity noise phase and delay calibration",
       "panelization and depanel damage inspection"
     ]
+  },
+  "current_eco": {
+    "id": "PCB_MIC_ACOUSTIC_CLEARANCE_ECO_001",
+    "application": "hardware/reviews/PCB_MIC_ACOUSTIC_CLEARANCE_ECO_001_APPLICATION_REV_A.json",
+    "status": "APPLIED_DRC_PASS_REVIEW_A_B_REPEAT_REQUIRED_NOT_FOR_MANUFACTURE",
+    "native_board_sha256": "BA2AF99FE3B0B850A2801B9B73F1333D48C55A56D59E91187495D5E95910D93A",
+    "altium_board_sha256": "5694BA909348205998DAA8E907407898A46A35665A23B05F51CD2E193DCD3A7E"
   }
 }
