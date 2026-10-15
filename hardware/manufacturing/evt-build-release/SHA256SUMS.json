@@ -1,8 +1,8 @@
 [
   {
     "path": "PCB-MAIN/drc.json",
-    "bytes": 885050,
-    "sha256": "9592ef4bbdd338fb7acea1e7709caaae4f6cdb9ef2d260c7ea03e27d89a9cdc7"
+    "bytes": 861377,
+    "sha256": "84467c77ce8aba41364b051df40c7ba42d7b6cb6a633a5bd7c583145ac99258e"
   },
   {
     "path": "PCB-MAIN/drill/PCB-MAIN-drl_map.pdf",
@@ -11,88 +11,88 @@
   },
   {
     "path": "PCB-MAIN/drill/PCB-MAIN.drl",
-    "bytes": 5967,
-    "sha256": "1816aad217fa2a4f126beed8cd91749b86af2650c4fc99ee10c4075344412ba2"
+    "bytes": 5590,
+    "sha256": "dec9c0230387d4c44f2557130c214d5c099defec68c262854ae8fa3676c5d481"
   },
   {
     "path": "PCB-MAIN/erc.json",
-    "bytes": 2990,
-    "sha256": "ba6bc7b4a4418101007b3966961c9383690ddf9712e4aca5a501151d233293c9"
+    "bytes": 2908,
+    "sha256": "f81b7fab27f5abb9a020b8a710723f3999c0dfc520ecfb84d3b49c2b37ee5b0d"
   },
   {
     "path": "PCB-MAIN/FAB_NOTES.md",
-    "bytes": 1024,
-    "sha256": "d3fee604c0d0eab6f6c882dbc2b86d72d4aada962022d42858d92a41832684b9"
+    "bytes": 1006,
+    "sha256": "218cbe94efcdb5653268ce50f57946d5835c4086f83ee63f5edf7209a5ecf005"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-B_Cu.gbr",
-    "bytes": 28537,
-    "sha256": "f84ac00936f833aa53da858cdea39b8d853212226a8e65304b397987fbec035f"
+    "bytes": 27353,
+    "sha256": "5408923a04fad636026665c16657039c32e74d721c1f69e328dcd1ec3b78182d"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-B_Mask.gbr",
-    "bytes": 4022,
-    "sha256": "ff8bd9ad75ee70e303a1954dd0e3e68415ee80888ace690b5a8e79e55f52235c"
+    "bytes": 3849,
+    "sha256": "73518b5887e223ebd7e3854f8cf80ce3481647bbf8c87bdf52c692d4b5f6b492"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-B_Paste.gbr",
-    "bytes": 468,
-    "sha256": "610df257877ecb913056802b39d2f145a46bb52f5ef5d0d3f212b27806bbc6d7"
+    "bytes": 453,
+    "sha256": "4e4cccab8b069779b34733fd45daa2cbc5751e66683649d699f459e7e1bdc448"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-B_Silkscreen.gbr",
-    "bytes": 469,
-    "sha256": "4967969a60121541bdc9e36c28f6a1d389caba4392dff3874b0cc756003ea675"
+    "bytes": 454,
+    "sha256": "201388e94269c28184ef6b8879b9ceaac1b16e99b7daafbcc526cba74c5a81f9"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-Edge_Cuts.gbr",
-    "bytes": 969,
-    "sha256": "98b9ce7ef8df769ac151359cc49e8740c9bbdd37dfe6b4d69302def8b6ba7ea3"
+    "bytes": 923,
+    "sha256": "8619581edc6ebda318a80311975320cfe7fd77b1da0dc92a99023b07f69a14db"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-F_Cu.gbr",
-    "bytes": 121105,
-    "sha256": "af59d3c336dc61c51f60e140462d5e721005c84488b550344000d45337ddf9b1"
+    "bytes": 115388,
+    "sha256": "949811c9e5dbe496d504aeb390df5a29d24da71493d780d1c8a51e89aeff5ee6"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-F_Mask.gbr",
-    "bytes": 40129,
-    "sha256": "9e9bc8ae6b315a5cc2b848476604492d595573d02e8a1df8928ebf8d79bf08ee"
+    "bytes": 38174,
+    "sha256": "995b41a70955b6e0ee91394bbf4096222732c44d7e967ee95c5fe241c446462a"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-F_Paste.gbr",
-    "bytes": 37580,
-    "sha256": "e4bdb0715ea01f9370b9329089961500ff7b60f7aa5bdb6de525b8cf94e1a753"
+    "bytes": 35745,
+    "sha256": "1a7b573a54ba6ac2f418a9ae831cea151e7ad5cdb16444d3c555c3c236f0d1d5"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-F_Silkscreen.gbr",
-    "bytes": 458483,
-    "sha256": "bb8edcb8d2fc366afa35aa14d0eae1816101a13f23287d2d7e6f1762bcab94c9"
+    "bytes": 439988,
+    "sha256": "3827a37feb5d60531614e687b3a66acc5d841b757060bbd87f059b78f3fd87d1"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-In1_Cu.gbr",
-    "bytes": 18800,
-    "sha256": "7cedd04690cea772eb803fc68f54ee79cd88d08f7f0035239f9bc9314b214611"
+    "bytes": 18034,
+    "sha256": "146c51dabfcdaebff6462eeea50be3dfc6389229ffc64b7b81e92a2bcb268bcd"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-In2_Cu.gbr",
-    "bytes": 18800,
-    "sha256": "626a30886bf13cefc418b9f7c1e7c4c6d0abe0fd5d4c68a1fdf23106afc6c316"
+    "bytes": 18034,
+    "sha256": "d87428b689c26cf5fb7620d406bc06f64c46922bcc7cc85de02ce89cd61daef5"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-In3_Cu.gbr",
-    "bytes": 19089,
-    "sha256": "e4107fc2fbb9c1a106b1b9e36cc4d86bb87557ed78a8f1b2340f4cf773988260"
+    "bytes": 18309,
+    "sha256": "ea00361f0da8f69655ed6985dfd9f8dc31a5cb317367b1a26905adb72d63805b"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-In4_Cu.gbr",
-    "bytes": 18800,
-    "sha256": "48ccd703e3f3650080a7d9062481810be9f2323c595851ceb2aa0c78bfcbbe3d"
+    "bytes": 18034,
+    "sha256": "ab8b084cf06b7fad038e960b293ac4e9f6281a00c0b2b3cb5719521de44dd125"
   },
   {
     "path": "PCB-MAIN/gerber/PCB-MAIN-job.gbrjob",
-    "bytes": 4620,
-    "sha256": "55f99f7cb5ec8b4a2da12bd1609b514837c15bcc057808cec481839541f96a50"
+    "bytes": 4418,
+    "sha256": "3851c9fd939d0a1e0929e5b82d032f1e01460d52a4d64bacfdab33bc1d65f2d3"
   },
   {
     "path": "PCB-MAIN/native/fp-lib-table",
@@ -321,8 +321,8 @@
   },
   {
     "path": "PCB-MAIN/PCB-MAIN.d356",
-    "bytes": 105876,
-    "sha256": "2fbce6bd75b1785a8fec3ecd229900a4c25e32830aba8a35630469a2526e1c1d"
+    "bytes": 104461,
+    "sha256": "e6ad0bbf1e33cd64729be2d2f3c9f2e6018fdab113b73bad078d7889ecdc36d6"
   },
   {
     "path": "PCB-MAIN/PCB-MAIN_board.step",
@@ -336,18 +336,18 @@
   },
   {
     "path": "PCB-MAIN/PCB-MAIN_jlc_bom.csv",
-    "bytes": 21477,
-    "sha256": "ea2d0cdcb7b38ac8c95eb3c54071f8344deeec92d669836a29a0245d9a1565a6"
+    "bytes": 21252,
+    "sha256": "2bda3d13d78f43651b965b8fdd1ef12513eacee5a6b704d3077a869c6bdebc5d"
   },
   {
     "path": "PCB-MAIN/PCB-MAIN_jlc_cpl.csv",
-    "bytes": 10292,
-    "sha256": "7ee3529c567688c4fef5644ddb4417c6de0f808fef26c7aed643eb9a63dd149f"
+    "bytes": 10055,
+    "sha256": "39ed1a76ff3705397a7613d653bcc6b14b8c6764b83309d73d84cf01a3624cac"
   },
   {
     "path": "PCB-MAIN/PCB-MAIN_pos.csv",
-    "bytes": 15990,
-    "sha256": "4ed852caeee300a7b5f8247185b5ce94340a69fe34e044f11cec079e5a62ae2b"
+    "bytes": 15753,
+    "sha256": "51041f0f2e9fa75d6315ebe0b608687bc24882796b9a5c864dc6419e72a40d31"
   },
   {
     "path": "PCB-MAIN/PCB-MAIN_schematic.pdf",
@@ -356,13 +356,13 @@
   },
   {
     "path": "PCB-MAIN/STATUS.json",
-    "bytes": 758,
-    "sha256": "2c94436ff844263cf2cdb5de01376195ca3d843f4956646ebc3f110b40304a21"
+    "bytes": 730,
+    "sha256": "4daacaca5b983393e4bc90b0db06adf75f5368c5ef423bd96d01f14144ff1768"
   },
   {
     "path": "PCB-MIC/drc.json",
-    "bytes": 1360,
-    "sha256": "4fc1e5b1b2d24ac2f342d8610115f61cfd0329453982907b41b94c9937107d3d"
+    "bytes": 1315,
+    "sha256": "088d82e51f48548a6fac6ffd05a0905acb931c0793b018b8de6182c6c38583f7"
   },
   {
     "path": "PCB-MIC/drill/PCB-MIC-drl_map.pdf",
@@ -371,68 +371,68 @@
   },
   {
     "path": "PCB-MIC/drill/PCB-MIC.drl",
-    "bytes": 574,
-    "sha256": "55a3195d604db4bd231faf7c0151b7da2b2fa11948aeb68f96ae3a3b22c8e3dc"
+    "bytes": 545,
+    "sha256": "4286af219ef0c9037875a1055900cc1b46c2ceac177e07dec4d1d4457b46d91d"
   },
   {
     "path": "PCB-MIC/erc.json",
-    "bytes": 1038,
-    "sha256": "3f426aa622ff798ccb6f1910014c2a410ebb41cad027c4742962ac6a2186238e"
+    "bytes": 1001,
+    "sha256": "cf1fc8f9fd762fbf3ad657a06a400bdb9e33698c3a00a434236bffa6dcac6cdf"
   },
   {
     "path": "PCB-MIC/FAB_NOTES.md",
-    "bytes": 950,
-    "sha256": "7dfb83da287ef10e3b726a1c792e2b4e4f587b820630f7dc50fce95952ba658c"
+    "bytes": 932,
+    "sha256": "2009246173cd934e09b19637a395ecc4948c393cbfb387f8dbc8a0ab06771767"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-B_Cu.gbr",
-    "bytes": 1494,
-    "sha256": "9572889eb13f2c049a2d572c004123d88ea02dd8df759f24e593193370186673"
+    "bytes": 1428,
+    "sha256": "30606fcb7814ef6fa1bf81a79cbe270496f1e6339807b918e8b980db817d49be"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-B_Mask.gbr",
-    "bytes": 753,
-    "sha256": "a64d876fcdb6e1c9ca1d70a9a8d8c02558314f01da51616572db007d3109ac6f"
+    "bytes": 720,
+    "sha256": "ba1590a9a5f63e98d14c116b5f9db0e2e786d5d07d6845142d0d4f6b52359ba4"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-B_Paste.gbr",
-    "bytes": 464,
-    "sha256": "1119ae78c8b0647819bd588c5d641fd949c56ba66036a823be7073af1cc2c8aa"
+    "bytes": 449,
+    "sha256": "02f04ca427a27af57d4634406a009dbc14620aa1a737cf0dd8843aa10fe4b4a2"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-B_Silkscreen.gbr",
-    "bytes": 465,
-    "sha256": "29173b5bdb709754db95084f8c089bd4e1bf6f6f08443b552c646ae77405dcea"
+    "bytes": 450,
+    "sha256": "cb8215134fd3b00d6901f0b804eead58db37470dd7f524c62c8b250892ccc6d7"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-Edge_Cuts.gbr",
-    "bytes": 637,
-    "sha256": "d82adb50de1f95c45349291a3d3c846be80e47ee937fa5edfa6b040336ea72ab"
+    "bytes": 611,
+    "sha256": "ee28b32d1d8f466793c46f879382768cd7a0300158cf55d55a8beb970afb3e79"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-F_Cu.gbr",
-    "bytes": 8273,
-    "sha256": "6a120eb8ec200df14b6b17cff3ae6fa057ab2151102e07717021790651542170"
+    "bytes": 7904,
+    "sha256": "ca4f096c68c57db7b21aa94d0803a3686120bae6b4c0718e120676f33d02ff80"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-F_Mask.gbr",
-    "bytes": 4717,
-    "sha256": "c7cab8162601afda6f824e421157aeefba31c6c3bab3e83f5c05e9865020a176"
+    "bytes": 4528,
+    "sha256": "2d6b5bcb49d031d5466809d858124e02704a894b86a829b4739146e1636b56f8"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-F_Paste.gbr",
-    "bytes": 2094,
-    "sha256": "bb00daf9894f2eb1549141314891ffab897912e462876e92468d2625d23ad3f6"
+    "bytes": 2010,
+    "sha256": "0325b3130d85ba34f85553b09c021d08be59fd8530142f6696464166e9ee9f70"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-F_Silkscreen.gbr",
-    "bytes": 2299,
-    "sha256": "ac361f45c5f5ae9fa9666040e342f0a071786e796d2d1fd03af257f8f9d0bb67"
+    "bytes": 2193,
+    "sha256": "4cc1b22292e75ff6d7a29d4720adf1c779dd571a94c846991a2b74f27dad559a"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-job.gbrjob",
-    "bytes": 2748,
-    "sha256": "f65ad93c8f4fdb4d6dbf3d6b9f507d174e247819b4a9b16dda730b212cc44cdf"
+    "bytes": 2623,
+    "sha256": "797046ac194ba7001e50193fb7c0b760f128ee18ac12f272f4b043a917326159"
   },
   {
     "path": "PCB-MIC/native/fabrication_metadata.json",
@@ -491,8 +491,8 @@
   },
   {
     "path": "PCB-MIC/PCB-MIC.d356",
-    "bytes": 4401,
-    "sha256": "cf423c31d1b6c13c062437d89999d5f38c81bff8b818fbf775fc958299b3aea8"
+    "bytes": 4339,
+    "sha256": "2333963114bb63df0e5a3c26bc5850e0b616cd105a53bcf25d92a14d13dba6ad"
   },
   {
     "path": "PCB-MIC/PCB-MIC_board.step",
@@ -506,18 +506,18 @@
   },
   {
     "path": "PCB-MIC/PCB-MIC_jlc_bom.csv",
-    "bytes": 629,
-    "sha256": "26311221995154048d68ccf36eced2cd01c34b0d9f6df24071ec06f72be016de"
+    "bytes": 624,
+    "sha256": "7cad17888a547a529bbfd1d6f4609b7d921b7598c83b1982798d206c470d5491"
   },
   {
     "path": "PCB-MIC/PCB-MIC_jlc_cpl.csv",
-    "bytes": 214,
-    "sha256": "b2af8df3084f97fda9f51400a342776641e6812710a782ede2bd23faf443bc40"
+    "bytes": 209,
+    "sha256": "cbe0e9649a6d8c3c96fa72cd4de91b6f936719fe86d18b30eb319f7e6a7742cd"
   },
   {
     "path": "PCB-MIC/PCB-MIC_pos.csv",
-    "bytes": 333,
-    "sha256": "da13746b42fc6fbc6c2ec8e6f39e5fa8dee7e6701383ba8ee5c737c058e8a698"
+    "bytes": 328,
+    "sha256": "3f90c92535b09aa59f9b400da9d524960c21fe1771e62185c6060b2aabb2b337"
   },
   {
     "path": "PCB-MIC/PCB-MIC_schematic.pdf",
@@ -526,13 +526,13 @@
   },
   {
     "path": "PCB-MIC/STATUS.json",
-    "bytes": 747,
-    "sha256": "5734f6f343d13fa24c97363293efbbe70892ea89f4015ef6c7a12d2003d76616"
+    "bytes": 719,
+    "sha256": "d0ca2aa41e51dc9ec102178578732369ea674fb5581df850bc32b87c40dee536"
   },
   {
     "path": "PCB-PWR/drc.json",
-    "bytes": 7005,
-    "sha256": "a6628268d39b99c0efe9ffcaea0da974b4502562fa375da078ea4b56b923f247"
+    "bytes": 6806,
+    "sha256": "b61f66c16c30ed060fa479a93e54241151bdde5289ed1adb2d19c3e8a0d5668c"
   },
   {
     "path": "PCB-PWR/drill/PCB-PWR-drl_map.pdf",
@@ -541,78 +541,78 @@
   },
   {
     "path": "PCB-PWR/drill/PCB-PWR.drl",
-    "bytes": 4830,
-    "sha256": "258c2bc95826591164d5d2e73d7f336c84b1714d3cf8c0f2e9adb16503112372"
+    "bytes": 4514,
+    "sha256": "4406e1c261816c5efcd32ed49725e2495dbb64c4c2eae37533cc9d4be1063f9e"
   },
   {
     "path": "PCB-PWR/erc.json",
-    "bytes": 1862,
-    "sha256": "040f47131788c9bcd3c14d809fb1963015a71c646fc79a5a0331f8da02e8b42d"
+    "bytes": 1805,
+    "sha256": "ac14448337b00ec5b3261a23aa786b5702e6f34ef28bc2b41313dc6ba5b19522"
   },
   {
     "path": "PCB-PWR/FAB_NOTES.md",
-    "bytes": 1052,
-    "sha256": "f074459581780d250592877636ec14f435969a4ec703ed4488d66068f8a2c0dc"
+    "bytes": 1034,
+    "sha256": "05edaa5f55dda8118db87769d93dd58745e6bc0269991886a41c2b3cf0a788a4"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-B_Cu.gbr",
-    "bytes": 150959,
-    "sha256": "6ec3d2c9ef53fd30f313368fb37a17f604fed1297802ec0a4cd96ab9df9d2582"
+    "bytes": 144790,
+    "sha256": "ec4cf3ab0ebcfda4ea788c972f44ef71af6ea58b17df5f7ea6d70cae69a33747"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-B_Mask.gbr",
-    "bytes": 2599,
-    "sha256": "82029def50aecfdc8e81ead3ed3e37143af87797b976388939c620dd4b3c197c"
+    "bytes": 2494,
+    "sha256": "c0ffc5f844c463bcf1b212df76191986569505759d7c4f59da432ef6f943455a"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-B_Paste.gbr",
-    "bytes": 467,
-    "sha256": "2542e088a5b4e0d2c456dd809781a92794117a0fe5db583311abbf164bc42020"
+    "bytes": 452,
+    "sha256": "465388cc53f6212ee6ecf3bc036a7645aa0df10f1a25ee78160a3baa8f1283dd"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-B_Silkscreen.gbr",
-    "bytes": 468,
-    "sha256": "84b678a43d45a96699ec9f9825172d47d83fd060a4450d67203846c84df5680e"
+    "bytes": 453,
+    "sha256": "9fb2b71c25cc9da354441c9e1dfc36e60eb0201b53371b15e77eb5ac830cca71"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-Edge_Cuts.gbr",
-    "bytes": 640,
-    "sha256": "1ae851c5151441a6d593cb911db2f6007308ba13c4f5646572ccc7eee94423e3"
+    "bytes": 614,
+    "sha256": "4e4320a9e625eb5278acc69122d88c4548adc8b672c18d2a132aa649c5b9a04a"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-F_Cu.gbr",
-    "bytes": 353388,
-    "sha256": "adab619c95e08f2e937348053f215d031572775c393e8fa1b42525c0b9744fbb"
+    "bytes": 338752,
+    "sha256": "d6739fb3518efd294c3f1b053a67880ec4bc4d5bda606cc26c683371257e4bb7"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-F_Mask.gbr",
-    "bytes": 10394,
-    "sha256": "458cfd3311f0d0a6d73a84f16f97d50e650d99616bb9ff39f02a60c44a17a02e"
+    "bytes": 9915,
+    "sha256": "ecfe7fb2bff8f79adfc50e1ca41fa8de3c9641b6bed0b885778da3a89db337fb"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-F_Paste.gbr",
-    "bytes": 8258,
-    "sha256": "26b80ac14e563337b9dcd0bf4522230712f0d50c11c5cf9142d8a1f67e6f8b10"
+    "bytes": 7890,
+    "sha256": "2d216765463c372b585f90f95115709eaa538329da68f23da8d1d157a5fe23a6"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-F_Silkscreen.gbr",
-    "bytes": 84207,
-    "sha256": "ba900a5a54764e6552561c3a229117cc78ade1f5488d0989c9d383eab8a8256a"
+    "bytes": 80796,
+    "sha256": "c4fc101e7a8182d06760243545eaba050fe759f432b6624dfa40d6664071a80d"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-In1_Cu.gbr",
-    "bytes": 126345,
-    "sha256": "0561914896658635e8efda004431cbcd324994f196df5f707aa04a2b7a315d53"
+    "bytes": 121240,
+    "sha256": "c09b6ba7b719965cb378d5bf54b80a170c20fddf19047db7288d630efc5de930"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-In2_Cu.gbr",
-    "bytes": 125532,
-    "sha256": "232e464b1198116b0859dd5dfe7f82db6fe87ebe863f45f88447a1ae30335608"
+    "bytes": 120466,
+    "sha256": "be911525aac7167e802ad2e71070bfe424887ecc76b1f92e50cace9ccb1dc8ae"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-job.gbrjob",
-    "bytes": 3804,
-    "sha256": "9a75aff78b1810b344b4aeace1d41c6eb53bdd019456b947936e6c9a50f8ca70"
+    "bytes": 3635,
+    "sha256": "25f71d213a6d94d212a84387c6a9b9784d29405b4519c49f1a8142b88cc83acc"
   },
   {
     "path": "PCB-PWR/native/fp-lib-table",
@@ -716,8 +716,8 @@
   },
   {
     "path": "PCB-PWR/PCB-PWR.d356",
-    "bytes": 33576,
-    "sha256": "5103958efafe7c8ee6f2a9db5fc9ed5f51cc8e05f67290d50dcc8f593521e8fa"
+    "bytes": 33125,
+    "sha256": "41c11dad7ce1f52c827a1a4e53757cc5779733019d2fa42eaf9da0511381d55b"
   },
   {
     "path": "PCB-PWR/PCB-PWR_board.step",
@@ -731,18 +731,18 @@
   },
   {
     "path": "PCB-PWR/PCB-PWR_jlc_bom.csv",
-    "bytes": 2913,
-    "sha256": "b162c639a77ebfc5ab0b9f932a386e2cfcc7e849a55c8cb2531d3e9ab275f751"
+    "bytes": 2887,
+    "sha256": "5248c41981fa54b0656ef843ba944e0279c69364bc2053c9af30e2755d644e53"
   },
   {
     "path": "PCB-PWR/PCB-PWR_jlc_cpl.csv",
-    "bytes": 1921,
-    "sha256": "baf525f90d196786bdbb2f48cc66063202d02d0c27d7f9058be9cacf4074f7ff"
+    "bytes": 1876,
+    "sha256": "6b045e3570b1384d1f6892f709f3d6f9f8a4cb76a0cdf782db50e9533b233d6f"
   },
   {
     "path": "PCB-PWR/PCB-PWR_pos.csv",
-    "bytes": 4039,
-    "sha256": "017951999cd60210007bca6d07168246795168cf9e46b1bfa2f840aa0855c1dc"
+    "bytes": 3994,
+    "sha256": "7fb58f7e9af57dc6f8c8bb80ec2852a02ed42576e69f8d824c6cc963edf1f24a"
   },
   {
     "path": "PCB-PWR/PCB-PWR_schematic.pdf",
@@ -751,22 +751,22 @@
   },
   {
     "path": "PCB-PWR/STATUS.json",
-    "bytes": 749,
-    "sha256": "74b6a30ca9a161feb545ccd5ce5da3e301db6da064d14045b87f6b5db82af58d"
+    "bytes": 721,
+    "sha256": "c8e06883830c182150ed9e8051b7aea6e8f19c32407a2063dbec27b72472404b"
   },
   {
     "path": "README.md",
-    "bytes": 969,
-    "sha256": "f0a69f7169bf3522a69c8bf9298f7b432a750497d66899e98766dc3430f42f8b"
+    "bytes": 960,
+    "sha256": "e362167b43d6ab29e2c51d5410dd1dc2d8c997aa6a2b72b25d4f180bf21e8f6a"
   },
   {
     "path": "snapshot_status.json",
-    "bytes": 284,
-    "sha256": "915b67d18832f4f39b985f5df5ff3cdde7981ab5f7624f778cbbb47fe9f1d927"
+    "bytes": 275,
+    "sha256": "e524e90a158f0771faa2abb6c8a14a79b59f79b2afd3b70d6bb85612e3043b0e"
   },
   {
     "path": "SOURCE_INDEX.txt",
-    "bytes": 67529,
-    "sha256": "c64b80b052f8478ccd9adc120ac9d1bf0d49ae8246e9168ca13beda345b399ec"
+    "bytes": 66585,
+    "sha256": "1bc3bc84d25cc213ee400dcb596d1c18f64a4818afd870c3de2c055c97e5fece"
   }
 ]

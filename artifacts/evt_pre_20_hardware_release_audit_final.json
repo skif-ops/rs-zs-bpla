@@ -1,0 +1,888 @@
+{
+  "schema": "dioneya-hardware-production-release-audit-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "scope": {
+    "included": [
+      "BOM",
+      "PCB-MAIN",
+      "PCB-MIC",
+      "PCB-PWR",
+      "mechanics",
+      "harness",
+      "supplier_DFM",
+      "purchase_lot"
+    ],
+    "excluded": [
+      "application_firmware",
+      "server",
+      "Android",
+      "customer_supplier_selection",
+      "supplier_stock",
+      "commercial_price",
+      "MOQ",
+      "payment_terms",
+      "freight",
+      "destination_delivery"
+    ],
+    "software_rule": "software is included only when an explicit hardware interface or production-test dependency requires it"
+  },
+  "hardware_design_release": {
+    "ready": false,
+    "status": "BLOCKED",
+    "blockers": [
+      "PCB-PWR input-protection release remains open: native value ECO=True; qualification evidence=4/20 PASS",
+      "EVT harness drawing, lengths, wire AVL or build baseline is incomplete",
+      "harness manufacturing release remains open: ",
+      "PCB-MAIN Review B/DRC/CAM/DFM release is not complete",
+      "PCB-PWR serial mechanics/routing/DRC/CAM/DFM Review B release is not complete",
+      "PCB-MIC controlled manufacturing handoff packet is not ready",
+      "PCB-MIC Review B/CAM/DFM and manufacturing release are not complete",
+      "mechanical release inputs remain open: DIM-001, DIM-005, DIM-006, DIM-007, DIM-008, DIM-009, DIM-010, DIM-011, DIM-012, DIM-013, DIM-014S, DIM-015, DIM-016"
+    ]
+  },
+  "purchase_release": {
+    "ready": false,
+    "status": "BLOCKED",
+    "meaning": "engineering handoff for customer-owned procurement; not an executed purchase order",
+    "owner": "CUSTOMER",
+    "commercial_quote_or_availability_required": false,
+    "job_specific_technical_manufacturing_responses_required": false,
+    "selected_station_quantity": 20,
+    "blockers": [
+      "PCB-PWR input-protection release remains open: native value ECO=True; qualification evidence=4/20 PASS",
+      "EVT harness drawing, lengths, wire AVL or build baseline is incomplete",
+      "harness manufacturing release remains open: ",
+      "PCB-MAIN Review B/DRC/CAM/DFM release is not complete",
+      "PCB-PWR serial mechanics/routing/DRC/CAM/DFM Review B release is not complete",
+      "PCB-MIC controlled manufacturing handoff packet is not ready",
+      "PCB-MIC Review B/CAM/DFM and manufacturing release are not complete",
+      "mechanical release inputs remain open: DIM-001, DIM-005, DIM-006, DIM-007, DIM-008, DIM-009, DIM-010, DIM-011, DIM-012, DIM-013, DIM-014S, DIM-015, DIM-016"
+    ]
+  },
+  "boards": {
+    "PCB-MAIN": {
+      "files": {
+        "schematic": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_sch",
+        "board": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_pcb",
+        "project": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_pro"
+      },
+      "missing": [],
+      "copper": {
+        "segments": 765,
+        "vias": 304,
+        "zones": 12
+      },
+      "routing_present": true
+    },
+    "PCB-MIC": {
+      "files": {
+        "schematic": "hardware\\kicad\\native\\PCB-MIC\\PCB-MIC.kicad_sch",
+        "board": "hardware\\kicad\\native\\PCB-MIC\\PCB-MIC.kicad_pcb",
+        "project": "hardware\\kicad\\native\\PCB-MIC\\PCB-MIC.kicad_pro"
+      },
+      "missing": [],
+      "copper": {
+        "segments": 27,
+        "vias": 5,
+        "zones": 0
+      },
+      "routing_present": true
+    },
+    "PCB-PWR": {
+      "files": {
+        "schematic": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_sch",
+        "board": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_pcb",
+        "project": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_pro"
+      },
+      "missing": [],
+      "copper": {
+        "segments": 575,
+        "vias": 267,
+        "zones": 33
+      },
+      "routing_present": true
+    }
+  },
+  "bom_qg2": {
+    "gate": "QG-2",
+    "status": "PASS",
+    "production_bom_complete": true,
+    "checks": [
+      {
+        "name": "procurement_lots_4_10_20",
+        "pass": true,
+        "detail": "engineering and procurement BOM quantities independently reconcile for 4, 10 and 20 stations"
+      },
+      {
+        "name": "program_procurement_2x20_plus_1",
+        "pass": true,
+        "detail": "41-station program demand reconciles as two EVT-20 lots plus one bench with two reserve pools"
+      },
+      {
+        "name": "main_active_mpn_freeze",
+        "pass": true,
+        "detail": "all active MAIN MPNs match"
+      },
+      {
+        "name": "main_passive_support_authority_bom",
+        "pass": true,
+        "detail": "all 211 MAIN-AUTH-010 identities values populations ratings and physical pins are represented"
+      },
+      {
+        "name": "power_identity_and_refdes",
+        "pass": true,
+        "detail": "power IC/protection identity and RefDes match"
+      },
+      {
+        "name": "power_passive_authority_bom",
+        "pass": true,
+        "detail": "all 39 BOM passives/net-ties match authority; 10 DFT pads remain non-procured"
+      },
+      {
+        "name": "mic_native_component_identity",
+        "pass": true,
+        "detail": "four native PCB-MIC fitted identities match"
+      },
+      {
+        "name": "mic_native_exact_orderable_mpn",
+        "pass": true,
+        "detail": "single native KiCad-9 PCB-MIC source binds exact MK1/J1 identities and controlled footprints"
+      },
+      {
+        "name": "fitted_line_exact_fields",
+        "pass": true,
+        "detail": "all fitted lines have exact identity/package/rating"
+      },
+      {
+        "name": "build_to_print_internal_article_identity",
+        "pass": true,
+        "detail": "eight internal BOM identities and EVT order specifications are controlled while customer-selected supplier and quote fields remain open"
+      },
+      {
+        "name": "passive_values",
+        "pass": true,
+        "detail": "all passive values are explicit"
+      },
+      {
+        "name": "bom_dispositions_released",
+        "pass": true,
+        "detail": "all BOM identities and customer-owned procurement scopes are controlled"
+      },
+      {
+        "name": "power_schematic_refdes_coverage",
+        "pass": true,
+        "detail": "all PCB-PWR passive/net-tie RefDes represented"
+      },
+      {
+        "name": "power_cap_bank_native_expansion",
+        "pass": true,
+        "detail": "all power capacitors have individual native RefDes"
+      },
+      {
+        "name": "main_capture_status_control",
+        "pass": true,
+        "detail": "PCB-MAIN capture status is explicit and release-blocked"
+      },
+      {
+        "name": "main_capture_authority_complete",
+        "pass": true,
+        "detail": "PCB-MAIN capture authority is complete"
+      },
+      {
+        "name": "main_native_schematic_source",
+        "pass": true,
+        "detail": "all 10 native PCB-MAIN hierarchy sources contain the frozen MPNs, controlled physical-net overlay, three ground domains and schematic-derived BOM provenance"
+      },
+      {
+        "name": "main_review_a_complete",
+        "pass": true,
+        "detail": "PCB-MAIN Review A complete with required evidence"
+      },
+      {
+        "name": "system_ots_documentary_procurement_identity",
+        "pass": true,
+        "detail": "eight exact system OTS MPNs have documentary purchase control; physical assembly/EOL/EVT validation remains open"
+      },
+      {
+        "name": "system_sku_release",
+        "pass": true,
+        "detail": "system SKUs and build-to-print article identities are controlled"
+      }
+    ],
+    "blockers": [],
+    "system_ots_procurement_identity": {
+      "status": "PASS_DOCUMENTARY_PURCHASE_IDENTITY_PHYSICAL_VALIDATION_DURING_ASSEMBLY_EOL_EVT",
+      "configuration": "EVT-PRE-20 Rev.A",
+      "documentary_purchase_identity_complete": true,
+      "controlled_item_ids": [
+        "BAT1",
+        "PV1",
+        "MPPT1",
+        "MPPT-TEMP",
+        "ANT-CELL",
+        "ANT-GNSS",
+        "ANT-LORA",
+        "RF-PIGTAIL"
+      ],
+      "controlled_item_count": 8,
+      "standalone_preorder_qualification_unit_required": false,
+      "receiving_hold_required": false,
+      "commercial_quote_and_destination_delivery_complete": false,
+      "physical_qualification_complete": false,
+      "hardware_design_release": false,
+      "purchase_release": false,
+      "manufacturing_release": false,
+      "record": "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json",
+      "record_sha256": "6d985fa9260b47a3f52b21a615f146f424be8ccfe3d7c4c74030a913454ac7ad"
+    }
+  },
+  "system_ots_procurement_identity": {
+    "status": "PASS_DOCUMENTARY_PURCHASE_IDENTITY_PHYSICAL_VALIDATION_DURING_ASSEMBLY_EOL_EVT",
+    "configuration": "EVT-PRE-20 Rev.A",
+    "documentary_purchase_identity_complete": true,
+    "controlled_item_ids": [
+      "BAT1",
+      "PV1",
+      "MPPT1",
+      "MPPT-TEMP",
+      "ANT-CELL",
+      "ANT-GNSS",
+      "ANT-LORA",
+      "RF-PIGTAIL"
+    ],
+    "controlled_item_count": 8,
+    "standalone_preorder_qualification_unit_required": false,
+    "receiving_hold_required": false,
+    "commercial_quote_and_destination_delivery_complete": false,
+    "physical_qualification_complete": false,
+    "hardware_design_release": false,
+    "purchase_release": false,
+    "manufacturing_release": false,
+    "record": "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json",
+    "record_sha256": "6d985fa9260b47a3f52b21a615f146f424be8ccfe3d7c4c74030a913454ac7ad"
+  },
+  "pcb_layer_count_authority": {
+    "schema": "dioneya-pcb-layer-count-authority-audit-v1",
+    "configuration": "EVT-PRE-20 Rev.A",
+    "status": "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED",
+    "manufacturing_release": false,
+    "authority": "hardware\\PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
+    "native_boards": {
+      "PCB-MAIN": {
+        "path": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_pcb",
+        "layers": [
+          "F.Cu",
+          "In1.Cu",
+          "In2.Cu",
+          "In3.Cu",
+          "In4.Cu",
+          "B.Cu"
+        ],
+        "copper_layers": 6,
+        "thickness_mm": 1.6
+      },
+      "PCB-PWR": {
+        "path": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_pcb",
+        "layers": [
+          "F.Cu",
+          "In1.Cu",
+          "In2.Cu",
+          "B.Cu"
+        ],
+        "copper_layers": 4,
+        "thickness_mm": 1.6
+      },
+      "PCB-MIC": {
+        "path": "hardware\\kicad\\native\\PCB-MIC\\PCB-MIC.kicad_pcb",
+        "layers": [
+          "F.Cu",
+          "B.Cu"
+        ],
+        "copper_layers": 2,
+        "thickness_mm": 1.0
+      }
+    },
+    "controlled_counts": {
+      "PCB-MAIN": 6,
+      "PCB-PWR": 4,
+      "PCB-MIC": 2
+    },
+    "open_interlocks": {
+      "PCB-MAIN": "routing; native DRC; CAM; independent Review B; EVT validation",
+      "PCB-PWR": "routing; native DRC; CAM; plus70C thermal EVT; independent Review B; series mechanical revalidation",
+      "PCB-MIC": "native DRC; CAM; first-panel acoustic inspection; independent Review B"
+    }
+  },
+  "pcb_main_hierarchy": {
+    "status": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE",
+    "root_sheets": 9,
+    "pages": 10,
+    "pdf_page_order": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10"
+    ],
+    "symbols": 248,
+    "physical_symbols": 247,
+    "logical_pad_numbers": 1066,
+    "physical_pad_occurrences": 1077,
+    "repeated_logical_pad_numbers": 7,
+    "duplicate_pad_occurrences": 11,
+    "repeated_pad_map": {
+      "J6": {
+        "SHIELD": 2
+      },
+      "J7": {
+        "SHIELD": 2
+      },
+      "J8": {
+        "SHIELD": 2
+      },
+      "J9": {
+        "SHIELD": 2
+      },
+      "J10": {
+        "SHIELD": 2
+      },
+      "J11": {
+        "SHIELD": 4
+      },
+      "J12": {
+        "SHIELD": 4
+      }
+    },
+    "wire_segments": 1073,
+    "connected_pin_wires": 905,
+    "explicit_nc": 169,
+    "cross_sheet_nets": 75,
+    "hierarchical_labels": 168,
+    "pin_net_semantic_sha256": "d320bdd98712a65f9736bd520a8f9197d4f53fedb4be3b798086810e7a8f4bf6",
+    "erc_native_kicad_9": "PASS_COMMIT_BOUND_ZERO_VIOLATIONS",
+    "hierarchy_pdf_evidence": "PASS_COMMIT_BOUND_TEN_PAGE_A2_VISUAL_PREFLIGHT",
+    "hierarchy_human_review": "ACCEPTED_SKIF_ACCEPT_HIERARCHY_ONLY",
+    "routing_authorized": false,
+    "manufacturing_release": false
+  },
+  "pcb_main_public_numeric_routing_basis": {
+    "schema": "dioneya-pcb-main-routing-design-basis-audit-v2",
+    "configuration": "EVT-PRE-20 Rev.A",
+    "board": "PCB-MAIN",
+    "status": "PASS_PUBLIC_STANDARD_SELECTED_AS_EVT_JOB_STACKUP_NOT_FOR_MANUFACTURE",
+    "stackup_id": "JLC06161H-3313",
+    "rf_50ohm_trace_width_mm": 0.1509,
+    "usb_90ohm_trace_width_mm": 0.1537,
+    "usb_90ohm_pair_gap_mm": 0.2032,
+    "external_reply_required": false,
+    "manufacturing_release": false
+  },
+  "pcb_pwr_hierarchy": {
+    "status": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE",
+    "root_sheets": 4,
+    "pages": 5,
+    "symbols": 65,
+    "physical_symbols": 62,
+    "wire_segments": 189,
+    "cross_sheet_nets": 9,
+    "hierarchical_labels": 26,
+    "pin_net_semantic_sha256": "84a35aa607bac3ee65b5d8f60684e958277b2fa5a7ed01f810af32f0b52b73f7",
+    "readability_profile": "PASS_BOTTOM_JUSTIFIED_NET_TEXT_COMPACT_TITLES_HORIZONTAL_PASSIVES_EXPANDED_FUNCTIONAL_BODIES",
+    "erc_native_kicad_9": "PASS_COMMIT_BOUND_POST_CINHF_ECO",
+    "hierarchy_pdf_evidence": "PASS_COMMIT_BOUND_POST_CINHF_ECO",
+    "pin_net_review_a": "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE",
+    "hierarchy_human_review": "ACCEPTED_SKIF_ACCEPT_HIERARCHY_ONLY",
+    "manufacturing_release": false
+  },
+  "pcb_pwr_input_protection": {
+    "configuration": "EVT-PRE-20 Rev.A",
+    "audit": "PCB-PWR Rev.A input-protection qualification control",
+    "status": "PASS_CONTROLLED_QUALIFICATION_PLAN_PHYSICAL_EVIDENCE_PENDING",
+    "fuse": {
+      "signed_native_mpn": "0451005.MRL",
+      "target_evt_mpn": "0451008.MRL",
+      "continuous_current_a": 5.0,
+      "minimum_nominal_rating_at_25c_a": 6.666666666666667,
+      "target_capacity_after_standard_derating_a": 6.0,
+      "nominal_loss_at_5a_w": 0.1925
+    },
+    "tvs": {
+      "target_evt_mpn": "SMBJ18A",
+      "maximum_clamp_v": 29.2,
+      "project_candidate_clamp_limit_v": 32.0,
+      "buck_absolute_max_input_v": 36.0
+    },
+    "native_value_eco_applied": true,
+    "value_only_change_verified": true,
+    "pin_net_semantic_sha256": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+    "board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
+    "repeat_erc_pdf_human_review_complete": true,
+    "source_control_complete": true,
+    "source_control_evidence_sha256": "1ee7d72b7f71bfd53879c43031ba0bf184a0c5d3beb0558ca1e691c585424823",
+    "prepurchase_documentary_identity_complete": true,
+    "standalone_engineering_sample_purchase_required": false,
+    "procurement_identity_evidence_sha256": "2b3acbc5bcee5b08bb1a45f009d75d57210592d8488f2e5dc29358c072a62250",
+    "receiving_identity_hold_required": false,
+    "accepted_rows": 4,
+    "required_rows": 20,
+    "failed_rows": [],
+    "physical_qualification_complete": false,
+    "pcba_procurement_authorized": false,
+    "manufacturing_release": false
+  },
+  "pcb_pwr_dim_003": {
+    "schema": "dioneya-pcb-pwr-dim-003-request-audit-v2",
+    "configuration": "EVT-PRE-20 Rev.A",
+    "assembly": "PCB-PWR",
+    "status": "PASS_DIM_003_EVT_ENGINEERING_ACCEPTED_SERIAL_REVALIDATION_REQUIRED",
+    "internal_packet_complete": true,
+    "packet": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
+    "response_register": "hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv",
+    "accepted_authority": "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json",
+    "frozen_step": "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step",
+    "frozen_step_sha256": "28482b57e8e8db09b198add6fefbbb88386f10c46ea6740cc84ab20e13c6a949",
+    "required_response_rows": 18,
+    "accepted_response_rows": 18,
+    "pending_response_rows": 0,
+    "dim_003_accepted": true,
+    "serial_revalidation_required": true,
+    "board": {
+      "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+      "semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
+      "copper_layers": 4,
+      "electrical_footprints": 62,
+      "mounting_holes": 4,
+      "nets": 31,
+      "trace_items": 14,
+      "copper_zones": 0,
+      "minimum_mounting_to_fitted_body_margin_mm": 0.426721
+    },
+    "routing_authorized": true,
+    "harness_board_datum_authorized": true,
+    "final_harness_cut_lengths_authorized": false,
+    "review_b_complete": false,
+    "manufacturing_release": false
+  },
+  "pcb_pwr_stackup_copper": {
+    "schema": "dioneya-pcb-pwr-stackup-copper-audit-v2",
+    "configuration": "EVT-PRE-20 Rev.A",
+    "assembly": "PCB-PWR",
+    "status": "PASS_EVT_PUBLIC_STACKUP_AND_CALCULATED_POWER_GEOMETRY_ACCEPTED",
+    "internal_packet_complete": true,
+    "complete": true,
+    "required_fabricator_slots": [],
+    "required_response_rows": 24,
+    "accepted_fabricator_slots": 0,
+    "accepted_response_rows": 24,
+    "selected_public_standard": "JLC04161H-3313A",
+    "external_reply_required": false,
+    "board": {
+      "trace_items": 14,
+      "copper_zones": 0
+    },
+    "stackup_accepted": true,
+    "copper_weights_and_plating_accepted": true,
+    "numeric_power_geometry_authorized": true,
+    "routing_authorized": true,
+    "review_b_complete": false,
+    "manufacturing_release": false,
+    "fabrication_authorized": false
+  },
+  "harness": {
+    "status": "ERROR",
+    "error": "Harness manufacturing drawing: FAIL\n- accepted harness authority input missing: hardware\\reviews\\EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
+  },
+  "checks": [
+    {
+      "name": "controlled_procurement_scenarios",
+      "pass": true,
+      "detail": "procurement quantities 4, 10 and 20 with maximum serial capacity 20",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "customer_commercial_procurement_boundary",
+      "pass": true,
+      "detail": "stock, price, MOQ, payment and delivery are non-blocking customer actions; exact MPN, checkout DFM and physical EVT gates remain mandatory; external replies do not",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "production_bom_qg2",
+      "pass": true,
+      "detail": "production BOM QG-2 PASS",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "system_ots_documentary_procurement_identity",
+      "pass": true,
+      "detail": "PASS_DOCUMENTARY_PURCHASE_IDENTITY_PHYSICAL_VALIDATION_DURING_ASSEMBLY_EOL_EVT",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_layer_count_authority",
+      "pass": true,
+      "detail": "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_human_readable_hierarchy_internal_equivalence",
+      "pass": true,
+      "detail": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_hierarchy_native_erc_pdf_evidence",
+      "pass": true,
+      "detail": "commit-bound KiCad 9 ERC/PDF evidence PASS",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_hierarchy_independent_human_review",
+      "pass": true,
+      "detail": "independent human hierarchy review PASS",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_ti_primary_source_binding",
+      "pass": true,
+      "detail": "LMR604403SRAKR U3 adjustable/U4 fixed and LM74700 VCAP primary evidence PASS",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_human_readable_hierarchy_internal_equivalence",
+      "pass": true,
+      "detail": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_hierarchy_native_erc_pdf_evidence",
+      "pass": true,
+      "detail": "commit-bound KiCad 9 ERC/PDF evidence PASS",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_hierarchy_independent_human_review",
+      "pass": true,
+      "detail": "independent human hierarchy review PASS",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_input_protection_qualification_packet",
+      "pass": true,
+      "detail": "PASS_CONTROLLED_QUALIFICATION_PLAN_PHYSICAL_EVIDENCE_PENDING",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_input_protection_release",
+      "pass": false,
+      "detail": "native ECO=True; qualification=4/20 PASS",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_fitted_2d_placement_clearance",
+      "pass": true,
+      "detail": "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_pre_route_constraint_coverage",
+      "pass": true,
+      "detail": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_hot_loop_006_application",
+      "pass": true,
+      "detail": "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_shunt_bulk_007_application",
+      "pass": true,
+      "detail": "PASS_EXACT_ACCEPTED_PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPLICATION",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_c13_c12_008_application",
+      "pass": true,
+      "detail": "PASS_EXACT_ACCEPTED_PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_3v8_output_bulk_010_application",
+      "pass": true,
+      "detail": "PASS_EXACT_ACCEPTED_PCB_PWR_3V8_OUTPUT_BULK_ROUTING_010_APPLICATION",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_c13_c11_009_application",
+      "pass": true,
+      "detail": "PASS_EXACT_ACCEPTED_PCB_PWR_VBAT_SYS_C13_C11_ROUTING_009_APPLICATION",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_conservative_evt_numeric_routing_basis",
+      "pass": true,
+      "detail": "PASS_EVT_ENGINEERING_STACKUP_AND_NUMERIC_ROUTING_INPUT_JOB_DFM_PENDING",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_dim_003_request_packet",
+      "pass": true,
+      "detail": "PASS_DIM_003_EVT_ENGINEERING_ACCEPTED_SERIAL_REVALIDATION_REQUIRED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_dim_003_acceptance",
+      "pass": true,
+      "detail": "18/18 responses accepted",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_stackup_copper_request_packet",
+      "pass": true,
+      "detail": "PASS_EVT_PUBLIC_STACKUP_AND_CALCULATED_POWER_GEOMETRY_ACCEPTED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_pwr_stackup_copper_acceptance",
+      "pass": true,
+      "detail": "accepted_rows=24/24 external_reply_required=false stackup=JLC04161H-3313A",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "harness_controlled_preliminary_packet",
+      "pass": false,
+      "detail": "ERROR; supplier responses=MISSING/16",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "harness_manufacturing_release",
+      "pass": false,
+      "detail": "controlled preliminary; 0 release blockers",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb-main_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-main_routing_presence",
+      "pass": true,
+      "detail": "segments=765 vias=304 zones=12",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-mic_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-mic_routing_presence",
+      "pass": true,
+      "detail": "segments=27 vias=5 zones=0",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-pwr_native_source",
+      "pass": true,
+      "detail": "complete native schematic/board/project set",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb-pwr_routing_presence",
+      "pass": true,
+      "detail": "segments=575 vias=267 zones=33",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_placement_clearance",
+      "pass": true,
+      "detail": "state=PASS confirmed=0 screening=0 mounting_confirmed=0 mounting_screening=0 tool_confirmed=0 tool_screening=0",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_public_numeric_routing_basis",
+      "pass": true,
+      "detail": "JLC06161H-3313 EVT stackup RF=0.1509 mm USB=0.1537/0.2032 mm; external reply not required",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_rf_si_return_path_control",
+      "pass": true,
+      "detail": "historical ECO_REQUIRED finding and cellular L2 proposal remain hash-bound after bounded application",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_gnss_rf_eco_control",
+      "pass": true,
+      "detail": "historical FL1/C64-only GNSS RF ECO-001 proposal remains hash-bound after bounded application",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_rf_remediation_application_control",
+      "pass": true,
+      "detail": "PASS_BOTH_ACCEPTED_RF_REMEDIATIONS_COMPOSED_COMBINED_KICAD9_GATE_BOUND",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_cellular_l2_return_acceptance",
+      "pass": true,
+      "detail": "accepted and applied",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_gnss_rf_placement_routeability",
+      "pass": true,
+      "detail": "GNSS placement/routeability delta accepted and applied",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_rf_si_return_path_repeat_review",
+      "pass": true,
+      "detail": "PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_stackup_impedance_request_packet",
+      "pass": true,
+      "detail": "EVT_PUBLIC_STANDARD_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_stackup_impedance_acceptance",
+      "pass": true,
+      "detail": "22/22 engineering-baseline closures; JLC06161H-3313 selected",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_assembler_dfm_stencil_request_packet",
+      "pass": true,
+      "detail": "EVT_STANDARD_PCBA_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_assembler_dfm_stencil_acceptance",
+      "pass": true,
+      "detail": "accepted=14/14 assembler/site selected by customer at order time",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_main_review_b_release",
+      "pass": false,
+      "detail": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_pwr_review_b_release",
+      "pass": false,
+      "detail": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_DIM_003_AND_EVT_STACKUP_GEOMETRY_ACCEPTED_ROUTING_PENDING",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_mic_release_status_control",
+      "pass": true,
+      "detail": "ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_mic_mechanical_authority_traceability",
+      "pass": true,
+      "detail": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "pcb_mic_manufacturing_handoff_packet",
+      "pass": false,
+      "detail": "SOURCE_CHANGED_REGENERATE_OUTPUTS_AND_REPEAT_REVIEW",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "pcb_mic_fabrication_release",
+      "pass": false,
+      "detail": "status=ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED; Review A=REPEAT_REQUIRED_AFTER_ACOUSTIC_CLEARANCE_ECO; Review B=REOPENED_AFTER_ACOUSTIC_CLEARANCE_ECO",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "mechanical_dimensions",
+      "pass": false,
+      "detail": "open: DIM-001, DIM-005, DIM-006, DIM-007, DIM-008, DIM-009, DIM-010, DIM-011, DIM-012, DIM-013, DIM-014S, DIM-015, DIM-016",
+      "blocks_hardware_design_release": true,
+      "blocks_purchase_release": true
+    },
+    {
+      "name": "purchase_lot_selection",
+      "pass": true,
+      "detail": "selected quantity 20",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    },
+    {
+      "name": "customer_commercial_rfq_fields",
+      "pass": true,
+      "detail": "non-blocking customer fields remain blank in 25 sourcing rows",
+      "blocks_hardware_design_release": false,
+      "blocks_purchase_release": false
+    }
+  ]
+}
