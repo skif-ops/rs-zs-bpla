@@ -1,0 +1,90 @@
+{
+  "schema": "dioneya-evt-pre-20-split-archive-record-v1",
+  "date": "2026-10-16",
+  "source_payload_commit": "e208d91ddc251b72c7643881955fb94bc309f17f",
+  "primary_altium_production_archive": {
+    "archive": "F:\\Проекты\\Codex\\release-packages\\EVT_PRE_20_ПРОИЗВОДСТВЕННЫЙ_КОМПЛЕКТ_20261016.zip",
+    "archive_bytes": 17719031,
+    "archive_sha256": "AC9497EBFED6E5BA314CF338B18B3FB500B043B087FD61B75CCEDF037A558AB9",
+    "zip_member_count": 760,
+    "zip_crc_verified": true,
+    "zip_payload_hashes_verified": true,
+    "path_confinement_verified": true,
+    "directory": "F:\\Проекты\\Codex\\release-packages\\EVT_PRE_20_ПРОИЗВОДСТВЕННЫЙ_КОМПЛЕКТ_20261016",
+    "payload_file_count": 760,
+    "validation": {
+      "schema": "dioneya-evt-pre-20-altium-payload-verification-v1",
+      "status": "PASS",
+      "boards": {
+        "PCB-MAIN": {
+          "pass": true,
+          "expected_copper_layers": 8,
+          "copper_gerber_count": 8,
+          "copper_gerbers": [
+            "PCB-MAIN_Copper_Signal_1.gbr",
+            "PCB-MAIN_Copper_Signal_2.gbr",
+            "PCB-MAIN_Copper_Signal_3.gbr",
+            "PCB-MAIN_Copper_Signal_4.gbr",
+            "PCB-MAIN_Copper_Signal_5.gbr",
+            "PCB-MAIN_Copper_Signal_6.gbr",
+            "PCB-MAIN_Copper_Signal_Bot.gbr",
+            "PCB-MAIN_Copper_Signal_Top.gbr"
+          ],
+          "expected_schdoc_count": 10,
+          "schdoc_count": 10,
+          "schlib_count": 2,
+          "pcblib_count": 1,
+          "drc_report_count": 2,
+          "missing": []
+        },
+        "PCB-PWR": {
+          "pass": true,
+          "expected_copper_layers": 4,
+          "copper_gerber_count": 4,
+          "copper_gerbers": [
+            "PCB-PWR_Copper_Signal_1.gbr",
+            "PCB-PWR_Copper_Signal_2.gbr",
+            "PCB-PWR_Copper_Signal_Bot.gbr",
+            "PCB-PWR_Copper_Signal_Top.gbr"
+          ],
+          "expected_schdoc_count": 5,
+          "schdoc_count": 5,
+          "schlib_count": 2,
+          "pcblib_count": 2,
+          "drc_report_count": 1,
+          "missing": []
+        },
+        "PCB-MIC": {
+          "pass": true,
+          "expected_copper_layers": 2,
+          "copper_gerber_count": 2,
+          "copper_gerbers": [
+            "PCB-MIC_Copper_Signal_Bot.gbr",
+            "PCB-MIC_Copper_Signal_Top.gbr"
+          ],
+          "expected_schdoc_count": 1,
+          "schdoc_count": 1,
+          "schlib_count": 2,
+          "pcblib_count": 1,
+          "drc_report_count": 2,
+          "missing": []
+        }
+      },
+      "kicad_source_file_count": 0,
+      "kicad_source_files": [],
+      "failures": []
+    }
+  },
+  "separate_kicad_source_archive": {
+    "archive": "F:\\Проекты\\Codex\\release-packages\\EVT_PRE_20_KICAD_ИСХОДНИКИ_АРХИВ_20261016.zip",
+    "archive_bytes": 7249281,
+    "archive_sha256": "A99F20112E3A4810F50AAFC452D51AE43454EACE3DE15198C7BA3871D9173B88",
+    "zip_member_count": 294,
+    "zip_crc_verified": true,
+    "zip_payload_hashes_verified": true,
+    "path_confinement_verified": true,
+    "directory": "F:\\Проекты\\Codex\\release-packages\\EVT_PRE_20_KICAD_ИСХОДНИКИ_АРХИВ_20261016",
+    "payload_file_count": 294,
+    "manufacturing_master": false
+  }
+}
