@@ -1,0 +1,61 @@
+{
+  "release_id": "EVT_PRE_20_REV_D10",
+  "date": "2026-10-16",
+  "hardware_payload_inherited_from_rev_d9": true,
+  "hardware_payload_hash_match": true,
+  "archives": {
+    "FULL": {
+      "filename": "EVT_PRE_20_REV_D10_FULL.zip",
+      "bytes": 34914959,
+      "sha256": "A321453F6589B88E4D9DB8233C89F7A2144D7B144A184D07C18BA784EBB9DD95",
+      "file_count": 880,
+      "root": "EVT_D10",
+      "crc_test": "PASS",
+      "full_extraction": "PASS",
+      "max_member_path_characters": 117,
+      "kicad_absent": true,
+      "private_key_markers_absent": true,
+      "manifest_hashes_verified": 879
+    },
+    "ALTIUM": {
+      "filename": "EVT_PRE_20_REV_D10_ALTIUM.zip",
+      "bytes": 12357317,
+      "sha256": "443B12F1AF6673640620C81DFE8797DFB80E1CCC224777B96546ABAB29045183",
+      "file_count": 316,
+      "root": "EVT_D10_ALTIUM",
+      "crc_test": "PASS",
+      "full_extraction": "PASS",
+      "max_member_path_characters": 135,
+      "kicad_absent": true,
+      "private_key_markers_absent": true,
+      "manifest_hashes_verified": 315
+    },
+    "TESTS": {
+      "filename": "EVT_PRE_20_REV_D10_TESTS.zip",
+      "bytes": 5021882,
+      "sha256": "7BD589F4998256CABF6B56557F72B4FC373F9277B1A0279E7EC56D6EA2B50A18",
+      "file_count": 355,
+      "root": "EVT_D10_TESTS",
+      "crc_test": "PASS",
+      "full_extraction": "PASS",
+      "max_member_path_characters": 111,
+      "kicad_absent": true,
+      "private_key_markers_absent": true,
+      "manifest_hashes_verified": 354
+    }
+  },
+  "overall": "PASS",
+  "hardware_payload_file_count": 313,
+  "nested_altium_matches_standalone": true,
+  "operation_workbook_crc": "PASS",
+  "serial_identity_count": 41,
+  "serial_identity_files_verified": [
+    "STATION_ASSEMBLY_CHECKLIST_REV_B.csv",
+    "FIRST_POWER_CHECKLIST_REV_B.csv",
+    "INSTALLATION_COMMISSIONING_CHECKLIST_REV_B.csv",
+    "EVT_PRE_20_41_STATION_TRAVELLER_REGISTER_REV_B.csv"
+  ],
+  "controlled_parameter_count": 24,
+  "controlled_parameter_approved_count": 0,
+  "controlled_parameter_open_count": 24
+}

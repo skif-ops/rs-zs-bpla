@@ -1,0 +1,18 @@
+﻿Operation_ID,Operation_RU_EN,Applies_To,Required_Input_or_Parameter,Acceptance,Failure_Disposition,Operator,QC,Evidence_SHA256,Status
+HOP-010,Verify release and work order / Проверить выпуск и задание,all,manifest,release verified,HOLD,,,,NOT_RUN
+HOP-020,Verify material lots / Проверить партии материалов,all,incoming record,MPN lot quantity accepted,HOLD,,,,NOT_RUN
+HOP-030,Verify calibrated tools / Проверить инструмент,all,calibration register,all tools valid,HOLD,,,,NOT_RUN
+HOP-040,Cut and identify wires / Нарезать и маркировать,all,length schedule,length color identity pass,REWORK,,,,NOT_RUN
+HOP-050,Strip trial / Пробная зачистка,by terminal-wire pair,PAR-H01/H04/H07/H10,no strand damage and length pass,HOLD,,,,NOT_RUN
+HOP-060,Crimp setup / Наладка обжима,by terminal-wire pair,PAR-H02/H05/H08/H10,tooling and first-off set,HOLD,,,,NOT_RUN
+HOP-070,Pull test first-off / Pull test,by terminal-wire pair,PAR-H03/H06/H09/H11,minimum pull accepted,HOLD,,,,NOT_RUN
+HOP-080,QC first-off release / Выпуск first-off,by lot,signed setup record,operator and QC signatures,HOLD,,,,NOT_RUN
+HOP-090,Production crimp / Серийный обжим,each end,approved first-off,visual and periodic crimp height pass,REJECT_TERMINAL,,,,NOT_RUN
+HOP-100,Insert terminals / Вставить контакты,each housing,logical pinout,cavity and retention pass,REWORK,,,,NOT_RUN
+HOP-110,Install secondary locks / Установить замки,as applicable,connector drawing,lock seated,REWORK,,,,NOT_RUN
+HOP-120,Form and protect harness / Сформировать жгут,each harness,PAR-H13 and routing notes,routing protection pass,HOLD,,,,NOT_RUN
+HOP-130,100 percent continuity and cross-short / Электроконтроль,each harness,approved tester program,all circuits pass,REWORK_FULL_RETEST,,,,NOT_RUN
+HOP-140,Measure conductor resistance / Измерить сопротивление,each conductor,0.15/0.10 ohm limits,all conductors pass,REWORK_FULL_RETEST,,,,NOT_RUN
+HOP-150,Dimension and visual inspection / Размеры и внешний вид,each harness,drawing,length labels workmanship pass,REWORK,,,,NOT_RUN
+HOP-160,Evidence and sign-off / Доказательства и подписи,each harness,source logs and photos,SHA-256 plus two signatures,HOLD,,,,NOT_RUN
+HOP-170,Pack by station serial / Упаковать по serial,each station set,six accepted harnesses,set complete and protected,HOLD,,,,NOT_RUN
