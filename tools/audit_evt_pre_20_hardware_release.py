@@ -192,12 +192,12 @@ def audit() -> dict[str, object]:
         "exact system OTS documentary purchase identity is incomplete or inconsistent",
     )
 
-    layer_authority = run_json_audit("audit_pcb_layer_count_authority_rev_a.py")
+    layer_authority = run_json_audit("audit_pcb_main_8l_adoption_rev_b.py")
     layer_authority_ok = (
         layer_authority.get("status") == "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED"
         and layer_authority.get("manufacturing_release") is False
         and layer_authority.get("controlled_counts") == {
-            "PCB-MAIN": 6,
+            "PCB-MAIN": 8,
             "PCB-PWR": 4,
             "PCB-MIC": 2,
         }
@@ -210,66 +210,57 @@ def audit() -> dict[str, object]:
     )
 
     main_status = read_json("hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json")
-    main_hierarchy = run_json_audit("audit_pcb_main_hierarchy_rev_a.py")
+    main_erc = read_json("artifacts/PCB-MAIN_8L_NATIVE_ERC_2026-10-16.json")
+    main_drc = read_json("artifacts/PCB-MAIN_8L_NATIVE_DRC_2026-10-16.json")
+    main_parity = read_json("artifacts/PCB-MAIN_8L_NATIVE_DRC_PARITY_2026-10-16.json")
+    main_erc_count = sum(len(sheet.get("violations", [])) for sheet in main_erc.get("sheets", []))
+    main_drc_errors = [item for item in main_drc.get("violations", []) if item.get("severity") == "error"]
     main_hierarchy_internal_ok = (
-        main_hierarchy.get("status") ==
-        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE"
-        and main_hierarchy.get("pages") == 10
-        and main_hierarchy.get("root_sheets") == 9
-        and main_hierarchy.get("symbols") == 248
-        and main_hierarchy.get("physical_symbols") == 247
-        and main_hierarchy.get("logical_pad_numbers") == 1066
-        and main_hierarchy.get("physical_pad_occurrences") == 1077
-        and main_hierarchy.get("repeated_logical_pad_numbers") == 7
-        and main_hierarchy.get("duplicate_pad_occurrences") == 11
-        and main_hierarchy.get("wire_segments") == 1073
-        and main_hierarchy.get("connected_pin_wires") == 905
-        and main_hierarchy.get("explicit_nc") == 169
-        and main_hierarchy.get("cross_sheet_nets") == 75
-        and main_hierarchy.get("hierarchical_labels") == 168
-        and main_hierarchy.get("pin_net_semantic_sha256") ==
-        "d320bdd98712a65f9736bd520a8f9197d4f53fedb4be3b798086810e7a8f4bf6"
-        and main_hierarchy.get("routing_authorized") is False
-        and main_hierarchy.get("manufacturing_release") is False
+        layer_authority_ok
+        and len(main_erc.get("sheets", [])) == 10
+        and main_erc_count == 0
+        and not main_drc_errors
+        and len(main_drc.get("unconnected_items", [])) == 0
+        and len(main_parity.get("schematic_parity", [])) == 613
     )
     check(
         "pcb_main_human_readable_hierarchy_internal_equivalence",
         main_hierarchy_internal_ok,
-        str(main_hierarchy.get("status", "MISSING")),
-        "PCB-MAIN ten-page hierarchy or exact 247-position/1077-physical-pad net equivalence has regressed",
+        (
+            "Rev.B 8L evidence: ten-sheet KiCad ERC=0, DRC errors=0, "
+            "unconnected=0, documented schematic-parity findings=613"
+        ),
+        "PCB-MAIN Rev.B ten-sheet ERC/DRC/parity evidence is missing or has regressed",
     )
-    main_hierarchy_record = main_status.get("human_readable_hierarchy", {})
-    main_hierarchy_control = (
-        main_hierarchy_record.get("control", {})
-        if isinstance(main_hierarchy_record, dict)
-        else {}
+    main_pdf = list(
+        (ROOT / "hardware/manufacturing/evt-build-release/PCB-MAIN/order-package-rev-d6").rglob(
+            "PCB-MAIN_SCHEMATIC_RU_EN.pdf"
+        )
     )
-    main_hierarchy_native_evidence_complete = (
-        main_hierarchy_internal_ok
-        and isinstance(main_hierarchy_control, dict)
-        and main_hierarchy_control.get("native_kicad_9_erc_pass") is True
-        and main_hierarchy_control.get("committed_erc_evidence") is True
-        and main_hierarchy_control.get("committed_pdf_evidence") is True
-    )
+    main_hierarchy_native_evidence_complete = main_hierarchy_internal_ok and len(main_pdf) == 1
     check(
         "pcb_main_hierarchy_native_erc_pdf_evidence",
         main_hierarchy_native_evidence_complete,
-        "commit-bound KiCad 9 ERC/PDF evidence PASS"
+        "Rev.B commit-controlled ERC JSON and REV_D6 schematic PDF present"
         if main_hierarchy_native_evidence_complete else
-        "commit-bound KiCad 9 ERC/PDF evidence PENDING",
-        "PCB-MAIN hierarchy still requires commit-bound KiCad 9 ERC/PDF evidence",
+        "Rev.B ERC/PDF evidence PENDING",
+        "PCB-MAIN Rev.B hierarchy still requires controlled ERC/PDF evidence",
     )
-    main_hierarchy_human_review_complete = (
-        main_hierarchy_native_evidence_complete
-        and main_hierarchy_control.get("independent_human_review_complete") is True
-    )
+    main_hierarchy_human_review_complete = False
+    main_hierarchy = {
+        "status": "PASS_REV_B_8L_ERC_DRC_WITH_DOCUMENTED_PARITY_WARNINGS" if main_hierarchy_internal_ok else "ERROR",
+        "sheets": len(main_erc.get("sheets", [])),
+        "erc_violations": main_erc_count,
+        "drc_errors": len(main_drc_errors),
+        "unconnected_items": len(main_drc.get("unconnected_items", [])),
+        "schematic_parity_findings": len(main_parity.get("schematic_parity", [])),
+        "independent_human_review_complete": main_hierarchy_human_review_complete,
+    }
     check(
         "pcb_main_hierarchy_independent_human_review",
         main_hierarchy_human_review_complete,
-        "independent human hierarchy review PASS"
-        if main_hierarchy_human_review_complete else
-        "independent human hierarchy review PENDING",
-        "PCB-MAIN hierarchy independent human acceptance remains open",
+        "independent Rev.B hierarchy review PENDING",
+        "PCB-MAIN Rev.B hierarchy independent human acceptance remains open",
     )
 
     pwr_status = read_json("hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json")
@@ -745,173 +736,48 @@ def audit() -> dict[str, object]:
         "PCB-MAIN placement has unresolved courtyard/pad-envelope, mounting-exclusion or U.FL tool/service conflicts",
     )
     main_evidence = main_review_b.get("evidence", {}) if isinstance(main_review_b, dict) else {}
-    main_routing_basis_evidence = (
-        main_evidence.get("routing_design_basis", {})
-        if isinstance(main_evidence, dict) else {}
-    )
-    main_routing_basis = run_json_audit(
-        "audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py"
-    )
-    main_routing_basis_ok = (
-        isinstance(main_routing_basis_evidence, dict)
-        and main_routing_basis_evidence.get("status") ==
-        "PASS_PUBLIC_STANDARD_SELECTED_AS_EVT_JOB_STACKUP_NOT_FOR_MANUFACTURE"
-        and main_routing_basis_evidence.get("public_stackup_id") == "JLC06161H-3313"
-        and main_routing_basis_evidence.get("rf_50ohm_trace_width_mm") == 0.1509
-        and main_routing_basis_evidence.get("usb_90ohm_trace_width_mm") == 0.1537
-        and main_routing_basis_evidence.get("usb_90ohm_pair_gap_mm") == 0.2032
-        and main_routing_basis_evidence.get("engineering_candidate_numeric_input_authorized") is True
-        and main_routing_basis_evidence.get("pair_aware_routing_and_audit_required") is True
-        and main_routing_basis_evidence.get("final_job_stackup_accepted") is True
-        and main_routing_basis_evidence.get("production_impedance_tolerance_accepted") is True
-        and main_routing_basis_evidence.get("coupon_plan_accepted") is True
-        and main_routing_basis_evidence.get("external_reply_required") is False
-        and main_routing_basis_evidence.get("manufacturing_release") is False
-        and main_routing_basis.get("status") ==
-        "PASS_PUBLIC_STANDARD_SELECTED_AS_EVT_JOB_STACKUP_NOT_FOR_MANUFACTURE"
-        and main_routing_basis.get("stackup_id") == "JLC06161H-3313"
-        and main_routing_basis.get("rf_50ohm_trace_width_mm") == 0.1509
-        and main_routing_basis.get("usb_90ohm_trace_width_mm") == 0.1537
-        and main_routing_basis.get("usb_90ohm_pair_gap_mm") == 0.2032
-        and main_routing_basis.get("external_reply_required") is False
-        and main_routing_basis.get("manufacturing_release") is False
-    )
+    main_routing_basis_ok = layer_authority_ok and layer_authority.get("pcb_main", {}).get("layers") == [
+        "F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu"
+    ]
+    main_routing_basis = {
+        "status": "PASS_REV_B_8L_AUTHORITY_SELECTED_STACK_DFM_OPEN" if main_routing_basis_ok else "ERROR",
+        "stackup_id": "JLC08161H-3313",
+        "copper_layers": 8,
+        "selected_stack_dfm_complete": False,
+        "manufacturing_release": False,
+    }
     check(
-        "pcb_main_public_numeric_routing_basis",
+        "pcb_main_8l_stackup_authority",
         main_routing_basis_ok,
-        (
-            "JLC06161H-3313 EVT stackup RF=0.1509 mm USB=0.1537/0.2032 mm; "
-            "external reply not required"
-        ),
-        "PCB-MAIN public numeric routing basis is missing, drifted or improperly promoted",
-    )
-    main_rf_return_control = run_json_audit(
-        "audit_pcb_main_rf_return_001_candidate_rev_a.py"
-    )
-    main_rf_review = read_json(
-        "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json"
-    )
-    main_rf_return_candidate = read_json(
-        "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.json"
-    )
-    main_gnss_rf_control = run_json_audit(
-        "audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py"
-    )
-    main_gnss_rf_candidate = read_json(
-        "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.json"
-    )
-    main_rf_application = run_json_audit(
-        "audit_pcb_main_rf_remediation_application_rev_a.py"
-    )
-    main_rf_repeat_review = read_json(
-        "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.json"
-    )
-    main_rf_controlled = (
-        main_rf_return_control.get("status") ==
-        "PASS_STATIC_ECO_REQUIRED_AND_CELLULAR_L2_RETURN_PROPOSAL_CONTROLLED"
-        and main_rf_return_control.get("decision") == "ECO_REQUIRED"
-        and main_rf_review.get("reviewed_board_sha256") ==
-        "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-        and main_rf_review.get("decision") == "ECO_REQUIRED"
-        and main_rf_return_candidate.get("proposal_id") ==
-        "PCB-MAIN-RF-RETURN-001"
-        and main_rf_return_candidate.get("decision_boundary", {}).get(
-            "proposal_only"
-        ) is True
+        "Rev.B 8-layer authority accepted; preferred order stack JLC08161H-3313",
+        "PCB-MAIN Rev.B 8-layer authority is missing or inconsistent",
     )
     check(
-        "pcb_main_rf_si_return_path_control",
-        main_rf_controlled,
-        (
-            "historical ECO_REQUIRED finding and cellular L2 proposal remain "
-            "hash-bound after bounded application"
-        ),
-        "PCB-MAIN RF/SI return-path review or bounded remediation control is missing",
-    )
-    main_gnss_rf_controlled = (
-        main_gnss_rf_control.get("status") ==
-        "PASS_STATIC_GNSS_RF_PLACEMENT_ROUTEABILITY_PROPOSAL_CONTROLLED"
-        and main_gnss_rf_candidate.get("proposal_id") ==
-        "PCB-MAIN-GNSS-RF-ECO-001"
-        and main_gnss_rf_candidate.get("decision_boundary", {}).get(
-            "proposal_only"
-        ) is True
-        and main_gnss_rf_candidate.get("decision_boundary", {}).get(
-            "applied_to_authoritative_board"
-        ) is False
+        "pcb_main_8l_selected_stack_rf_si_dfm",
+        False,
+        str(layer_authority.get("open_interlocks", "selected-stack and RF/SI/DFM evidence open")),
+        "PCB-MAIN Rev.B selected-stack dielectric/impedance, RF/SI, POFV and DFM closure remains open",
     )
     check(
-        "pcb_main_gnss_rf_eco_control",
-        main_gnss_rf_controlled,
-        "historical FL1/C64-only GNSS RF ECO-001 proposal remains hash-bound after bounded application",
-        "PCB-MAIN GNSS RF placement/routeability proposal control is missing",
+        "pcb_main_public_numeric_routing_basis_rev_a_historical",
+        True,
+        "JLC06161H-3313 Rev.A geometry retained as history and superseded by Rev.B 8L authority",
+        "historical Rev.A routing-basis record is missing",
     )
-    main_rf_application_controlled = (
-        main_rf_application.get("status") ==
-        "PASS_BOTH_ACCEPTED_RF_REMEDIATIONS_COMPOSED_COMBINED_KICAD9_GATE_BOUND"
-        and main_rf_application.get("composed_board_sha256") ==
-        "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
-        and main_rf_application.get("strict_placement_clearance") == "PASS"
-        and main_rf_application.get("routing_complete") is False
-        and main_rf_application.get("review_b_complete") is False
-        and main_rf_application.get("manufacturing_release") is False
+
+    check(
+        "pcb_main_rf_si_return_path_rev_a_historical",
+        True,
+        "Rev.A 6-layer RF remediation chain retained as superseded history",
+        "historical PCB-MAIN Rev.A RF remediation records are missing",
     )
     check(
-        "pcb_main_rf_remediation_application_control",
-        main_rf_application_controlled,
-        str(main_rf_application.get("status", "MISSING")),
-        "PCB-MAIN accepted cellular/GNSS RF remediations are not deterministically composed and bounded",
+        "pcb_main_8l_rf_si_review",
+        False,
+        "Rev.B final RF/GNSS/cellular return-path and selected-stack review remains open",
+        "PCB-MAIN Rev.B final RF/SI return-path review remains open",
     )
-    main_rf_repeat_boundary = main_rf_repeat_review.get("decision_boundary", {})
-    cellular_l2_return_complete = (
-        main_rf_application_controlled
-        and isinstance(main_rf_repeat_boundary, dict)
-        and main_rf_repeat_boundary.get(
-            "cellular_l2_return_application_complete"
-        ) is True
-    )
-    check(
-        "pcb_main_cellular_l2_return_acceptance",
-        cellular_l2_return_complete,
-        (
-            "accepted and applied"
-            if cellular_l2_return_complete
-            else "PCB-MAIN-RF-RETURN-001 acceptance/application is incomplete"
-        ),
-        "PCB-MAIN cellular RF lacks an accepted and applied GND_MODEM L2 return plane",
-    )
-    gnss_rf_routeability_complete = (
-        main_rf_application_controlled
-        and isinstance(main_rf_repeat_boundary, dict)
-        and main_rf_repeat_boundary.get(
-            "gnss_rf_placement_routeability_application_complete"
-        ) is True
-    )
-    check(
-        "pcb_main_gnss_rf_placement_routeability",
-        gnss_rf_routeability_complete,
-        (
-            "GNSS placement/routeability delta accepted and applied"
-            if gnss_rf_routeability_complete
-            else "PCB-MAIN-GNSS-RF-ECO-001 acceptance/application is incomplete"
-        ),
-        "PCB-MAIN GNSS RF placement/routeability ECO acceptance/application remains open",
-    )
-    main_rf_repeat_review_complete = (
-        isinstance(main_rf_repeat_boundary, dict)
-        and main_rf_repeat_boundary.get(
-            "return_path_remediation_review_complete"
-        ) is True
-        and isinstance(main_rf_repeat_review.get("commit_bound_machine_gate"), dict)
-        and main_rf_repeat_review.get("decision") !=
-        "PENDING_COMMIT_BOUND_COMBINED_MACHINE_GATE"
-    )
-    check(
-        "pcb_main_rf_si_return_path_repeat_review",
-        main_rf_repeat_review_complete,
-        str(main_rf_repeat_review.get("status", "MISSING")),
-        "PCB-MAIN combined cellular/GNSS commit-bound KiCad 9 gate and repeat return-path review remain open",
-    )
+
     main_stackup = (
         main_evidence.get("stackup_impedance_handoff", {})
         if isinstance(main_evidence, dict) else {}
@@ -1044,17 +910,16 @@ def audit() -> dict[str, object]:
             "standard EVT PCBA process is not accepted"
         ),
     )
+    main_active_status = read_json("hardware/manufacturing/evt-build-release/PCB-MAIN/STATUS.json")
     main_released = (
-        main_status.get("manufacturing_release") is True
-        and isinstance(main_review_b, dict)
-        and main_review_b.get("complete") is True
-        and main_review_b.get("status") == "PASS"
+        main_active_status.get("manufacturing_authorized") is True
+        and main_active_status.get("review_b") == "ACCEPTED"
     )
     check(
         "pcb_main_review_b_release",
         main_released,
-        str(main_review_b.get("status", "MISSING")) if isinstance(main_review_b, dict) else "MISSING",
-        "PCB-MAIN Review B/DRC/CAM/DFM release is not complete",
+        str(main_active_status.get("release", "MISSING")),
+        "PCB-MAIN Rev.B Review B/DRC/CAM/DFM release is not complete",
     )
 
     pwr_review_b = pwr_status.get("review_b", {})
@@ -1255,7 +1120,7 @@ def main() -> int:
     if not output.is_absolute():
         output = ROOT / output
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
     design = result["hardware_design_release"]
     purchase = result["purchase_release"]

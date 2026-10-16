@@ -1,9 +1,9 @@
 
-# PCB-MAIN 8L COMPLETE-105 — Altium production candidate
+# PCB-MAIN 8L COMPLETE-105 — primary Altium production candidate
 
-Status: **PRODUCTION CANDIDATE / HOLD FOR DFM**. Manufacturing is not authorized.
+Status: **PRIMARY EVT 8L PRODUCTION CANDIDATE / HOLD FOR DFM**. Manufacturing is not authorized.
 
-This directory contains the Altium Designer 26.10.1 Trial conversion of the exact KiCad 8-layer candidate at commit `592f955d88570dcbb5eb41d59848db05aac84f88` and path `hardware/kicad/candidates/PCB-MAIN-8L-COMPLETE-105`. The KiCad source remains preserved in the repository and in the release archive.
+This directory contains the Altium Designer 26.10.1 Trial conversion of PCB-MAIN COMPLETE-105 Rev.B. On 2026-10-16 the exact 8-layer candidate was promoted to `hardware/kicad/native/PCB-MAIN`; the former 6-layer source remains preserved under `hardware/kicad/retired`. The accepted KiCad source and this Altium conversion remain in the repository and release archive.
 
 ## Verified results
 
@@ -24,7 +24,7 @@ No separate NPTH drill file was emitted by Altium because the converted board co
 
 - disposition of the three antenna-via warnings;
 - fabricator stackup, copper and controlled-impedance confirmation;
-- reconciliation of the global procurement BOM, which still identifies PCB-MAIN as six-layer;
+- confirmation that EMS/fabricator quotations reference the reconciled Rev.B 8-layer BOM and JLC08161H-3313 order profile;
 - reconciliation of 248 compiled schematic components versus 251 board component objects;
 - RF/GNSS/cellular review, DFM, independent Review B, DNP/polarity and first-article checks.
 

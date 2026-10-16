@@ -1,28 +1,62 @@
 {
+  "schema": "dioneya-evt-board-cam-candidate-v2",
+  "date": "2026-10-16",
   "board": "PCB-MAIN",
-  "release": "CANDIDATE_HOLD_FOR_REVIEW",
-  "drc_return_code": 0,
-  "erc_return_code": 0,
-  "gerber_return_code": 0,
-  "drill_return_code": 0,
-  "position_return_code": 0,
-  "ipc_d_356_return_code": 0,
-  "step_return_code": 0,
-  "schematic_pdf_return_code": 0,
-  "bom_return_code": 0,
-  "schema": "dioneya-evt-board-cam-candidate-v1",
-  "source_commit": "b6d9d620",
-  "review_b": "OPEN",
+  "revision": "COMPLETE-105_REV_B",
+  "release": "EVT_8L_PRODUCTION_CANDIDATE_HOLD_FOR_DFM_REVIEW_B",
   "manufacturing_authorized": false,
-  "drc": {
-    "errors": 203,
-    "warnings": 464,
-    "unconnected_items": 499
+  "primary_layer_count": 8,
+  "copper_layers": [
+    "F.Cu",
+    "In1.Cu",
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu",
+    "B.Cu"
+  ],
+  "preferred_order_stack": "JLC08161H-3313",
+  "source": {
+    "native_path": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "native_sha256": "47b1c8dd391aabd6339c878ac4baff4f8fdf4f82d6ab588c13f7437552ea1f77",
+    "rev_d6_packaged_board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+    "rev_d6_archive": "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_20261013_REV_D6.zip",
+    "rev_d6_extracted_file_count": 98
   },
-  "jlc_bom": {
-    "rows": 224,
-    "lcsc_ids_complete": false,
-    "note": "Manufacturer/MPN data is retained; LCSC mapping remains open in the assembler part map."
+  "kicad_checks_2026_10_16": {
+    "erc_errors": 0,
+    "drc_errors": 0,
+    "drc_warnings": 30,
+    "warning_categories": {
+      "via_dangling": 7,
+      "silk_over_copper": 23
+    },
+    "unconnected_items": 0,
+    "schematic_parity_findings": 613
   },
-  "jlc_cpl_rows": 236
+  "rev_d6_order_controls": {
+    "gerber_copper_layers": 8,
+    "via_fill_cap_order_count": 76,
+    "native_board_count": 74,
+    "cam_override_count": 2,
+    "ipc_d_356": true,
+    "bom_and_positions": true,
+    "kicad_sources_preserved": true
+  },
+  "altium": {
+    "project_path": "hardware/altium/production-candidate/PCB-MAIN-8L-COMPLETE-105",
+    "compile_errors": 0,
+    "compile_warnings": 146,
+    "drc_violations": 3,
+    "drc_category": "Net Antennae"
+  },
+  "review_b": "OPEN",
+  "open_gates": [
+    "Selected fabricator stack dielectric and impedance/return-path confirmation",
+    "REV_D6 POFV order-control confirmation by fabricator",
+    "Three Altium Net Antennae warning dispositions",
+    "Final upload parser and DFM review",
+    "Independent Review B and first-article inspection/test"
+  ]
 }

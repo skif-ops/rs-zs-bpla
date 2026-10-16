@@ -2,7 +2,7 @@
 
 Статус: `EVT STACKUPS CONTROLLED / MANUFACTURING RELEASE HOLD`
 
-Единый authority числа медных слоёв: `hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv`.
+Единый authority числа медных слоёв: `hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv`.
 Число слоёв, EVT-конструкции, медь и численные impedance/силовые геометрии
 зафиксированы в `EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md`. До заказа
 обязательны routing, DRC, CAM, checkout DFM и Review B.
@@ -10,8 +10,10 @@
 ## PCB-MAIN
 
 - Количество на изделие: 1.
-- Технология Rev.A: 6 медных слоёв, `JLC06161H-3313`, заказ 1.6 мм,
-  1 oz/0.5 oz, ENIG; 50/90 Ом по принятой публичной конструкции `±10%`.
+- Технология Rev.B: 8 медных слоёв, `JLC08161H-3313`, заказ 1.6 мм,
+  1 oz/0.5 oz, ENIG; COMPLETE-105 принят как основной EVT-источник.
+- KiCad DRC: 0 ошибок, 0 неподключённых элементов, 30 предупреждений;
+  окончательные импедансы и return path проверяются на выбранном заказном стеке.
 - Целевая зона: ориентировочно до 100 x 80 мм, окончательно после компоновки корпуса.
 - Разделение зон: RF cellular, RF GNSS, RF LoRa, quiet digital/audio, modem power, service/debug.
 - Антенны внешние, отдельные разъёмы cellular/GNSS/LoRa. Межпортовая развязка проверяется на макете корпуса.

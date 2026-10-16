@@ -1,3 +1,5 @@
+> **CURRENT PCB-MAIN SOURCE — REV.B (2026-10-16):** `native/PCB-MAIN/PCB-MAIN.kicad_pcb` is now PCB-MAIN COMPLETE-105 Rev.B with 8 copper layers. The former 6-layer native source is preserved under `retired/PCB-MAIN-6L-REV-A-2026-10-16/`. Rev.A 6-layer routing/stack sections below are historical.
+
 # ZS-BPLA EVT-PRE-20 KiCad package
 
 Status: `NATIVE SOURCE CONTROLLED / NOT FOR MANUFACTURE`

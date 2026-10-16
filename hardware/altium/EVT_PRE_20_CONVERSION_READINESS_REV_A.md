@@ -1,3 +1,5 @@
+> **SUPERSEDED READINESS SNAPSHOT:** Conversion was completed after this 2026-10-14 inventory. The current PCB-MAIN authority is the 8-layer COMPLETE-105 Rev.B project in `hardware/altium/production-candidate/PCB-MAIN-8L-COMPLETE-105`; PCB-PWR and PCB-MIC production candidates are also present. This document remains only as the pre-conversion inventory.
+
 # EVT-PRE-20 — инвентаризация и готовность к переносу в Altium Designer
 
 Дата проверки: 2026-10-14. Ветка: `evt-pre-20`. Контрольный исходный commit: `4314cd6dddd189880b43a160c550e225acd31fc4`.

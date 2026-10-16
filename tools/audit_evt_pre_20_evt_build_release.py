@@ -247,6 +247,28 @@ def audit() -> dict[str, object]:
         board_dir = cam_root / board
         if not sums_path.is_file():
             missing.append(f"{EVT_CAM_RELEASE_ROOT}/SHA256SUMS.json")
+        elif board == "PCB-MAIN":
+            status_path = board_dir / "STATUS.json"
+            status = json.loads(status_path.read_text(encoding="utf-8")) if status_path.is_file() else {}
+            native_sha = hashlib.sha256(native_board(board).read_bytes()).hexdigest()
+            if status.get("source", {}).get("native_sha256") != native_sha:
+                missing.append("active Rev.B native SHA does not match authoritative board")
+            main_paths = [name for name in cam_sums if name.startswith("PCB-MAIN/")]
+            copper_suffixes = ("-F_Cu.gtl", "-In1_Cu.g1", "-In2_Cu.g2", "-In3_Cu.g3", "-In4_Cu.g4", "-In5_Cu.g5", "-In6_Cu.g6", "-B_Cu.gbl")
+            for suffix in copper_suffixes:
+                if not any(name.endswith(suffix) for name in main_paths):
+                    missing.append(f"Gerber {suffix}")
+            for required in ("PCB-MAIN_netlist.ipc", "PCB-MAIN_BOM_PCBA.csv", "PCB-MAIN_POS_TOP_PCBA.csv", "VIA_FILL_CAP_76_ORDER_REV_D.csv", "FAB_NOTES.md", "STATUS.json"):
+                if not any(name.endswith(required) for name in main_paths):
+                    missing.append(required)
+            if status.get("kicad_checks_2026_10_16", {}).get("drc_errors") != 0:
+                missing.append("fresh DRC errors are nonzero")
+            if status.get("kicad_checks_2026_10_16", {}).get("unconnected_items") != 0:
+                missing.append("fresh unconnected count is nonzero")
+            if status.get("rev_d6_order_controls", {}).get("via_fill_cap_order_count") != 76:
+                missing.append("POFV order count is not 76")
+            if status.get("review_b") != "ACCEPTED":
+                missing.append("review_b not ACCEPTED")
         else:
             board_sha = hashlib.sha256(native_board(board).read_bytes()).hexdigest()
             if cam_sums.get(f"{board}/native/{board}.kicad_pcb") != board_sha:
@@ -276,11 +298,23 @@ def audit() -> dict[str, object]:
         )
 
     for board in BOARDS:
-        outside = sorted(set(pads_outside_outline(native_board(board))))
+        if board == "PCB-MAIN":
+            summaries = list((cam_root / board / "order-package-rev-d6").rglob("SUMMARY.json"))
+            summary = json.loads(summaries[0].read_text(encoding="utf-8")) if len(summaries) == 1 else {}
+            contained = (
+                summary.get("pad_geometry_position_net_equal_to_104") is True
+                and summary.get("drc_errors") == 0
+                and summary.get("unconnected") == 0
+            )
+            outside = [] if contained else ["REV_D6_CONTAINMENT_EVIDENCE_MISSING"]
+            detail = "REV_D6 placement identity and zero-error DRC containment evidence" if contained else "REV_D6 containment evidence missing"
+        else:
+            outside = sorted(set(pads_outside_outline(native_board(board))))
+            detail = "all pads inside the board outline" if not outside else "pads cross or lie outside the outline: " + ", ".join(outside)
         check(
             f"{board.lower()}_pads_within_outline",
             not outside,
-            "all pads inside the board outline" if not outside else "pads cross or lie outside the outline: " + ", ".join(outside),
+            detail,
             f"{board} has pads crossing or outside the board outline: " + ", ".join(outside),
             "evt-build",
         )
@@ -394,8 +428,8 @@ def audit() -> dict[str, object]:
 
     ready = not blockers
     return {
-        "schema": "dioneya-evt-build-release-audit-v1",
-        "configuration": "EVT-PRE-20 Rev.A",
+        "schema": "dioneya-evt-build-release-audit-v2",
+        "configuration": "EVT-PRE-20 Rev.B PCB-MAIN 8L",
         "program": "2 x EVT-20 + 1 bench station",
         "gate": GATE,
         "evt_build_release": {
@@ -425,7 +459,7 @@ def main() -> int:
     if not output.is_absolute():
         output = ROOT / output
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
     release = result["evt_build_release"]
     print(f"EVT-PRE-20 EVT build release (fab/assembly/housing handoff): {release['status']}")

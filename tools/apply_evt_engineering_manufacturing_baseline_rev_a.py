@@ -596,6 +596,7 @@ def refresh_pwr_routing_basis_bindings() -> None:
 
 
 def main() -> None:
+    raise RuntimeError("This Rev.A migration is superseded for PCB-MAIN by PCB_LAYER_COUNT_AUTHORITY_REV_B and must not be reapplied.")
     update_response(
         "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv",
         "JLC06161H-3313 public standard and controlled project geometry accepted for EVT",

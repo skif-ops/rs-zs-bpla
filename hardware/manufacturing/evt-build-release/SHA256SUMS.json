@@ -1,363 +1,533 @@
 [
   {
-    "path": "PCB-MAIN/drc.json",
-    "bytes": 861377,
-    "sha256": "84467c77ce8aba41364b051df40c7ba42d7b6cb6a633a5bd7c583145ac99258e"
-  },
-  {
-    "path": "PCB-MAIN/drill/PCB-MAIN-drl_map.pdf",
-    "bytes": 26940,
-    "sha256": "116a6ecdfb4a5330fbf558c5ad6d5156ac8a1bc77ca61f0b2fc9b7e555ada93f"
-  },
-  {
-    "path": "PCB-MAIN/drill/PCB-MAIN.drl",
-    "bytes": 5590,
-    "sha256": "dec9c0230387d4c44f2557130c214d5c099defec68c262854ae8fa3676c5d481"
-  },
-  {
-    "path": "PCB-MAIN/erc.json",
-    "bytes": 2908,
-    "sha256": "f81b7fab27f5abb9a020b8a710723f3999c0dfc520ecfb84d3b49c2b37ee5b0d"
-  },
-  {
     "path": "PCB-MAIN/FAB_NOTES.md",
-    "bytes": 1006,
-    "sha256": "218cbe94efcdb5653268ce50f57946d5835c4086f83ee63f5edf7209a5ecf005"
+    "bytes": 655,
+    "sha256": "2beeb3a2975831505ef3e583a940566b7d36513e17ad9f463596898f45b5e10e"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-B_Cu.gbr",
-    "bytes": 27353,
-    "sha256": "5408923a04fad636026665c16657039c32e74d721c1f69e328dcd1ec3b78182d"
+    "path": "PCB-MAIN/order-package-rev-d6/00_Задание_PCB-MAIN_на_изготовление_и_монтаж.docx",
+    "bytes": 16381,
+    "sha256": "17dae42135f8049be52e6129ec76659467299c0655970562f439e1da946ecd2e"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-B_Mask.gbr",
-    "bytes": 3849,
-    "sha256": "73518b5887e223ebd7e3854f8cf80ce3481647bbf8c87bdf52c692d4b5f6b492"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-B_Cu.gbl",
+    "bytes": 102131,
+    "sha256": "086ef76da6ebe7fc9a78221197e626c1f4b870a137a9144feb8f5ab075c4ed2b"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-B_Paste.gbr",
-    "bytes": 453,
-    "sha256": "4e4cccab8b069779b34733fd45daa2cbc5751e66683649d699f459e7e1bdc448"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-B_Mask.gbs",
+    "bytes": 3163,
+    "sha256": "1dfbbf506338c49f9bab9c918c5aae2404f58db01ff7fa38d0704206b1ab6c4a"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-B_Silkscreen.gbr",
-    "bytes": 454,
-    "sha256": "201388e94269c28184ef6b8879b9ceaac1b16e99b7daafbcc526cba74c5a81f9"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-B_Paste.gbp",
+    "bytes": 497,
+    "sha256": "22919eb3cae7468c7e743126f351fdcd340c435a926dbee41460e534ba592277"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-Edge_Cuts.gbr",
-    "bytes": 923,
-    "sha256": "8619581edc6ebda318a80311975320cfe7fd77b1da0dc92a99023b07f69a14db"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-B_Silkscreen.gbo",
+    "bytes": 3175,
+    "sha256": "548c7213f8f029165bcb6158a2311dc37b7b925a882be6fc85f6f8e623f1483a"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-F_Cu.gbr",
-    "bytes": 115388,
-    "sha256": "949811c9e5dbe496d504aeb390df5a29d24da71493d780d1c8a51e89aeff5ee6"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-Edge_Cuts.gm1",
+    "bytes": 998,
+    "sha256": "3a9d37b49fcd5b607f05e031c52e7cc971c20e0ef4102b5fbac994b5b9c6242c"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-F_Mask.gbr",
-    "bytes": 38174,
-    "sha256": "995b41a70955b6e0ee91394bbf4096222732c44d7e967ee95c5fe241c446462a"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-F_Cu.gtl",
+    "bytes": 244155,
+    "sha256": "bc4128874e5ab2b58d74d4d19280f43c22c90258436c415c1c27bcc65270e6d7"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-F_Paste.gbr",
-    "bytes": 35745,
-    "sha256": "1a7b573a54ba6ac2f418a9ae831cea151e7ad5cdb16444d3c555c3c236f0d1d5"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-F_Mask.gts",
+    "bytes": 39415,
+    "sha256": "44722e3574267e774a9a752314222ec6286c7baecae9b47fd8bfebde28c04a5a"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-F_Silkscreen.gbr",
-    "bytes": 439988,
-    "sha256": "3827a37feb5d60531614e687b3a66acc5d841b757060bbd87f059b78f3fd87d1"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-F_Paste.gtp",
+    "bytes": 37561,
+    "sha256": "d05dc59d72ff7afc4c2c20a0d2eeeb07f4931d52c73de77a8cee0da196a93d5c"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-In1_Cu.gbr",
-    "bytes": 18034,
-    "sha256": "146c51dabfcdaebff6462eeea50be3dfc6389229ffc64b7b81e92a2bcb268bcd"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-F_Silkscreen.gto",
+    "bytes": 56239,
+    "sha256": "fe72525ce647a713902d082ff3c6b5953751eed38e32a4da44af8f41fb098e88"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-In2_Cu.gbr",
-    "bytes": 18034,
-    "sha256": "d87428b689c26cf5fb7620d406bc06f64c46922bcc7cc85de02ce89cd61daef5"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In1_Cu.g1",
+    "bytes": 834467,
+    "sha256": "2955cb9cc26efb435d9726a8d2a2126a57239e275932160be41d3453b5c50438"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-In3_Cu.gbr",
-    "bytes": 18309,
-    "sha256": "ea00361f0da8f69655ed6985dfd9f8dc31a5cb317367b1a26905adb72d63805b"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In2_Cu.g2",
+    "bytes": 713199,
+    "sha256": "7346e0bfc57b683fe2f9b649bf362a65529004e3e599e2fb3e1820690ca19fa9"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-In4_Cu.gbr",
-    "bytes": 18034,
-    "sha256": "ab8b084cf06b7fad038e960b293ac4e9f6281a00c0b2b3cb5719521de44dd125"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In3_Cu.g3",
+    "bytes": 99543,
+    "sha256": "60bc6e05f0e740a8f65b15b4b42552cf8c8aa7bb902a3d74811db3bb594d219b"
   },
   {
-    "path": "PCB-MAIN/gerber/PCB-MAIN-job.gbrjob",
-    "bytes": 4418,
-    "sha256": "3851c9fd939d0a1e0929e5b82d032f1e01460d52a4d64bacfdab33bc1d65f2d3"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In4_Cu.g4",
+    "bytes": 817839,
+    "sha256": "c3b108686103bced3649572f2ef205092901ab830d98282f6a401a7ebbbf4f90"
   },
   {
-    "path": "PCB-MAIN/native/fp-lib-table",
-    "bytes": 645,
-    "sha256": "1c47fb4609ed49f15a299ed2eb80d6538bdbc0082ec7471c483750a35cedefa3"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In5_Cu.g5",
+    "bytes": 49953,
+    "sha256": "82fac5fa07d9148626387f59083e4a216bdc9a12bbbbda01f352c9127e5aace1"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.kicad_sym",
-    "bytes": 365058,
-    "sha256": "565d255cb6d45209be3b68fe5be51c5d897e66b5e4aba40c6c3197b30060eb56"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-In6_Cu.g6",
+    "bytes": 655192,
+    "sha256": "610e73358a8f68151085a0403a6a8e5745d5664462814008c38441522a1dbd3f"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Abracon_ABSES5AF_1109-5.kicad_mod",
-    "bytes": 1063,
-    "sha256": "23c81edc4a45c68fcea775040f042dc2101888c80a00e1a37e5a04b56f7ccc90"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-job.gbrjob",
+    "bytes": 3310,
+    "sha256": "afe379e3ee84e9bcc2060b5eb4bef91f9ac20f31e6894b48bed817d5ea453720"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Ebyte_E22-M22S_Castellated-22.kicad_mod",
-    "bytes": 2590,
-    "sha256": "e701867e072a198f83a737d541de6424eff3c309688a0cbbad7d68150309c6e7"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/JLCPCB_OFFICIAL_CAPABILITY_SCREEN_REV_B_105.json",
+    "bytes": 3597,
+    "sha256": "ef53d6031c02ffc53a7908a6c502d68d890f7caebf164ebff2f0c5dc0a45db3c"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/GCT_MEM2052-00-195-00-A.kicad_mod",
-    "bytes": 2107,
-    "sha256": "7f3368cfb98d68922679433b2c9e96ef129b8976b1fa233df531d60ac049f4bb"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/PCB-MAIN_netlist.ipc",
+    "bytes": 147051,
+    "sha256": "fbade881acb871240a18cd6bb9351e7c749e68682aff311cec83365a71212177"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Hirose_U.FL-R-SMT-1.kicad_mod",
-    "bytes": 1186,
-    "sha256": "3a5029441591fb1ea9974d5450449593fb8f374d88dd749d9dce0e5d28ff32ae"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/PCB-MAIN_ИМПЕДАНС_ТРАССЫ_CONTROL.json",
+    "bytes": 1651,
+    "sha256": "f643a699370aa18e09b5af6e98896c89ea7b18dca7228b5f93d5feb29b4028bb"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/KEMET_T52X_D_7343-31_DensityB.kicad_mod",
-    "bytes": 1093,
-    "sha256": "a5ee0ff5fdfd9b7ce2197f35333062d0023fcccd6320431719b5c84f946c39d7"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.csv",
+    "bytes": 2920,
+    "sha256": "a39a03a36a220ee220d0603dfa47d3d4f971c5e03c99b01b4087c18b9491a798"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/LT6000_DCB-7.kicad_mod",
-    "bytes": 1292,
-    "sha256": "6284c99e8302bd671a8eb20d1e732ed009c708e85892703b54c51b839532e497"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.xlsx",
+    "bytes": 6689,
+    "sha256": "8d630b76ae91e9cb2fc4fd89cfdfe7d57e4751192f8ba7e38f081937f01043c2"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Molex_43045-1202_MicroFit-12_RA.kicad_mod",
-    "bytes": 2105,
-    "sha256": "b495c6001746670a5d37afbb3de9fcf49392fc18e0a72528feccc44b8d276cdb"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/PCB-MAIN_Официальная_проверка_JLCPCB_RU_EN.docx",
+    "bytes": 16787,
+    "sha256": "ff10bb54f7313aa0200d61e1a2ad9bb3de3a625f3046daddeccc50d91ec32dee"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Molex_504050-0291_PicoLock-2.kicad_mod",
-    "bytes": 1134,
-    "sha256": "c0143595ccb60dfca65b822bfb94248ab2b37fb98059d20daf9141034457ac56"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/STACKUP_REQUEST.json",
+    "bytes": 4340,
+    "sha256": "38884e023ba0ea6ca44321a65920f17bb58f86a35c9ba9d37bb50e0cf733b238"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Nexperia_MMBT3904_SOT23.kicad_mod",
-    "bytes": 1393,
-    "sha256": "09e16af7131d59096cb68c093daadf650d453e022697a5d638fcab151493da6d"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/VIA_FILL_CAP_76_MAP_RU_EN.pdf",
+    "bytes": 90886,
+    "sha256": "6ba3ebae05c9b10a6035a4b60a994e9b06f6d7ae302969dc1f30b2b46bcf46a9"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Nexperia_PESD5V0S1UL_SOD882.kicad_mod",
-    "bytes": 1347,
-    "sha256": "f790403b5af284ff7fdecc0033bc2f96097849d26dbb576e2354b25eb731e567"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/VIA_FILL_CAP_76_ORDER_CONTROL.json",
+    "bytes": 2042,
+    "sha256": "8885bd523b0ba1eb38ec2ab35b46bfd4a0eed156d2d215c0f5f828da3efca78b"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/PESD5V0C1BSF_SOD962-2.kicad_mod",
-    "bytes": 814,
-    "sha256": "eee737e3ea2c4b9af01d0d022f2a7bf5a66c0a080513965dc11ccfc078d3a112"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/VIA_FILL_CAP_76_ORDER_REV_D.csv",
+    "bytes": 5434,
+    "sha256": "cb03392955c226c500710920d463e3a78ed31f38d9f86b3978e7521209af50b7"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Quectel_BG95-M3_LGA-102.kicad_mod",
-    "bytes": 12384,
-    "sha256": "48780a92b91648b3cafe42922aef9853e85db8bd5e4763e3975a02968f0ff179"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Сверловка_Excellon/drill_report.txt",
+    "bytes": 1230,
+    "sha256": "e90acca147e57f960de662f8f73164e048b121cf4f3f679751d36d3344ab6ed5"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Raytac_MDBT50Q-P1MV2.kicad_mod",
-    "bytes": 6967,
-    "sha256": "f19787598f9c1d2e892b3d3850804f5e56ba25dde8daccbba842bab4854bca44"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Сверловка_Excellon/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-NPTH-drl_map.pdf",
+    "bytes": 15043,
+    "sha256": "e8f6e6d0969567fc4a14bccfb323acbfc9bce26200b04eb32dd50226c2588d02"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/SiT1552_JE_CSP-4.kicad_mod",
-    "bytes": 1174,
-    "sha256": "f89d41dc8b07610954dff6672c3566eb27c37fe08c90b22b5e6c00c0961d34df"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Сверловка_Excellon/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-NPTH.drl",
+    "bytes": 812,
+    "sha256": "2606dc10e94e1549f56094f57538e34d012a52afb25948465ab1bdb44cd1faaf"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/ST_ESDALC6V1-5P6_SOT666.kicad_mod",
-    "bytes": 1402,
-    "sha256": "473a3f69b1daf6751a860187ed50d44f738bbc3f626f0edd6fe0f445fdd49ed2"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Сверловка_Excellon/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-PTH-drl_map.pdf",
+    "bytes": 60518,
+    "sha256": "013dcdc21bdad77f2fb5ffa5009a9c3e76bb95413d9f6e17dfd71b2329d223e9"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/ST_LIS2DW12_LGA-12L.kicad_mod",
-    "bytes": 2513,
-    "sha256": "71613d02186e56ce03941c394acbea3404e705758c56bee149b452e70d701be8"
+    "path": "PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/Сверловка_Excellon/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-PTH.drl",
+    "bytes": 13715,
+    "sha256": "acbe058466f7c338929750e3a825b5a712326d639b426954b3ba6d2a3a6825bc"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/ST_STM32U585_LQFP100_1L.kicad_mod",
-    "bytes": 9471,
-    "sha256": "fad5eff80bb5889c3f3443fd4b800b83a58f5639527ac8b863cf8e1d5b53865f"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_BOM_MPN_AUDIT.json",
+    "bytes": 777,
+    "sha256": "3d4f800fb6ec00dcbc246b4f62aae5fb914cc8a9350cc787e455d87de7d7616e"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/STTS22H_UDFN-6L.kicad_mod",
-    "bytes": 1301,
-    "sha256": "e06136e5f2ebd67798141ff1ef99db94d895d139d20b3c98a671e34bbbfa277f"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_BOM_PCBA.csv",
+    "bytes": 21318,
+    "sha256": "aa8339f003e026e27c586497f600bb307c4e4bd4524c5f67d3f2fa0b30758571"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/TE_2336582-1_NanoSIM.kicad_mod",
-    "bytes": 2130,
-    "sha256": "8457cd97b6a147c3a8f2a3968f407aa6fe8af41063b6f4ff6a0275817ac9e8e3"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_BOM_SCHEMATIC.csv",
+    "bytes": 13656,
+    "sha256": "abed1f760a57d07d101fbcc92fdde876f2cee929bd23593d967c0bac9ecf0246"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/TI_DBV0005A_SOT23-5.kicad_mod",
-    "bytes": 1604,
-    "sha256": "3417ce9959d5ec4c01c77ca85f372fdaa8caab0343b2875aa841c041110589fc"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_DNP.csv",
+    "bytes": 884,
+    "sha256": "2c3f02dfe7f63341fafdbb294c59a07a6aec9c33faedb898fc1a79c74a2a5d6c"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/TI_DQA0010A_USON10.kicad_mod",
-    "bytes": 2503,
-    "sha256": "3c47b238566ba213cd0acb75a95c6c2d938b3669d26a75fd73fcd16dd30eab16"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_OFFBOARD_STATION.csv",
+    "bytes": 53,
+    "sha256": "f47fcb29477a1bd5040b02a1bcf908e951e983dedafebf3152ea974342cf227b"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/TI_DRL0006A_SOT6.kicad_mod",
-    "bytes": 1742,
-    "sha256": "58309ce43d3c4812b7ab925f0245d1d8ca9080c7bde0fa4e959b891054deaa5e"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_PLACEMENT_INDEX.xlsx",
+    "bytes": 14544,
+    "sha256": "5220e2fa8b0fb2309d1ba4fc8557a18960897132b14fd5d48d4b319dadad4c94"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/TI_DRT0003A_IPC_Candidate.kicad_mod",
-    "bytes": 1297,
-    "sha256": "b82af2a8e0eb455b430115ea8d9f2c4aeae30cc71de92823573d4f2d092bc6b9"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_POS_BOTTOM_ALL.csv",
+    "bytes": 369,
+    "sha256": "04bda2bfc7419a6220ef46af8150a1bb58c692a128c1305db6762ef612d02558"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/TI_DYA0002A_SOD523.kicad_mod",
-    "bytes": 1137,
-    "sha256": "05734890d74ced4990348df184cd922826415c54c9a919e069b507fffe793b5c"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_POS_TOP_ALL.csv",
+    "bytes": 15663,
+    "sha256": "42f336374e482ad5345bfe7fb5a2aa61cf64892dd4f793596faabc156ba77435"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/TI_PW0014A_TSSOP14.kicad_mod",
-    "bytes": 2908,
-    "sha256": "c7ac553b05eda1a2d9999dc2e8f73c2c2de2e96f1bea62d58a3426c8b811ca7c"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_POS_TOP_PCBA.csv",
+    "bytes": 14100,
+    "sha256": "e954e9ef1b5f504709b67a5ee9e019a1586df656f9d61c0c60b9c2fb34915c7d"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/TI_PW0024A_TSSOP24.kicad_mod",
-    "bytes": 4416,
-    "sha256": "b16e058a945d70e228291e0d1d0de09a714e3059b74a99925893b8ccc004d16f"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_POS_TOP_SMD.csv",
+    "bytes": 4852,
+    "sha256": "6c28dd31d49e1b82b9cac5f8a8a0dff023d810e11e9ea7a9a73c2b4d2192ab02"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/u-blox_MAX-M10S_LCC-18.kicad_mod",
-    "bytes": 2008,
-    "sha256": "9c38091a434fb82f84dac437901e0d544c8b2be6e5aa4ee0cfced36c6aa95d87"
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_SCHEMATIC_RU_EN.pdf",
+    "bytes": 1431774,
+    "sha256": "38dce9b10ca13520b0b02105f43bb5f12764b2d078af72b38d74fec8867e1521"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Vishay_Si1016X_SC-89.kicad_mod",
+    "path": "PCB-MAIN/order-package-rev-d6/02_Монтаж_платы/PCB-MAIN_Сборка_и_DFM_RU_EN.pdf",
+    "bytes": 967896,
+    "sha256": "672f9671e8f55a0fcbf991ea0ffdfd17ac28331a150200451f6959df8b85b62a"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/board_identity_105.json",
+    "bytes": 1666,
+    "sha256": "467091c7587d98ec3aa38d841813b0901a4af63dee30355140d9513aeacbc78b"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/drc_candidate.json",
+    "bytes": 24324,
+    "sha256": "1223e518354ec6199d18e17f674676fbd9800ff72b18fc8d879b8d8e7e3a2b60"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/drc_schematic_parity.json",
+    "bytes": 380734,
+    "sha256": "a831466b94c69227f76a9550c3945eb8e1ad5a996b63280d2d0131dc0f8b9559"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/erc_candidate.json",
+    "bytes": 2968,
+    "sha256": "ccfd776b599c3f912a29eb9fc450df0b8ba5ed415bd4a69d71d0a9f93a32c280"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/fab_generation.json",
+    "bytes": 5714,
+    "sha256": "0d990dc3116ec61acd64a0db52c6946d3c23ba405c1d766b750b9a5adeb87864"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/SUMMARY.json",
+    "bytes": 3707,
+    "sha256": "966535e098ed58875343b14b38e22a70a7c10b787f55bc1ca271f53ac6766402"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/via_in_pad_105.json",
+    "bytes": 8436,
+    "sha256": "3ced3260ffc19b912490565f8c5360cfa02ce35234c2700826d9f62399630c5c"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/fp-lib-table",
+    "bytes": 652,
+    "sha256": "277861f9341d3cc63cb316c0e7f6ed1fdfe1f73e900643a8497310268ae134da"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.kicad_sym",
+    "bytes": 374316,
+    "sha256": "32ddeb1c079f3ca088b348f18d7c8c1f10e4337336a09a625ff5a9bcf92887ca"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Abracon_ABSES5AF_1109-5.kicad_mod",
+    "bytes": 1080,
+    "sha256": "a0fcec650580ef2eb0d676808642fda4fb6c393d011fb293ceb75e9fea494213"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Ebyte_E22-M22S_Castellated-22.kicad_mod",
+    "bytes": 2624,
+    "sha256": "78d7f5f8001c5e5b29b81e193ed4f20eb5f21b3e57d87c191b872f7e0d9241b1"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/GCT_MEM2052-00-195-00-A.kicad_mod",
+    "bytes": 2132,
+    "sha256": "30ae45bf29fd39025116042df088ca8bead0ca5f4665954679d499f797062043"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Hirose_U.FL-R-SMT-1.kicad_mod",
+    "bytes": 1204,
+    "sha256": "18ed19e1a2089240f24d5a43e5b1ff80f6b7d973fe109bd550355057bd53257d"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/KEMET_T52X_D_7343-31_DensityB.kicad_mod",
+    "bytes": 1108,
+    "sha256": "172865814a10b4f860a33ef0a4cc2ce535b28396088ffc04d5b40c38df98206e"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/LT6000_DCB-7.kicad_mod",
+    "bytes": 1311,
+    "sha256": "3ecf0c9c0844c025f1f165ad04016876fd096bc4a1a10c7596a4a1b1d9822710"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Molex_43045-1202_MicroFit-12_RA.kicad_mod",
+    "bytes": 2131,
+    "sha256": "891f80a1de972d1333ed4b663ab2cebce60b42cd12367b4d7c77670b983ceb96"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Molex_504050-0291_PicoLock-2.kicad_mod",
+    "bytes": 1150,
+    "sha256": "db7cb9fa5da21cff38a669873a895912cd705a7c93d56c287dc4c07f2db1e729"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Nexperia_MMBT3904_SOT23.kicad_mod",
     "bytes": 1412,
-    "sha256": "3256048c59e1758c1e36d1c545681406241c8f2f283997033a9ceabf20743e0c"
+    "sha256": "20c82de3ea15ea7f66a81f28d0b202b46e9157154ae8fb79d988eaeef1c9cc07"
   },
   {
-    "path": "PCB-MAIN/native/libs/DioneyaMain.pretty/Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",
-    "bytes": 2900,
-    "sha256": "78a67dda268e971a3463c41a8fb8170c3c59a1d3af145c65ed6b7212d1d8af83"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Nexperia_PESD5V0S1UL_SOD882.kicad_mod",
+    "bytes": 1364,
+    "sha256": "36a9aca4678f445b87b9aa67e441e962b54c254d0042e36c7aa840317b80c216"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN.kicad_pcb",
-    "bytes": 700330,
-    "sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/PESD5V0C1BSF_SOD962-2.kicad_mod",
+    "bytes": 830,
+    "sha256": "734f1f35586afda3ed06201406a86650ae7b801f8dbff87124c0d9a10eac055b"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN.kicad_pro",
-    "bytes": 441,
-    "sha256": "236a25b84abc40de5cb67464d9ee46cceaa247384d4710c84c93990a98961897"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Quectel_BG95-M3_LGA-102.kicad_mod",
+    "bytes": 12499,
+    "sha256": "6b9bad638383a4e84bebf1d12ddde2dffd8fbba7902e6151ca61fae030a501ac"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN.kicad_sch",
-    "bytes": 76219,
-    "sha256": "810a3aa16d88e4179cf84a7bfbfd9c29d1a5d95066a75a6e2517f4d1d30a0918"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Raytac_MDBT50Q-P1MV2.kicad_mod",
+    "bytes": 7068,
+    "sha256": "503228390d80eb8b74f63a8d125570abac27614f92f9277bc053478db5145628"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_01_POWER.kicad_sch",
-    "bytes": 18947,
-    "sha256": "4c163f8c88b42a4ffd35e4b6cb27acd32753c1fa2004acb194084997c8de51c0"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/SiT1552_JE_CSP-4.kicad_mod",
+    "bytes": 1196,
+    "sha256": "4125e09295de0d33f015578e570cab19266a4eb98ce61a6931316b3f30bd3254"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_02_MCU.kicad_sch",
-    "bytes": 137127,
-    "sha256": "e2f13a507e66a9658d65dc628897db0eb824d46216fcefe7f7f8e8b153d8e405"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/ST_ESDALC6V1-5P6_SOT666.kicad_mod",
+    "bytes": 1421,
+    "sha256": "fc0869344500fb3b9c3ff56142f725f278a9695eab0d7c675811f770aff16709"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_03_AUDIO.kicad_sch",
-    "bytes": 116519,
-    "sha256": "e359b46850186940efd914460eaefa8e6f292d0cddaae91ad92ae1f99d5c2516"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/ST_LIS2DW12_LGA-12L.kicad_mod",
+    "bytes": 2537,
+    "sha256": "3176dd6f958e9f81861b985580974b8e33ef54aa1ffc98f4ff90e4d7b8dfe87c"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_04_GNSS.kicad_sch",
-    "bytes": 77243,
-    "sha256": "0741780507d2c4b5907d8ab0b00807eb2b1ecb2becf899e6246d3a4787b1e38c"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/ST_STM32U585_LQFP100_1L.kicad_mod",
+    "bytes": 9584,
+    "sha256": "55ed1ee76a94e5692b32c6c2dcc1d3945bf3f5891893a17847f8045351037292"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_05_CELLULAR.kicad_sch",
-    "bytes": 340281,
-    "sha256": "b944b2ae8eed85e9436577e62beac1e0fdd6a6831dcc292f2e2bf37058bdecd4"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/STTS22H_UDFN-6L.kicad_mod",
+    "bytes": 1320,
+    "sha256": "a9f27fc85b2996a756cbda912f27f31050b4e006bf8e8a408886957919529b15"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_06_LORA.kicad_sch",
-    "bytes": 70721,
-    "sha256": "733c2996581794b49eb7061019c9136c53476750a251e0499e37a849a05db155"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/TE_2336582-1_NanoSIM.kicad_mod",
+    "bytes": 2159,
+    "sha256": "37e0b523390fa877fdfa9b1da39ca5d510bb91e9eb59a5d209d149c8b4ab840b"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_07_BLE.kicad_sch",
-    "bytes": 59524,
-    "sha256": "af66b777d65d86645893dd1966b6980045a2c444b9d06e6979bc676cfb72f7fd"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/TI_DBV0005A_SOT23-5.kicad_mod",
+    "bytes": 1622,
+    "sha256": "d26f0074d523c8ef1cf3a970d6853e1e5c19dfad71886b7db946006a70576213"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_08_STORAGE_SENSORS.kicad_sch",
-    "bytes": 166043,
-    "sha256": "24a76c439aa3f7ad22b3f2b761d8458b852b190ea62169647ab0d150a00260aa"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/TI_DQA0010A_USON10.kicad_mod",
+    "bytes": 2528,
+    "sha256": "05b10f3e443bbeaf8406ed0ef539182befdfe7a47039e1f5c3cda94e8b22c57e"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_09_CONNECTORS_TEST.kicad_sch",
-    "bytes": 73432,
-    "sha256": "fe24ad6ccc93310acd2bede9d9f5839bfa825a857bef9e9319ec1b6ef3ec658d"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/TI_DRL0006A_SOT6.kicad_mod",
+    "bytes": 1761,
+    "sha256": "21d155068a7577f747cd0b715c2bbd663629f754f3b7219f512a9f9ebca1faff"
   },
   {
-    "path": "PCB-MAIN/native/PCB-MAIN_capture_manifest.json",
-    "bytes": 12022,
-    "sha256": "8dbfe1a51af3690e9b5d4f7e67ace397a9daeeff548708c882a97fa814485ac4"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/TI_DRT0003A_IPC_Candidate.kicad_mod",
+    "bytes": 1313,
+    "sha256": "029640292c4fef5acb69c3dfbccfbd687213517683d2b53164c817b7c54cf493"
   },
   {
-    "path": "PCB-MAIN/native/sym-lib-table",
-    "bytes": 186,
-    "sha256": "06b7072dc084b7bfabb1ae955f30bf4972df14ac56d471186bef75949aeb8f63"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/TI_DYA0002A_SOD523.kicad_mod",
+    "bytes": 1152,
+    "sha256": "9dc185dde3f32228032a92d8179f2f525da4dabbef411c6164f27d4497f43ebe"
   },
   {
-    "path": "PCB-MAIN/PCB-MAIN.d356",
-    "bytes": 104461,
-    "sha256": "e6ad0bbf1e33cd64729be2d2f3c9f2e6018fdab113b73bad078d7889ecdc36d6"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/TI_PW0014A_TSSOP14.kicad_mod",
+    "bytes": 2935,
+    "sha256": "eb572ba9b46f623848af2383fcaa6aaf4e81e691d9a5ea0f24926be00a1610c1"
   },
   {
-    "path": "PCB-MAIN/PCB-MAIN_board.step",
-    "bytes": 87094,
-    "sha256": "46be08463fdc450b803506f1ff63c0af9f283660d9eb680c31294a28da3ef2a7"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/TI_PW0024A_TSSOP24.kicad_mod",
+    "bytes": 4453,
+    "sha256": "90663262b3d7babf8810d9250aa759b26b4d33172f9606d6292dcd528785eddf"
   },
   {
-    "path": "PCB-MAIN/PCB-MAIN_bom.csv",
-    "bytes": 1805,
-    "sha256": "d40a5ea12151e19d24b672bf67f46e8d40860f3085113723bf37b632664a63b9"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/u-blox_MAX-M10S_LCC-18.kicad_mod",
+    "bytes": 2038,
+    "sha256": "c71d1d52e56d160d4359e22a19ddd38ab638663a6c8be759cda4880729823815"
   },
   {
-    "path": "PCB-MAIN/PCB-MAIN_jlc_bom.csv",
-    "bytes": 21252,
-    "sha256": "2bda3d13d78f43651b965b8fdd1ef12513eacee5a6b704d3077a869c6bdebc5d"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Vishay_Si1016X_SC-89.kicad_mod",
+    "bytes": 1431,
+    "sha256": "a8e5bd47ba386bea02632db7ae52e0a5dcc76579b3cc98a1cd2fc54ea50568a4"
   },
   {
-    "path": "PCB-MAIN/PCB-MAIN_jlc_cpl.csv",
-    "bytes": 10055,
-    "sha256": "39ed1a76ff3705397a7613d653bcc6b14b8c6764b83309d73d84cf01a3624cac"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/libs/DioneyaMain.pretty/Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",
+    "bytes": 2929,
+    "sha256": "56a77edb9a2b9b717a7d05d3df6623b53bedebc86638c18183872f1a7bb57b55"
   },
   {
-    "path": "PCB-MAIN/PCB-MAIN_pos.csv",
-    "bytes": 15753,
-    "sha256": "51041f0f2e9fa75d6315ebe0b608687bc24882796b9a5c864dc6419e72a40d31"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN.kicad_pcb",
+    "bytes": 5155485,
+    "sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f"
   },
   {
-    "path": "PCB-MAIN/PCB-MAIN_schematic.pdf",
-    "bytes": 1418249,
-    "sha256": "11c7daab1987f5302b22a565fd89ebeb566aece5415b2a9427b07bdb7c7faa49"
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN.kicad_pro",
+    "bytes": 10080,
+    "sha256": "bcc87d3601f84fc123100f1f3761a7d604ace48b30da7b1097583944ec6f4f41"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN.kicad_sch",
+    "bytes": 78471,
+    "sha256": "9b042ab9ca9df64bbd3aa9fa123b00df24164768d9f202aa1c53e4fd916a7782"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_01_POWER.kicad_sch",
+    "bytes": 19552,
+    "sha256": "af3b9845cec4c44b3d7deb0d0bef3afd6d9ffb569a1a232ce44e0039130a9de5"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_02_MCU.kicad_sch",
+    "bytes": 140788,
+    "sha256": "f974839f2081bf87b30be390ec3563e1b75e26afd1137d751e6afdf86e0d6995"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_03_AUDIO.kicad_sch",
+    "bytes": 119698,
+    "sha256": "c71c1d2e4645f65119d8f3f0cbab0db7563cb1439b18f16f9736f8af1d162e7d"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_04_GNSS.kicad_sch",
+    "bytes": 79422,
+    "sha256": "50cba131dfbf0758ca8f626f0a298843a0d7e244dfc9c8724bd091ac18582b8c"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_05_CELLULAR.kicad_sch",
+    "bytes": 349314,
+    "sha256": "3a2e5467f366d08992151beeaeb9702f655831c258548ead1f52774a970e2a55"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_06_LORA.kicad_sch",
+    "bytes": 72738,
+    "sha256": "be60d753f8a276ad2764cd624152f432ba161b94ff341f7e1c3671e029f891fd"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_07_BLE.kicad_sch",
+    "bytes": 61091,
+    "sha256": "896441f058a01038c5ad55419905641b1c22e2f70bb7fb6731ed5b87534d5052"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_08_STORAGE_SENSORS.kicad_sch",
+    "bytes": 170584,
+    "sha256": "4dba8380de8950e74806c2dc3794192971f77c55f3de2d97d24a3e46f6ae332d"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/PCB-MAIN_09_CONNECTORS_TEST.kicad_sch",
+    "bytes": 75490,
+    "sha256": "8a1b3c6c0c608a63083174a2ad76e878a5cfa168634c4bcb644f23b7248d0b2c"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/03_Исходники_и_контроль/Проект_KiCad/sym-lib-table",
+    "bytes": 190,
+    "sha256": "0004bb67b0eb4fd7dadc457a76c84a2c8cda2324642265e5347444d1c97ac1b0"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/STATUS.json",
+    "bytes": 251,
+    "sha256": "21964cb5d38ff4261141b0289015b7053fc3765f032bf0fa4ab4d74c459dee9f"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.pdf",
+    "bytes": 494397,
+    "sha256": "9bdfc229624f4c936cbad78e78933c1d9d8cecad2e5aef8338d33eea847ebc5d"
+  },
+  {
+    "path": "PCB-MAIN/order-package-rev-d6/ПОРЯДОК_ЕДИНОЙ_ПАРТИИ_CONTROL.json",
+    "bytes": 1368,
+    "sha256": "8a075df8482f7f2538260cb17e22d65ef1a932ad5d07b661d994541fc79b336f"
+  },
+  {
+    "path": "PCB-MAIN/README.md",
+    "bytes": 867,
+    "sha256": "20ed22961da0b1ec49a340154e366e5d3bf4b1316bc4b4d707aec65b4efe00c3"
   },
   {
     "path": "PCB-MAIN/STATUS.json",
-    "bytes": 730,
-    "sha256": "4daacaca5b983393e4bc90b0db06adf75f5368c5ef423bd96d01f14144ff1768"
+    "bytes": 1930,
+    "sha256": "19672e309d5a8c558ad841a06730522c9f888e143e07fc2781e6e40e8b0fae8f"
+  },
+  {
+    "path": "PCB-MAIN/verification-current/PCB-MAIN_8L_NATIVE_DRC_2026-10-16.json",
+    "bytes": 23642,
+    "sha256": "725bdbe1e74c6188096cb84509aec8a5e4af469fdd4b4e624bc27008d074bb60"
+  },
+  {
+    "path": "PCB-MAIN/verification-current/PCB-MAIN_8L_NATIVE_DRC_PARITY_2026-10-16.json",
+    "bytes": 375888,
+    "sha256": "4c78a1b7fe6da93a04110477ca98c7fa537da091d57e43b24900f9933ba05c12"
+  },
+  {
+    "path": "PCB-MAIN/verification-current/PCB-MAIN_8L_NATIVE_ERC_2026-10-16.json",
+    "bytes": 2908,
+    "sha256": "301a698fa2cae21277c02734948d67ea261b89e283f8b5210aec101d5b2510ec"
+  },
+  {
+    "path": "PCB-MAIN/verification-current/PCB_MAIN_8L_ADOPTION_DECISION_REV_B.json",
+    "bytes": 1846,
+    "sha256": "fc6bd27cb2c4303077aa4530856cd7a566ad9f15583ed01a828b479be46db4a0"
+  },
+  {
+    "path": "PCB-MAIN/verification-current/pcb_main_8l_adoption_rev_b.json",
+    "bytes": 925,
+    "sha256": "b846233999e60a7ef0bc8b6f1894b3c1be6dbba18942105ac7c220cf68829bc9"
   },
   {
     "path": "PCB-MIC/drc.json",
@@ -756,17 +926,17 @@
   },
   {
     "path": "README.md",
-    "bytes": 960,
-    "sha256": "e362167b43d6ab29e2c51d5410dd1dc2d8c997aa6a2b72b25d4f180bf21e8f6a"
+    "bytes": 943,
+    "sha256": "731ff5fa84d7b14addd7d614a3439cf9303e30a70b21ae4bc4f83cf84dcb4c83"
   },
   {
     "path": "snapshot_status.json",
-    "bytes": 275,
-    "sha256": "e524e90a158f0771faa2abb6c8a14a79b59f79b2afd3b70d6bb85612e3043b0e"
+    "bytes": 570,
+    "sha256": "d9d38063c1a58fd1c0421a475b951427ea5224839d93b483166d804a30e0a624"
   },
   {
     "path": "SOURCE_INDEX.txt",
-    "bytes": 66585,
-    "sha256": "1bc3bc84d25cc213ee400dcb596d1c18f64a4818afd870c3de2c055c97e5fece"
+    "bytes": 66994,
+    "sha256": "20ab13d1303c48f684c00de59652b90d3e6fc912ecb72562ad8b9b70582c80df"
   }
 ]

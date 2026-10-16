@@ -1,13 +1,15 @@
 {
-  "schema": "dioneya-main8l-altium-production-candidate-v1",
+  "schema": "dioneya-main8l-altium-primary-production-candidate-v2",
   "date": "2026-10-15",
   "release_status": "PRODUCTION_CANDIDATE_HOLD_FOR_DFM",
   "manufacturing_authorized": false,
   "source": {
     "git_commit": "592f955d88570dcbb5eb41d59848db05aac84f88",
-    "git_path": "hardware/kicad/candidates/PCB-MAIN-8L-COMPLETE-105",
+    "git_path": "hardware/kicad/native/PCB-MAIN",
     "revision": "B",
-    "copper_layers": 8
+    "copper_layers": 8,
+    "authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv",
+    "adoption_decision": "hardware/PCB_MAIN_8L_ADOPTION_DECISION_REV_B.json"
   },
   "altium": {
     "compile_success": true,
@@ -59,8 +61,10 @@
   "open_gates": [
     "Three Altium Net Antennae via warnings require design disposition.",
     "Fabricator stackup and controlled-impedance confirmation are open.",
-    "The global procurement BOM still identifies PCB-MAIN as six-layer and must be reconciled to this eight-layer candidate.",
+    "EMS/fabricator quotation and checkout must use the reconciled Rev.B 8-layer BOM and JLC08161H-3313 order profile.",
     "The Altium compiled BOM has 248 schematic components while the board has 251 component objects; mechanical/non-electrical objects require disposition.",
     "RF/GNSS/cellular, DFM, Review B, assembly polarity/DNP and first-article checks remain open."
-  ]
+  ],
+  "authority_update_date": "2026-10-16",
+  "accepted_as_primary_evt_source": true
 }

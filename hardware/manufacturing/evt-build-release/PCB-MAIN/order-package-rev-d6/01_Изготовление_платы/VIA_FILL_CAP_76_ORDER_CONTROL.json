@@ -1,0 +1,29 @@
+{
+  "schema": "dioneya-pcb-main-pofv-order-76-v1",
+  "board_revision": "B_candidate_105",
+  "native_board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "fabrication_authority_csv": "VIA_FILL_CAP_76_ORDER_REV_D.csv",
+  "process": "SELECTIVE_EPOXY_FILL_PLANARIZE_COPPER_CAP",
+  "total_order_locations": 76,
+  "native_source_flagged_locations": 74,
+  "cam_override_locations": [
+    {
+      "id": "FC75",
+      "x_mm_KiCad": 41.75,
+      "y_mm_KiCad": 30.4,
+      "pad": "C6.1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "id": "FC76",
+      "x_mm_KiCad": 80.01,
+      "y_mm_KiCad": 20.5,
+      "pad": "D11.1",
+      "net": "3V3_DIGITAL"
+    }
+  ],
+  "manufacturing_release_condition_ru": "До запуска панели фабрика должна подтвердить заполнение и медное закрытие всех 76 точек по CSV, включая C6.1 и D11.1; одно лишь закрытие паяльной маской не допускается. При невозможности выборочной обработки остановить выпуск и согласовать ECO.",
+  "manufacturing_release_condition_en": "Before panel release the fabricator shall confirm epoxy fill and copper cap at all 76 CSV coordinates, including C6.1 and D11.1. Solder-mask tenting alone is not acceptable. If selective processing is unavailable, stop and resolve by ECO.",
+  "source_board_note_ru": "В нативной плате признаки filling/capping стоят у 74 переходов; два дополнительных перехода сохранены в исходной геометрии и добавлены в заказное CAM-задание без изменения Gerber и сверловки.",
+  "source_board_note_en": "The native board flags 74 vias for filling/capping. Two additional vias retain their source geometry and are added by the fabrication CAM order without changing Gerber or drill files."
+}

@@ -1,3 +1,5 @@
+> **CURRENT PCB-MAIN LAYOUT AUTHORITY — REV.B (2026-10-16):** PCB-MAIN COMPLETE-105 Rev.B, 8 copper layers, is the primary EVT-PRE-20 source. Use `hardware/PCB_LAYER_COUNT_AUTHORITY_CURRENT.txt`, `hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.md` and `hardware/PCB_MAIN_8L_ADOPTION_DECISION_REV_B.md`. The Rev.A/JLC06161H sections below are retained as design history and do not authorize the active board.
+
 # EVT-PRE-20 hardware production release gate — Rev.A
 
 Status: `ACTIVE / BLOCKING`

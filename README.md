@@ -32,7 +32,7 @@
 
 | Область | Принято | Остаётся открытым |
 |---|---|---|
-| PCB-MAIN | 186-net authority; `JLC06161H-3313`; 50 Ω `0.1509 mm`; 90 Ω `0.1537/0.2032 mm`; 1023 trace items; 8 zones | оставшаяся трассировка, final SI, DRC, CAM, checkout DFM, STEP/service review, Review B |
+| PCB-MAIN | 8L COMPLETE-105 Rev.B; `JLC08161H-3313`; 5969 route segments; 251 components; KiCad DRC 0 errors / 0 unconnected | selected-stack impedance/return-path review, POFV confirmation, Altium antenna-warning disposition, checkout DFM, Review B |
 | PCB-PWR | `DIM-003` `18/18`; 90×60×1.6 mm; H1-H4 M3 NPTH; `JLC04161H-3313A`; 70/35 µm copper; ≥18 µm hole wall; расчётная силовая геометрия; точный ECO-002 применён, 14 принятых сегментов; application gate PASS | input-protection qualification, оставшаяся трассировка, rail-drop/load-step/fault/+70 °C evidence, DRC, CAM, checkout DFM, Review B |
 | PCB-MIC | copper subgate и стандартный двухслойный/PCBA процесс; 9/9 engineering closures | first-panel bore/acoustic inspection, CAM comparison, общий Review B и physical EVT |
 | Жгуты | 38 проводников; точные wire MPN; длины `275/440/330 mm` с 10% запасом; 16/16 engineering closures | first-off crimp height/pull, 100% continuity/polarity/cross-short/resistance, installed-route SI/thermal/cold/strain EVT |

@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-evt-engineering-manufacturing-baseline-v2",
+  "date": "2026-10-16",
+  "status": "EVT_ENGINEERING_BASELINE_8L_MAIN_ACCEPTED_RELEASE_GATES_OPEN",
+  "authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv",
+  "boards": {
+    "PCB-MAIN": {
+      "layers": 8,
+      "stack_candidate": "JLC08161H-3313",
+      "source": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+      "source_sha256": "47b1c8dd391aabd6339c878ac4baff4f8fdf4f82d6ab588c13f7437552ea1f77"
+    },
+    "PCB-PWR": {
+      "layers": 4,
+      "basis": "Rev.A unchanged"
+    },
+    "PCB-MIC": {
+      "layers": 2,
+      "basis": "Rev.A unchanged"
+    }
+  },
+  "manufacturing_authorized": false
+}

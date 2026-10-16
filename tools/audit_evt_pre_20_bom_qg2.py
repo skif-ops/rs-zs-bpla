@@ -337,8 +337,8 @@ def main() -> int:
           "fitted lines missing exact production fields: " + ", ".join(exact_fields_missing) if exact_fields_missing else "all fitted lines have exact identity/package/rating")
 
     build_to_print_expected = {
-        "ASM-MAIN": ("DIO-ASM-MAIN-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
-        "PCB-MAIN": ("DIO-PCB-MAIN-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "ASM-MAIN": ("DIO-ASM-MAIN-REV-B", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "PCB-MAIN": ("DIO-PCB-MAIN-REV-B", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
         "ASM-PWR": ("DIO-ASM-PWR-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
         "PCB-PWR": ("DIO-PCB-PWR-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
         "ASM-MIC": ("DIO-ASM-MIC-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
@@ -360,8 +360,8 @@ def main() -> int:
             build_to_print_errors.append(item_id)
 
     rfq_expected = {
-        "ASM-MAIN": ("Customer-selected standard PCBA service", "DIO-PCBA-MAIN-EVT-A"),
-        "PCB-MAIN": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-MAIN-EVT-A_JLC06161H-3313"),
+        "ASM-MAIN": ("Customer-selected standard PCBA service", "DIO-PCBA-MAIN-EVT-B_JLC08161H-3313"),
+        "PCB-MAIN": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-MAIN-EVT-B_JLC08161H-3313"),
         "ASM-PWR": ("Customer-selected standard PCBA service", "DIO-PCBA-PWR-EVT-A"),
         "PCB-PWR": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-PWR-EVT-A_JLC04161H-3313A"),
         "ASM-MIC": ("Customer-selected standard PCBA service", "DIO-PCBA-MIC-EVT-A"),
@@ -635,7 +635,7 @@ def main() -> int:
     }
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     print(f"EVT-PRE-20 production BOM QG-2 technical gate: {result['status']}")
     for blocker in blockers:
         print(f"- {blocker}")

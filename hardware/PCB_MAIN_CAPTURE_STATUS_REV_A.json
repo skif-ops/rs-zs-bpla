@@ -1,4 +1,8 @@
 {
+  "document_scope": "HISTORICAL_REV_A_CAPTURE_STATUS",
+  "current_layout_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv",
+  "current_primary_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+  "superseded_for_layout_by": "hardware/PCB_MAIN_8L_ADOPTION_DECISION_REV_B.json",
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MAIN",

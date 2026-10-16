@@ -1,9 +1,9 @@
-# EVT-PRE-20 current-source CAM candidate — 2026-10-16
+# EVT-PRE-20 current-source production candidate — 2026-10-16
 
-Status: **CANDIDATE / HOLD FOR ENGINEERING REVIEW.** This directory is a reproducible export from commit `b6d9d620`. It is intentionally not marked as a manufacturing release.
+Status: **CANDIDATE / HOLD FOR ENGINEERING REVIEW AND DFM.** Manufacturing is not authorized.
 
-For PCB-MAIN, PCB-PWR and PCB-MIC it contains native KiCad sources, Gerber, Excellon drill/maps, IPC-D-356, centroid/CPL, manufacturing/JLC BOM, schematic PDF, board STEP, ERC/DRC JSON, fabrication notes and per-board status.
+PCB-MAIN is PCB-MAIN COMPLETE-105 Rev.B with eight copper layers and preferred order stack JLC08161H-3313. Its active package is imported from REV_D6 and contains all eight copper Gerbers, drills, IPC-D-356, BOM, placement, drawings, KiCad source and the 76-site POFV control. Fresh KiCad 10.0.6 checks report 0 ERC violations, 0 DRC errors, 0 unconnected items and 30 warnings.
 
-The export records the actual state rather than suppressing it: PCB-MAIN authoritative 6-layer native source remains unrouted and has DRC errors/unconnected items; PCB-PWR has no unconnected items but retains seven native silkscreen warnings; PCB-MIC is DRC clean. `review_b` remains `OPEN` in every `STATUS.json`.
+PCB-PWR remains 4-layer and PCB-MIC remains 2-layer. Their previously verified source and CAM outputs are retained. Altium projects and hash-bound outputs are stored under `hardware/altium/production-candidate`.
 
-Altium projects and their separately hash-bound outputs are included in the external full candidate archive. They do not override the six-layer PCB-MAIN authority or close Review B.
+Open gates include selected-stack/impedance confirmation, POFV acceptance, three PCB-MAIN Altium antenna warning dispositions, upload DFM, independent Review B and first-article validation.

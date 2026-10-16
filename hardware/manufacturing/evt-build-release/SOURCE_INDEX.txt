@@ -1,3 +1,13 @@
+hardware/PCB_LAYER_COUNT_AUTHORITY_CURRENT.txt
+hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv
+hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.md
+hardware/PCB_MAIN_8L_ADOPTION_DECISION_REV_B.json
+hardware/PCB_MAIN_8L_ADOPTION_DECISION_REV_B.md
+hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb
+hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
+hardware/altium/production-candidate/PCB-MAIN-8L-COMPLETE-105
+hardware/manufacturing/evt-build-release/PCB-MAIN/order-package-rev-d6
+tools/audit_pcb_main_8l_adoption_rev_b.py
 hardware/PCB_DOUBLE_REVIEW_GATE.md
 hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv
 hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.md
@@ -238,8 +248,6 @@ hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_
 hardware/kicad/candidates/PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_BASE_REV_A.kicad_pcb
 hardware/kicad/candidates/PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.kicad_pcb
 hardware/kicad/components.csv
-hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb
-hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
 hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
 hardware/kicad/native/PCB-MAIN/PCB-MAIN_01_POWER.kicad_sch
 hardware/kicad/native/PCB-MAIN/PCB-MAIN_02_MCU.kicad_sch

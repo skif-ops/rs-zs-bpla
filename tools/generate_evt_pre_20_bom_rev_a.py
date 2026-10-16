@@ -38,16 +38,16 @@ PROGRAM_TOTAL_STATIONS = (
 # manufacturing gate remain separate release inputs.
 BUILD_TO_PRINT_SCOPES = {
     "ASM-MAIN": {
-        "mpn": "DIO-ASM-MAIN-REV-A",
-        "package": "6-layer PCBA build-to-print service scope",
+        "mpn": "DIO-ASM-MAIN-REV-B",
+        "package": "8-layer PCB-MAIN COMPLETE-105 Rev.B PCBA build-to-print service scope; JLC08161H-3313; ENIG; POFV",
         "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_EMS_SELECTION_PENDING",
         "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
         "channel": "Customer-selected qualified EMS; quotation and purchase outside the engineering repository",
         "notes": "PRIMARY procurement track; internal assembled-article identity only; routing DRC CAM DFM stencil Review B and EOL scope remain mandatory before build",
     },
     "PCB-MAIN": {
-        "mpn": "DIO-PCB-MAIN-REV-A",
-        "package": "6-layer FR-4 110x75x1.6 mm build-to-print fabrication scope",
+        "mpn": "DIO-PCB-MAIN-REV-B",
+        "package": "8-layer FR-4 110x75x1.6 mm PCB-MAIN COMPLETE-105 Rev.B fabrication scope; JLC08161H-3313; ENIG; outer 1 oz; inner 0.5 oz; POFV",
         "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_FAB_SELECTION_PENDING",
         "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
         "channel": "Customer-selected qualified PCB fabricator; quotation and purchase outside the engineering repository",

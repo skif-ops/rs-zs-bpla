@@ -1,5 +1,8 @@
 # Дионея EVT-PRE-20 Rev.A — authority числа медных слоёв
 
+> **SUPERSEDED 2026-10-16:** PCB-MAIN 6L in this Rev.A record is historical. The current authority is `hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv`, where PCB-MAIN COMPLETE-105 is 8L.
+
+
 Статус: `CONTROLLED LAYER COUNT / EVT STACKUPS ACCEPTED / NOT FOR MANUFACTURE`
 
 Дата: 2026-09-15

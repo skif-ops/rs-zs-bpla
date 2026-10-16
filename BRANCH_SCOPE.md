@@ -48,7 +48,7 @@
   до начала сборки;
 - все девять native `.kicad_sch/.kicad_pcb/.kicad_pro` файлов PCB-MAIN,
   PCB-MIC и PCB-PWR присутствуют и контролируются CI;
-- PCB-MAIN: 186-сетевой authority PASS, `JLC06161H-3313` и геометрия 50/90 Ом
+- PCB-MAIN: 8L COMPLETE-105 Rev.B принят основным, `JLC08161H-3313`, KiCad DRC 0 ошибок / 0 неподключённых элементов
   приняты для EVT, активны 1023 trace items и восемь copper zones; оставшаяся
   трассировка, SI, DRC, CAM, checkout DFM и Review B открыты;
 - PCB-PWR: `DIM-003` принят `18/18` для EVT; `JLC04161H-3313A`, 70/35 µm

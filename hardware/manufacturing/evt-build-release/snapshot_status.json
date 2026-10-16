@@ -1,9 +1,17 @@
 {
-  "schema": "dioneya-evt-cam-candidate-v1",
+  "schema": "dioneya-evt-cam-candidate-v2",
   "date": "2026-10-16",
-  "source_commit": "b6d9d620",
-  "release": "CANDIDATE_HOLD_FOR_ENGINEERING_REVIEW",
+  "release": "CANDIDATE_HOLD_FOR_ENGINEERING_REVIEW_AND_DFM",
   "manufacturing_authorized": false,
-  "main_layer_authority": "6L",
-  "main_altium_8l_candidate_conflict_open": true
+  "main_layer_authority": "8L_COMPLETE_105_REV_B",
+  "main_preferred_stack": "JLC08161H-3313",
+  "main_altium_8l_candidate_conflict_open": false,
+  "board_layers": {
+    "PCB-MAIN": 8,
+    "PCB-PWR": 4,
+    "PCB-MIC": 2
+  },
+  "authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv",
+  "adoption_decision": "hardware/PCB_MAIN_8L_ADOPTION_DECISION_REV_B.json",
+  "manufacturing_gates_open": true
 }
