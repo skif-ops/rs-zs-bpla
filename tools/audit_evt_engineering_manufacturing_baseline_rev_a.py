@@ -59,7 +59,7 @@ def validate_git_binding(
         require(head == commit_sha, f"evidence commit {commit_sha} != checked-out HEAD {head}")
     if require_clean_source:
         sources = list(dict.fromkeys([*CONTROLLED_BASELINE_SOURCES, *extra_sources]))
-        relative_sources = [str(path.resolve().relative_to(ROOT)) for path in sources]
+        relative_sources = [path.resolve().relative_to(ROOT).as_posix() for path in sources]
         dirty = subprocess.check_output(
             ["git", "status", "--porcelain", "--", *relative_sources],
             cwd=ROOT,
@@ -78,7 +78,7 @@ def read_csv(relative: str) -> list[dict[str, str]]:
 
 
 def audit() -> dict[str, object]:
-    baseline = read_json(str(BASELINE_PATH.relative_to(ROOT)))
+    baseline = read_json(BASELINE_PATH.relative_to(ROOT).as_posix())
     require(
         baseline.get("schema") == "dioneya-evt-engineering-manufacturing-baseline-v1",
         "baseline schema drift",

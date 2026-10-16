@@ -1,0 +1,36 @@
+{
+  "configuration": "EVT-PRE-20 Rev.A",
+  "audit": "PCB-PWR Rev.A input-protection qualification control",
+  "status": "PASS_CONTROLLED_QUALIFICATION_PLAN_PHYSICAL_EVIDENCE_PENDING",
+  "fuse": {
+    "signed_native_mpn": "0451005.MRL",
+    "target_evt_mpn": "0451008.MRL",
+    "continuous_current_a": 5.0,
+    "minimum_nominal_rating_at_25c_a": 6.666666666666667,
+    "target_capacity_after_standard_derating_a": 6.0,
+    "nominal_loss_at_5a_w": 0.1925
+  },
+  "tvs": {
+    "target_evt_mpn": "SMBJ18A",
+    "maximum_clamp_v": 29.2,
+    "project_candidate_clamp_limit_v": 32.0,
+    "buck_absolute_max_input_v": 36.0
+  },
+  "native_value_eco_applied": true,
+  "value_only_change_verified": true,
+  "pin_net_semantic_sha256": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+  "board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
+  "repeat_erc_pdf_human_review_complete": true,
+  "source_control_complete": true,
+  "source_control_evidence_sha256": "1ee7d72b7f71bfd53879c43031ba0bf184a0c5d3beb0558ca1e691c585424823",
+  "prepurchase_documentary_identity_complete": true,
+  "standalone_engineering_sample_purchase_required": false,
+  "procurement_identity_evidence_sha256": "2b3acbc5bcee5b08bb1a45f009d75d57210592d8488f2e5dc29358c072a62250",
+  "receiving_identity_hold_required": false,
+  "accepted_rows": 4,
+  "required_rows": 20,
+  "failed_rows": [],
+  "physical_qualification_complete": false,
+  "pcba_procurement_authorized": false,
+  "manufacturing_release": false
+}

@@ -174,7 +174,7 @@ def validate_supplier_request() -> dict[str, object]:
 
     external = contract.get("external_response", {})
     require(external == {
-        "response_register": str(SUPPLIER_RESPONSE.relative_to(ROOT)),
+        "response_register": SUPPLIER_RESPONSE.relative_to(ROOT).as_posix(),
         "required_rows": 16,
         "pending_rows": 16,
         "accepted_rows": 0,
@@ -232,9 +232,9 @@ def validate_supplier_request() -> dict[str, object]:
 
     return {
         "status": SUPPLIER_REQUEST_STATUS,
-        "request": str(SUPPLIER_REQUEST.relative_to(ROOT)),
-        "contract": str(SUPPLIER_CONTRACT.relative_to(ROOT)),
-        "response_register": str(SUPPLIER_RESPONSE.relative_to(ROOT)),
+        "request": SUPPLIER_REQUEST.relative_to(ROOT).as_posix(),
+        "contract": SUPPLIER_CONTRACT.relative_to(ROOT).as_posix(),
+        "response_register": SUPPLIER_RESPONSE.relative_to(ROOT).as_posix(),
         "required_response_rows": 16,
         "pending_response_rows": 16,
         "accepted_response_rows": 0,
@@ -257,7 +257,7 @@ def audit_evt_accepted(contract: dict[str, object]) -> dict[str, object]:
             "central harness EVT authority differs")
     authority_inputs = contract.get("authority_inputs", [])
     for source in (EVT_BASELINE, EVT_BASELINE_MANUAL, LENGTH_BASIS):
-        require(str(source.relative_to(ROOT)) in authority_inputs,
+        require(source.relative_to(ROOT).as_posix() in authority_inputs,
                 f"accepted harness authority input missing: {source.relative_to(ROOT)}")
     expected_binding = [
         {"path": relative, "sha256": sha256(ROOT / relative)}
@@ -319,7 +319,7 @@ def audit_evt_accepted(contract: dict[str, object]) -> dict[str, object]:
                     )) for row in rows),
             "harness external wait rows are not closed by EVT evidence")
     require(contract.get("external_response") == {
-        "response_register": str(SUPPLIER_RESPONSE.relative_to(ROOT)),
+        "response_register": SUPPLIER_RESPONSE.relative_to(ROOT).as_posix(),
         "required_rows": 16,
         "closed_rows": 16,
         "pending_rows": 0,
@@ -503,8 +503,8 @@ def audit() -> dict[str, object]:
         "status": "PASS_CONTROLLED_PRELIMINARY_LENGTHS_OPEN",
         "packet_complete": True,
         "manufacturing_release": False,
-        "schedule": str(SCHEDULE.relative_to(ROOT)),
-        "drawing": str(DRAWING.relative_to(ROOT)),
+        "schedule": SCHEDULE.relative_to(ROOT).as_posix(),
+        "drawing": DRAWING.relative_to(ROOT).as_posix(),
         "controlled_conductors": len(schedule),
         "harness_counts": dict(sorted(counts.items())),
         "supplier_request_status": supplier_request["status"],

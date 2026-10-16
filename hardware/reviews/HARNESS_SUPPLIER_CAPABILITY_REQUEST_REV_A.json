@@ -34,11 +34,11 @@
     },
     {
       "path": "hardware/EVT_PRE_20_BOM_REV_A.csv",
-      "sha256": "7301c1ec58528bcedcbfff76effbb27fa1219b40c0a991f4c7f57f08c8a969df"
+      "sha256": "77e8da7e7538352a6269d378ad093d110506930313fbb72c4fb01d13859dc2df"
     },
     {
       "path": "hardware/CHINA_PROCUREMENT_RFQ.csv",
-      "sha256": "cb73fe45fca620be75de31de87ba50a2be8842dcd66303612d62352c769bd68f"
+      "sha256": "caf06479483761ccce88c4d20a99bf02d205242c73a8bc171e9ac48c009ab159"
     },
     {
       "path": "manufacturing/EVT_LOT_SELECTION_REV_A.csv",

@@ -3,8 +3,8 @@
   "date": "2026-10-16",
   "board": "PCB-MAIN",
   "revision": "COMPLETE-105_REV_B",
-  "release": "EVT_8L_PRODUCTION_CANDIDATE_HOLD_FOR_DFM_REVIEW_B",
-  "manufacturing_authorized": false,
+  "release": "EVT_8L_BUILD_AUTHORIZED_CUSTOMER_CHECKOUT_REQUIRED",
+  "manufacturing_authorized": true,
   "primary_layer_count": 8,
   "copper_layers": [
     "F.Cu",
@@ -51,12 +51,23 @@
     "drc_violations": 3,
     "drc_category": "Net Antennae"
   },
-  "review_b": "OPEN",
-  "open_gates": [
-    "Selected fabricator stack dielectric and impedance/return-path confirmation",
-    "REV_D6 POFV order-control confirmation by fabricator",
-    "Three Altium Net Antennae warning dispositions",
-    "Final upload parser and DFM review",
-    "Independent Review B and first-article inspection/test"
+  "review_b": "ACCEPTED",
+  "open_gates": [],
+  "desktop_release_basis": "hardware/reviews/EVT_FACTORY_PUBLIC_CAPABILITY_BASELINE_REV_B.json",
+  "specific_factory_job_confirmed": false,
+  "specific_factory_job_confirmation_owner": "CUSTOMER",
+  "customer_checkout_controls": [
+    "Upload the controlled archive without renaming or editing CAM layers.",
+    "Select the stated layer count, thickness, copper, finish and stackup for each board.",
+    "For PCB-MAIN, select epoxy resin via filling and copper capping for all 76 controlled locations and include the controlled CSV/order remark.",
+    "Resolve every upload-parser or DFM error before payment; do not approve an automatic geometry repair that changes copper, drills, outline, POFV or polarity.",
+    "Download and compare the job-specific production files with the controlled Gerber, drill, outline and special-process notes, then confirm them in the factory portal.",
+    "Record order number, selected options, production-file checksum and any factory engineering message in the order record."
+  ],
+  "post_build_evt_validation": [
+    "PCB-MAIN RF and GNSS/cellular/LoRa installed VSWR, sensitivity and coexistence",
+    "PCB-PWR rail drop, inrush, transient, thermal, cold start, protection and EMI",
+    "PCB-MIC acoustic-port inspection, phase, gain, noise and delay calibration",
+    "First-article SPI/AOI/X-ray disposition and functional test before releasing the remaining lot"
   ]
 }

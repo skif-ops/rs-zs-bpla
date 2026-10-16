@@ -1,0 +1,51 @@
+{
+  "schema": "dioneya-pcb-pwr-placement-clearance-audit-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "board": {
+    "path": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_pcb",
+    "sha256": "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7",
+    "semantic_sha256": "4c835eae78eaf1e43116642bc5d5ceafed0c156abfc1a7906293f94636e8d1e2",
+    "trace_items": 842,
+    "copper_zones": 33
+  },
+  "placement_authority": {
+    "path": "hardware\\PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
+    "sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
+    "row_count": 62
+  },
+  "method": {
+    "scope": "SIMULTANEOUSLY_FITTED_ASSEMBLY_BODIES_ONLY",
+    "courtyard_geometry": "CONSERVATIVE_AXIS_ALIGNED_ENVELOPE_AFTER_TRANSFORM",
+    "distance_metric": "EUCLIDEAN_NEAREST_RECTANGLE_DISTANCE",
+    "geometry_tolerance_mm": 0.005,
+    "dnp_and_pcb_features": "EXCLUDED_BODY_SERVICE_AND_FIXTURE_REVIEW_OPEN",
+    "j2_edge_overhang": "PROVISIONAL_INTENT_NOT_SERVICE_CLEARANCE_PASS"
+  },
+  "summary": {
+    "state": "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED",
+    "fitted_footprints": 44,
+    "courtyard_footprints": 44,
+    "excluded_dnp_footprints": 5,
+    "excluded_pcb_feature_footprints": 13,
+    "required_clearance_mm": 0.2,
+    "minimum_observed_clearance_mm": 0.2,
+    "clearance_conflicts": 0,
+    "provisional_edge_overhangs": [
+      "J2"
+    ],
+    "mounting_holes": 4,
+    "minimum_mounting_to_fitted_body_margin_mm": 0.426721,
+    "mounting_to_fitted_body_conflicts": 0,
+    "mounting_to_existing_pad_conflicts": 0
+  },
+  "clearance_conflicts": [],
+  "mounting_to_fitted_body_conflicts": [],
+  "mounting_to_existing_pad_conflicts": [],
+  "open_boundaries": [
+    "serial enclosure and exact vendor component STEP revalidation",
+    "fabricator stackup copper weights and numeric power geometry",
+    "routing DRC CAM DFM physical evidence and independent Review B"
+  ],
+  "release_disposition": "PASS_EVT_2D_FITTED_AND_MOUNTING_CLEARANCE_ROUTING_AND_REVIEW_B_OPEN",
+  "manufacturing_release": false
+}

@@ -1,0 +1,11 @@
+Part_number,Description,Qty_per_station,Material_or_spec,Manufacturing_notes
+DIO_HSG_ELECTRONICS_BASE_REV_A,Upper electronics base,1,UV-stabilized ASA,Print from controlled STL; three SMA holes and one M16 gland hole
+DIO_HSG_ELECTRONICS_LID_REV_A,Upper electronics lid,1,UV-stabilized ASA,"EPDM seal, M4 A4 screws"
+DIO_HSG_POWER_BASE_REV_A,RB40 battery base,1,UV-stabilized ASA,Internal 205 x 174 x 190 mm; M20/M16 gland openings
+DIO_HSG_POWER_LID_REV_A,Power electronics lid,1,UV-stabilized ASA,PCB-PWR and MPPT mounting provisions
+DIO_HSG_MIC_POD_BASE_REV_A,Microphone pod base,4,UV-stabilized ASA,Fits PCB-MIC 24 x 22 mm; centered acoustic path
+DIO_HSG_MIC_POD_CAP_REV_A,Microphone pod cap,4,UV-stabilized ASA,Retains controlled ePTFE membrane
+DIO_SEAL_EPDM70_REV_A,Gasket set,1,Closed-cell EPDM 70 Shore A,15-25 percent compression; cut to lid grooves
+DIO_INSERT_M3_M4_REV_A,Heat-set insert set,1,"Brass, knurled",M3 PCB/pod and M4 enclosure inserts
+DIO_FASTENER_A4_REV_A,Fastener set,1,A4 stainless,M3/M4 with captive washers; torque per drawing
+DIO_ACOUSTIC_MEMBRANE_PTFE_REV_A,Acoustic membrane set,4,Hydrophobic ePTFE,Supplier lot controlled; first-article acoustic validation required

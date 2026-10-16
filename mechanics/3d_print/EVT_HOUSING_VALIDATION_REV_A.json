@@ -1,0 +1,53 @@
+{
+  "schema": "dioneya-evt-housing-validation-v1",
+  "status": "PASS",
+  "step_valid": true,
+  "step_solids": 6,
+  "step_sha256": "c4fb3182bdb219b7fdbe7aa937e9a6bb52c06e1258f02542eb14e54fe0d82fd6",
+  "stl_files": [
+    {
+      "file": "DIO_HSG_ELECTRONICS_BASE_REV_A.stl",
+      "facets": 12404,
+      "bytes": 620284
+    },
+    {
+      "file": "DIO_HSG_ELECTRONICS_LID_REV_A.stl",
+      "facets": 2588,
+      "bytes": 129484
+    },
+    {
+      "file": "DIO_HSG_POWER_BASE_REV_A.stl",
+      "facets": 6628,
+      "bytes": 331484
+    },
+    {
+      "file": "DIO_HSG_POWER_LID_REV_A.stl",
+      "facets": 10664,
+      "bytes": 533284
+    },
+    {
+      "file": "DIO_HSG_MIC_POD_BASE_REV_A.stl",
+      "facets": 3088,
+      "bytes": 154484
+    },
+    {
+      "file": "DIO_HSG_MIC_POD_CAP_REV_A.stl",
+      "facets": 2048,
+      "bytes": 102484
+    }
+  ],
+  "drawing_pdf_bytes": 6200,
+  "drawing_pdf_sha256": "63ad39fa5d5e9899483f7ce81a208cf19bc8ef6ac9b7e6fb98cd72664e5c93a5",
+  "maximum_part_bbox_mm": [
+    215,
+    184,
+    196
+  ],
+  "printer_build_volume_mm": [
+    220,
+    220,
+    220
+  ],
+  "all_parts_fit_declared_printer": true,
+  "physical_first_article_pending": true
+}

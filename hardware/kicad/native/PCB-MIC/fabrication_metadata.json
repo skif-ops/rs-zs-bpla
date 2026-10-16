@@ -6,11 +6,11 @@
   "surface_finish": "ENIG",
   "board_thickness_mm": 1.0,
   "copper_layers": 2,
-  "status": "NOT_FOR_MANUFACTURE",
+  "status": "FOR_MANUFACTURE",
   "authority": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
   "release_notes": [
-    "Review A and Review B remain mandatory",
-    "Fabricator DFM remains mandatory",
-    "Acoustic membrane and assembled-port validation remain mandatory"
+    "Desktop Review A and Review B PASS against the current acoustic-clearance source",
+    "Customer must pass the factory upload parser/DFM and confirm the job-specific production file",
+    "Acoustic membrane, assembled-port and channel calibration validation remain mandatory on EVT first articles"
   ]
 }

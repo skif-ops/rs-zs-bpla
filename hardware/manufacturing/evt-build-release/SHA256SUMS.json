@@ -1,8 +1,8 @@
 [
   {
     "path": "PCB-MAIN/FAB_NOTES.md",
-    "bytes": 655,
-    "sha256": "2beeb3a2975831505ef3e583a940566b7d36513e17ad9f463596898f45b5e10e"
+    "bytes": 1192,
+    "sha256": "7451640867b40e35c1ed0cd48d5b43274f6145c5439b8069dadf8ed3b98349b4"
   },
   {
     "path": "PCB-MAIN/order-package-rev-d6/00_Задание_PCB-MAIN_на_изготовление_и_монтаж.docx",
@@ -501,8 +501,8 @@
   },
   {
     "path": "PCB-MAIN/STATUS.json",
-    "bytes": 1930,
-    "sha256": "19672e309d5a8c558ad841a06730522c9f888e143e07fc2781e6e40e8b0fae8f"
+    "bytes": 3040,
+    "sha256": "67814fef25acfb06f7fa2d225dca5b428922f52be3842bf39f33ac346e6426b7"
   },
   {
     "path": "PCB-MAIN/verification-current/PCB-MAIN_8L_NATIVE_DRC_2026-10-16.json",
@@ -551,8 +551,8 @@
   },
   {
     "path": "PCB-MIC/FAB_NOTES.md",
-    "bytes": 932,
-    "sha256": "2009246173cd934e09b19637a395ecc4948c393cbfb387f8dbc8a0ab06771767"
+    "bytes": 1000,
+    "sha256": "e4095de435e8d04b0054246d4afaac47a3bdd30253b1f57f9f07a2573bbcd25d"
   },
   {
     "path": "PCB-MIC/gerber/PCB-MIC-B_Cu.gbr",
@@ -606,8 +606,8 @@
   },
   {
     "path": "PCB-MIC/native/fabrication_metadata.json",
-    "bytes": 486,
-    "sha256": "2bf50bc3f462092ed57485a1a791b1f4bbfea8fdd1e19f2fda405265dcb8e1a9"
+    "bytes": 628,
+    "sha256": "7a38b47fdf5b4997c8ab7c670433da32e1e7032a3f7be433a6fc7d3b98c955db"
   },
   {
     "path": "PCB-MIC/native/fp-lib-table",
@@ -696,8 +696,8 @@
   },
   {
     "path": "PCB-MIC/STATUS.json",
-    "bytes": 719,
-    "sha256": "d0ca2aa41e51dc9ec102178578732369ea674fb5581df850bc32b87c40dee536"
+    "bytes": 987,
+    "sha256": "6f6e0870cfc072561c8ea4e834cd79e62b2a93130e2a7b59839f7f066633d942"
   },
   {
     "path": "PCB-PWR/drc.json",
@@ -721,8 +721,8 @@
   },
   {
     "path": "PCB-PWR/FAB_NOTES.md",
-    "bytes": 1034,
-    "sha256": "05edaa5f55dda8118db87769d93dd58745e6bc0269991886a41c2b3cf0a788a4"
+    "bytes": 1006,
+    "sha256": "113f2dafff93b1536952b14d7a14d8e148ac8d0baee70af6d47da834998a28c7"
   },
   {
     "path": "PCB-PWR/gerber/PCB-PWR-B_Cu.gbr",
@@ -921,13 +921,13 @@
   },
   {
     "path": "PCB-PWR/STATUS.json",
-    "bytes": 721,
-    "sha256": "c8e06883830c182150ed9e8051b7aea6e8f19c32407a2063dbec27b72472404b"
+    "bytes": 989,
+    "sha256": "e97423203e3c42863520cce1e96953e8b4731103dc00baf9199b6858684d3630"
   },
   {
     "path": "README.md",
-    "bytes": 943,
-    "sha256": "731ff5fa84d7b14addd7d614a3439cf9303e30a70b21ae4bc4f83cf84dcb4c83"
+    "bytes": 1698,
+    "sha256": "15eac13c4ff4d0659d4dc9efde1b6554d3836b4f2527a8949524c3add5f3f79f"
   },
   {
     "path": "snapshot_status.json",

@@ -1,6 +1,6 @@
 # EVT-PRE-20 — выпуск на сборку EVT (EVT build release), Rev.A
 
-Статус: `ACTIVE / BLOCKING`
+Статус: `PASS / 2026-10-16 / PHYSICAL EVT FOLLOW-UP ACTIVE`
 
 ## Назначение
 

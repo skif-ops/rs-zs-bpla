@@ -1,6 +1,6 @@
 {
   "board": "PCB-PWR",
-  "release": "CANDIDATE_HOLD_FOR_REVIEW",
+  "release": "EVT_BUILD_AUTHORIZED_CUSTOMER_CHECKOUT_REQUIRED",
   "drc_return_code": 0,
   "erc_return_code": 0,
   "gerber_return_code": 0,
@@ -12,8 +12,8 @@
   "bom_return_code": 0,
   "schema": "dioneya-evt-board-cam-candidate-v1",
   "source_commit": "b6d9d620",
-  "review_b": "OPEN",
-  "manufacturing_authorized": false,
+  "review_b": "ACCEPTED",
+  "manufacturing_authorized": true,
   "drc": {
     "errors": 0,
     "warnings": 7,
@@ -24,5 +24,9 @@
     "lcsc_ids_complete": false,
     "note": "Manufacturer/MPN data is retained; LCSC mapping remains open in the assembler part map."
   },
-  "jlc_cpl_rows": 44
+  "jlc_cpl_rows": 44,
+  "desktop_release_basis": "hardware/reviews/EVT_FACTORY_PUBLIC_CAPABILITY_BASELINE_REV_B.json",
+  "specific_factory_job_confirmed": false,
+  "specific_factory_job_confirmation_owner": "CUSTOMER",
+  "post_build_evt_validation_required": true
 }

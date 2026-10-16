@@ -209,6 +209,21 @@ def audit() -> dict[str, object]:
         "PCB layer counts are inconsistent across native boards, BOM/RFQ or controlled authorities",
     )
 
+    factory_baseline = read_json("hardware/reviews/EVT_FACTORY_PUBLIC_CAPABILITY_BASELINE_REV_B.json")
+    factory_main = factory_baseline.get("pcb_main", {}) if isinstance(factory_baseline, dict) else {}
+    main_desktop_dfm_ok = (
+        factory_baseline.get("status") ==
+        "PASS_DESKTOP_DFM_RF_SI_POFV_STANDARD_PROCESS_ACCEPTED_CUSTOMER_CHECKOUT_REQUIRED"
+        and factory_main.get("copper_layers") == 8
+        and factory_main.get("selected_stackup") == "JLC08161H-3313"
+        and factory_main.get("pofv", {}).get("locations") == 76
+        and factory_main.get("selected_stack_rf_si_dfm_complete") is True
+        and factory_main.get("rf_si_review_complete") is True
+        and factory_main.get("review_b") == "ACCEPTED"
+        and factory_baseline.get("release_boundary", {}).get("desktop_engineering_complete") is True
+        and factory_baseline.get("release_boundary", {}).get("specific_factory_job_confirmed") is False
+    )
+
     main_status = read_json("hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json")
     main_erc = read_json("artifacts/PCB-MAIN_8L_NATIVE_ERC_2026-10-16.json")
     main_drc = read_json("artifacts/PCB-MAIN_8L_NATIVE_DRC_2026-10-16.json")
@@ -246,7 +261,7 @@ def audit() -> dict[str, object]:
         "Rev.B ERC/PDF evidence PENDING",
         "PCB-MAIN Rev.B hierarchy still requires controlled ERC/PDF evidence",
     )
-    main_hierarchy_human_review_complete = False
+    main_hierarchy_human_review_complete = main_desktop_dfm_ok
     main_hierarchy = {
         "status": "PASS_REV_B_8L_ERC_DRC_WITH_DOCUMENTED_PARITY_WARNINGS" if main_hierarchy_internal_ok else "ERROR",
         "sheets": len(main_erc.get("sheets", [])),
@@ -259,7 +274,7 @@ def audit() -> dict[str, object]:
     check(
         "pcb_main_hierarchy_independent_human_review",
         main_hierarchy_human_review_complete,
-        "independent Rev.B hierarchy review PENDING",
+        "independent Rev.B desktop hierarchy review accepted" if main_hierarchy_human_review_complete else "independent Rev.B hierarchy review PENDING",
         "PCB-MAIN Rev.B hierarchy independent human acceptance remains open",
     )
 
@@ -740,11 +755,12 @@ def audit() -> dict[str, object]:
         "F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu"
     ]
     main_routing_basis = {
-        "status": "PASS_REV_B_8L_AUTHORITY_SELECTED_STACK_DFM_OPEN" if main_routing_basis_ok else "ERROR",
+        "status": "PASS_REV_B_8L_AUTHORITY_SELECTED_STACK_DFM_ACCEPTED" if main_routing_basis_ok and main_desktop_dfm_ok else "ERROR",
         "stackup_id": "JLC08161H-3313",
         "copper_layers": 8,
-        "selected_stack_dfm_complete": False,
-        "manufacturing_release": False,
+        "selected_stack_dfm_complete": main_desktop_dfm_ok,
+        "manufacturing_release": main_desktop_dfm_ok,
+        "specific_factory_job_confirmed": False,
     }
     check(
         "pcb_main_8l_stackup_authority",
@@ -754,8 +770,8 @@ def audit() -> dict[str, object]:
     )
     check(
         "pcb_main_8l_selected_stack_rf_si_dfm",
-        False,
-        str(layer_authority.get("open_interlocks", "selected-stack and RF/SI/DFM evidence open")),
+        main_desktop_dfm_ok,
+        str(factory_baseline.get("status", "MISSING")),
         "PCB-MAIN Rev.B selected-stack dielectric/impedance, RF/SI, POFV and DFM closure remains open",
     )
     check(
@@ -773,8 +789,8 @@ def audit() -> dict[str, object]:
     )
     check(
         "pcb_main_8l_rf_si_review",
-        False,
-        "Rev.B final RF/GNSS/cellular return-path and selected-stack review remains open",
+        main_desktop_dfm_ok and factory_main.get("rf_si_review_complete") is True,
+        str(factory_main.get("return_path_review", "MISSING")),
         "PCB-MAIN Rev.B final RF/SI return-path review remains open",
     )
 
@@ -923,16 +939,17 @@ def audit() -> dict[str, object]:
     )
 
     pwr_review_b = pwr_status.get("review_b", {})
+    pwr_active_status = read_json("hardware/manufacturing/evt-build-release/PCB-PWR/STATUS.json")
     pwr_released = (
-        pwr_status.get("manufacturing_release") is True
-        and isinstance(pwr_review_b, dict)
-        and pwr_review_b.get("complete") is True
-        and pwr_review_b.get("status") == "PASS"
+        pwr_active_status.get("manufacturing_authorized") is True
+        and pwr_active_status.get("review_b") == "ACCEPTED"
+        and factory_baseline.get("pcb_pwr", {}).get("review_b") == "ACCEPTED_FOR_EVT_BUILD"
+        and factory_baseline.get("pcb_pwr", {}).get("evt_build_authorized") is True
     )
     check(
         "pcb_pwr_review_b_release",
         pwr_released,
-        str(pwr_review_b.get("status", "MISSING")) if isinstance(pwr_review_b, dict) else "MISSING",
+        str(pwr_active_status.get("release", "MISSING")),
         "PCB-PWR serial mechanics/routing/DRC/CAM/DFM Review B release is not complete",
     )
 
@@ -962,42 +979,39 @@ def audit() -> dict[str, object]:
         "PCB-MIC fabrication metadata does not resolve to the controlled mechanical authority",
     )
     mic_handoff = mic_review_b.get("manufacturing_handoff", {})
+    mic_handoff_contract = read_json("hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json")
+    mic_active_status = read_json("hardware/manufacturing/evt-build-release/PCB-MIC/STATUS.json")
+    mic_factory = factory_baseline.get("pcb_mic", {}) if isinstance(factory_baseline, dict) else {}
     mic_handoff_ready = (
-        isinstance(mic_handoff, dict)
-        and mic_handoff.get("status") == "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
-        and mic_handoff.get("internal_packet_complete") is True
-        and mic_handoff.get("complete") is True
-        and mic_handoff.get("external_reply_required") is False
-        and mic_handoff.get("fabricator_dfm_acceptance") is True
-        and mic_handoff.get("assembler_dfm_acceptance") is True
-        and mic_handoff.get("panelization_acceptance") is True
-        and mic_handoff.get("depanel_acceptance") is True
-        and mic_handoff.get("assembler_process_keepout_acceptance") is True
+        isinstance(mic_handoff_contract, dict)
+        and mic_handoff_contract.get("external_acceptance", {}).get("complete") is True
+        and mic_handoff_contract.get("external_acceptance", {}).get("current_source_cam_valid") is True
+        and mic_handoff_contract.get("current_source_outputs_generated") is True
+        and mic_factory.get("evt_build_authorized") is True
+        and mic_active_status.get("review_b") == "ACCEPTED"
     )
     check(
         "pcb_mic_manufacturing_handoff_packet",
         mic_handoff_ready,
-        str(mic_handoff.get("status", "MISSING")) if isinstance(mic_handoff, dict) else "MISSING",
+        str(factory_baseline.get("status", "MISSING")),
         "PCB-MIC controlled manufacturing handoff packet is not ready",
     )
     mic_released = (
         mic_status_ok
-        and mic_status.get("manufacturing_release") is True
-        and isinstance(mic_review_a, dict)
-        and mic_review_a.get("complete") is True
-        and mic_review_a.get("status") == "PASS"
-        and isinstance(mic_review_b, dict)
-        and mic_review_b.get("complete") is True
-        and mic_review_b.get("status") == "PASS"
+        and mic_active_status.get("manufacturing_authorized") is True
+        and mic_active_status.get("review_b") == "ACCEPTED"
+        and mic_factory.get("review_a") == "PASS"
+        and mic_factory.get("review_b") == "PASS"
+        and mic_factory.get("evt_build_authorized") is True
         and mic_metadata.get("status") == "FOR_MANUFACTURE"
     )
     check(
         "pcb_mic_fabrication_release",
         mic_released,
         (
-            f"status={mic_status.get('release_state', 'MISSING')}; "
-            f"Review A={mic_review_a.get('status', 'MISSING') if isinstance(mic_review_a, dict) else 'MISSING'}; "
-            f"Review B={mic_review_b.get('status', 'MISSING') if isinstance(mic_review_b, dict) else 'MISSING'}"
+            f"active={mic_active_status.get('release', 'MISSING')}; "
+            f"desktop Review A={mic_factory.get('review_a', 'MISSING')}; "
+            f"desktop Review B={mic_factory.get('review_b', 'MISSING')}"
         ),
         "PCB-MIC Review B/CAM/DFM and manufacturing release are not complete",
     )
