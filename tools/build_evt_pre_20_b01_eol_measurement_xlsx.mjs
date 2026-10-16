@@ -67,7 +67,7 @@ summary.getRange("A15:B26").values = [
   ["PASS строк / PASS rows", null],
   ["FAIL строк / FAIL rows", null],
   ["HOLD строк / HOLD rows", null],
-  ["OPEN limits", null],
+  ["Открытые критерии / OPEN criteria (не число станций / not station count)", null],
   ["Готовых строк / Ready rows", null],
   ["MSA PASS", null],
   ["Полная регрессия / Full regression", "NOT_RUN"],

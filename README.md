@@ -2,13 +2,16 @@
 
 Эта ветка содержит инженерную базу одного управляемого предсерийного лота
 `EVT-20`. Актуальная программа закупки — два отдельных набора по 20 станций и
-один стендовый образец, всего 41 станция. Расчёты для 4 и 10 станций сохранены
-для сравнения, но не являются разрешением закупки.
+один стендовый образец, всего 41 станция. Закупочная выдача имеет два явно
+разделённых варианта: 21 станция (один EVT-20 плюс стендовая) и 41 станция
+(два EVT-20 плюс стендовая). Расчёты для 4 и 10 станций сохранены для
+сравнения, но не являются разрешением закупки.
 
 ## Зафиксированный baseline
 
 - производственная единица управления: `EVT-20`, 20 изделий;
 - программа: `2 × EVT-20 + 1 bench`, 41 станция;
+- варианты закупки: `21 = EVT-20 + bench` и `41 = 2 × EVT-20 + bench`;
 - резервы: два независимых EVT-20 пула; стендовый образец не создаёт третий;
 - серийные номера: первый лот `DIO-EVT-001…020`, второй `DIO-EVT-021…040`,
   стендовый образец `DIO-EVT-B01`; индивидуальные travellers заполняются до
@@ -83,7 +86,9 @@ Gerber, прошивки, бинарники, корпуса и серверны
 - [`docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv`](docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv) — реестр поставки и gates.
 - [`docs/OPEN_INPUTS_FOR_FREEZE.csv`](docs/OPEN_INPUTS_FOR_FREEZE.csv) — входные данные, блокирующие финальный выпуск.
 - [`hardware/EVT_PRE_20_BOM_POLICY_REV_A.md`](hardware/EVT_PRE_20_BOM_POLICY_REV_A.md) — BOM и количества.
-- [`hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv`](hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv) — aggregate-план на 41 станцию.
+- [`hardware/EVT_PROGRAM_PROCUREMENT_VARIANTS_REV_A.csv`](hardware/EVT_PROGRAM_PROCUREMENT_VARIANTS_REV_A.csv) — реестр вариантов закупки 21 и 41.
+- [`hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv`](hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv) — вариант на 21 станцию.
+- [`hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv`](hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv) — полный план на 41 станцию.
 - [`hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md`](hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md) — hardware release gate.
 - [`manufacturing/README.md`](manufacturing/README.md) — маршрут сборки, traceability и EOL.
 - [`tests/EVT_MASTER_PLAN.md`](tests/EVT_MASTER_PLAN.md) — последовательность EVT.

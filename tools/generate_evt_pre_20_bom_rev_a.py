@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DRAFT = ROOT / "hardware/EVT_PRE_20_BOM_DRAFT.csv"
 OUT = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 PROCUREMENT_OUT = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+PROGRAM_21_OUT = ROOT / "hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv"
 PROGRAM_OUT = ROOT / "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv"
 MAIN_PASSIVE_SUPPORT = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
 PWR_PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
@@ -772,6 +773,16 @@ def main(*, check_only: bool = False) -> None:
         "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
         "Program_scope",
     ]
+    program_21_fields = [
+        "Program_Procurement_ID", "Procurement_ID", "Assemblies", "Item_IDs",
+        "Category", "Manufacturer", "MPN", "Package", "Value", "Variant",
+        "Population", "Qty_per_station", "Production_lots_20", "Bench_stations",
+        "Total_stations", "Base_qty_1x20_plus_1", "Spare_qty_one_evt20_lot",
+        "Procure_qty_1x20_plus_1", "Spare_policy", "Procurement_track",
+        "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
+        "Program_scope",
+    ]
+    program_21_rows: list[dict[str, str]] = []
     program_rows: list[dict[str, str]] = []
     for procurement_row in procurement_rows:
         quantity_20 = int(procurement_row["Qty_20"])
@@ -789,6 +800,32 @@ def main(*, check_only: bool = False) -> None:
             track = "ALTERNATIVE_BARE_PCB_QUOTATION_ONLY"
         else:
             track = "COMMON_PROGRAM_PROCUREMENT"
+        base_quantity_21 = quantity_per_station * 21
+        program_spares_21 = int(procurement_row["Spares_20"])
+        program_21_rows.append({
+            "Program_Procurement_ID": f"P21-{len(program_21_rows) + 1:03d}",
+            "Procurement_ID": procurement_row["Procurement_ID"],
+            **{
+                field: procurement_row[field]
+                for field in (
+                    "Assemblies", "Item_IDs", "Category", "Manufacturer", "MPN",
+                    "Package", "Value", "Variant", "Population", "Spare_policy",
+                    "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
+                )
+            },
+            "Qty_per_station": str(quantity_per_station),
+            "Production_lots_20": "1",
+            "Bench_stations": "1",
+            "Total_stations": "21",
+            "Base_qty_1x20_plus_1": str(base_quantity_21),
+            "Spare_qty_one_evt20_lot": str(program_spares_21),
+            "Procure_qty_1x20_plus_1": str(base_quantity_21 + program_spares_21),
+            "Procurement_track": track,
+            "Program_scope": (
+                "ONE_EVT20_PRODUCTION_SET_PLUS_ONE_BENCH; "
+                "one EVT-20 reserve pool; no separate reserve pool for bench"
+            ),
+        })
         program_rows.append({
             "Program_Procurement_ID": f"PG-{len(program_rows) + 1:03d}",
             "Procurement_ID": procurement_row["Procurement_ID"],
@@ -826,6 +863,7 @@ def main(*, check_only: bool = False) -> None:
         [{field: row.get(field, "") for field in fields} for row in rows],
     )
     procurement_text = render_csv(procurement_fields, procurement_rows)
+    program_21_text = render_csv(program_21_fields, program_21_rows)
     program_text = render_csv(program_fields, program_rows)
     if check_only:
         require(OUT.is_file(), f"generated BOM is missing: {OUT.relative_to(ROOT)}")
@@ -842,6 +880,11 @@ def main(*, check_only: bool = False) -> None:
             f"generated procurement BOM drift: run {Path(__file__).relative_to(ROOT)}",
         )
         require(
+            PROGRAM_21_OUT.is_file()
+            and PROGRAM_21_OUT.read_text(encoding="utf-8") == program_21_text,
+            f"generated 1x20+1 program procurement drift: run {Path(__file__).relative_to(ROOT)}",
+        )
+        require(
             PROGRAM_OUT.is_file() and PROGRAM_OUT.read_text(encoding="utf-8") == program_text,
             f"generated 2x20+1 program procurement drift: run {Path(__file__).relative_to(ROOT)}",
         )
@@ -849,13 +892,15 @@ def main(*, check_only: bool = False) -> None:
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(detail_text, encoding="utf-8")
         PROCUREMENT_OUT.write_text(procurement_text, encoding="utf-8")
+        PROGRAM_21_OUT.write_text(program_21_text, encoding="utf-8")
         PROGRAM_OUT.write_text(program_text, encoding="utf-8")
 
     print(
         f"{'Verified' if check_only else 'Generated'} {OUT.relative_to(ROOT)} with "
         f"{len(rows)} engineering rows and "
         f"{PROCUREMENT_OUT.relative_to(ROOT)} with {len(procurement_rows)} procurement rows; "
-        f"{PROGRAM_OUT.relative_to(ROOT)} with {len(program_rows)} program rows"
+        f"{PROGRAM_21_OUT.relative_to(ROOT)} with {len(program_21_rows)} phase-1 rows and "
+        f"{PROGRAM_OUT.relative_to(ROOT)} with {len(program_rows)} full-program rows"
     )
 
 

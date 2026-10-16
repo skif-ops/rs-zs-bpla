@@ -12,6 +12,8 @@ const { FileBlob, SpreadsheetFile, Workbook } = await import(toolUrl);
 const root = process.cwd();
 const workbookPath = path.join(root, "hardware/EVT_PRE_20_BOM_REV_A.xlsx");
 const mode = process.argv[2] ?? "render";
+const previewDir = path.join(root, "outputs", "qa_bom_workbook");
+await fs.mkdir(previewDir, { recursive: true });
 
 const input = await FileBlob.load(workbookPath);
 const workbook = await SpreadsheetFile.importXlsx(input);
@@ -35,12 +37,13 @@ if (mode === "render") {
     tableMaxCellChars: 80,
   });
   console.log(inspection.ndjson);
-  await savePreview("/tmp/evt_pre_20_bom_before.png");
-  console.log("rendered=/tmp/evt_pre_20_bom_before.png");
+  await savePreview(path.join(previewDir, "evt_pre_20_bom_before.png"));
+  console.log("rendered=" + path.join(previewDir, "evt_pre_20_bom_before.png"));
 } else if (mode === "update") {
   const sources = [
     ["Engineering BOM", "hardware/EVT_PRE_20_BOM_REV_A.csv"],
     ["Procurement", "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"],
+    ["Program 21", "hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv"],
     ["Program 41", "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv"],
     ["RFQ", "hardware/CHINA_PROCUREMENT_RFQ.csv"],
   ];
@@ -60,7 +63,7 @@ if (mode === "render") {
       0, 0, values.length, values[0].length,
     );
     target.values = values;
-    if (sheetName === "Program 41") {
+    if (sheetName === "Program 21" || sheetName === "Program 41") {
       sheet.showGridLines = false;
       sheet.freezePanes.freezeRows(1);
       target.format = {
@@ -80,9 +83,20 @@ if (mode === "render") {
       sheet.getRange("I:S").format.columnWidth = 14;
       sheet.getRange("T:U").format.columnWidth = 24;
       sheet.getRange("V:Y").format.columnWidth = 34;
-      if (created) sheet.tables.add(`A1:Y${values.length}`, true, "Program41Table");
+      if (created) {
+        const tableName = sheetName === "Program 21" ? "Program21Table" : "Program41Table";
+        sheet.tables.add(`A1:Y${values.length}`, true, tableName);
+      }
     }
   }
+  const summary = workbook.worksheets.getItem("Summary");
+  summary.getRange("A9:F10").values = [
+    ["Build-lot unit", "EVT-20", "20 stations", "DIO-EVT-001..020", "Purchase gate", "BLOCKED"],
+    ["Procurement variants", "21 = 20 + bench", "41 = 20 + 20 + bench", "41 serials reserved", "Selection", "CUSTOMER_TO_SELECT"],
+  ];
+  summary.getRange("A9:F10").format.wrapText = true;
+  summary.getRange("A10:F10").format.fill = "#D9EAF7";
+  summary.getRange("A12:B12").values = [["Source baseline commit", "5be7569149c5"]];
   workbook.recalculate();
   const formulaErrors = await workbook.inspect({
     kind: "match",
@@ -91,15 +105,17 @@ if (mode === "render") {
     maxChars: 4000,
   });
   console.log(formulaErrors.ndjson);
-  await savePreview("/tmp/evt_pre_20_bom_after.png");
-  await savePreview("/tmp/evt_pre_20_rfq_after.png", "RFQ", "A1:S28");
-  await savePreview("/tmp/evt_program_41_after.png", "Program 41", "A1:Y20");
+  await savePreview(path.join(previewDir, "evt_pre_20_bom_after.png"));
+  await savePreview(path.join(previewDir, "evt_pre_20_rfq_after.png"), "RFQ", "A1:S28");
+  await savePreview(path.join(previewDir, "evt_program_21_after.png"), "Program 21", "A1:Y20");
+  await savePreview(path.join(previewDir, "evt_program_41_after.png"), "Program 41", "A1:Y20");
   const output = await SpreadsheetFile.exportXlsx(workbook);
   await output.save(workbookPath);
   console.log("updated=" + workbookPath);
-  console.log("rendered=/tmp/evt_pre_20_bom_after.png");
-  console.log("rendered=/tmp/evt_pre_20_rfq_after.png");
-  console.log("rendered=/tmp/evt_program_41_after.png");
+  console.log("rendered=" + path.join(previewDir, "evt_pre_20_bom_after.png"));
+  console.log("rendered=" + path.join(previewDir, "evt_pre_20_rfq_after.png"));
+  console.log("rendered=" + path.join(previewDir, "evt_program_21_after.png"));
+  console.log("rendered=" + path.join(previewDir, "evt_program_41_after.png"));
 } else {
   throw new Error(`unknown mode: ${mode}`);
 }

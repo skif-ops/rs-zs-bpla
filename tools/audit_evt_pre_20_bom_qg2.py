@@ -198,6 +198,56 @@ def main() -> int:
         else "41-station program demand reconciles as two EVT-20 lots plus one bench with two reserve pools",
     )
 
+    program_21_path = ROOT / "hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv"
+    program_21_errors: list[str] = []
+    program_21_rows = read(program_21_path) if program_21_path.is_file() else []
+    program_21_by_id = {row.get("Procurement_ID", ""): row for row in program_21_rows}
+    if len(program_21_rows) != len(procurement_rows) or set(program_21_by_id) != set(procurement_by_id):
+        program_21_errors.append("row_or_procurement_id_coverage")
+    else:
+        for procurement_id, source in procurement_by_id.items():
+            aggregate = program_21_by_id[procurement_id]
+            try:
+                quantity_20 = int(source["Qty_20"])
+                if quantity_20 % 20:
+                    program_21_errors.append(f"{procurement_id}:qty20_not_divisible")
+                    continue
+                per_station = quantity_20 // 20
+                base = per_station * 21
+                spares = int(source["Spares_20"])
+                if (
+                    aggregate.get("Qty_per_station") != str(per_station)
+                    or aggregate.get("Production_lots_20") != "1"
+                    or aggregate.get("Bench_stations") != "1"
+                    or aggregate.get("Total_stations") != "21"
+                    or aggregate.get("Base_qty_1x20_plus_1") != str(base)
+                    or aggregate.get("Spare_qty_one_evt20_lot") != str(spares)
+                    or aggregate.get("Procure_qty_1x20_plus_1") != str(base + spares)
+                    or "no separate reserve pool for bench" not in aggregate.get("Program_scope", "")
+                ):
+                    program_21_errors.append(f"{procurement_id}:1x20_plus_1_arithmetic")
+            except (KeyError, ValueError):
+                program_21_errors.append(f"{procurement_id}:invalid_program_quantity")
+    program_21_key_totals = {
+        row.get("Item_IDs", ""): row.get("Procure_qty_1x20_plus_1", "")
+        for row in program_21_rows
+    }
+    expected_program_21_key_totals = {
+        "ASM-MAIN": "23", "ASM-PWR": "23", "ASM-MIC": "86",
+        "PCB-MAIN": "23", "PCB-PWR": "23", "PCB-MIC": "86",
+        "HARNESS": "23",
+    }
+    if any(program_21_key_totals.get(item) != value
+           for item, value in expected_program_21_key_totals.items()):
+        program_21_errors.append("key_scope_totals")
+    check(
+        "program_procurement_1x20_plus_1",
+        not program_21_errors,
+        "1x20+1 procurement mismatch: " + ", ".join(program_21_errors)
+        if program_21_errors
+        else "21-station procurement option reconciles as one EVT-20 lot plus one bench with one reserve pool",
+    )
+
     main_freeze = read(ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv")
     main_item_for_ref = {
         **{f"U{i}": f"U{i}" for i in (1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18)},

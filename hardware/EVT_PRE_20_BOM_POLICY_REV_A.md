@@ -4,13 +4,17 @@ Status: `ACTIVE / TECHNICAL BOM QG-2 CONTROLLED / HARDWARE RELEASE BLOCKED`
 
 `hardware/EVT_PRE_20_BOM_REV_A.csv` is the generated controlled engineering BOM.
 `hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv` is its MPN-level procurement roll-up.
-`hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv` is the controlled aggregate
-for the actual program demand: two production sets of 20 stations plus one bench
-station, 41 stations total.
+`hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv` is the controlled
+procurement option for one production set of 20 stations plus one bench station,
+21 stations total. `hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv`
+is the controlled full-program option for two production sets of 20 stations plus
+one bench station, 41 stations total. The program itself remains 41 stations in both
+cases; the 21-station option is a phased first purchase.
 `hardware/EVT_PRE_20_BOM_PRICE_ESTIMATE_REV_A.csv` is the non-binding budgetary
 price layer for the same procurement rows.
 The per-lot files contain explicit calculations for 4, 10 and 20 stations. The
-program aggregate derives every line from the 20-station authority. Technical BOM QG-2
+21- and 41-station procurement aggregates derive every line from the 20-station
+authority. Technical BOM QG-2
 reports `PASS` when exact component identities, project-owned build-to-print article
 identities and quantity arithmetic are controlled. That result is not a factory release:
 supplier selection, job-specific manufacturing evidence and the hardware release gate
@@ -98,7 +102,11 @@ selected-process acceptance or the hardware release gate.
   terminals `43030-0038` and 12 control/I2C terminals `43030-0001`;
 - `Qty_N = Qty_per_station x N` and `Procure_qty_N = Qty_N + Spares_N` for
   `N = 4, 10, 20` on every engineering and procurement row.
-- For the program aggregate, `Base_qty_2x20_plus_1 = Qty_per_station x 41`,
+- For the 21-station option, `Base_qty_1x20_plus_1 = Qty_per_station x 21`,
+  `Spare_qty_one_evt20_lot = Spares_20`, and the bench station adds no separate
+  reserve pool. The selected full-PCBA track therefore carries 23 PCB-MAIN,
+  23 PCB-PWR and 86 PCB-MIC assemblies.
+- For the 41-station option, `Base_qty_2x20_plus_1 = Qty_per_station x 41`,
   `Spare_qty_two_evt20_lots = 2 x Spares_20`, and
   `Procure_qty_2x20_plus_1` is their sum. Thus the selected full-PCBA track carries
   45 PCB-MAIN assemblies, 45 PCB-PWR assemblies and 168 PCB-MIC assemblies.
@@ -168,7 +176,7 @@ and receipt plan. Passing this documentary audit does not mark any physical test
 
 `tools/audit_evt_pre_20_bom_workbook.py` reads the XLSX package independently with
 the Python standard library. It compares every displayed value in the Engineering
-BOM, Procurement, RFQ and Cost estimate worksheets with their CSV authorities and
+BOM, Procurement, Program 21, Program 41, RFQ and Cost estimate worksheets with their CSV authorities and
 verifies the native Excel-table ranges, summary lot quantities and gate statuses.
 It also recomputes the bare-PCB and primary full-PCBA tracks for lots 4, 10 and 20,
 requires exactly two spare boards per design, checks the full-PCBA per-station value

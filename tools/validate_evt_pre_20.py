@@ -1836,6 +1836,13 @@ def validate_policy_text() -> None:
     require("selected_evt_quantity: 20" in baseline, "baseline does not select the locked 20-station EVT lot")
     require("program_total_station_quantity: 41" in baseline,
             "baseline does not control the 2x20+1 total")
+    require("program_procurement_variants: [21, 41]" in baseline,
+            "baseline does not expose the 21 and 41 procurement variants")
+    require("program_procurement_selection_status: CUSTOMER_TO_SELECT_21_PHASE1_OR_41_FULL_PROGRAM" in baseline,
+            "baseline procurement variant selection status differs")
+    require("program_procurement_authority_21: hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv" in baseline
+            and "program_procurement_authority_41: hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv" in baseline,
+            "baseline procurement variant authorities differ")
     require("program_structure: TWO_EVT20_PRODUCTION_SETS_PLUS_ONE_BENCH" in baseline,
             "baseline program structure differs")
     require("program_spare_rule: TWO_EVT20_RESERVE_POOLS_BENCH_ADDS_NO_THIRD_RESERVE_POOL" in baseline,

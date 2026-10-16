@@ -7,9 +7,13 @@ controlled comparison and contingency calculations only.
 
 The wider program demand is two EVT-20 production sets plus one bench station
 (`20 + 20 + 1 = 41`). This does not rename the controlled per-set configuration or
-mix scenario columns. Its aggregate quantities are controlled separately in
-`hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv`: two EVT-20 spare pools
-are included and the bench station adds no third pool. Serial identities for the
+mix scenario columns. Procurement may be issued as either 21 stations (one EVT-20
+set plus the bench) or 41 stations (both EVT-20 sets plus the bench). Authorities are
+`hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv` and
+`hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv`; their selection register is
+`hardware/EVT_PROGRAM_PROCUREMENT_VARIANTS_REV_A.csv`. The 21-station option uses one
+EVT-20 spare pool, the 41-station option uses two, and the bench adds no separate pool.
+Serial identities for the
 second set (`DIO-EVT-021` through `DIO-EVT-040`) and bench (`DIO-EVT-B01`) are
 reserved in `manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv`; individual
 build travellers remain required before assembly starts.
