@@ -1,0 +1,35 @@
+{
+  "schema": "dioneya-evt-pre-20-production-release-record-v3",
+  "date": "2026-10-16",
+  "branch": "evt-pre-20",
+  "archive_source_commit": "e208d91ddc251b72c7643881955fb94bc309f17f",
+  "release_status": "EVT_BUILD_RELEASED_CUSTOMER_CHECKOUT_REQUIRED",
+  "manufacturing_authorized": true,
+  "specific_factory_job_confirmed": false,
+  "archive_name": "EVT-PRE-20_FULL_PRODUCTION_RELEASE_2026-10-16.zip",
+  "archive_bytes": 28084491,
+  "archive_sha256": "034313156E6E104DE730D17EBAFB27AE0158EC46B9071D7AFF1D40DCFC24571D",
+  "payload_file_count": 1181,
+  "zip_member_count": 1182,
+  "pcb_main_primary": {
+    "revision": "Rev.B",
+    "copper_layers": 8,
+    "stack_id": "JLC08161H-3313",
+    "nominal_thickness_mm": 1.6
+  },
+  "verification": {
+    "directory_manifest": true,
+    "zip_crc": true,
+    "zip_payload_hashes": true,
+    "path_confinement": true,
+    "strict_evt_build_release": "PASS_61_OF_61"
+  },
+  "board_release": {
+    "PCB-MAIN": "EVT_BUILD_AUTHORIZED_8L_CUSTOMER_CHECKOUT_REQUIRED",
+    "PCB-PWR": "EVT_BUILD_AUTHORIZED_PHYSICAL_PROTECTION_THERMAL_EMI_AT_EVT",
+    "PCB-MIC": "EVT_BUILD_AUTHORIZED_PHYSICAL_ACOUSTIC_VALIDATION_AT_EVT"
+  },
+  "customer_checkout_required": true,
+  "first_article_hold_required": true,
+  "serial_release": false
+}

@@ -1,0 +1,18 @@
+{
+  "schema": "dioneya-evt-pre-20-external-archive-v2",
+  "release_directory": "F:\\Проекты\\Codex\\release-packages\\EVT-PRE-20_FULL_PRODUCTION_RELEASE_2026-10-16",
+  "archive": "F:\\Проекты\\Codex\\release-packages\\EVT-PRE-20_FULL_PRODUCTION_RELEASE_2026-10-16.zip",
+  "archive_bytes": 28084491,
+  "archive_sha256": "034313156E6E104DE730D17EBAFB27AE0158EC46B9071D7AFF1D40DCFC24571D",
+  "payload_file_count": 1181,
+  "zip_member_count": 1182,
+  "directory_manifest_verified": true,
+  "zip_crc_verified": true,
+  "zip_payload_hashes_verified": true,
+  "path_confinement_verified": true,
+  "source_commit": "e208d91ddc251b72c7643881955fb94bc309f17f",
+  "pcb_main_primary": "Rev.B / 8 layers / JLC08161H-3313",
+  "release_status": "EVT_BUILD_RELEASED_CUSTOMER_CHECKOUT_REQUIRED",
+  "manufacturing_authorized": true,
+  "specific_factory_job_confirmed": false
+}
