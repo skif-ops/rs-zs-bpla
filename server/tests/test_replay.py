@@ -7,7 +7,8 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from station.replay import MAX_WINDOW_US, TRACK_MARGIN_US, ReplayError, build_replay, replay_sources
+from station.replay import (EPISODE_GAP_US, MAX_WINDOW_US, TRACK_MARGIN_US, ReplayError, build_replay,
+                            latest_episode_start_us, replay_sources)
 from tests.test_bearing_fusion import ARRIVALS, FRAME, STATIONS, bridge, feed, truth  # noqa: F401  (bridge is a fixture)
 
 
@@ -36,6 +37,7 @@ def test_replay_of_a_track_in_local_metres(fused):
     times = [p["t_us"] for p in track["points"]]
     assert times == sorted(times)
     assert r["window"]["target_last_us"] == times[-1]
+    assert r["window"]["episode_first_us"] == times[0]
     # Sound reaches a station after the target emitted it.  The API therefore exposes target time separately from
     # the overall last sample, so the live cursor does not move beyond the target and hide it.
     assert r["window"]["last_us"] >= r["window"]["target_last_us"]
@@ -53,6 +55,17 @@ def test_replay_of_a_track_in_local_metres(fused):
     assert all(b["track_id"] == summary["track_id"] for b in r["bearings"])
     assert all(b["bearing_key"].startswith(f'{b["station_id"]}:') for b in r["bearings"])
     assert all(isinstance(b["track_event_id"], str) for b in r["bearings"])
+
+
+def test_latest_live_episode_is_recovered_from_persisted_track_times():
+    first = 1_000_000
+    second = first + 2_000_000
+    next_episode = second + EPISODE_GAP_US + 1
+    assert latest_episode_start_us([]) is None
+    assert latest_episode_start_us([second, first, second]) == first
+    assert latest_episode_start_us([first, second, next_episode, next_episode + 1_000_000]) == next_episode
+    # Exactly seven seconds is an ordinary calculation gap; only a longer silence separates episodes.
+    assert latest_episode_start_us([first, first + EPISODE_GAP_US]) == first
 
 
 def test_replay_of_an_event_and_of_explicit_times(fused):
@@ -111,6 +124,8 @@ def test_replay_api_and_page(fused, monkeypatch):
     assert script.status_code == 200
     assert "function bearingsAt" in script.text and "for (const b of bearingsAt" in script.text
     assert "LIVE_EPISODE_GAP_US = 7000000" in script.text
+    assert "data.window.episode_first_us" in script.text
+    assert "liveEpisodeStartUs" in script.text
     assert "LIVE_ACTIVITY_HOLD_MS = 4000" in script.text
     assert "LIVE_BEARING_HOLD_MS = 6000" in script.text
     assert "LIVE_VISUAL_FADE_MS = 1500" in script.text

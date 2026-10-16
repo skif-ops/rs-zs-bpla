@@ -34,6 +34,7 @@
   let liveSince = Number(pageQuery.get("since")) || Date.now() * 1000 - 5 * 60 * 1e6;
   let livePrerollUs = pageQuery.get("segment") === "1" ? 2e6 : 15e6;
   let liveLastTrackUs = 0;
+  let liveEpisodeStartUs = liveSince;
   const liveTrackUntil = new Map();       // track_id -> local receipt-time expiry
   const liveTrackLastPoint = new Map();   // track_id -> newest point already observed by this page
   const liveTrackLastBearing = new Map(); // track_id -> newest associated bearing time (station arrival time)
@@ -64,6 +65,22 @@
     $("replay-speed").value = "1";
     $("replay-follow").checked = true;
     $("replay-geometry").checked = true;
+  }
+
+  function beginLiveEpisode(startUs, clearScene) {
+    liveEpisodeStartUs = startUs;
+    liveSince = startUs;
+    livePrerollUs = 2e6;
+    liveFollowing = true;
+    liveLastTrackUs = 0;
+    liveTrackUntil.clear(); liveTrackLastPoint.clear(); liveTrackLastBearing.clear();
+    liveLastEvidenceAt = 0;
+    liveHasConfirmedTrack = false;
+    if (!clearScene) return;
+    data = null; byStation = new Map(); coverage = null;
+    $("replay-empty").textContent = "Начинается новый эпизод…";
+    $("replay-empty").hidden = false;
+    draw();
   }
 
   async function loadSources() {
@@ -146,6 +163,16 @@
     if (liveActive) $("replay-live-state").textContent = "● Тревога · обновляется";
     if (liveActive) {
       const newest = Number(data.window.target_last_us) || 0;
+      const episodeFirst = Number(data.window.episode_first_us) || 0;
+      if (episodeFirst) {
+        const delta = episodeFirst - liveEpisodeStartUs;
+        // The API reconstructs the boundary from persisted points.  This is
+        // the recovery path when a loaded page missed the boundary WebSocket
+        // message (for example while another tab was open or fusion was busy).
+        if (delta > LIVE_EPISODE_GAP_US) beginLiveEpisode(episodeFirst, false);
+        else if (Math.abs(delta) <= LIVE_EPISODE_GAP_US) liveEpisodeStartUs = episodeFirst;
+      }
+      liveLastTrackUs = Math.max(liveLastTrackUs, newest);
       const now = Date.now();
       const newestBearingByTrack = new Map();
       for (const bearing of data.bearings) {
@@ -532,7 +559,8 @@
     }
     $("ro-utc").textContent = fmtUtc(t);
     $("replay-current-time").textContent = fmtUtc(t) + " UTC";
-    $("ro-rel").textContent = ((t - data.window.first_us) / 1e6).toFixed(1) + " с";
+    const relativeStart = liveActive && liveEpisodeStartUs ? liveEpisodeStartUs : data.window.first_us;
+    $("ro-rel").textContent = (Math.max(0, t - relativeStart) / 1e6).toFixed(1) + " с";
     const targetBody = $("replay-target-body");
     targetBody.replaceChildren();
     if (!active.length) {
@@ -692,15 +720,7 @@
     if (msg.type === "track.update" && msg.live_current === true) {
       const pointUs = Date.parse(msg.time) * 1000;
       if (Number.isFinite(pointUs) && liveLastTrackUs && pointUs - liveLastTrackUs > LIVE_EPISODE_GAP_US) {
-        liveSince = pointUs;
-        livePrerollUs = 2e6;
-        liveFollowing = true;
-        liveTrackUntil.clear(); liveTrackLastPoint.clear(); liveTrackLastBearing.clear();
-        liveLastEvidenceAt = 0;
-        data = null; byStation = new Map(); coverage = null;
-        $("replay-empty").textContent = "Начинается новый эпизод…";
-        $("replay-empty").hidden = false;
-        draw();
+        beginLiveEpisode(pointUs, true);
       }
       if (Number.isFinite(pointUs)) {
         const receivedAt = Date.now();

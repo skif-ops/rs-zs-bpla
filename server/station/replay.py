@@ -17,10 +17,29 @@ from station.access_scope import UNRESTRICTED
 MAX_WINDOW_US = 30 * 60 * 1_000_000        # one replay covers at most half an hour
 TRACK_MARGIN_US = 15_000_000               # bearings heard up to ~15 s (5 km of sound) around the track's points
 EVENT_WINDOW_US = 150_000_000              # an event without fused track: its detections' time +- 2.5 min
+EPISODE_GAP_US = 7_000_000                 # a longer quiet interval starts another live flight episode
 
 
 class ReplayError(ValueError):
     pass
+
+
+def latest_episode_start_us(times: list[int]) -> int | None:
+    """Return the first target-time sample after the latest quiet interval.
+
+    A long alert can contain several controlled flights.  The live page may
+    miss the WebSocket message at their boundary, so the replay response also
+    carries a boundary reconstructed from persisted track points.
+    """
+    ordered = sorted(set(times))
+    if not ordered:
+        return None
+    start = previous = ordered[0]
+    for current in ordered[1:]:
+        if current - previous > EPISODE_GAP_US:
+            start = current
+        previous = current
+    return start
 
 
 def _window(store, track_id: str | None, system_event_id: str | None, since_us: int | None, until_us: int | None,
@@ -137,7 +156,8 @@ def build_replay(store, *, track_id: str | None = None, system_event_id: str | N
                    # Bearing time is when sound reached a station and can be several seconds later than the
                    # target's emission-time track point.  The live UI must follow this value, otherwise its
                    # cursor runs past the track and the target disappears while bearings still arrive.
-                   "target_last_us": max(target_times) if target_times else None},
+                   "target_last_us": max(target_times) if target_times else None,
+                   "episode_first_us": latest_episode_start_us(target_times)},
         "origin": {"lat": lat0, "lon": lon0, "alt_msl_m": alt0},
         "stations": stations,
         "tracks": out_tracks,
