@@ -88,6 +88,51 @@ def test_strong_three_station_target_is_published_by_seventh_step(tmp_path):
     assert len(tracks) == 1 and tracks[0]["stations"] == [9001, 9002, 9003]
 
 
+def test_second_episode_keeps_both_targets_through_close_pass(tmp_path):
+    """The same three continuous source segments must survive a turn that makes the Kalman prediction re-gate."""
+    store = EventStore(tmp_path / "three-by-two-close-pass.sqlite3")
+    service = StationFusionService(store)
+    stations = stations_for_scenario(2)
+    start_us = 1_800_000_000_000_000
+    flights = make_passes(2, start_us, 40, TARGETS)
+    boot_id = 78
+    rng = random.Random(20261016)
+    sequence = {station.station_id: 2000 for station in stations}
+    events = {}
+
+    for second in range(41):
+        for flight in flights:
+            for station in stations:
+                if not heard(station, flight, float(second)):
+                    continue
+                key = station.station_id, flight.index
+                if key not in events:
+                    sequence[station.station_id] += 1
+                    event_id = (boot_id << 32) | sequence[station.station_id]
+                    events[key] = event_id
+                    payload = detection_payload(
+                        station, flight, float(second), seq_no=sequence[station.station_id],
+                        boot_id=boot_id, event_id=event_id, rng=rng,
+                    )
+                    assert process_message(
+                        f"zs/v1/bench/{station.station_id}/up", payload, "bench", True,
+                        event_store=store, fusion_service=service,
+                    ) == "stored"
+                payload = bearing_payload(
+                    station, flight, float(second), boot_id=boot_id,
+                    track_event_id=events[key], rng=rng,
+                )
+                assert process_message(
+                    f"zs/v1/bench/{station.station_id}/bearing", payload, "bench", True,
+                    event_store=store, fusion_service=service,
+                ) == "stored"
+
+    tracks = store.list_tracks(limit=20)
+    assert len(tracks) == 2
+    assert all(track["stations"] == [9004, 9005, 9006] for track in tracks)
+    assert all(track["last_time_us"] >= start_us + 34_000_000 for track in tracks)
+
+
 def test_final_episode_fuses_two_distinct_tracks_with_all_five_stations(tmp_path):
     """Regression for the fourth episode: two sources at every station must not create a Cartesian backlog or ghosts."""
     store = EventStore(tmp_path / "five-by-two.sqlite3")

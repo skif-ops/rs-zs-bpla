@@ -519,7 +519,7 @@
     if (liveActive) {
       if (active.length) {
         const targetText = ` · целей сейчас: ${active.length}`;
-        $("replay-live-state").textContent = "● Сопровождение-тревога" + targetText;
+        $("replay-live-state").textContent = "● Тревога · сопровождение" + targetText;
         $("replay-selection-title").textContent = "Тревога · " + (liveTenant || "участок") + targetText;
       } else {
         const recentlySeen = liveLastEvidenceAt && Date.now() - liveLastEvidenceAt <= LIVE_SEARCH_HOLD_MS;

@@ -117,7 +117,7 @@ def test_replay_api_and_page(fused, monkeypatch):
     assert "bearingUs / 1000 + LIVE_BEARING_HOLD_MS" in script.text
     assert "liveTrackUntil.set(msg.track.track_id, receivedAt + LIVE_ACTIVITY_HOLD_MS)" in script.text
     assert "if (liveActive && !active.length) return" in script.text
-    assert "● Сопровождение-тревога" in script.text
+    assert "● Тревога · сопровождение" in script.text
     assert "● Тревога · уточнение координат" in script.text
     assert "● Поиск целей · анализ продолжается" in script.text
     assert "● Контроль участка · активных целей нет" in script.text

@@ -693,7 +693,12 @@ class HypothesisTrackFusion:
             tr = tracks[track_id]
             kf = self._kalman(tr["kf"])
             new = [(t, f) for t, f in chosen[i].fixes if t > tr["last_s"]][:5]
-            if new and sum(not self._gated(kf, t, f) for t, f in new) > len(new) // 2:
+            # An unchanged set of source segments is stronger identity evidence than the motion prediction.  Let the
+            # REGATE_POINTS path below reset a stale filter after a close pass; the early gate remains authoritative
+            # when a different association is trying to take over the track.
+            same_members = set(chosen[i].members) == {tuple(m) for m in tr["cur"]}
+            if (not same_members and new
+                    and sum(not self._gated(kf, t, f) for t, f in new) > len(new) // 2):
                 refused.add(i)                                   # not the motion of that track: no decision yet
                 continue
             assigned[i] = track_id
