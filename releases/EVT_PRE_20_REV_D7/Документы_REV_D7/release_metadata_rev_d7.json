@@ -1,0 +1,45 @@
+{
+  "configuration": "EVT-PRE-20",
+  "revision": "REV_D7",
+  "date": "2026-10-16",
+  "scope": "one controlled lot of 20 stations",
+  "pcb": {
+    "PCB-MAIN": {
+      "revision": "Rev.B",
+      "copper_layers": 8
+    },
+    "PCB-PWR": {
+      "copper_layers": 4
+    },
+    "PCB-MIC": {
+      "copper_layers": 2
+    }
+  },
+  "counts": {
+    "bom_lines": 295,
+    "procurement_lines": 124,
+    "pcba_map_lines": 253,
+    "interconnect_links": 32,
+    "harness_conductors": 38,
+    "assembly_steps": 26
+  },
+  "budgetary_total_rub_evt20": 4228880.0,
+  "document_files": [
+    "ПАСПОРТ_ПРОИЗВОДСТВЕННОГО_КОМПЛЕКТА_EVT_PRE_20_REV_D7.docx",
+    "АКТУАЛИЗИРОВАННОЕ_ТЕХНИЧЕСКОЕ_ЗАДАНИЕ_EVT_PRE_20_REV_D7.docx",
+    "ТЕХНИЧЕСКИЙ_ПРОЕКТ_EVT_PRE_20_REV_D7.docx",
+    "ЗАЯВКА_НА_ЗАКУПКУ_И_СБОРКУ_EVT_PRE_20_REV_D7.docx",
+    "РУКОВОДСТВО_ПО_СБОРКЕ_СТАНЦИЙ_EVT_PRE_20_REV_D7.docx",
+    "ЗАДАНИЕ_НА_ИЗГОТОВЛЕНИЕ_ЖГУТОВ_И_КАБЕЛЕЙ_EVT_PRE_20_REV_D7.docx",
+    "ЗАДАНИЕ_НА_КОРПУСА_ЛИТЬЕ_И_3D_ПЕЧАТЬ_EVT_PRE_20_REV_D7.docx",
+    "ЗАДАНИЕ_НА_ИЗГОТОВЛЕНИЕ_И_МОНТАЖ_ПЛАТ_ALTIUM_EVT_PRE_20_REV_D7.docx",
+    "ПРОГРАММА_И_МЕТОДИКИ_EVT_PRE_20_REV_D7.docx",
+    "ОТЧЕТНЫЕ_ФОРМЫ_EVT_PRE_20_REV_D7.docx",
+    "РУКОВОДСТВО_ДООБУЧЕНИЯ_МУХОЕД_EVT_PRE_20_REV_D7.docx",
+    "СХЕМА_ПОДКЛЮЧЕНИЙ_И_РАСПАЙКИ_EVT_PRE_20_REV_D7.docx"
+  ],
+  "status": {
+    "document_package": "READY_FOR_HANDOFF",
+    "physical_evt": "NOT_RUN"
+  }
+}
