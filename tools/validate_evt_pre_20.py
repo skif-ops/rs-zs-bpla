@@ -30,14 +30,19 @@ def require(condition: bool, message: str) -> None:
 
 def validate_csv_shapes() -> None:
     for path in sorted(ROOT.rglob("*.csv")):
+        relative = path.relative_to(ROOT)
+        if relative.parts[0] in {".git", "outputs"} or any(
+            part.startswith("build") for part in relative.parts
+        ):
+            continue
         with path.open(encoding="utf-8-sig", newline="") as source:
             rows = list(csv.reader(source))
-        require(bool(rows), f"empty CSV: {path.relative_to(ROOT)}")
+        require(bool(rows), f"empty CSV: {relative}")
         width = len(rows[0])
         for line_number, row in enumerate(rows[1:], start=2):
             require(
                 len(row) == width,
-                f"CSV width mismatch: {path.relative_to(ROOT)}:{line_number}",
+                f"CSV width mismatch: {relative}:{line_number}",
             )
 
 
@@ -885,6 +890,19 @@ def validate_decisions_and_tests() -> None:
         and "manufacturing blocks" in decisions["DEC-071"]["Impact"],
         "PCB-MAIN RF/SI ECO split decision is missing or over-released",
     )
+    require(
+        decisions["DEC-147"]["Status"] ==
+        "ACCEPTED_PRIMARY_8L_SOURCE_RELEASE_GATES_OPEN"
+        and "PCB-MAIN 8-layer COMPLETE-105 Rev.B"
+        in decisions["DEC-147"]["Decision"]
+        and "JLC08161H-3313 preferred stack"
+        in decisions["DEC-147"]["Impact"]
+        and "preserve 6L as superseded"
+        in decisions["DEC-147"]["Impact"]
+        and "DFM impedance POFV Review B and first-article gates open"
+        in decisions["DEC-147"]["Impact"],
+        "PCB-MAIN accepted eight-layer primary-source decision is missing or over-released",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -920,26 +938,28 @@ def validate_deliverable_register() -> None:
     )
     main_layout = deliverables["HW-M-002"]["Критерий выпуска"]
     require(
-        "Six-layer native candidate" in main_layout
-        and "strict 2D placement-clearance PASS" in main_layout
-        and "constraints for all 186 nets" in main_layout
-        and "JLC06161H-3313 numeric RF/USB geometry is accepted for EVT" in main_layout
-        and "1023 trace items and eight copper zones" in main_layout
-        and "remaining connector and pair-aware routing" in main_layout
-        and "checkout DFM" in main_layout
-        and "Review B remain open" in main_layout,
+        deliverables["HW-M-002"]["Статус"] == "EVT_8L_COMPLETE_105_ADOPTED"
+        and deliverables["HW-M-002"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-M-002"]["QG-2 техника"] == "OPEN"
+        and "PCB-MAIN COMPLETE-105 Rev.B" in main_layout
+        and "primary eight-layer EVT source" in main_layout
+        and "KiCad DRC 0 errors and 0 unconnected" in main_layout
+        and "selected-stack impedance/return-path" in main_layout
+        and "POFV" in main_layout
+        and "Altium antenna warnings" in main_layout
+        and "DFM and Review B remain open" in main_layout,
         "PCB-MAIN deliverable does not match the accepted stackup and active routing state",
     )
     require(
         deliverables["HW-M-011"]["Статус"] ==
-        "EVT_ENGINEERING_BASELINE_ACCEPTED"
+        "EVT_8L_BASELINE_ACCEPTED"
         and deliverables["HW-M-011"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-M-011"]["QG-2 техника"] == "PASS"
-        and "Official JLC06161H-3313 controls EVT"
+        and "JLC08161H-3313 is the preferred 8-layer 1.6 mm order stack"
         in deliverables["HW-M-011"]["Критерий выпуска"]
-        and "all 22 historical response rows are project engineering closures"
+        and "selected dielectrics, impedance, return paths and DFM"
         in deliverables["HW-M-011"]["Критерий выпуска"]
-        and "routing RF/SI DRC CAM checkout DFM Review B and manufacture are separate gates"
+        and "before panel release"
         in deliverables["HW-M-011"]["Критерий выпуска"],
         "PCB-MAIN accepted stackup/impedance deliverable is missing or stale",
     )
@@ -1038,13 +1058,15 @@ def validate_deliverable_register() -> None:
     )
     risks = {row["Risk_ID"]: row for row in read_csv("docs/RISK_REGISTER.csv")}
     require(
-        "audited 186-net pre-route authority" in risks["R-025"]["Mitigation"]
-        and "selected JLC06161H-3313 geometry" in risks["R-025"]["Mitigation"]
-        and "controlled U9 paste implementation" in risks["R-025"]["Mitigation"]
-        and "checkout DFM" in risks["R-025"]["Mitigation"]
-        and "checkout stackup mismatch" in risks["R-025"]["Trigger"]
-        and "unresolved portal DFM error" in risks["R-025"]["Trigger"]
-        and "premature U9 paste" in risks["R-025"]["Trigger"],
+        "accepted PCB-MAIN 8-layer production source" in risks["R-025"]["Risk"]
+        and "retired 6-layer source" in risks["R-025"]["Risk"]
+        and "PCB-MAIN COMPLETE-105 Rev.B" in risks["R-025"]["Mitigation"]
+        and "JLC08161H-3313 Rev.B authority" in risks["R-025"]["Mitigation"]
+        and "selected-stack dielectric and impedance review" in risks["R-025"]["Mitigation"]
+        and "POFV confirmation" in risks["R-025"]["Mitigation"]
+        and "Altium antenna-warning disposition" in risks["R-025"]["Mitigation"]
+        and "In5/In6 Gerbers" in risks["R-025"]["Trigger"]
+        and "selected-stack/POFV/DFM confirmation" in risks["R-025"]["Trigger"],
         "PCB-MAIN production-layout risk does not match the accepted EVT baseline",
     )
     require(
@@ -1650,9 +1672,7 @@ def validate_hardware_baseline() -> None:
             all(mic_review_a_evidence.get(key) for key in required_mic_review_a_evidence),
             "PCB-MIC signed Review A evidence links are incomplete",
         )
-    else:
-        require(mic_status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
-                "PCB-MIC release state is neither signed nor an explicit post-ECO candidate")
+    elif mic_status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO":
         require(mic_review_a["complete"] is False
                 and mic_review_a["status"] == "REVIEW_REQUIRED_AFTER_COPPER_ECO",
                 "PCB-MIC post-ECO Review A is not explicitly open")
@@ -1686,34 +1706,82 @@ def validate_hardware_baseline() -> None:
         require(copper_gate.get("decision") == "ECO_REQUIRED"
                 and copper_gate.get("reviewer") and copper_gate.get("date"),
                 "PCB-MIC ECO_REQUIRED decision traceability is incomplete")
+    else:
+        require(
+            mic_status["release_state"] ==
+            "ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED",
+            "PCB-MIC release state is neither signed nor an explicit post-ECO candidate",
+        )
+        require(
+            mic_review_a["complete"] is False
+            and mic_review_a["status"] ==
+            "REPEAT_REQUIRED_AFTER_ACOUSTIC_CLEARANCE_ECO",
+            "PCB-MIC acoustic-clearance ECO does not explicitly require repeat Review A",
+        )
+        require(
+            all(mic_review_a.get(field) for field in ("reviewer", "date", "commit_sha"))
+            and re.fullmatch(r"[0-9a-f]{40}", mic_review_a["commit_sha"]) is not None,
+            "PCB-MIC historical Review-A traceability is incomplete after acoustic ECO",
+        )
+        current_hash = str(mic_review_a.get("current_source_sha256", ""))
+        approved_hash = str(mic_review_a.get("approved_native_board_sha256", ""))
+        require(
+            re.fullmatch(r"[0-9A-Fa-f]{64}", current_hash) is not None
+            and re.fullmatch(r"[0-9A-Fa-f]{64}", approved_hash) is not None
+            and current_hash.lower() != approved_hash.lower(),
+            "PCB-MIC acoustic ECO does not prove that the approved source changed",
+        )
+        required_evidence = mic_review_a.get("required_evidence", {})
+        require(
+            required_evidence.get("status") ==
+            "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A",
+            "PCB-MIC acoustic ECO is missing commit-bound evidence for repeat Review A",
+        )
+        mic_review_b = mic_status["review_b"]
+        require(
+            mic_review_b["status"] == "REOPENED_AFTER_ACOUSTIC_CLEARANCE_ECO"
+            and mic_review_b.get("copper_return_gate", {}).get("status") ==
+            "HISTORICAL_PASS_SOURCE_CHANGED_REPEAT_REQUIRED",
+            "PCB-MIC Review B was not reopened after the acoustic-clearance ECO",
+        )
     mic_handoff = mic_status["review_b"].get("manufacturing_handoff", {})
-    require(
-        mic_handoff.get("status") == "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
-        and mic_handoff.get("internal_packet_complete") is True
-        and mic_handoff.get("complete") is True
-        and mic_handoff.get("accepted_response_rows") == 9
-        and mic_handoff.get("external_reply_required") is False,
-        "PCB-MIC manufacturing baseline is not accepted",
-    )
-    require(
-        all(mic_handoff.get(key) is True for key in (
-            "fabricator_dfm_acceptance",
-            "assembler_dfm_acceptance",
-            "panelization_acceptance",
-            "depanel_acceptance",
-            "assembler_process_keepout_acceptance",
-        ))
-        and mic_handoff.get("review_b_complete") is False
-        and mic_handoff.get("manufacturing_release") is False,
-        "PCB-MIC process baseline or release boundary drifted",
-    )
-    for relative in (
-        mic_handoff.get("packet"),
-        mic_handoff.get("machine_contract"),
-        mic_handoff.get("response_register"),
-    ):
-        require(isinstance(relative, str) and (ROOT / relative).is_file(),
-                f"PCB-MIC manufacturing handoff file is missing: {relative}")
+    if mic_status["release_state"] == "ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED":
+        require(
+            mic_handoff.get("status") == "SOURCE_CHANGED_REGENERATE_OUTPUTS_AND_REPEAT_REVIEW"
+            and mic_handoff.get("internal_packet_complete") is False
+            and mic_handoff.get("complete") is False
+            and mic_handoff.get("review_b_complete") is False
+            and mic_handoff.get("manufacturing_release") is False,
+            "PCB-MIC manufacturing handoff was not reopened after the acoustic ECO",
+        )
+    else:
+        require(
+            mic_handoff.get("status") == "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
+            and mic_handoff.get("internal_packet_complete") is True
+            and mic_handoff.get("complete") is True
+            and mic_handoff.get("accepted_response_rows") == 9
+            and mic_handoff.get("external_reply_required") is False,
+            "PCB-MIC manufacturing baseline is not accepted",
+        )
+        require(
+            all(mic_handoff.get(key) is True for key in (
+                "fabricator_dfm_acceptance",
+                "assembler_dfm_acceptance",
+                "panelization_acceptance",
+                "depanel_acceptance",
+                "assembler_process_keepout_acceptance",
+            ))
+            and mic_handoff.get("review_b_complete") is False
+            and mic_handoff.get("manufacturing_release") is False,
+            "PCB-MIC process baseline or release boundary drifted",
+        )
+        for relative in (
+            mic_handoff.get("packet"),
+            mic_handoff.get("machine_contract"),
+            mic_handoff.get("response_register"),
+        ):
+            require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                    f"PCB-MIC manufacturing handoff file is missing: {relative}")
     require(
         mic_status["native_source"]["independent_schematic_audit"] ==
         "artifacts/pcb_mic_native_schematic_rev_a.json",

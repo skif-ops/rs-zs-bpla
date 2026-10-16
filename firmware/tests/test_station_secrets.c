@@ -39,11 +39,17 @@ static void test_ram(void) {
   /* first commit: version 1 into slot 0 */
   memset(&s, 0, sizeof(s));
   for (unsigned i = 0u; i < 32u; i++) s.engineer_key[i] = (uint8_t)(0xa0 + i);
+  for (unsigned i = 0u; i < ZS_STATION_PAIRING_SECRET_BYTES; i++) s.pairing_secret[i] = (uint8_t)(0x10u + i);
   s.engineer_key_set = true;
+  s.pairing_secret_set = true;
+  s.factory_serial_set = true;
+  strcpy(s.factory_serial, "DIO-EVT-012");
   strcpy(s.iccid[0], ICCID1);
   assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK && s.version == 1u);
   assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 0u && back.version == 1u);
   assert(back.engineer_key_set && memcmp(back.engineer_key, s.engineer_key, 32u) == 0 && strcmp(back.iccid[0], ICCID1) == 0 && back.iccid[1][0] == 0 && !back.command_key_set);
+  assert(back.pairing_secret_set && memcmp(back.pairing_secret, s.pairing_secret, ZS_STATION_PAIRING_SECRET_BYTES) == 0);
+  assert(back.factory_serial_set && strcmp(back.factory_serial, "DIO-EVT-012") == 0);
 
   /* second commit goes to slot 1 with version 2; the unset key bytes of the caller do not matter */
   strcpy(s.iccid[1], ICCID2);
@@ -115,13 +121,12 @@ static void test_nor(void) {
   assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK);
   assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK && s.version == 2u);
   assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 1u && strcmp(back.iccid[1], ICCID2) == 0);
-  assert(memcmp(&m.memory[2u * MOCK_ERASE_BYTES], "ZSSECR02", 8) == 0 && memcmp(&m.memory[3u * MOCK_ERASE_BYTES], "ZSSECR02", 8) == 0);
+  assert(memcmp(&m.memory[2u * MOCK_ERASE_BYTES], "ZSSECR03", 8) == 0 && memcmp(&m.memory[3u * MOCK_ERASE_BYTES], "ZSSECR03", 8) == 0);
   for (uint32_t a = 0u; a < 2u * MOCK_ERASE_BYTES; a++) assert(m.memory[a] == 0xffu);     /* nothing outside the partition */
   printf("secrets nor ok\n");
 }
 
-/* Addendum E: the next command key round-trips; a v1 record written before it (132 bytes, CRC at 128) still loads,
-   and the next commit upgrades it to v2 in the other slot. */
+/* Addendum E and factory identity: legacy v1/v2 records still load and the next commit upgrades them to v3. */
 static uint32_t t_crc32(const uint8_t *d, size_t n) {
   uint32_t c = 0xffffffffu;
   for (size_t i = 0u; i < n; i++) { c ^= d[i]; for (unsigned b = 0u; b < 8u; b++) c = (c >> 1) ^ (0xedb88320u & (uint32_t)-(int32_t)(c & 1u)); }
@@ -141,21 +146,35 @@ static void test_next_key_and_v1(void) {
   crc = t_crc32(r, 128u); r[128] = (uint8_t)crc; r[129] = (uint8_t)(crc >> 8); r[130] = (uint8_t)(crc >> 16); r[131] = (uint8_t)(crc >> 24);
   assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 0u && back.version == 7u);
   assert(back.command_key_set && back.command_public_key[31] == 0x11u && !back.command_next_key_set && !back.engineer_key_set);
-  /* install a next key: v2 in slot 1, both keys back */
+  /* install a next key: v3 in slot 1, both keys back */
   s = back;
   s.command_next_key_set = true; memset(s.command_next_key, 0x22, 32u);
   assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK && s.version == 8u);
-  assert(memcmp(m.slots[1], "ZSSECR02", 8) == 0);
+  assert(memcmp(m.slots[1], "ZSSECR03", 8) == 0);
   assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 1u && back.version == 8u);
   assert(back.command_key_set && back.command_public_key[0] == 0x11u && back.command_next_key_set && back.command_next_key[0] == 0x22u);
   /* promote: next becomes current, next cleared */
   memcpy(s.command_public_key, s.command_next_key, 32u); s.command_next_key_set = false;
   assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK && s.version == 9u);
   assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 0u && back.command_public_key[0] == 0x22u && !back.command_next_key_set);
-  /* a v2 record with a flipped next-key byte fails its CRC: the previous record wins */
+  /* a v3 record with a flipped next-key byte fails its CRC: the previous record wins */
   m.slots[0][140] ^= 0x01u;
   assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 1u && back.version == 8u);
-  printf("secrets next key / v1 ok\n");
+
+  /* A v2 record from a fielded image remains readable and is upgraded on its next commit. */
+  memset(&m, 0xff, sizeof(m)); m.writes = 0u; m.fail_write = 0u; m.erases = 0u;
+  r = m.slots[0];
+  memcpy(r, "ZSSECR02", 8); r[8] = 10u; r[9] = r[10] = r[11] = 0u; r[12] = 8u; r[13] = r[14] = r[15] = 0u;
+  memset(r + 94, 0x33, 32u);
+  crc = t_crc32(r, 160u); r[160] = (uint8_t)crc; r[161] = (uint8_t)(crc >> 8); r[162] = (uint8_t)(crc >> 16); r[163] = (uint8_t)(crc >> 24);
+  assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && back.version == 10u && back.command_public_key[0] == 0x33u);
+  s = back; s.factory_serial_set = true; strcpy(s.factory_serial, "DIO-EVT-B01");
+  memset(s.pairing_secret, 0x44, sizeof(s.pairing_secret)); s.pairing_secret_set = true;
+  assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK && memcmp(m.slots[1], "ZSSECR03", 8) == 0);
+  assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && back.factory_serial_set && back.pairing_secret_set);
+  assert(zs_station_factory_serial_valid("DIO-EVT-001", NULL) && zs_station_factory_serial_valid("DIO-EVT-040", NULL) &&
+         zs_station_factory_serial_valid("DIO-EVT-B01", NULL) && !zs_station_factory_serial_valid("DIO-EVT-041", NULL));
+  printf("secrets next key / legacy / factory identity ok\n");
 }
 
 int main(void) {

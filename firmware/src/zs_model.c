@@ -5,6 +5,10 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#if defined(_MSC_VER)
+#include <intrin.h>
+#pragma intrinsic(_ReadWriteBarrier)
+#endif
 
 _Static_assert(ZS_MODEL_CLASS_COUNT <= ZS_MODEL_PACKAGE_MAX_CLASSES, "the built-in model fits the package limits");
 
@@ -144,7 +148,13 @@ static zs_model_t ram_model;
 static volatile uint32_t ram_seq;          /* odd: being written */
 static volatile bool ram_active;
 
-static void fence(void) { __atomic_thread_fence(__ATOMIC_SEQ_CST); }
+static void fence(void) {
+#if defined(_MSC_VER)
+  _ReadWriteBarrier();
+#else
+  __atomic_thread_fence(__ATOMIC_SEQ_CST);
+#endif
+}
 
 zs_model_status_t zs_model_activate(zs_model_read_fn read, void *ctx, uint32_t size, uint32_t expected_version) {
   zs_model_t check;

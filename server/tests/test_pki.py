@@ -241,6 +241,7 @@ def test_cli_end_to_end(tmp_path, monkeypatch):
     assert cli(["station-package", "--pki", str(server), "DIO-EVT-012", "--out", str(tmp_path / "eol")]) == 0
     pkg = json.loads((tmp_path / "eol" / "DIO-EVT-012" / "station.json").read_text())
     assert pkg["station_id"] == 12 and pkg["tenant"] == "pilot1" and pkg["mqtt_port"] == 8883
+    assert len(pkg["pairing_secret_b32"]) == 26 and len(pkg["pairing_secret_hex"]) == 32
     assert not (tmp_path / "eol" / "DIO-EVT-012" / "station.key.pem").exists()
 
     # the station certificate validates against the chain mosquitto will use

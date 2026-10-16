@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "release_id": "EVT_PRE_20_RELEASE_CANDIDATE_2026101601",
+  "release_code": 2026101601,
+  "date": "2026-10-16",
+  "status": "SIGNED_RELEASE_CANDIDATE_HARDWARE_QUALIFICATION_PENDING",
+  "scope": "EVT_BUILD_B01_CHARACTERIZATION_AND_EOL_LIMIT_FREEZE",
+  "production_release": false,
+  "allowed_for_evt_build_and_measurement": true,
+  "firmware_lock": "FORBIDDEN_HARDWARE_VALIDATION_PENDING",
+  "private_material_in_repository_or_package": false,
+  "pcb_stackup": {
+    "PCB-MAIN": 8,
+    "PCB-PWR": 4,
+    "PCB-MIC": 2
+  },
+  "stm32": {
+    "target": "STM32U585VIT6Q",
+    "version": "0.1.0-evt.20261016",
+    "release_code": 2026101601,
+    "signature": "Ed25519",
+    "public_key_id": "fd82ce3ef2f92b6b",
+    "public_key_hex": "f517d3ba21ee52db647585f7ae632d567af59abca719b676ca1bccbefcb2c1f2",
+    "option_byte_profile": "option_bytes_bench_rev_a.json",
+    "signed_image_sha256": "e23154fc99899903aed9a73f004f96848b14ee96a51113f35461041dce5223e4",
+    "manifest_sha256": "e95b2136c9a774d77b967259d31fd016df51fbb5bafe53627faca288cfd11064",
+    "signature_file_sha256": "600fa15b0cf11f17c3e1c6e98cd3dde38db54f99bb02ca4d8046b595bdd82c7d",
+    "flash_used_bytes": 249024,
+    "ram_used_bytes": 714008,
+    "budget_gate": "PASS"
+  },
+  "nrf52840": {
+    "target": "Raytac MDBT50Q-P1MV2 / nRF52840",
+    "version": "0.1.0+2026101601",
+    "signature": "MCUboot ECDSA P-256",
+    "public_key_spki_sha256": "9b227a7115bc24aa13cb00f9f255eec18ed6266b68abc3547872e2a82bc0c0b1",
+    "signed_image_sha256": "8f360a5fe9e0cc72b5a7bcd208a51d5e164447bbd0c83f302bb2249adde73951",
+    "signed_hex_sha256": "c56ee628690b040d0a7c00050d4a61cb32cbf754bad463f2ff6baecb8c48c360",
+    "dfu_zip_sha256": "d910194fb7db2799fce9325d094f46914c009669a6465cebe7feb64e3b3e485d",
+    "merged_hex_sha256": "835d04956e00fc9fab9d2326e306b1d9d84b2fb28cd50426c331edcfe88ffc6a",
+    "imgtool_verify": "PASS"
+  },
+  "android": {
+    "application_id": "ru.dioneya.commissioning",
+    "version_code": 2026101601,
+    "version_name": "0.1.0-evt.20261016",
+    "signature_scheme": "APK_V2",
+    "certificate_sha256": "a7ba19ca151d213da46b80bed73dd740b3c2e7a0132cc06ab3a56cd792e3cd6e",
+    "apk_sha256": "4aac5e997107f76c25e080e08dad934f9526e0174ab8071c8cd31ea06b0b5ec8",
+    "unit_tests": "72_PASS"
+  },
+  "open_hardware_gates": [
+    "DIO-EVT-B01 power and current characterization",
+    "microphone and acoustic fixture characterization",
+    "GNSS PPS accuracy and holdover measurement",
+    "conducted and enclosure RF validation",
+    "temperature and power-cycle margins",
+    "enclosure sealing and pressure-decay characterization",
+    "complete EOL regression and two-person approval"
+  ],
+  "acceptance_policy": "Any undefined mandatory numeric limit or missing evidence produces HOLD. Production firmware locking is denied until all hardware gates pass."
+}

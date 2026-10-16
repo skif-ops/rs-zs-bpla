@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "policy_id": "EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A",
+  "status": "LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING",
+  "applies_to": [
+    "DIO-EVT-B01",
+    "DIO-EVT-001..040"
+  ],
+  "bench_profile": "option_bytes_bench_rev_a.json",
+  "bench_requirements": {
+    "irreversible_changes_allowed": false,
+    "rdp": "0xAA",
+    "trustzone": "disabled",
+    "boot_lock": "disabled",
+    "write_protection": "disabled",
+    "pcrop": "disabled",
+    "swd_recovery_required": true,
+    "boot0_recovery_required": true
+  },
+  "lock_release_requirements": {
+    "separate_release_id_required": true,
+    "separate_option_byte_profile_required": true,
+    "bench_profile_must_not_be_modified_into_lock_profile": true,
+    "target_hardware_qualification_result": "PASS",
+    "full_regression_result": "PASS",
+    "open_mandatory_items_allowed": false,
+    "failed_mandatory_items_allowed": false,
+    "approved_numeric_hardware_limits_required": true,
+    "production_key_and_recovery_policy_required": true,
+    "two_person_release_approval_required": true,
+    "required_hardware_evidence": [
+      "STM32 SWD read-back and cold boot",
+      "BOOT0 and system-memory recovery",
+      "STM32 A/B trial, confirmation and rollback with power interruption",
+      "nRF52840 SWD, MCUboot update, rollback and serial recovery",
+      "four microphone channels and approved acoustic limits",
+      "QSPI and microSD read, write and interrupted-write recovery",
+      "BG95 mutual TLS, MQTT, dual-SIM and reconnect",
+      "GNSS and PPS",
+      "LoRa in an approved RF setup",
+      "power, current, temperature, protection and power-cycle limits",
+      "complete EOL run with no OPEN, NOT_RUN, FAIL or HOLD mandatory item"
+    ]
+  },
+  "per_station_requirements": {
+    "eol_result": "PASS",
+    "identity_and_provisioning_verified": true,
+    "firmware_hashes_verified": true,
+    "evidence_bundle_complete": true,
+    "ncr_open_allowed": false,
+    "lock_applied_only_after_station_pass": true,
+    "post_lock_readback_boot_and_connectivity_test_required": true
+  },
+  "forbidden_before_authorization": [
+    "RDP transition above Level 0",
+    "BOOT_LOCK enable",
+    "TrustZone enable",
+    "WRP enable",
+    "PCROP enable",
+    "SWD disable or restriction",
+    "BOOT0 recovery disable",
+    "production immutable root provisioning"
+  ],
+  "rdp_level_2_policy": "PROHIBITED_UNLESS_SEPARATELY_APPROVED_AS_AN_IRREVERSIBLE_PRODUCT_DECISION",
+  "evidence_record": "manufacturing/EOL_RESULT_REGISTER.csv plus signed target qualification protocol and per-station traveller",
+  "normative_document": "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.md"
+}

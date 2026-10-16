@@ -1,0 +1,17 @@
+EVT-PRE-20 nRF52840 release candidate 2026101601
+Status: signed release candidate; hardware validation pending
+Board: evt_pre_20_ble / Raytac MDBT50Q-P1MV2 / nRF52840
+NCS: 2.7.0, Zephyr: 3.6.99-ncs2, GNU Arm: 12.2.0
+MCUboot signature: ECDSA P-256
+Public key SPKI SHA-256: 9b227a7115bc24aa13cb00f9f255eec18ed6266b68abc3547872e2a82bc0c0b1
+imgtool verify: PASS
+Image version: 0.1.0+2026101601
+Image digest: fa5cac1c6935e00a86cb01d37672b898665a8d03f9c0b5fe1e041ac863dcd06f
+Application flash: 207564 / 482816 bytes (42.99%)
+Application RAM: 68480 / 262144 bytes (26.12%)
+MCUboot flash: 35550 / 49152 bytes (72.33%)
+MCUboot RAM: 22080 / 262144 bytes (8.42%)
+CONFIG_DISABLE_FLASH_PATCH=y
+Fixed passkey warning reviewed: passkey is unique per station and derived from the provisioned label secret.
+Assertions remain enabled for EVT diagnostics.
+Final acceptance and firmware locking require B01 EOL measurements on assembled hardware.

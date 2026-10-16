@@ -260,7 +260,7 @@ static bool secrets_decode_patch(const uint8_t *p, size_t len, zs_station_secret
 static void handle_secrets_write(zs_ipc_service_t *s, const uint8_t *p, size_t len) {
   zs_station_secrets_t rec;
   uint32_t started = 0u;
-  bool clear = false, stored;
+  bool clear = false, stored, record_found;
   const zs_commissioning_role_t role = zs_ipc_service_role(s);
   zs_commissioning_operation_t op;
   zs_station_secrets_result_t r;
@@ -269,8 +269,13 @@ static void handle_secrets_write(zs_ipc_service_t *s, const uint8_t *p, size_t l
   if (!secrets_available(s)) { s->secrets_rejections++; (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_STORAGE_ERROR); return; }
   r = zs_station_secrets_load(s->port->secrets_io, &rec, NULL);
   if (r == ZS_STATION_SECRETS_IO_ERROR) { s->secrets_rejections++; (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_STORAGE_ERROR); return; }
-  stored = r == ZS_STATION_SECRETS_OK;
-  if (!stored) memset(&rec, 0, sizeof(rec));
+  /* Factory identity and the pairing secret are written before BLE can be used.  They do not make the
+     operational secrets record "already provisioned": the installer must still be able to perform the first
+     authenticated 0x0206 write. */
+  record_found = r == ZS_STATION_SECRETS_OK;
+  stored = record_found &&
+           (rec.engineer_key_set || rec.iccid[0][0] || rec.iccid[1][0] || rec.command_key_set);
+  if (!record_found) memset(&rec, 0, sizeof(rec));
   if (!secrets_decode_patch(p, len, &rec, &clear)) {
     memset(&rec, 0, sizeof(rec)); s->secrets_rejections++;
     secrets_audit(s, ZS_COMMISSIONING_AUDIT_REJECTED, ZS_COMMISSIONING_OPERATION_SECRETS_WRITE, ZS_COMMISSIONING_INVALID_RECORD, 0u);
@@ -285,8 +290,23 @@ static void handle_secrets_write(zs_ipc_service_t *s, const uint8_t *p, size_t l
   }
   secrets_audit(s, ZS_COMMISSIONING_AUDIT_INTENT, op, ZS_COMMISSIONING_OK, 0u);
   if (clear) {
-    r = zs_station_secrets_clear(s->port->secrets_io);
+    /* A BLE decommission clears operational secrets but preserves the factory serial and the label pairing
+       secret.  Erasing those would make the next authenticated BLE session impossible.  Full factory erase is
+       deliberately confined to the physical EOL console. */
+    const bool pairing = rec.pairing_secret_set, identity = rec.factory_serial_set;
+    uint8_t pairing_secret[ZS_STATION_PAIRING_SECRET_BYTES];
+    char factory_serial[ZS_STATION_FACTORY_SERIAL_CAPACITY];
+    memcpy(pairing_secret, rec.pairing_secret, sizeof(pairing_secret));
+    memcpy(factory_serial, rec.factory_serial, sizeof(factory_serial));
     memset(&rec, 0, sizeof(rec));
+    rec.pairing_secret_set = pairing;
+    rec.factory_serial_set = identity;
+    if (pairing) memcpy(rec.pairing_secret, pairing_secret, sizeof(pairing_secret));
+    if (identity) memcpy(rec.factory_serial, factory_serial, sizeof(factory_serial));
+    memset(pairing_secret, 0, sizeof(pairing_secret));
+    memset(factory_serial, 0, sizeof(factory_serial));
+    r = pairing || identity ? zs_station_secrets_commit(s->port->secrets_io, &rec) :
+                              zs_station_secrets_clear(s->port->secrets_io);
   } else {
     r = zs_station_secrets_commit(s->port->secrets_io, &rec);
   }

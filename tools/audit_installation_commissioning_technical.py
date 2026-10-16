@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """QG-2 independent technical audit of portable installation commissioning."""
 import hashlib
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -55,17 +56,19 @@ def main() -> int:
             "portable result or nRF/GATT boundary is not explicit")
 
     with tempfile.TemporaryDirectory(prefix="zs-commissioning-qg2-") as tmp:
-        binary = Path(tmp) / "installation_commissioning_qg2"
+        binary = Path(tmp) / ("installation_commissioning_qg2.exe" if os.name == "nt" else "installation_commissioning_qg2")
         command = [
-            "cc", "-std=gnu11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
+            os.environ.get("CC", "cc"), "-std=gnu11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
             f"-I{ROOT / 'firmware/include'}",
             str(ROOT / "firmware/src/zs_sha256.c"),
             str(ROOT / "firmware/src/zs_position_trust.c"),
             str(ROOT / "firmware/src/zs_installation_store.c"),
             str(ROOT / "firmware/src/zs_installation_commissioning.c"),
             str(ROOT / "firmware/tests/test_installation_commissioning.c"),
-            "-lm", "-o", str(binary),
         ]
+        if os.name != "nt":
+            command.append("-lm")
+        command.extend(("-o", str(binary)))
         subprocess.run(command, check=True, cwd=ROOT)
         completed = subprocess.run([str(binary)], check=True, cwd=ROOT,
                                    text=True, capture_output=True)

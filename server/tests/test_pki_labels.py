@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 import pytest
 
 from pki import ca as pki
@@ -27,7 +29,7 @@ def test_label_payload_crc_and_roundtrip():
     assert StationLabel.decode(bench.encode()) == bench
 
 
-def test_registry_pairing_secret_and_label_commands(tmp_path, monkeypatch):
+def test_registry_pairing_secret_and_label_commands(tmp_path, monkeypatch, capsys):
     # Rendering needs `qrcode`, which lives in requirements-pki.txt (admin tool / muhoed-pki.exe),
     # not in the server runtime lock: the full-server job skips this test, the PKI job runs it.
     pytest.importorskip("qrcode")
@@ -52,10 +54,13 @@ def test_registry_pairing_secret_and_label_commands(tmp_path, monkeypatch):
     # CLI: label for one station and a sheet for a lot
     pki_dir = tmp_path / "pki"
     assert cli(["station-add", "--pki", str(pki_dir), "--all-lots"]) == 0
+    capsys.readouterr()
     assert cli(["label-qr", "--pki", str(pki_dir), "DIO-EVT-012", "--out", str(tmp_path / "labels")]) == 0
+    command_output = capsys.readouterr().out
     svg = (tmp_path / "labels" / "DIO-EVT-012.svg").read_text()
     payload = (tmp_path / "labels" / "DIO-EVT-012.txt").read_text().strip()
     lab = StationLabel.decode(payload)
+    assert payload not in command_output and lab.pairing_secret_b32 not in command_output
     assert lab.serial == "DIO-EVT-012" and lab.station_id == 12 and lab.tenant == "pilot1"
     assert svg.startswith("<svg") and "DIO-EVT-012  id 12  pilot1" in svg and svg.count("<rect") > 300
     assert cli(["label-sheet", "--pki", str(pki_dir), "--out", str(tmp_path / "sheet.svg"), "--lot", "EVT-LOT-2"]) == 0
@@ -103,7 +108,8 @@ def test_nrf_boot_key_create_show_and_refuse_overwrite(tmp_path, capsys):
     out = capsys.readouterr().out
     k = nrf_boot_key.load(tmp_path)
     assert k.key_path.exists() and (tmp_path / "nrf-boot" / "nrf-boot.pub.pem").exists()
-    assert oct(k.key_path.stat().st_mode & 0o777) == "0o600"
+    if os.name != "nt":
+        assert oct(k.key_path.stat().st_mode & 0o777) == "0o600"
     assert k.public_fingerprint_hex in out and "SB_CONFIG_BOOT_SIGNATURE_KEY_FILE" in out
     meta = (tmp_path / "nrf-boot" / "nrf-boot.json").read_text()
     assert k.public_fingerprint_hex in meta and "secp256r1" in meta

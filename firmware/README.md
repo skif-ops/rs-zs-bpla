@@ -4,6 +4,8 @@
 
 Целевой контроллер предсерии: `STM32U585VIT6Q`, LQFP100. Упоминания STM32U585ZI и платы WeAct относятся к предыдущим этапам и не являются target EVT-PRE-20.
 
+Текущий подписанный кандидат: `EVT_PRE_20_RELEASE_CANDIDATE_2026101601`. Версия STM32: `2026101601`; версия nRF52840: `0.1.0+2026101601`; Android: `0.1.0-evt.20261016` (`versionCode 2026101601`). Статус: `READY FOR EVT BUILD AND B01 MEASUREMENTS / HARDWARE QUALIFICATION PENDING`. Полная история и хеши образов находятся в [`RELEASE_NOTES.md`](RELEASE_NOTES.md).
+
 ## Что уже проверяется
 
 ```sh
@@ -12,19 +14,22 @@ cmake --build firmware/build --parallel
 ctest --test-dir firmware/build --output-on-failure
 ```
 
-Host PASS не означает готовую прошивку изделия.
+Host PASS подтверждает переносимое ядро, но не заменяет аппаратную проверку. Выпускной архив содержит подписанные образы STM32 и nRF52840, манифесты и контрольные суммы. Для прошивки используется только образ из выпущенного архива; произвольный BIN/HEX из каталога сборки применять нельзя.
 
-## Что отсутствует до target build
+## Что остаётся до завершения аппаратных испытаний
 
-- открытие, проверка и регенерация подготовленного STM32CubeMX `.ioc` версией 6.12.0;
-- production linker с secure boot/A/B и HAL/LL bindings;
-- драйвер PDM/MDF для четырёх T5838 на фактической плате;
-- аппаратное и end-to-end подтверждение BG95 TLS/MQTT, защищённый downstream и provisioning;
-- два валидированных региональных LoRa-профиля;
-- secure boot, A/B OTA, rollback и подписанный release;
-- измерение памяти, CPU, тока и времени на target.
+- SWD, BOOT0, system-memory recovery и read-back option bytes;
+- A/B swap, trial confirmation и rollback с прерыванием питания;
+- четыре канала T5838 на фактической PCB-MIC и STM32 MDF/PDM;
+- BG95 mutual TLS/MQTT, dual SIM и provisioning на собранной станции;
+- nRF52840 BLE, LESC pairing, IPC и serial recovery;
+- QSPI, microSD, GNSS/PPS, LoRa, датчики, ток, температура и EOL-пределы.
 
-До закрытия этих пунктов статус firmware: `TARGET_PORT_REQUIRED / OPEN / NOT RUN`. BIN/HEX из host-сборки запрещено маркировать как прошивку станции.
+Текущий статус firmware: `READY FOR EVT BUILD AND B01 MEASUREMENTS / HARDWARE QUALIFICATION PENDING`.
+
+## Блокировка прошивки
+
+Текущий release candidate всегда применяется без производственной блокировки: RDP Level 0, SWD и BOOT0 recovery сохранены, BOOT_LOCK, TrustZone, WRP и PCROP отключены. CI проверяет это по `release/firmware_lock_interlock_rev_a.json`. Отдельный production-профиль защиты можно выпустить только после полного аппаратного PASS таргета и регрессии с утвержденными численными пределами. Конкретную станцию можно блокировать только после ее собственного EOL PASS; после блокировки обязательны cold boot и проверка связи с сервером.
 
 Host-контракт BG95 теперь покрывает автоматическое чтение SIM/оператора,
 выбор APN через ответ сети или разрешённый PLMN-каталог, обязательное чтение
@@ -139,9 +144,9 @@ profiles. Контракт генерируется воспроизводимо
 
 Второй target-инкремент закрепляет STM32CubeU5 v1.9.0 и его CMSIS-U5 commit,
 добавляет официальный GCC startup/system и инженерный linker для 2 MiB flash,
-768 KiB SRAM1-3 и 16 KiB SRAM4. Этот linker предназначен только для первичного
-запуска без TrustZone; он не заменяет production-разметку secure boot/A/B и не
-снимает общий `TARGET_PORT_REQUIRED`.
+768 KiB SRAM1-3 и 16 KiB SRAM4. Инженерная ARM-сборка с этим linker проходит,
+но он предназначен только для первичного запуска без TrustZone, не заменяет
+production-разметку secure boot/A/B и не разрешает выпуск прошивки.
 
 Третий target-инкремент формирует воспроизводимый pinout `.ioc` для
 STM32CubeMX 6.12.0 / DB.6.0.120. В нём сохранены 67 назначений, включая

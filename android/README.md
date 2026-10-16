@@ -13,17 +13,26 @@
 - поддерживает resume, A/B status и rollback report;
 - USB-C используется как отдельный сервисный recovery path.
 
-Статус: `SOURCE_BASELINE / POSITION_HASH_READBACK_HOST_PASS / BLE_NOT_IMPLEMENTED / RELEASE_APK_NOT_BUILT`.
+Статус: `RELEASE CANDIDATE APK SIGNED / 72 UNIT TESTS PASS / HARDWARE VALIDATION PENDING`.
 
-В каталоге `app` находится минимальный Kotlin/Android проект с unit tests, но он не является commissioning APK: BLE UUID, authenticated pairing и формат OTA signature ещё не заморожены.
+В каталоге `app` находится Kotlin/Android проект с unit tests и Android
+`BluetoothGatt` transport, подключённым к экранам выбора станции, установки и
+настройки сервера. Текущий release candidate APK `0.1.0-evt.20261016`
+(`versionCode 2026101601`) собран с обязательной внешней конфигурацией подписи.
+Формат подписанного OTA, release signing и CycloneDX SBOM закрыты стендовым
+релизным пакетом. BLE UUID, authenticated pairing, station GATT и OTA end-to-end
+проверяются на физическом стендовом изделии `DIO-EVT-B01`.
 
 Domain-слой installation commissioning независимо воспроизводит станционный
 58-byte SHA-256 contract, контролирует installer/service-engineer policy,
 monotonic recommission version и принимает read-back только при совпадении
 полей, hash, storage generation и `auditCommitted`. Он не передаёт hash как
-источник доверия станции и не реализует BLE transport.
+источник доверия станции. Android BLE transport в исходниках есть; закрытие
+готовности требует проверки на nRF52840 GATT реальной станции.
 
-Debug source baseline успешно собран CI на commit `6e561637c03856b6bfb963a5b16a481888925991`, workflow run `34240158982`. APK не публиковался и не разрешён к установке на производстве.
+Debug source baseline успешно собран CI на commit `6e561637c03856b6bfb963a5b16a481888925991`, workflow run `34240158982`. Стендовый release APK собран с Gradle 9.6.0, AGP 9.4.0, JDK 21 и API 36 после unit tests. APK Signature Scheme v2 и fingerprint сертификата фиксируются в `firmware/targets/evt_pre_20/release/EVT_RELEASE_CANDIDATE_2026101601.json`. Закрытый ключ и пароль находятся только во внешнем локальном хранилище и в Git не попадают.
+
+Gradle wrapper 9.6.0 закреплён официальной SHA-256 суммой. Для release-задач обязательны переменные `DIONEA_ANDROID_KEYSTORE`, `DIONEA_ANDROID_STORE_PASSWORD`, `DIONEA_ANDROID_KEY_ALIAS` и `DIONEA_ANDROID_KEY_PASSWORD`; без них сборка прекращается.
 
 Документы:
 

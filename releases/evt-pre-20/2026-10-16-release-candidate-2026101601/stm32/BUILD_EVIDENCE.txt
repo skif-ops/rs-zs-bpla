@@ -1,0 +1,11 @@
+EVT-PRE-20 STM32 release candidate 2026101601
+Status: signed release candidate; hardware validation pending
+Target: STM32U585VIT6Q / LQFP100
+Version: 0.1.0-evt.20261016 / release code 2026101601
+Signature: Ed25519
+Public key id: fd82ce3ef2f92b6b
+Flash: 249024 bytes (23.94%)
+RAM: 714008 bytes (90.79%)
+Maximum static stack allocation: 2304 bytes
+Firmware budget gate: PASS
+Final numeric EOL limits, production protection profile and firmware locking require measurements on assembled DIO-EVT-B01 hardware and full regression.

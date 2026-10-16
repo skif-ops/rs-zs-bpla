@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "release_id": "EVT_PRE_20_RELEASE_CANDIDATE_2026101601",
+  "application_id": "ru.dioneya.commissioning",
+  "version_code": 2026101601,
+  "version_name": "0.1.0-evt.20261016",
+  "tasks": {
+    "cleanTestDebugUnitTestAssembleRelease": "PASS",
+    "jvm_unit_tests": "72_PASS_0_FAILURES_0_ERRORS_0_SKIPPED",
+    "apksignerVerify": "PASS_V2_ONE_SIGNER"
+  },
+  "toolchain": {
+    "jdk": "Microsoft OpenJDK 21.0.12.1+1",
+    "gradle": "9.6.0",
+    "gradle_distribution_sha256": "bbaeb2fef8710818cf0e261201dab964c572f92b942812df0c3620d62a529a01",
+    "android_gradle_plugin": "9.4.0",
+    "compile_sdk": 36,
+    "target_sdk": 36,
+    "min_sdk": 28
+  },
+  "apk": {
+    "bytes": 353018,
+    "sha256": "4aac5e997107f76c25e080e08dad934f9526e0174ab8071c8cd31ea06b0b5ec8",
+    "release_authorized": true,
+    "scope": "EVT_BUILD_B01_CHARACTERIZATION_AND_EOL_LIMIT_FREEZE"
+  },
+  "signer": {
+    "algorithm": "RSA",
+    "key_bits": 3072,
+    "certificate_sha256": "a7ba19ca151d213da46b80bed73dd740b3c2e7a0132cc06ab3a56cd792e3cd6e",
+    "public_key_sha256": "745d2f8a0a576e083cedaee6726759d5adbe072f754a08c1cac99987020eb6bf",
+    "private_material_in_repository": false,
+    "certificate_subject": "CN=Dioneya-EVT-Release-Candidate-20261016",
+    "certificate_validity": "2026-10-16..2036-10-13"
+  },
+  "runtime_dependencies": [
+    "org.jetbrains.kotlin:kotlin-stdlib:2.2.10",
+    "org.jetbrains:annotations:13.0",
+    "com.google.zxing:core:3.5.3"
+  ],
+  "source_commit_binding": "release package release_candidate_contract.json and repository release commit",
+  "hardware_validation_pending": [
+    "install on approved Android device",
+    "authenticated pairing with DIO-EVT-B01",
+    "GATT configuration write and read-back",
+    "signed OTA and rollback end-to-end"
+  ]
+}

@@ -463,12 +463,46 @@ static void test_station_secrets(void) {
   printf("station secrets ok\n");
 }
 
+/* The EOL console writes identity + pairing before BLE exists.  That factory record must still permit the
+   installer's first operational-secrets write, and BLE decommissioning must preserve the factory fields. */
+static void test_factory_seed_then_ble_secrets(void) {
+  static world_t W;
+  zs_station_secrets_t seeded, back;
+  uint8_t patch[96], newkey[32], tag[ZS_ROLE_TAG_BYTES], resp[1u + ZS_ROLE_TAG_BYTES];
+  const uint8_t challenge = ZS_ROLE_OP_CHALLENGE;
+  zs_cbor_t c;
+  world_init(&W);
+  memset(&seeded, 0, sizeof(seeded));
+  seeded.factory_serial_set = true; strcpy(seeded.factory_serial, "DIO-EVT-012");
+  seeded.pairing_secret_set = true; memset(seeded.pairing_secret, 0x5a, sizeof(seeded.pairing_secret));
+  assert(zs_station_secrets_commit(&W.sec_io, &seeded) == ZS_STATION_SECRETS_OK && seeded.version == 1u);
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  for (unsigned i = 0u; i < sizeof(newkey); i++) newkey[i] = (uint8_t)(0x60u + i);
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ENGINEER); zs_cbor_bytes(&c, newkey, sizeof(newkey));
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);  /* installer, despite factory record */
+  assert(zs_station_secrets_load(&W.sec_io, &back, NULL) == ZS_STATION_SECRETS_OK && back.version == 2u);
+  assert(back.factory_serial_set && strcmp(back.factory_serial, "DIO-EVT-012") == 0 && back.pairing_secret_set && back.engineer_key_set);
+
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);
+  zs_ipc_role_tag(newkey, W.identity.serial, W.prev_notify + 1u, tag);
+  resp[0] = ZS_ROLE_OP_RESPONSE; memcpy(resp + 1u, tag, sizeof(tag));
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_OK);
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_CLEAR); zs_cbor_bool(&c, true);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+  assert(zs_station_secrets_load(&W.sec_io, &back, NULL) == ZS_STATION_SECRETS_OK);
+  assert(back.factory_serial_set && back.pairing_secret_set && !back.engineer_key_set && back.iccid[0][0] == 0);
+  printf("factory seed / first BLE secrets / preserved decommission ok\n");
+}
+
 int main(void) {
   test_framing_vectors();
   test_ipc_link();
   test_end_to_end();
   test_session_role();
   test_station_secrets();
+  test_factory_seed_then_ble_secrets();
   printf("ble bridge tests passed\n");
   return 0;
 }

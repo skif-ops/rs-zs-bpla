@@ -1,0 +1,13 @@
+EVT-PRE-20 Android release candidate 2026101601
+Status: signed release candidate; hardware and end-to-end validation pending
+Package: ru.dioneya.commissioning
+Version code: 2026101601
+Version name: 0.1.0-evt.20261016
+Minimum SDK: 28
+Target SDK: 36
+APK Signature Scheme v2: PASS
+Certificate SHA-256: a7ba19ca151d213da46b80bed73dd740b3c2e7a0132cc06ab3a56cd792e3cd6e
+Certificate: RSA 3072, CN=Dioneya-EVT-Release-Candidate-20261016
+Gradle clean testDebugUnitTest assembleRelease: PASS
+JVM unit tests: 72 total, 0 failures, 0 errors, 0 skipped
+Final acceptance requires BLE/GATT/pairing/provisioning tests on assembled B01 hardware.

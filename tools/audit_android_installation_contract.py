@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """QG-2 independent audit of the Android/firmware installation hash contract."""
 import hashlib
+import json
 from pathlib import Path
 import struct
 
@@ -50,6 +51,12 @@ def main() -> int:
     android_test = (ROOT / "android/app/src/test/java/ru/dioneya/commissioning/core/InstallationCommissioningContractTest.kt").read_text(encoding="utf-8")
     firmware_test = (ROOT / "firmware/tests/test_installation_commissioning.c").read_text(encoding="utf-8")
     status = (ROOT / "android/track_status.yaml").read_text(encoding="utf-8")
+    build_evidence = json.loads((ROOT / "android/debug_build_evidence.json").read_text(encoding="utf-8"))
+    release_evidence = json.loads((ROOT / "android/release_build_evidence.json").read_text(encoding="utf-8"))
+    android_ble = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ble/AndroidBleTransport.kt").read_text(encoding="utf-8")
+    station_picker = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ui/StationPickerActivity.kt").read_text(encoding="utf-8")
+    installation_ui = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ui/InstallationActivity.kt").read_text(encoding="utf-8")
+    server_ui = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ui/ServerActivity.kt").read_text(encoding="utf-8")
 
     require(independent_hash() == EXPECTED_HASH, "independent known-answer hash drift")
     require(EXPECTED_HASH in android_test and EXPECTED_HASH in firmware_test,
@@ -78,8 +85,30 @@ def main() -> int:
             "Android does not compare station read-back against its independent digest")
     require("if (!readback.auditCommitted)" in kotlin,
             "Android can accept a read-back without committed audit")
-    require("BLE_TRANSPORT_NOT_IMPLEMENTED" in status and "station_gatt_prototype" in status,
-            "Android status overclaims target BLE readiness")
+    require("ANDROID_BLE_TRANSPORT_SOURCE_PRESENT_STATION_GATT_HARDWARE_VALIDATION_PENDING" in status and
+            "station_gatt_hardware_validation" in status and "BENCH_RELEASE_SIGNED" in status,
+            "Android status must expose the signed bench release and retain the hardware gate")
+    require(build_evidence["tasks"] == {"testDebugUnitTest": "PASS", "assembleDebug": "PASS"},
+            "Android debug build evidence does not record both required tasks as PASS")
+    require(build_evidence["apk"]["release_authorized"] is False and
+            build_evidence["apk"]["artifact_retained"] is False,
+            "Android debug artifact was incorrectly promoted to a release")
+    require(release_evidence["tasks"] == {
+                "testDebugUnitTest": "PASS",
+                "assembleRelease": "PASS",
+                "apksignerVerify": "PASS_V2_ONE_SIGNER",
+            }, "Android release evidence does not record all required PASS results")
+    require(release_evidence["apk"]["release_authorized"] is True and
+            release_evidence["apk"]["scope"] == "BENCH_AND_EVT_HARDWARE_VALIDATION",
+            "Android signed APK has the wrong release scope")
+    require(release_evidence["signer"]["private_material_in_repository"] is False and
+            len(release_evidence["signer"]["certificate_sha256"]) == 64,
+            "Android signer evidence is incomplete or unsafe")
+    require("class AndroidBleTransport" in android_ble and ": BleTransport" in android_ble and "BluetoothGattCallback" in android_ble,
+            "Android BluetoothGatt transport is missing")
+    require("AndroidBleTransport(this, device)" in station_picker and "AndroidBleTransport(this, it)" in installation_ui and
+            "AndroidBleTransport(this, it)" in server_ui,
+            "Android UI does not wire the source BLE transport into commissioning screens")
 
     print("Android installation commissioning QG-2 independent technical audit: PASS")
     print("58-byte field order and firmware/Android SHA-256 known-answer agreement verified")
