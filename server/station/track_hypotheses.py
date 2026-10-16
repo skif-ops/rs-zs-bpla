@@ -407,7 +407,10 @@ class HypothesisTrackFusion:
             for t in np.arange(start, hi, 1.0):
                 fix = self._cached("fix", combo, float(t), now)
                 if fix is None:
-                    break                       # later emission times need still later acoustic arrivals as well
+                    cache_key = ("fix", tuple(u.member for u in combo), float(t))
+                    if cache_key not in self._fix_cache:
+                        break                   # its possible late acoustic arrivals have not all reached us yet
+                    continue                    # final no-fix geometry at one instant must not block later valid fixes
                 if not fix.consistent:
                     self._established_fixes.pop(key, None)
                     return None                 # changed geometry: rebuild all competing associations

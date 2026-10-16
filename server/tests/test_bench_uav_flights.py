@@ -89,7 +89,7 @@ def test_strong_three_station_target_is_published_by_seventh_step(tmp_path):
 
 
 def test_second_episode_keeps_both_targets_through_close_pass(tmp_path):
-    """The same three continuous source segments must survive a turn that makes the Kalman prediction re-gate."""
+    """The live runner's exact message stream must keep both targets through their close pass."""
     store = EventStore(tmp_path / "three-by-two-close-pass.sqlite3")
     service = StationFusionService(store)
     stations = stations_for_scenario(2)
@@ -99,6 +99,7 @@ def test_second_episode_keeps_both_targets_through_close_pass(tmp_path):
     rng = random.Random(20261016)
     sequence = {station.station_id: 2000 for station in stations}
     events = {}
+    detection_started = set()
 
     for second in range(41):
         for flight in flights:
@@ -108,8 +109,14 @@ def test_second_episode_keeps_both_targets_through_close_pass(tmp_path):
                 key = station.station_id, flight.index
                 if key not in events:
                     sequence[station.station_id] += 1
-                    event_id = (boot_id << 32) | sequence[station.station_id]
-                    events[key] = event_id
+                    events[key] = (boot_id << 32) | sequence[station.station_id]
+                if second % 5 == 0:
+                    if key not in detection_started:
+                        event_id = events[key]
+                        detection_started.add(key)
+                    else:
+                        sequence[station.station_id] += 1
+                        event_id = (boot_id << 32) | sequence[station.station_id]
                     payload = detection_payload(
                         station, flight, float(second), seq_no=sequence[station.station_id],
                         boot_id=boot_id, event_id=event_id, rng=rng,
