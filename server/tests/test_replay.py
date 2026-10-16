@@ -112,8 +112,13 @@ def test_replay_api_and_page(fused, monkeypatch):
     assert "function bearingsAt" in script.text and "for (const b of bearingsAt" in script.text
     assert "LIVE_EPISODE_GAP_US = 7000000" in script.text
     assert "LIVE_ACTIVITY_HOLD_MS = 4000" in script.text
+    assert "LIVE_BEARING_HOLD_MS = 6000" in script.text
     assert "LIVE_VISUAL_FADE_MS = 1500" in script.text
-    assert "liveTrackUntil.set(msg.track.track_id, Date.now() + LIVE_ACTIVITY_HOLD_MS)" in script.text
+    assert "bearingUs / 1000 + LIVE_BEARING_HOLD_MS" in script.text
+    assert "liveTrackUntil.set(msg.track.track_id, receivedAt + LIVE_ACTIVITY_HOLD_MS)" in script.text
     assert "if (liveActive && !active.length) return" in script.text
-    assert "Сопровождение завершено · ожидание новой цели" in script.text
+    assert "● Сопровождение-тревога" in script.text
+    assert "● Тревога · уточнение координат" in script.text
+    assert "● Поиск целей · анализ продолжается" in script.text
+    assert "● Контроль участка · активных целей нет" in script.text
     assert "const visible = liveActive ? active" in script.text

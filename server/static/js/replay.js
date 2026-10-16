@@ -11,7 +11,9 @@
   const RAY_HOLD_US = 1500000;     // a bearing is shown for this long after it was heard
   const LIVE_TRACK_HOLD_US = 3000000; // concurrently updated targets can differ by a few fusion ticks
   const LIVE_ACTIVITY_HOLD_MS = 4000; // same current-alert window as the station status page
+  const LIVE_BEARING_HOLD_MS = 6000;  // a fresh associated bearing keeps a target while fusion catches up
   const LIVE_VISUAL_FADE_MS = 1500;   // a silent target fades instead of leaving one frozen final frame
+  const LIVE_SEARCH_HOLD_MS = 8000;   // after the last evidence, distinguish a short search from quiet monitoring
   const LIVE_MAX_PIPELINE_MS = 15000; // acoustic travel at 5 km plus bounded fusion time
   const LIVE_EPISODE_GAP_US = 7000000; // a quiet interval separates adjacent controlled or real flight episodes
   const GRID_STEPS = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
@@ -34,6 +36,9 @@
   let liveLastTrackUs = 0;
   const liveTrackUntil = new Map();       // track_id -> local receipt-time expiry
   const liveTrackLastPoint = new Map();   // track_id -> newest point already observed by this page
+  const liveTrackLastBearing = new Map(); // track_id -> newest associated bearing time (station arrival time)
+  let liveLastEvidenceAt = 0;             // newest point receipt or bearing time, in browser milliseconds
+  let liveHasConfirmedTrack = !!pageQuery.get("track"); // confirmation persists through short calculation gaps
   let liveStations = pageQuery.get("stations") || "";
   let liveTenant = pageQuery.get("tenant") || "";
 
@@ -142,6 +147,12 @@
     if (liveActive) {
       const newest = Number(data.window.target_last_us) || 0;
       const now = Date.now();
+      const newestBearingByTrack = new Map();
+      for (const bearing of data.bearings) {
+        if (!bearing.track_id) continue;
+        newestBearingByTrack.set(bearing.track_id,
+          Math.max(newestBearingByTrack.get(bearing.track_id) || 0, Number(bearing.t_us) || 0));
+      }
       for (const track of data.tracks) {
         const pointUs = Number(track.points[track.points.length - 1]?.t_us) || 0;
         const previous = liveTrackLastPoint.get(track.track_id) || 0;
@@ -151,8 +162,23 @@
         if (pointUs && ageMs >= 0 && ageMs <= LIVE_MAX_PIPELINE_MS
           && pointUs >= newest - LIVE_TRACK_HOLD_US && pointUs > previous) {
           liveTrackUntil.set(track.track_id, now + LIVE_ACTIVITY_HOLD_MS);
+          liveLastEvidenceAt = Math.max(liveLastEvidenceAt, now);
+          liveHasConfirmedTrack = true;
         }
         if (pointUs > previous) liveTrackLastPoint.set(track.track_id, pointUs);
+        // Multi-target fusion can publish points in bursts even while the stations keep sending bearings.  The
+        // replay response relates every bearing to its fused target; use that independent evidence to bridge the
+        // calculation gap.  The expiry is based on the bearing timestamp, so a stopped target is never prolonged by
+        // repeatedly fetching the same historical sample.
+        const bearingUs = newestBearingByTrack.get(track.track_id) || 0;
+        const previousBearing = liveTrackLastBearing.get(track.track_id) || 0;
+        const bearingAgeMs = now - bearingUs / 1000;
+        if (bearingUs > previousBearing && bearingAgeMs >= -2000 && bearingAgeMs <= LIVE_MAX_PIPELINE_MS) {
+          liveTrackLastBearing.set(track.track_id, bearingUs);
+          liveTrackUntil.set(track.track_id, Math.max(liveTrackUntil.get(track.track_id) || 0,
+            bearingUs / 1000 + LIVE_BEARING_HOLD_MS));
+          liveLastEvidenceAt = Math.max(liveLastEvidenceAt, bearingUs / 1000);
+        }
       }
     }
     byStation = new Map();
@@ -336,8 +362,7 @@
     const now = Date.now();
     const active = data ? data.tracks.map((tr, index) => {
       const until = liveTrackUntil.get(tr.track_id) || 0;
-      const freshness = !liveActive ? 1 : Math.max(0, Math.min(1,
-        (until - now) / Math.max(LIVE_ACTIVITY_HOLD_MS - LIVE_VISUAL_FADE_MS, 1)));
+      const freshness = !liveActive ? 1 : Math.max(0, Math.min(1, (until - now) / LIVE_VISUAL_FADE_MS));
       return { tr, index, point: pointAt(tr, t), freshness };
     }).filter((x) => x.point && (!liveActive || (liveTrackUntil.get(x.tr.track_id) || 0) > now)) : [];
     if (active.length && $("replay-follow").checked) focusActiveTargets(active);
@@ -494,11 +519,15 @@
     if (liveActive) {
       if (active.length) {
         const targetText = ` · целей сейчас: ${active.length}`;
-        $("replay-live-state").textContent = "● Тревога" + targetText + " · обновляется";
+        $("replay-live-state").textContent = "● Сопровождение-тревога" + targetText;
         $("replay-selection-title").textContent = "Тревога · " + (liveTenant || "участок") + targetText;
       } else {
-        $("replay-live-state").textContent = "● Сопровождение завершено · ожидание новой цели";
-        $("replay-selection-title").textContent = "Сопровождение · " + (liveTenant || "участок") + " · целей сейчас: 0";
+        const recentlySeen = liveLastEvidenceAt && Date.now() - liveLastEvidenceAt <= LIVE_SEARCH_HOLD_MS;
+        $("replay-live-state").textContent = recentlySeen && !liveHasConfirmedTrack
+          ? "● Тревога · уточнение координат"
+          : recentlySeen ? "● Поиск целей · анализ продолжается"
+            : "● Контроль участка · активных целей нет";
+        $("replay-selection-title").textContent = "Тревога · " + (liveTenant || "участок") + " · активных целей нет";
       }
     }
     $("ro-utc").textContent = fmtUtc(t);
@@ -648,9 +677,11 @@
     const msg = event.detail;
     if (!liveActive || msg.alert_id !== liveAlertId) return;
     if (msg.type === "alert.end") {
-      liveTrackUntil.clear(); liveTrackLastPoint.clear();
+      liveTrackUntil.clear(); liveTrackLastPoint.clear(); liveTrackLastBearing.clear();
+      liveLastEvidenceAt = 0;
+      liveHasConfirmedTrack = false;
       liveActive = false;
-      $("replay-live-state").textContent = "● Тревога завершилась";
+      $("replay-live-state").textContent = "● Тревога завершена · активных целей нет";
       $("replay-now").hidden = true;
       data = null; byStation = new Map(); coverage = null;
       $("replay-empty").textContent = "Тревога завершилась.";
@@ -664,21 +695,28 @@
         liveSince = pointUs;
         livePrerollUs = 2e6;
         liveFollowing = true;
-        liveTrackUntil.clear(); liveTrackLastPoint.clear();
+        liveTrackUntil.clear(); liveTrackLastPoint.clear(); liveTrackLastBearing.clear();
+        liveLastEvidenceAt = 0;
         data = null; byStation = new Map(); coverage = null;
         $("replay-empty").textContent = "Начинается новый эпизод…";
         $("replay-empty").hidden = false;
         draw();
       }
       if (Number.isFinite(pointUs)) {
+        const receivedAt = Date.now();
         liveLastTrackUs = Math.max(liveLastTrackUs, pointUs);
         liveTrackLastPoint.set(msg.track.track_id, Math.max(liveTrackLastPoint.get(msg.track.track_id) || 0, pointUs));
-        liveTrackUntil.set(msg.track.track_id, Date.now() + LIVE_ACTIVITY_HOLD_MS);
+        liveTrackUntil.set(msg.track.track_id, receivedAt + LIVE_ACTIVITY_HOLD_MS);
+        liveLastEvidenceAt = Math.max(liveLastEvidenceAt, receivedAt);
+        liveHasConfirmedTrack = true;
       }
     } else if (msg.type === "track.end" && msg.track?.track_id) {
       liveTrackUntil.delete(msg.track.track_id);
+      liveTrackLastPoint.delete(msg.track.track_id);
+      liveTrackLastBearing.delete(msg.track.track_id);
       draw();
     }
+    if (msg.type === "bearing" || msg.type === "alert.update") liveLastEvidenceAt = Date.now();
     if (msg.alert?.stations?.length) liveStations = msg.alert.stations.map((s) => s.station_id).join(",");
     if (msg.type === "alert.update" || msg.type === "track.update" || msg.type === "bearing") refreshLive();
   });
