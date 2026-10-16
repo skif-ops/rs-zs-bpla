@@ -1093,7 +1093,9 @@ DIO-EVT-NNN/
 | Target status | `firmware/targets/evt_pre_20/target_status.yaml` |
 | nRF52840 target | `firmware/targets/nrf52840_ble/README.md` |
 | Android release evidence | `android/release_build_evidence.json` |
-| PKI CLI и политика | `server/pki/README.md`, `server/pki/cli.py`, `manufacturing/PROVISIONING_AND_KEYS.md` |
+| PKI CLI и политика | `server/pki/README.md`, `server/pki/cli.py`, `manufacturing/PROVISIONING_AND_KEYS.md`, `docs/EVT_PRE_20_PKI_CERTIFICATE_LIFECYCLE_INSTRUCTION_REV_A.md` |
+| Синхронизация времени и доверие координат | `docs/EVT_PRE_20_TIME_SYNCHRONIZATION_TRUST_INSTRUCTION_REV_A.md` |
+| Развёртывание, резервное копирование и эксплуатация сервера | `docs/EVT_PRE_20_SERVER_DEPLOYMENT_BACKUP_OPERATIONS_INSTRUCTION_REV_A.md` |
 | BLE provisioning | `protocols/BLE_GATT_OTA_ICD_v0_3.md` |
 | Label и pairing | `protocols/STATION_LABEL_QR_v0_1.md` |
 | Station configuration | `protocols/STATION_CONFIG_CBOR_v0_1.md` |

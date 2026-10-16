@@ -76,4 +76,4 @@ ICCID и IMSI являются идентификаторами, а не клю�
 
 Provisioning receipt содержит serial, station ID, tenant, публичные идентификаторы, маскированные ICCID references, certificate fingerprint, key generation mode, firmware release, tool versions, операторов, timestamps, ACL revision и результаты connection tests. Временные файлы с секретами удаляются. Старые сертификаты при ротации отзываются, CRL и ACL обновляются, Mosquitto перезапускается.
 
-Полная пошаговая процедура приведена в `docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md`.
+Полная процедура жизненного цикла сертификатов приведена в `docs/EVT_PRE_20_PKI_CERTIFICATE_LIFECYCLE_INSTRUCTION_REV_A.md`; последовательность EOL и прошивки — в `docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.md`.

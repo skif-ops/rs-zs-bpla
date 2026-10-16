@@ -45,4 +45,6 @@ python -m pki.cli pairing-secret-rotate DIO-EVT-012 --reason "label lost"   # th
 Windows executables: `pki\build_windows.ps1` or the `ci-dispatch` GitHub Actions workflow
 (`muhoed-pki.exe`, `dioneya-root-offline.exe`, x64 and arm64, with SHA256SUMS.txt).
 
-Full procedure, roles, backups and rotation: document "Инструкция PKI ключи и сертификаты Мухоед Дионея v0.1".
+Full controlled procedure, roles, certificate issuance, revocation, backups and rotation:
+`docs/EVT_PRE_20_PKI_CERTIFICATE_LIFECYCLE_INSTRUCTION_REV_A.md`. The station EOL sequence is also controlled by
+`docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.md`.
