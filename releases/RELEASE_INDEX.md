@@ -21,9 +21,9 @@
 
 ## EVT-PRE-20 REV_D7 — 2026-10-16
 
-- Полный производственный комплект: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_ПОЛНЫЙ_ПРОИЗВОДСТВЕННЫЙ_КОМПЛЕКТ_20261016_REV_D7.zip`.
-- Фабричный комплект плат: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_ALTIUM_20261016_REV_D7.zip`.
-- Программа, методики, отчёты и Мухоед: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_ПРОГРАММА_МЕТОДИКИ_ОТЧЕТЫ_И_МУХОЕД_20261016_REV_D7.zip`.
+- Полный производственный комплект: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_REV_D7_FULL.zip`.
+- Фабричный комплект плат: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_REV_D7_ALTIUM.zip`.
+- Программа, методики, отчёты и Мухоед: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_REV_D7_TESTS.zip`.
 - PCB-MAIN Rev.B — 8 слоёв; PCB-PWR — 4; PCB-MIC — 2. Платы выдаются в Altium; KiCad в основном и фабричном архивах отсутствует.
 - Документальный пакет готов; physical first article/EOL/EVT остаются NOT RUN до фактического изготовления.
 
