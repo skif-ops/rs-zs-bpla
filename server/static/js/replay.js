@@ -38,6 +38,15 @@
   const liveTrackUntil = new Map();       // track_id -> local receipt-time expiry
   const liveTrackLastPoint = new Map();   // track_id -> newest point already observed by this page
   const liveTrackLastBearing = new Map(); // track_id -> newest associated bearing time (station arrival time)
+  const TARGET_CLASS_NAMES = {
+    uav_piston: "Поршневой БПЛА",
+    uav_jet: "Реактивный БПЛА",
+    uav_electric: "Электрический БПЛА",
+    aircraft: "Самолёт",
+    helicopter: "Вертолёт",
+    other: "Воздушная цель",
+    unknown: "Тип уточняется",
+  };
   let liveLastEvidenceAt = 0;             // newest point receipt or bearing time, in browser milliseconds
   let liveHasConfirmedTrack = !!pageQuery.get("track"); // confirmation persists through short calculation gaps
   let liveStations = pageQuery.get("stations") || "";
@@ -433,6 +442,26 @@
 
   const label = (m) => (Math.abs(m) >= 1000 ? (m / 1000).toFixed(m % 1000 ? 1 : 0) + " км" : m + " м");
 
+  function targetClassification(track) {
+    const klass = track.class || {};
+    const known = !!klass.code && klass.code !== "unknown";
+    const exactType = klass.type && klass.type !== "UNKNOWN" ? klass.type : null;
+    const identified = known || !!exactType;
+    const className = TARGET_CLASS_NAMES[klass.code] || (known && klass.label && klass.label !== "UNKNOWN" ? klass.label : TARGET_CLASS_NAMES.unknown);
+    const classConfidence = Number.isFinite(Number(klass.confidence)) ? Number(klass.confidence) : 0;
+    const typeConfidence = Number.isFinite(Number(klass.type_confidence)) ? Number(klass.type_confidence) : classConfidence;
+    const confidence = Math.max(0, Math.min(1, exactType ? typeConfidence : classConfidence));
+    const typeStatus = String(klass.type_status || "").toUpperCase();
+    const status = !identified ? "не определена"
+      : exactType && typeStatus === "STABLE" ? "подтверждено"
+        : exactType && typeStatus === "PROVISIONAL" ? "предварительно"
+          : confidence >= 0.8 ? "подтверждено" : confidence >= 0.55 ? "предварительно" : "низкая";
+    return {
+      label: exactType || className,
+      confidence: identified ? `${Math.round(confidence * 100)}% · ${status}` : status,
+    };
+  }
+
   function drawNorth(w) {
     const x = w - 28, y = 34;
     ctx.fillStyle = "#334155";
@@ -507,7 +536,8 @@
       ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fill();
       ctx.fillStyle = "#0f172a"; ctx.font = "12px system-ui, sans-serif";
       const prefix = active.length > 1 ? `цель ${active.findIndex((x) => x.tr.track_id === tr.track_id) + 1} · ` : "";
-      const tag = `${prefix}${Math.round(p.u)} м · ${Math.round(p.speed_mps * 3.6)} км/ч`;
+      const classification = targetClassification(tr);
+      const tag = `${prefix}${classification.label} · ${Math.round(p.u)} м · ${Math.round(p.speed_mps * 3.6)} км/ч`;
       const tw = ctx.measureText(tag).width;
       ctx.fillText(tag, x + 9 + tw > canvas.clientWidth - 4 ? x - 9 - tw : x + 9, y - 8);
       ctx.globalAlpha = 1;
@@ -566,7 +596,7 @@
     if (!active.length) {
       const row = document.createElement("tr");
       const cell = document.createElement("td");
-      cell.colSpan = 7; cell.className = "text-muted"; cell.textContent = "Активных целей в текущий момент нет";
+      cell.colSpan = 9; cell.className = "text-muted"; cell.textContent = "Активных целей в текущий момент нет";
       row.appendChild(cell); targetBody.appendChild(row);
     }
     active.forEach((item, position) => {
@@ -579,7 +609,10 @@
       target.appendChild(dot);
       target.appendChild(document.createTextNode(` Цель ${position + 1}`));
       row.appendChild(target);
+      const classification = targetClassification(item.tr);
       const values = [
+        classification.label,
+        classification.confidence,
         `${Math.round(p.u)} м ±${Math.round(p.v_err_m)}`,
         `${p.speed_mps.toFixed(1)} м/с · ${Math.round(p.speed_mps * 3.6)} км/ч`,
         p.speed_mps > 0.5 ? `${Math.round(p.course_deg)}°` : "—",

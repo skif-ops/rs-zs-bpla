@@ -33,6 +33,8 @@ def test_replay_of_a_track_in_local_metres(fused):
     assert abs(stations[1]["n"]) < 1.0 and abs(stations[1]["u"]) < 1.0
     (track,) = r["tracks"]
     assert track["track_id"] == summary["track_id"] and track["stations"] == [1, 2]
+    assert track["class"]["code"] == "uav_piston" and track["class"]["confidence"] > 0
+    assert track["class"]["type_status"] == "UNKNOWN" and track["class"]["type_confidence"] == 0
     assert len(track["points"]) == summary["points"]
     times = [p["t_us"] for p in track["points"]]
     assert times == sorted(times)
@@ -119,6 +121,7 @@ def test_replay_api_and_page(fused, monkeypatch):
     assert '<option value="1" selected>×1</option>' in page.text
     assert 'id="replay-geometry" checked' in page.text
     assert 'id="replay-target-body"' in page.text and "Цели в текущий момент" in page.text
+    assert "<th>Тип</th><th>Достоверность</th>" in page.text
     assert 'id="ro-alt"' not in page.text
     script = client.get("/static/js/replay.js")
     assert script.status_code == 200
@@ -137,3 +140,5 @@ def test_replay_api_and_page(fused, monkeypatch):
     assert "● Поиск целей · анализ продолжается" in script.text
     assert "● Контроль участка · активных целей нет" in script.text
     assert "const visible = liveActive ? active" in script.text
+    assert "function targetClassification" in script.text
+    assert "classification.confidence" in script.text
