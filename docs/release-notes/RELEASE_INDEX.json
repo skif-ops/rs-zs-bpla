@@ -3,15 +3,16 @@
   "updated": "2026-10-17",
   "server": {
     "product": "Мухоед",
-    "current_version": "1.2.2-evt-pre-20.1",
+    "current_version": "1.3.0-evt-pre-20.rc1",
     "protocol": "1.5",
-    "source_commit": "e7d161009434ad0e3cdee935fc8fdf5f74aca8b4",
-    "status": "RELEASED_AND_DEPLOYED",
+    "source_commit": "PENDING_BENCH_VALIDATION",
+    "status": "RELEASE_CANDIDATE_NOT_DEPLOYED",
     "release_notes": "server/RELEASE_NOTES.md",
     "deployments": [
       {
         "environment": "production",
         "endpoint": "https://dioneya.ru",
+        "version": "1.2.2-evt-pre-20.1",
         "build": "e7d16100",
         "verified": "2026-10-17",
         "status": "HEALTHY"
@@ -19,6 +20,7 @@
       {
         "environment": "bench",
         "endpoint": "https://bench.dioneya.ru",
+        "version": "1.2.2-evt-pre-20.1",
         "build": "e7d16100",
         "verified": "2026-10-17",
         "status": "HEALTHY"

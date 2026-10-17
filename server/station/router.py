@@ -2,8 +2,10 @@
 from __future__ import annotations
 import asyncio, json, os, time
 from pathlib import Path
+from typing import Literal
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
+from pydantic import BaseModel, Field
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest, FirmwareUpdateRequest, NetworkConfigRequest, RolloutRequest, RolloutReason, RevertRequest
 from station.command_codec import validate_command_payload
 from station.firmware_codec import ReleaseRepository, UPDATE_COMMAND
@@ -90,6 +92,17 @@ def _visible_event(request:Request,event_id:str)->dict:
     if result is None: raise HTTPException(404,'event not found')
     return result
 
+def _scoped_episode(request:Request,episode:dict|None)->dict|None:
+    if episode is None: return None
+    scope=scope_of(request,store)
+    if not scope.tenant(episode.get('tenant')) or not scope.any_station(episode.get('stations') or []): return None
+    if scope.station_list is None: return episode
+    return dict(episode,stations=[s for s in episode.get('stations') or [] if scope.station(s)])
+
+class AlertDecisionRequest(BaseModel):
+    disposition:Literal['confirmed_target','false_alarm','technical_event']
+    comment:str=Field(default='',max_length=2000)
+
 @router.get('/stations')
 async def stations(request:Request):
     scope=scope_of(request,store)
@@ -103,6 +116,41 @@ async def events(request:Request,limit:int=200):
 @router.get('/events/{event_id}')
 async def event(request:Request,event_id:str):
     return _visible_event(request,event_id)
+
+@router.get('/journal')
+async def alert_journal(request:Request,limit:int=200,before_us:int|None=None,before_id:str|None=None,tenant:str|None=None,
+                        disposition:Literal['pending','confirmed_target','false_alarm','technical_event']|None=None):
+    """One journal row per alert episode, with the latest operator decision.  Telemetry remains in its own tables."""
+    scope=scope_of(request,store)
+    if tenant is not None and not scope.tenant(tenant): raise HTTPException(403,'tenant is outside the account scope')
+    rows=store.list_alert_episodes(min(max(limit,1),2000),before_us=before_us,before_id=before_id,tenant=tenant,
+                                   tenants=sorted(scope.tenants) if scope.tenants and tenant is None else None,
+                                   stations=scope.station_list,disposition=disposition)
+    entries=[_scoped_episode(request,row) for row in rows]
+    entries=[row for row in entries if row is not None]
+    has_more=len(entries)==min(max(limit,1),2000)
+    return {'entries':entries,'next_before_us':entries[-1]['started_us'] if has_more else None,
+            'next_before_id':entries[-1]['alert_id'] if has_more else None}
+
+@router.get('/journal/{alert_id}')
+async def alert_journal_entry(request:Request,alert_id:str):
+    episode=_scoped_episode(request,store.get_alert_journal(alert_id))
+    if episode is None: raise HTTPException(404,'alert episode not found')
+    return episode
+
+@router.post('/journal/{alert_id}/decision')
+async def decide_alert(request:Request,alert_id:str,body:AlertDecisionRequest):
+    operator=operator_of(request)
+    if operator is not None and operator.get('via')!='cookie':
+        raise HTTPException(403,'an alert decision requires an interactive operator session')
+    episode=_scoped_episode(request,store.get_alert_journal(alert_id))
+    if episode is None: raise HTTPException(404,'alert episode not found')
+    comment=body.comment.strip()
+    if body.disposition in {'false_alarm','technical_event'} and not comment:
+        raise HTTPException(422,'comment is required for a false alarm or technical event')
+    decision=store.save_alert_decision(alert_id,_actor(request) or 'bench',body.disposition,comment)
+    if decision is None: raise HTTPException(404,'alert episode not found')
+    return {'alert_id':alert_id,'decision':decision}
 
 @router.get('/events/{event_id}/bearings')
 async def event_bearings(request:Request,event_id:str,limit:int=5000):

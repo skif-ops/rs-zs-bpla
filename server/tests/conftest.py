@@ -27,7 +27,8 @@ def isolate_station_store_after_collection():
         return
 
     with store.lock, store._conn() as connection:
-        for table in ("audio", "commands", "security_events", "system_events", "detections", "stations"):
+        for table in ("alert_decisions", "alert_tracks", "alert_episodes", "alert_outbox", "track_points", "track_members",
+                      "fused_tracks", "bearings", "audio", "commands", "security_events", "system_events", "detections", "stations"):
             connection.execute(f"DELETE FROM {table}")
     service.track_filters.clear()
     service.track_frames.clear()

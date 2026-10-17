@@ -265,6 +265,7 @@ def test_roles_and_permissions(auth):
         ("GET", "/api/v1/events", None, {"vic", "ops", "svc", "eng", "adm", "duo"}),
         ("GET", "/api/v1/stations/17/events/5/audio", None, {"ops", "eng", "duo"}),
         ("POST", AUDIO_REQUEST, {"event_id": 5}, {"ops", "eng", "duo"}),
+        ("POST", "/api/v1/journal/ALR-test-1/decision", {"disposition": "confirmed_target", "comment": ""}, {"ops", "eng", "duo"}),
         ("POST", "/dataset/delete", None, {"eng"}),
         ("POST", "/api/v1/stations/17/network-config", net, {"eng"}),
         ("POST", "/api/v1/stations/17/firmware-update", {"version": "9.9.9"}, {"eng"}),

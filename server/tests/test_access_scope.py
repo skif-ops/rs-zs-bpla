@@ -67,6 +67,13 @@ def field(tmp_path: Path, monkeypatch):
     for i, (tenant, kind, body) in enumerate(messages):
         store.append_alert(f"m{i}", tenant, kind, T0 + i, {"schema": "dioneya.alert/1", "msg_id": f"m{i}", "type": kind,
                                                          "tenant": tenant, **body})
+    alert_class = {"code": "uav_piston", "label": "PISTON_UAV", "confidence": .9, "type": "FP-1", "f0_hz": 91.0}
+    store.save_episode({"alert_id": "ALR-north", "tenant": "north", "started_us": T0 + 10,
+                        "last_activity_us": T0 + 20, "level": "alert", "stations": [17, 18],
+                        "class": alert_class, "ended_us": T0 + 30})
+    store.save_episode({"alert_id": "ALR-south", "tenant": "south", "started_us": T0 + 11,
+                        "last_activity_us": T0 + 21, "level": "warning", "stations": [19],
+                        "class": alert_class, "ended_us": T0 + 31})
     from app import app
 
     return oa.current_store(), store, app
@@ -203,6 +210,31 @@ def test_output_api_follows_the_account(field):
     accounts.add_user("all", "service", PASSWORD)
     everything = logged_in(app, "all").get("/api/v1/alerts").json()["messages"]
     assert len(everything) == 5 and len(everything[0]["alert"]["stations"]) == 2
+
+
+def test_alert_journal_follows_scope_and_only_operator_confirms(field):
+    accounts, store, app = field
+    accounts.add_user("vic", "viewer", PASSWORD)
+    accounts.set_scope("vic", [], [17])
+    viewer = logged_in(app, "vic")
+    entries = viewer.get("/api/v1/journal").json()["entries"]
+    assert [row["alert_id"] for row in entries] == ["ALR-north"]
+    assert entries[0]["stations"] == [17]
+    assert viewer.get("/api/v1/journal/ALR-south").status_code == 404
+    assert viewer.post("/api/v1/journal/ALR-north/decision",
+                       json={"disposition": "confirmed_target", "comment": ""}, headers=ORIGIN).status_code == 403
+
+    accounts.add_user("ops", "operator", PASSWORD)
+    accounts.set_scope("ops", [], [17])
+    operator = logged_in(app, "ops")
+    accepted = operator.post("/api/v1/journal/ALR-north/decision",
+                             json={"disposition": "confirmed_target", "comment": "Подтверждено оператором"},
+                             headers=ORIGIN)
+    assert accepted.status_code == 200 and accepted.json()["decision"]["actor"] == "ops"
+    assert operator.post("/api/v1/journal/ALR-south/decision",
+                         json={"disposition": "technical_event", "comment": "Чужой участок"},
+                         headers=ORIGIN).status_code == 404
+    assert store.alert_decisions("ALR-south") == []
 
 
 def test_scope_cuts_messages_as_documented():
