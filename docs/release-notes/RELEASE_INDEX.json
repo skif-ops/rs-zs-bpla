@@ -5,22 +5,22 @@
     "product": "Мухоед",
     "current_version": "1.2.2-evt-pre-20.1",
     "protocol": "1.5",
-    "source_commit": "b82117c1",
-    "status": "RELEASE_CANDIDATE_BENCH_VALIDATION_PENDING",
+    "source_commit": "e7d161009434ad0e3cdee935fc8fdf5f74aca8b4",
+    "status": "RELEASED_AND_DEPLOYED",
     "release_notes": "server/RELEASE_NOTES.md",
     "deployments": [
       {
         "environment": "production",
         "endpoint": "https://dioneya.ru",
-        "build": "aca42fa2",
-        "verified": "2026-10-16",
+        "build": "e7d16100",
+        "verified": "2026-10-17",
         "status": "HEALTHY"
       },
       {
         "environment": "bench",
         "endpoint": "https://bench.dioneya.ru",
-        "build": "aca42fa2",
-        "verified": "2026-10-16",
+        "build": "e7d16100",
+        "verified": "2026-10-17",
         "status": "HEALTHY"
       }
     ]
