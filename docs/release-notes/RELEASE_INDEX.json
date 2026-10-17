@@ -5,8 +5,8 @@
     "product": "Мухоед",
     "current_version": "1.3.0-evt-pre-20.rc1",
     "protocol": "1.5",
-    "source_commit": "PENDING_BENCH_VALIDATION",
-    "status": "RELEASE_CANDIDATE_NOT_DEPLOYED",
+    "source_commit": "62e0dbbb52487690cc4d926b4169615cf7fad57b",
+    "status": "RELEASE_CANDIDATE_READY_FOR_BENCH",
     "release_notes": "server/RELEASE_NOTES.md",
     "deployments": [
       {
