@@ -3,10 +3,10 @@
   "updated": "2026-10-18",
   "server": {
     "product": "Мухоед",
-    "current_version": "1.3.0-evt-pre-20.rc2",
+    "current_version": "1.3.0-evt-pre-20.1",
     "protocol": "1.5",
-    "source_commit": "add7372b5430fa05a239698e4b21d4e7cb5c2486",
-    "status": "RELEASE_CANDIDATE_DEPLOYED_TO_BENCH",
+    "source_commit": "3aa3268640573ded29065736f8999aa4b850cf95",
+    "status": "RELEASE_APPROVED_PENDING_PRODUCTION",
     "release_notes": "server/RELEASE_NOTES.md",
     "deployments": [
       {
