@@ -37,7 +37,7 @@ def test_one_superuser_created_by_the_server_and_protected(auth):
     root = store.user(ROOT)
     assert root["roles"] == [oa.SUPERUSER_ROLE] and root["must_change"] and root["totp_at_login"] and not root.get("totp")
     assert oa.verify_password(oa.SUPERUSER_DEFAULT_PASSWORD, root["password"])
-    assert root["permissions"] == set(oa.PERMISSIONS) | {oa.AUDIT_CONTROL}
+    assert root["permissions"] == set(oa.PERMISSIONS) | {oa.ALERT_CONFIRM, oa.AUDIT_CONTROL}
     for bad in (lambda: store.add_user(ROOT, "viewer", PASSWORD), lambda: store.add_user("other", "superuser", PASSWORD),
                 lambda: store.set_roles("anna", "superuser"), lambda: store.set_roles(ROOT, "viewer"),
                 lambda: store.remove_user(ROOT), lambda: store.set_disabled(ROOT, True),

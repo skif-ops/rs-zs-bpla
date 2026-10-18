@@ -89,6 +89,8 @@ BACKFILL_S = 15.0                # a new track shows the points of its last 15 s
 RANGE_GUESS_M = 2000.0           # first range of the iteration on the sound delay
 RANGE_ITERATIONS = 3             # fixed-point contraction v/c leaves < 40 m at 5 km even at 80 m/s
 RANGE_CONVERGENCE_M = 8.0        # 23 ms of sound travel and < 2 m target motion at EVT speeds
+PAIR_RANGE_ITERATIONS = 5        # a two-ray fix needs the tighter range iteration for the independent height gate
+PAIR_RANGE_CONVERGENCE_M = 2.0   # otherwise a crossing of different-height targets can look height-consistent
 FAST_CONTINUE_WINDOW_S = 6.0     # recent fixes retained for a confirmed association (at least STRONG_FIXES)
 TRACK_IDLE_S = 20.0              # a track without a new point this long is over (the output API ends it a little later:
                                  # integration/alert_producer.TRACK_END_US); a later hypothesis of its segments is a new track
@@ -208,7 +210,9 @@ def _solve(units, t: float, now: float, heard: list | None = None):
     arrival time) of every sample: the result is final once the bearings around them are in."""
     ranges = [RANGE_GUESS_M] * len(units)
     solved = None
-    for k in range(RANGE_ITERATIONS):
+    iterations = PAIR_RANGE_ITERATIONS if len(units) == 2 else RANGE_ITERATIONS
+    convergence_m = PAIR_RANGE_CONVERGENCE_M if len(units) == 2 else RANGE_CONVERGENCE_M
+    for k in range(iterations):
         az, el, sg = [], [], []
         for u, r in zip(units, ranges):
             ta = t + r / C
@@ -230,7 +234,7 @@ def _solve(units, t: float, now: float, heard: list | None = None):
         new = [float(np.linalg.norm(solved[0][:2] - o[:2])) for o in origins]
         if max(new) > MAX_RANGE_M:
             return "refuted"
-        converged = k > 0 and max(abs(a - b) for a, b in zip(new, ranges)) < RANGE_CONVERGENCE_M
+        converged = k > 0 and max(abs(a - b) for a, b in zip(new, ranges)) < convergence_m
         ranges = new
         if converged:
             break
