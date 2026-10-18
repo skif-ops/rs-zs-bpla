@@ -2,6 +2,7 @@
 bearings in metres around the stations; the page draws them.  The scene is the synthetic one of the fusion tests."""
 
 import math
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -142,3 +143,12 @@ def test_replay_api_and_page(fused, monkeypatch):
     assert "const visible = liveActive ? active" in script.text
     assert "function targetClassification" in script.text
     assert "classification.confidence" in script.text
+
+
+def test_live_coverage_refresh_is_bound_to_one_geometry_snapshot():
+    """Changing live station groups cannot combine an old raster with new hearing circles or require a page switch."""
+    script = (Path(__file__).resolve().parents[1] / "static" / "js" / "replay.js").read_text(encoding="utf-8")
+    assert "loadCoverage();\n    draw();" in script
+    assert "coverageSpec()?.key !== spec.key" in script
+    assert "coverage = { g, off, key: spec.key, stations: spec.stations }" in script
+    assert "for (const s of stations)" in script

@@ -26,6 +26,8 @@
   let lastWidth = 0;
   const view = { cx: 0, cy: 0, s: 0.1 };   // centre (m) and scale (px per m)
   let coverage = null;             // blind zones of the station geometry (/api/v1/geometry/coverage), pre-rendered
+  let coverageRequest = 0;         // rejects a response calculated for an older live geometry
+  let coveragePendingKey = "";
   const pageQuery = new URLSearchParams(location.search);
   const liveAlertId = pageQuery.get("live") === "1" ? pageQuery.get("alert") : null;
   let liveActive = !!liveAlertId;
@@ -86,7 +88,7 @@
     liveLastEvidenceAt = 0;
     liveHasConfirmedTrack = false;
     if (!clearScene) return;
-    data = null; byStation = new Map(); coverage = null;
+    data = null; byStation = new Map(); invalidateCoverage();
     $("replay-empty").textContent = "Начинается новый эпизод…";
     $("replay-empty").hidden = false;
     draw();
@@ -242,8 +244,10 @@
       $("replay-source").selectedOptions[0]?.textContent || "Сопровождение";
     enableControls(!empty);
     if (!updating || !hadPositions) fit();
+    // A live response can introduce a new station group and a new local ENU origin.  Keep the coverage raster tied
+    // to that exact geometry even during background refreshes; a page switch must never be required to restore it.
+    loadCoverage();
     draw();
-    if (!updating) loadCoverage();
   }
 
   async function refreshLive() {
@@ -253,22 +257,62 @@
   }
 
   // ---- blind zones of the station geometry (decision 5) --------------------------------------------------------
+  function invalidateCoverage() {
+    coverageRequest += 1;
+    coveragePendingKey = "";
+    coverage = null;
+  }
+
+  function coverageSpec() {
+    if (!$('replay-geometry').checked || !data || !data.origin || !data.stations.length) return null;
+    const range = Math.min(Math.max(Number($("replay-geo-range").value) || 2000, 100), 5000);
+    const height = Math.min(Math.max(Number($("replay-geo-height").value) || 0, 0), 5000);
+    const sigmas = data.bearings.map((b) => b.sigma_deg).filter((v) => v > 0).sort((a, b) => a - b);
+    const sigma = Math.round((sigmas.length ? sigmas[sigmas.length >> 1] : 3) * 10) / 10;
+    const stations = data.stations.map((station) => ({ ...station }));
+    const origin = { ...data.origin };
+    // The endpoint's raster uses the supplied origin, while the outlined circles use station ENU coordinates.
+    // Both therefore belong to one immutable snapshot.  The key also prevents a request on every four-second poll.
+    const key = JSON.stringify({
+      station_ids: stations.map((station) => station.station_id),
+      station_enu: stations.map((station) => [station.station_id, station.e, station.n]),
+      origin: [origin.lat, origin.lon, origin.alt_msl_m], range, height, sigma,
+    });
+    return { key, range, height, sigma, stations, origin };
+  }
+
   async function loadCoverage() {
     const on = $("replay-geometry").checked;
     $("replay-geometry-opts").hidden = !on;
+    const spec = coverageSpec();
+    if (!spec) {
+      invalidateCoverage();
+      $("replay-geo-share").textContent = "";
+      draw();
+      return;
+    }
+    if (coverage?.key === spec.key || coveragePendingKey === spec.key) return;
+    const requestId = ++coverageRequest;
+    coveragePendingKey = spec.key;
     coverage = null;
-    if (!on || !data || !data.origin || !data.stations.length) { $("replay-geo-share").textContent = ""; draw(); return; }
-    const sig = data.bearings.map((b) => b.sigma_deg).filter((v) => v > 0).sort((a, b) => a - b);
+    $("replay-geo-share").textContent = "Расчёт зон…";
+    draw();
     const q = new URLSearchParams({
-      station_ids: data.stations.map((s) => s.station_id).join(","),
-      range_m: Math.min(Math.max(Number($("replay-geo-range").value) || 2000, 100), 5000),
-      height_m: Math.min(Math.max(Number($("replay-geo-height").value) || 0, 0), 5000),
-      sigma_deg: sig.length ? sig[sig.length >> 1] : 3,
-      origin_lat: data.origin.lat, origin_lon: data.origin.lon, origin_alt: data.origin.alt_msl_m,
+      station_ids: spec.stations.map((station) => station.station_id).join(","),
+      range_m: spec.range,
+      height_m: spec.height,
+      sigma_deg: spec.sigma,
+      origin_lat: spec.origin.lat, origin_lon: spec.origin.lon, origin_alt: spec.origin.alt_msl_m,
     });
-    const res = await fetch("/api/v1/geometry/coverage?" + q);
-    if (!res.ok) { $("replay-geo-share").textContent = "Не удалось рассчитать зоны."; draw(); return; }
+    let res;
+    try { res = await fetch("/api/v1/geometry/coverage?" + q, { cache: "no-store" }); }
+    catch { res = null; }
+    // The operator may already be watching another station group.  Never combine an old raster with new circles.
+    if (requestId !== coverageRequest || coverageSpec()?.key !== spec.key) return;
+    coveragePendingKey = "";
+    if (!res || !res.ok) { $("replay-geo-share").textContent = "Не удалось рассчитать зоны."; draw(); return; }
     const g = await res.json();
+    if (requestId !== coverageRequest || coverageSpec()?.key !== spec.key) return;
     const off = document.createElement("canvas");
     off.width = g.nx; off.height = g.ny;
     const octx = off.getContext("2d");
@@ -288,7 +332,7 @@
       }
     }
     octx.putImageData(img, 0, 0);
-    coverage = { g, off };
+    coverage = { g, off, key: spec.key, stations: spec.stations };
     const pc = (v) => Math.round(v * 100) + " %";
     $("replay-geo-share").textContent = `Доля площади: точка ${pc(g.share.position)}, слепая геометрия ` +
       `${pc(g.share.blind_geometry)}, одна станция ${pc(g.share.single_station)}, не слышно ${pc(g.share.out_of_range)} ` +
@@ -298,7 +342,7 @@
 
   function drawCoverage() {
     if (!coverage) return;
-    const { g, off } = coverage;
+    const { g, off, stations } = coverage;
     const left = sx(g.e0 - g.step_m / 2), top = sy(g.n0 - g.step_m / 2 + g.ny * g.step_m);
     ctx.save();
     ctx.imageSmoothingEnabled = false;
@@ -308,7 +352,7 @@
     ctx.setLineDash([6, 5]);
     ctx.lineWidth = 1.2;
     ctx.font = "11px system-ui, sans-serif";
-    for (const s of data.stations) {
+    for (const s of stations) {
       const x = sx(s.e), y = sy(s.n);
       ctx.strokeStyle = colorOf(s.station_id);
       ctx.globalAlpha = 0.8;
@@ -744,7 +788,7 @@
       liveActive = false;
       $("replay-live-state").textContent = "● Тревога завершена · активных целей нет";
       $("replay-now").hidden = true;
-      data = null; byStation = new Map(); coverage = null;
+      data = null; byStation = new Map(); invalidateCoverage();
       $("replay-empty").textContent = "Тревога завершилась.";
       $("replay-empty").hidden = false;
       draw();
