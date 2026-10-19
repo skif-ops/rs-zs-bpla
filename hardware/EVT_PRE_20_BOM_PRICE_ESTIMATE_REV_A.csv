@@ -32,70 +32,70 @@ PR-030,TDK,CGA3E2X7R1H104K080AA,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,
 PR-031,TDK,CGA6P3X7R1E226M250AB,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,112,2800,160,4000,240,6000,Rounded engineering estimate pending supplier quotation.
 PR-032,TDK,CGA6P3X7R1H475K250AB,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,52,1300,70,1750,100,2500,Rounded engineering estimate pending supplier quotation.
 PR-033,Texas Instruments,CSD18540Q5B,Protection,450,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,2250,13,5850,25,11250,Rounded engineering estimate pending supplier quotation.
-PR-034,Ebyte,E22-900M22S,LoRa,1500,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,6,9000,13,19500,26,39000,Rounded engineering estimate pending supplier quotation.
-PR-035,Panasonic Industry,EEH-ZK1V101XP,Passive,120,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,44,5280,50,6000,60,7200,Rounded engineering estimate pending supplier quotation.
-PR-036,Panasonic Industry,ERA-2AEB104X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,44,1100,50,1250,60,1500,Rounded engineering estimate pending supplier quotation.
-PR-037,Panasonic Industry,ERA-2AEB3572X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,44,1100,50,1250,60,1500,Rounded engineering estimate pending supplier quotation.
-PR-038,Panasonic Industry,ERA-2AEB8662X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,1200,60,1500,80,2000,Rounded engineering estimate pending supplier quotation.
-PR-039,Panasonic,ERJ-2GE0R00X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
-PR-040,Panasonic,ERJ-2GE0R00X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,576,120,1440,240,2880,Rounded engineering estimate pending supplier quotation.
-PR-041,Panasonic Industry,ERJ-2GE0R00X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
-PR-042,Panasonic Industry,ERJ-2GE0R00X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,1200,60,1500,80,2000,Rounded engineering estimate pending supplier quotation.
-PR-043,Panasonic Industry,ERJ-2GE0R00X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,56,1400,80,2000,120,3000,Rounded engineering estimate pending supplier quotation.
-PR-044,Panasonic,ERJ-2GEJ104X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,96,20,240,40,480,Rounded engineering estimate pending supplier quotation.
-PR-045,Panasonic,ERJ-2GEJ561X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,48,10,120,20,240,Rounded engineering estimate pending supplier quotation.
-PR-046,Panasonic,ERJ-2RKF1001X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,20,240,50,600,100,1200,Rounded engineering estimate pending supplier quotation.
-PR-047,Panasonic,ERJ-2RKF1002X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,76,912,190,2280,380,4560,Rounded engineering estimate pending supplier quotation.
-PR-048,Panasonic Industry,ERJ-2RKF1002X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
-PR-049,Panasonic Industry,ERJ-2RKF1002X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,1200,60,1500,80,2000,Rounded engineering estimate pending supplier quotation.
-PR-050,Panasonic,ERJ-2RKF1003X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
-PR-051,Panasonic,ERJ-2RKF1003X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,84,1008,210,2520,420,5040,Rounded engineering estimate pending supplier quotation.
-PR-052,Panasonic Industry,ERJ-2RKF1003X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,1200,60,1500,80,2000,Rounded engineering estimate pending supplier quotation.
-PR-053,Panasonic,ERJ-2RKF1004X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,48,10,120,20,240,Rounded engineering estimate pending supplier quotation.
-PR-054,Panasonic,ERJ-2RKF2201X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,96,20,240,40,480,Rounded engineering estimate pending supplier quotation.
-PR-055,Panasonic,ERJ-2RKF22R0X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,116,1392,290,3480,580,6960,Rounded engineering estimate pending supplier quotation.
-PR-056,Panasonic,ERJ-2RKF4701X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,96,20,240,40,480,Rounded engineering estimate pending supplier quotation.
-PR-057,Panasonic Industry,ERJ-2RKF4701X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
-PR-058,Panasonic,ERJ-2RKF4702X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,12,144,30,360,60,720,Rounded engineering estimate pending supplier quotation.
-PR-059,Panasonic,ERJ-2RKF5101X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,96,20,240,40,480,Rounded engineering estimate pending supplier quotation.
-PR-060,Panasonic,ERJ-8GEYJ100V,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,48,10,120,20,240,Rounded engineering estimate pending supplier quotation.
-PR-061,STMicroelectronics,ESDALC6V1-5P6,ESD,140,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,10,1400,25,3500,50,7000,Rounded engineering estimate pending supplier quotation.
-PR-062,Taoglas,G30.B.108111,Antenna,4050,PUBLIC_AUTHORIZED_CHANNEL_PRICE,$32.38 at qty 10,USD,https://www.mouser.com/,2026-09-18,MEDIUM,5,20250,11,44550,22,89100,Published price converted to a rounded landed-RUB planning value; final cart/quote controls.
-PR-063,Murata,GRM1555C1E470JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-064,Murata,GRM1555C1H100JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
-PR-065,Murata,GRM1555C1H100JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,240,20,600,40,1200,Rounded engineering estimate pending supplier quotation.
-PR-066,Murata,GRM1555C1H101JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-067,Murata,GRM1555C1H151JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-068,Murata,GRM1555C1H330JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
-PR-069,Murata,GRM1555C1H330JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,240,20,600,40,1200,Rounded engineering estimate pending supplier quotation.
-PR-070,Murata,GRM1555C1H680JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-071,Murata,GRM155R61A225KE15D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,240,20,600,40,1200,Rounded engineering estimate pending supplier quotation.
-PR-072,Murata,GRM155R61C105KA12D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,12,360,30,900,60,1800,Rounded engineering estimate pending supplier quotation.
-PR-073,Murata,GRM155R71C103KA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-074,Murata,GRM155R71E103KA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,20,600,50,1500,100,3000,Rounded engineering estimate pending supplier quotation.
-PR-075,Murata,GRM155R71E104KE14D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
-PR-076,Murata,GRM155R71E104KE14D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,140,4200,350,10500,700,21000,Rounded engineering estimate pending supplier quotation.
-PR-077,Murata,GRM155R71E224KE14D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-078,Murata,GRM155R71E473KA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-079,Murata,GRM155R72A472KA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-080,Murata,GRM188R61A106KE69D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,32,960,80,2400,160,4800,Rounded engineering estimate pending supplier quotation.
-PR-081,Murata,GRM21BR61A226ME44L,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
-PR-082,Texas Instruments,INA226AIDGSR,Monitor,550,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,2750,13,7150,25,13750,Rounded engineering estimate pending supplier quotation.
-PR-083,STMicroelectronics,LIS2DW12TR,Motion,350,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,1750,13,4550,25,8750,Rounded engineering estimate pending supplier quotation.
-PR-084,Texas Instruments,LM74700QDBVRQ1,Protection,600,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,3000,13,7800,25,15000,Rounded engineering estimate pending supplier quotation.
-PR-085,Texas Instruments,LMR604403SRAKR,Power,950,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,10,9500,26,24700,50,47500,Rounded engineering estimate pending supplier quotation.
-PR-086,Murata,LQH32PN2R2NN0L,Inductor,180,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,720,10,1800,20,3600,Rounded engineering estimate pending supplier quotation.
-PR-087,Murata,LQW15AN27NJ00D,Inductor,180,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,720,10,1800,20,3600,Rounded engineering estimate pending supplier quotation.
-PR-088,Analog Devices,LT6000IDCB#TRMPBF,Operational_Amplifier,650,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,2600,10,6500,20,13000,Rounded engineering estimate pending supplier quotation.
-PR-089,u-blox,MAX-M10S-00B,GNSS,2500,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,12500,13,32500,25,62500,Rounded engineering estimate pending supplier quotation.
-PR-090,Raytac,MDBT50Q-P1MV2,BLE,2200,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,11000,13,28600,25,55000,Rounded engineering estimate pending supplier quotation.
-PR-091,GCT,MEM2052-00-195-00-A,Connector,550,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,2750,13,7150,25,13750,Rounded engineering estimate pending supplier quotation.
-PR-092,Nexperia,"MMBT3904,215",Transistor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,15,450,39,1170,75,2250,Rounded engineering estimate pending supplier quotation.
-PR-093,TDK InvenSense,MMICT5838-00-012,Microphone,500,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,20,10000,48,24000,96,48000,Rounded engineering estimate pending supplier quotation.
-PR-094,PCB fabrication,NET_TIE_COPPER_REV_A,PCB feature,0,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,12,0,30,0,60,0,Rounded engineering estimate pending supplier quotation.
-PR-095,Nexperia,PESD5V0C1BSF,RF_ESD,120,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,960,20,2400,40,4800,Rounded engineering estimate pending supplier quotation.
-PR-096,Nexperia,PESD5V0S1UL,Supply_TVS,100,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,800,20,2000,40,4000,Rounded engineering estimate pending supplier quotation.
-PR-097,RELiON,RB40,Battery,60000,PUBLIC_MANUFACTURER_PRICE,$479.95,USD,https://relionbattery.com/products/lithium/rb40,2026-09-18,MEDIUM,5,300000,11,660000,21,1260000,Published price converted to a rounded landed-RUB planning value; final cart/quote controls.
+PR-034,Epower Tech Co. Ltd,DIO-BAT-LFP-12V50-H-REV-A,Battery,60000,ENGINEERING_BUDGETARY_CEILING_PENDING_SUPPLIER_QUOTE,,RUB,,2026-10-19,LOW,5,300000,11,660000,21,1260000,Temporary planning ceiling for the accepted heated 50 Ah configuration; replace with the supplier quotation before commercial reconciliation.
+PR-035,Ebyte,E22-900M22S,LoRa,1500,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,6,9000,13,19500,26,39000,Rounded engineering estimate pending supplier quotation.
+PR-036,Panasonic Industry,EEH-ZK1V101XP,Passive,120,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,44,5280,50,6000,60,7200,Rounded engineering estimate pending supplier quotation.
+PR-037,Panasonic Industry,ERA-2AEB104X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,44,1100,50,1250,60,1500,Rounded engineering estimate pending supplier quotation.
+PR-038,Panasonic Industry,ERA-2AEB3572X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,44,1100,50,1250,60,1500,Rounded engineering estimate pending supplier quotation.
+PR-039,Panasonic Industry,ERA-2AEB8662X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,1200,60,1500,80,2000,Rounded engineering estimate pending supplier quotation.
+PR-040,Panasonic,ERJ-2GE0R00X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
+PR-041,Panasonic,ERJ-2GE0R00X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,576,120,1440,240,2880,Rounded engineering estimate pending supplier quotation.
+PR-042,Panasonic Industry,ERJ-2GE0R00X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
+PR-043,Panasonic Industry,ERJ-2GE0R00X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,1200,60,1500,80,2000,Rounded engineering estimate pending supplier quotation.
+PR-044,Panasonic Industry,ERJ-2GE0R00X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,56,1400,80,2000,120,3000,Rounded engineering estimate pending supplier quotation.
+PR-045,Panasonic,ERJ-2GEJ104X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,96,20,240,40,480,Rounded engineering estimate pending supplier quotation.
+PR-046,Panasonic,ERJ-2GEJ561X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,48,10,120,20,240,Rounded engineering estimate pending supplier quotation.
+PR-047,Panasonic,ERJ-2RKF1001X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,20,240,50,600,100,1200,Rounded engineering estimate pending supplier quotation.
+PR-048,Panasonic,ERJ-2RKF1002X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,76,912,190,2280,380,4560,Rounded engineering estimate pending supplier quotation.
+PR-049,Panasonic Industry,ERJ-2RKF1002X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
+PR-050,Panasonic Industry,ERJ-2RKF1002X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,1200,60,1500,80,2000,Rounded engineering estimate pending supplier quotation.
+PR-051,Panasonic,ERJ-2RKF1003X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
+PR-052,Panasonic,ERJ-2RKF1003X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,84,1008,210,2520,420,5040,Rounded engineering estimate pending supplier quotation.
+PR-053,Panasonic Industry,ERJ-2RKF1003X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,48,1200,60,1500,80,2000,Rounded engineering estimate pending supplier quotation.
+PR-054,Panasonic,ERJ-2RKF1004X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,48,10,120,20,240,Rounded engineering estimate pending supplier quotation.
+PR-055,Panasonic,ERJ-2RKF2201X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,96,20,240,40,480,Rounded engineering estimate pending supplier quotation.
+PR-056,Panasonic,ERJ-2RKF22R0X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,116,1392,290,3480,580,6960,Rounded engineering estimate pending supplier quotation.
+PR-057,Panasonic,ERJ-2RKF4701X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,96,20,240,40,480,Rounded engineering estimate pending supplier quotation.
+PR-058,Panasonic Industry,ERJ-2RKF4701X,Passive,25,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
+PR-059,Panasonic,ERJ-2RKF4702X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,12,144,30,360,60,720,Rounded engineering estimate pending supplier quotation.
+PR-060,Panasonic,ERJ-2RKF5101X,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,96,20,240,40,480,Rounded engineering estimate pending supplier quotation.
+PR-061,Panasonic,ERJ-8GEYJ100V,Resistor,12,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,48,10,120,20,240,Rounded engineering estimate pending supplier quotation.
+PR-062,STMicroelectronics,ESDALC6V1-5P6,ESD,140,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,10,1400,25,3500,50,7000,Rounded engineering estimate pending supplier quotation.
+PR-063,Taoglas,G30.B.108111,Antenna,4050,PUBLIC_AUTHORIZED_CHANNEL_PRICE,$32.38 at qty 10,USD,https://www.mouser.com/,2026-09-18,MEDIUM,5,20250,11,44550,22,89100,Published price converted to a rounded landed-RUB planning value; final cart/quote controls.
+PR-064,Murata,GRM1555C1E470JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-065,Murata,GRM1555C1H100JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
+PR-066,Murata,GRM1555C1H100JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,240,20,600,40,1200,Rounded engineering estimate pending supplier quotation.
+PR-067,Murata,GRM1555C1H101JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-068,Murata,GRM1555C1H151JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-069,Murata,GRM1555C1H330JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
+PR-070,Murata,GRM1555C1H330JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,240,20,600,40,1200,Rounded engineering estimate pending supplier quotation.
+PR-071,Murata,GRM1555C1H680JA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-072,Murata,GRM155R61A225KE15D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,240,20,600,40,1200,Rounded engineering estimate pending supplier quotation.
+PR-073,Murata,GRM155R61C105KA12D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,12,360,30,900,60,1800,Rounded engineering estimate pending supplier quotation.
+PR-074,Murata,GRM155R71C103KA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-075,Murata,GRM155R71E103KA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,20,600,50,1500,100,3000,Rounded engineering estimate pending supplier quotation.
+PR-076,Murata,GRM155R71E104KE14D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,0,0,0,0,0,0,Rounded engineering estimate pending supplier quotation.
+PR-077,Murata,GRM155R71E104KE14D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,140,4200,350,10500,700,21000,Rounded engineering estimate pending supplier quotation.
+PR-078,Murata,GRM155R71E224KE14D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-079,Murata,GRM155R71E473KA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-080,Murata,GRM155R72A472KA01D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-081,Murata,GRM188R61A106KE69D,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,32,960,80,2400,160,4800,Rounded engineering estimate pending supplier quotation.
+PR-082,Murata,GRM21BR61A226ME44L,Capacitor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,120,10,300,20,600,Rounded engineering estimate pending supplier quotation.
+PR-083,Texas Instruments,INA226AIDGSR,Monitor,550,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,2750,13,7150,25,13750,Rounded engineering estimate pending supplier quotation.
+PR-084,STMicroelectronics,LIS2DW12TR,Motion,350,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,1750,13,4550,25,8750,Rounded engineering estimate pending supplier quotation.
+PR-085,Texas Instruments,LM74700QDBVRQ1,Protection,600,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,3000,13,7800,25,15000,Rounded engineering estimate pending supplier quotation.
+PR-086,Texas Instruments,LMR604403SRAKR,Power,950,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,10,9500,26,24700,50,47500,Rounded engineering estimate pending supplier quotation.
+PR-087,Murata,LQH32PN2R2NN0L,Inductor,180,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,720,10,1800,20,3600,Rounded engineering estimate pending supplier quotation.
+PR-088,Murata,LQW15AN27NJ00D,Inductor,180,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,720,10,1800,20,3600,Rounded engineering estimate pending supplier quotation.
+PR-089,Analog Devices,LT6000IDCB#TRMPBF,Operational_Amplifier,650,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,4,2600,10,6500,20,13000,Rounded engineering estimate pending supplier quotation.
+PR-090,u-blox,MAX-M10S-00B,GNSS,2500,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,12500,13,32500,25,62500,Rounded engineering estimate pending supplier quotation.
+PR-091,Raytac,MDBT50Q-P1MV2,BLE,2200,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,11000,13,28600,25,55000,Rounded engineering estimate pending supplier quotation.
+PR-092,GCT,MEM2052-00-195-00-A,Connector,550,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,2750,13,7150,25,13750,Rounded engineering estimate pending supplier quotation.
+PR-093,Nexperia,"MMBT3904,215",Transistor,30,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,15,450,39,1170,75,2250,Rounded engineering estimate pending supplier quotation.
+PR-094,TDK InvenSense,MMICT5838-00-012,Microphone,500,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,20,10000,48,24000,96,48000,Rounded engineering estimate pending supplier quotation.
+PR-095,PCB fabrication,NET_TIE_COPPER_REV_A,PCB feature,0,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,12,0,30,0,60,0,Rounded engineering estimate pending supplier quotation.
+PR-096,Nexperia,PESD5V0C1BSF,RF_ESD,120,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,960,20,2400,40,4800,Rounded engineering estimate pending supplier quotation.
+PR-097,Nexperia,PESD5V0S1UL,Supply_TVS,100,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,8,800,20,2000,40,4000,Rounded engineering estimate pending supplier quotation.
 PR-098,Victron Energy,SBS050150200,Sensor,4900,PUBLIC_DISTRIBUTOR_PRICE,$39.10,USD,https://www.invertersupply.com/index.php?main_page=product_info&products_id=194069,2026-09-18,MEDIUM,5,24500,11,53900,21,102900,Published price converted to a rounded landed-RUB planning value; final cart/quote controls.
 PR-099,Victron Energy,SCC075010060R,Controller,8200,PUBLIC_DISTRIBUTOR_PRICE,$65.45,USD,https://www.invertersupply.com/index.php?main_page=product_info&products_id=31070,2026-09-18,MEDIUM,5,41000,11,90200,21,172200,Published price converted to a rounded landed-RUB planning value; final cart/quote controls.
 PR-100,Kingston,SDCIT2/32GB,Storage,2600,ENGINEERING_BUDGETARY_ESTIMATE,,RUB,,2026-09-18,LOW,5,13000,13,33800,25,65000,Rounded engineering estimate pending supplier quotation.

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -12,6 +13,8 @@ const { FileBlob, SpreadsheetFile, Workbook } = await import(toolUrl);
 const root = process.cwd();
 const workbookPath = path.join(root, "hardware/EVT_PRE_20_BOM_REV_A.xlsx");
 const mode = process.argv[2] ?? "render";
+const previewDir = process.env.EVT_BOM_PREVIEW_DIR ?? os.tmpdir();
+await fs.mkdir(previewDir, { recursive: true });
 
 const input = await FileBlob.load(workbookPath);
 const workbook = await SpreadsheetFile.importXlsx(input);
@@ -35,8 +38,9 @@ if (mode === "render") {
     tableMaxCellChars: 80,
   });
   console.log(inspection.ndjson);
-  await savePreview("/tmp/evt_pre_20_bom_before.png");
-  console.log("rendered=/tmp/evt_pre_20_bom_before.png");
+  const previewPath = path.join(previewDir, "evt_pre_20_bom_before.png");
+  await savePreview(previewPath);
+  console.log("rendered=" + previewPath);
 } else if (mode === "update") {
   const sources = [
     ["Engineering BOM", "hardware/EVT_PRE_20_BOM_REV_A.csv"],
@@ -83,6 +87,21 @@ if (mode === "render") {
       if (created) sheet.tables.add(`A1:Y${values.length}`, true, "Program41Table");
     }
   }
+  const priceCsvText = await fs.readFile(
+    path.join(root, "hardware/EVT_PRE_20_BOM_PRICE_ESTIMATE_REV_A.csv"), "utf8",
+  );
+  const priceCsvWorkbook = await Workbook.fromCSV(priceCsvText, { sheetName: "ImportedData" });
+  const priceValues = priceCsvWorkbook.worksheets.getItem("ImportedData").getUsedRange().values;
+  const numericPriceColumns = [4, 11, 12, 13, 14, 15, 16];
+  for (let row = 1; row < priceValues.length; row += 1) {
+    for (const column of numericPriceColumns) {
+      if (priceValues[row][column] !== "") {
+        priceValues[row][column] = Number(priceValues[row][column]);
+      }
+    }
+  }
+  const costSheet = workbook.worksheets.getItem("Cost estimate");
+  costSheet.getRangeByIndexes(11, 0, priceValues.length, priceValues[0].length).values = priceValues;
   workbook.recalculate();
   const formulaErrors = await workbook.inspect({
     kind: "match",
@@ -91,15 +110,27 @@ if (mode === "render") {
     maxChars: 4000,
   });
   console.log(formulaErrors.ndjson);
-  await savePreview("/tmp/evt_pre_20_bom_after.png");
-  await savePreview("/tmp/evt_pre_20_rfq_after.png", "RFQ", "A1:S28");
-  await savePreview("/tmp/evt_program_41_after.png", "Program 41", "A1:Y20");
+  const bomPreviewPath = path.join(previewDir, "evt_pre_20_bom_after.png");
+  const batteryPreviewPath = path.join(previewDir, "evt_pre_20_battery_after.png");
+  const rfqPreviewPath = path.join(previewDir, "evt_pre_20_rfq_after.png");
+  const programPreviewPath = path.join(previewDir, "evt_program_41_after.png");
+  const programBatteryPreviewPath = path.join(previewDir, "evt_program_41_battery_after.png");
+  const costBatteryPreviewPath = path.join(previewDir, "evt_cost_battery_after.png");
+  await savePreview(bomPreviewPath);
+  await savePreview(batteryPreviewPath, "Engineering BOM", "A39:AC46");
+  await savePreview(rfqPreviewPath, "RFQ", "A1:S28");
+  await savePreview(programPreviewPath, "Program 41", "A1:Y20");
+  await savePreview(programBatteryPreviewPath, "Program 41", "A31:Y38");
+  await savePreview(costBatteryPreviewPath, "Cost estimate", "A42:R49");
   const output = await SpreadsheetFile.exportXlsx(workbook);
   await output.save(workbookPath);
   console.log("updated=" + workbookPath);
-  console.log("rendered=/tmp/evt_pre_20_bom_after.png");
-  console.log("rendered=/tmp/evt_pre_20_rfq_after.png");
-  console.log("rendered=/tmp/evt_program_41_after.png");
+  console.log("rendered=" + bomPreviewPath);
+  console.log("rendered=" + batteryPreviewPath);
+  console.log("rendered=" + rfqPreviewPath);
+  console.log("rendered=" + programPreviewPath);
+  console.log("rendered=" + programBatteryPreviewPath);
+  console.log("rendered=" + costBatteryPreviewPath);
 } else {
   throw new Error(`unknown mode: ${mode}`);
 }

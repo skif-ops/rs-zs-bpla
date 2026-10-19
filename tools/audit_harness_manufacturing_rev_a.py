@@ -92,6 +92,11 @@ def require(condition: bool, message: str) -> None:
         raise AssertionError(message)
 
 
+def rel(path: Path) -> str:
+    """Return repository paths in the slash form stored by controlled JSON."""
+    return path.relative_to(ROOT).as_posix()
+
+
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(encoding="utf-8-sig", newline="") as source:
         return list(csv.DictReader(source))
@@ -102,11 +107,10 @@ def normalized_mpn(value: str) -> str:
 
 
 def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for block in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
+    data = path.read_bytes()
+    if path.suffix.lower() in {".csv", ".json", ".md", ".txt", ".yaml", ".yml", ".py"}:
+        data = data.replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def validate_supplier_request() -> dict[str, object]:
@@ -174,7 +178,7 @@ def validate_supplier_request() -> dict[str, object]:
 
     external = contract.get("external_response", {})
     require(external == {
-        "response_register": str(SUPPLIER_RESPONSE.relative_to(ROOT)),
+        "response_register": rel(SUPPLIER_RESPONSE),
         "required_rows": 16,
         "pending_rows": 16,
         "accepted_rows": 0,
@@ -232,9 +236,9 @@ def validate_supplier_request() -> dict[str, object]:
 
     return {
         "status": SUPPLIER_REQUEST_STATUS,
-        "request": str(SUPPLIER_REQUEST.relative_to(ROOT)),
-        "contract": str(SUPPLIER_CONTRACT.relative_to(ROOT)),
-        "response_register": str(SUPPLIER_RESPONSE.relative_to(ROOT)),
+        "request": rel(SUPPLIER_REQUEST),
+        "contract": rel(SUPPLIER_CONTRACT),
+        "response_register": rel(SUPPLIER_RESPONSE),
         "required_response_rows": 16,
         "pending_response_rows": 16,
         "accepted_response_rows": 0,
@@ -257,7 +261,7 @@ def audit_evt_accepted(contract: dict[str, object]) -> dict[str, object]:
             "central harness EVT authority differs")
     authority_inputs = contract.get("authority_inputs", [])
     for source in (EVT_BASELINE, EVT_BASELINE_MANUAL, LENGTH_BASIS):
-        require(str(source.relative_to(ROOT)) in authority_inputs,
+        require(rel(source) in authority_inputs,
                 f"accepted harness authority input missing: {source.relative_to(ROOT)}")
     expected_binding = [
         {"path": relative, "sha256": sha256(ROOT / relative)}
@@ -319,7 +323,7 @@ def audit_evt_accepted(contract: dict[str, object]) -> dict[str, object]:
                     )) for row in rows),
             "harness external wait rows are not closed by EVT evidence")
     require(contract.get("external_response") == {
-        "response_register": str(SUPPLIER_RESPONSE.relative_to(ROOT)),
+        "response_register": rel(SUPPLIER_RESPONSE),
         "required_rows": 16,
         "closed_rows": 16,
         "pending_rows": 0,
@@ -503,8 +507,8 @@ def audit() -> dict[str, object]:
         "status": "PASS_CONTROLLED_PRELIMINARY_LENGTHS_OPEN",
         "packet_complete": True,
         "manufacturing_release": False,
-        "schedule": str(SCHEDULE.relative_to(ROOT)),
-        "drawing": str(DRAWING.relative_to(ROOT)),
+        "schedule": rel(SCHEDULE),
+        "drawing": rel(DRAWING),
         "controlled_conductors": len(schedule),
         "harness_counts": dict(sorted(counts.items())),
         "supplier_request_status": supplier_request["status"],

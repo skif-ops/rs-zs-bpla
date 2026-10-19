@@ -2,22 +2,24 @@
 
 Status: `CAPTURE BASELINE - NOT FOR MANUFACTURE`
 Configuration: `EVT-PRE-20 Rev.A`
-Ambient requirement: `-40...+70 C`
-Component temperature capability target: at least `-40...+85 C`, with junction margin verified at +70 C.
+EVT ambient requirement: `-20...+60 C` for the configured heated battery assembly.
+Post-EVT series target: `-40...+70 C`; component capability remains a design target and does not block EVT.
 
 ## 1. Входная шина
 
 Источник: 4S LiFePO4, номинально 12.8 V.
 
-EVT-кандидат аккумулятора зафиксирован как RELiON `RB40`, 12.8 V / 40 Ah /
-512 Wh. Для расчёта DC/DC до завершения sample/EVT проверки сохраняется
+EVT-кандидат аккумулятора зафиксирован как supplier-configured heated
+`DIO-BAT-LFP-12V50-H-REV-A`, 12.8 V / 50 Ah / 640 Wh. Для расчёта DC/DC до
+завершения sample/EVT проверки сохраняется
 консервативное рабочее окно 10.0...14.6 V. Паспортные и измеренные BMS
-cutoff/recovery voltages RB40 должны заменить это provisional окно перед выпуском.
+cutoff/recovery voltages выбранной батареи должны заменить это provisional окно
+перед выпуском.
 
 EVT-кандидат солнечного тракта: SLD Tech `SLP080S-12M` и Victron SmartSolar
 75/10 `SCC075010060R` с датчиком Smart Battery Sense `SBS050150200` (`0.45 m`
 провода, wireless range до `10 m`, M10 eyelets, рабочий диапазон `-10..60 C`).
-Для M10 eyelets на M8 терминалах RB40 нужен утверждённый washer/retention stack.
+Для M10 eyelets на M8 терминалах батареи нужен утверждённый washer/retention stack.
 Выбор точных MPN не заменяет измерение переходного процесса и конфигурационный audit.
 
 Входной transient envelope пока НЕ заморожен. До выпуска платы требуется измерить/утвердить:
@@ -321,7 +323,8 @@ At +70 C ambient run worst realistic concurrent load. Record regulator, inductor
 
 ### PWR-04 - cold start
 
-At -40 C verify startup, capacitor ESR effects, rail sequencing and modem attach bursts.
+At the EVT minimum of -20 C verify startup, capacitor ESR effects, rail sequencing
+and modem attach bursts. Repeat at -40 C during post-EVT series qualification.
 
 ### PWR-05 - reverse polarity / input transient
 
@@ -373,7 +376,8 @@ Still open before `FOR_MANUFACTURE`:
 - TVS;
 - PCB fuse;
 - shunt Kelvin layout, temperature rise and reference-meter calibration;
-- measured RB40 BMS cutoff/recovery voltage limits and cold-system behavior;
+- measured `DIO-BAT-LFP-12V50-H-REV-A` BMS cutoff/recovery voltage limits,
+  heater consumption and cold-system behavior;
 - measured `SCC075010060R` disconnect/reconnect transient envelope and exported
   charge profile;
 - proof that `SBS050150200` remains in the VE.Smart network and disables charge

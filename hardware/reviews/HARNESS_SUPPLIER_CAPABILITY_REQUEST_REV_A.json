@@ -22,7 +22,7 @@
     },
     {
       "path": "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
-      "sha256": "f9f09a006f1d9cb4d74747bd239f7b22b4c55ac2d8d073dc1224922666dd55ea"
+      "sha256": "7174cb20b953953f7e06802e694a0b652d27fcddf5e0d923a9f36a9b06c9ca06"
     },
     {
       "path": "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md",
@@ -34,11 +34,11 @@
     },
     {
       "path": "hardware/EVT_PRE_20_BOM_REV_A.csv",
-      "sha256": "7301c1ec58528bcedcbfff76effbb27fa1219b40c0a991f4c7f57f08c8a969df"
+      "sha256": "0985749c03c9c786cc7db15b53902a7f10afd1511ea5572961f6efb8a618486c"
     },
     {
       "path": "hardware/CHINA_PROCUREMENT_RFQ.csv",
-      "sha256": "cb73fe45fca620be75de31de87ba50a2be8842dcd66303612d62352c769bd68f"
+      "sha256": "3e31f4e20e329c4bb7aaddf5e6bed203a724c94de05e6be19fb45670c76ba361"
     },
     {
       "path": "manufacturing/EVT_LOT_SELECTION_REV_A.csv",

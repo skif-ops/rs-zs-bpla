@@ -24,7 +24,7 @@ DECISIONS = ROOT / "docs/DECISION_LOG.csv"
 
 
 EXPECTED = {
-    "BAT1": ("RELiON", "RB40", 21, "RFQ-008"),
+    "BAT1": ("Epower Tech Co. Ltd", "DIO-BAT-LFP-12V50-H-REV-A", 21, "RFQ-008"),
     "PV1": ("SLD Tech / Solarland", "SLP080S-12M", 21, "RFQ-009"),
     "MPPT1": ("Victron Energy", "SCC075010060R", 21, "RFQ-010"),
     "MPPT-TEMP": ("Victron Energy", "SBS050150200", 21, "RFQ-026"),
@@ -109,22 +109,25 @@ def main() -> int:
         )
         require(target["official_sources"], f"{item_id}: official source missing")
         require(
-            all(url.startswith("https://") for url in target["official_sources"]),
-            f"{item_id}: official source is not HTTPS",
+            all(url.startswith("https://") or
+                (item_id == "BAT1" and url.startswith("hardware/reviews/"))
+                for url in target["official_sources"]),
+            f"{item_id}: official source is not an approved HTTPS or controlled supplier-evidence reference",
         )
         supplier_records = target["supplier_catalog_records"]
         require(supplier_records, f"{item_id}: supplier catalogue binding missing")
         for supplier_record in supplier_records:
             require(supplier_record["supplier"], f"{item_id}: supplier name missing")
             require(
-                supplier_record["url"].startswith("https://"),
-                f"{item_id}: supplier URL is not HTTPS",
+                supplier_record["url"].startswith("https://") or
+                (item_id == "BAT1" and supplier_record["url"].startswith("supplier-package:")),
+                f"{item_id}: supplier source is not an approved HTTPS or controlled package reference",
             )
             require(
                 supplier_record["claims_used"],
                 f"{item_id}: supplier binding has no controlled claim",
             )
-        require(mpn in target["purchase_order_rule"], f"{item_id}: PO rule omits exact MPN")
+        require(mpn in target["purchase_order_rule"], f"{item_id}: PO rule omits controlled article")
         require(
             "no substitution" in target["purchase_order_rule"].lower(),
             f"{item_id}: PO rule lacks no-substitution control",
@@ -156,11 +159,15 @@ def main() -> int:
         rfq_row = rfq.get(rfq_id)
         require(rfq_row is not None, f"{item_id}: RFQ {rfq_id} missing")
         require(rfq_row["BOM_Item_IDs"] == item_id, f"{item_id}: RFQ mapping drift")
-        require(mpn in rfq_row["MPN_or_spec"], f"{item_id}: RFQ omits exact MPN")
+        require(mpn in rfq_row["MPN_or_spec"], f"{item_id}: RFQ omits controlled article")
         require(rfq_row["Traceability_required"] == "Yes", f"{item_id}: RFQ traceability drift")
         require(rfq_row["Sample_required"] == "No", f"{item_id}: RFQ still requires pre-order unit")
         require(rfq_row["Status"] == "RFQ_REQUIRED", f"{item_id}: RFQ status drift")
-        require(rfq_row["URL"].startswith("https://"), f"{item_id}: RFQ authority URL missing")
+        require(
+            rfq_row["URL"].startswith("https://") or
+            (item_id == "BAT1" and rfq_row["URL"].startswith("hardware/reviews/")),
+            f"{item_id}: RFQ authority source missing",
+        )
         check_text = rfq_row["Blocking_check"].lower()
         require("no substitution" in check_text, f"{item_id}: RFQ no-substitution rule missing")
         require(
@@ -168,8 +175,11 @@ def main() -> int:
             f"{item_id}: RFQ does not route validation to assembly/EVT",
         )
 
-    require(targets["BAT1"]["controlled_facts"]["energy_wh"] == 512,
-            "RB40 energy binding drift")
+    require(targets["BAT1"]["controlled_facts"]["energy_wh"] == 640 and
+            targets["BAT1"]["controlled_facts"]["usable_energy_at_80_percent_wh"] == 512 and
+            targets["BAT1"]["controlled_facts"]["heating_required"] is True and
+            targets["BAT1"]["controlled_facts"]["evt_minimum_ambient_c"] == -20,
+            "heated 50 Ah battery energy or EVT-temperature binding drift")
     require(targets["PV1"]["controlled_facts"]["voc_v"] == 22.52,
             "SLP080S-12M Voc binding drift")
     require(targets["MPPT1"]["controlled_facts"]["rated_charge_current_a"] == 10 and
@@ -201,8 +211,9 @@ def main() -> int:
         expected_coverage = displayed is not None and displayed >= expected_quantity
         require(entry["quantity_coverage_confirmed"] is expected_coverage,
                 f"{entry['item_id']}: availability coverage flag drift")
-        require(entry["source"].startswith("https://"),
-                f"{entry['item_id']}: availability source is not HTTPS")
+        require(entry["source"].startswith("https://") or
+                (entry["item_id"] == "BAT1" and entry["source"].startswith("supplier-correspondence:")),
+                f"{entry['item_id']}: availability source is not approved")
     require(
         availability["rf_chain_displayed_stock_covers_evt_20_quantities"] is True
         and availability["power_chain_full_quantity_coverage_confirmed"] is False
@@ -303,16 +314,16 @@ def main() -> int:
         "hardware_design_release": False,
         "purchase_release": False,
         "manufacturing_release": False,
-        "record": str(RECORD.relative_to(ROOT)),
+        "record": RECORD.relative_to(ROOT).as_posix(),
         "record_sha256": record_hash,
     }
     output = args.output if args.output.is_absolute() else ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print("EVT system OTS documentary purchase-identity audit: PASS")
-    print("8 exact MPNs controlled; physical assembly/EOL/EVT qualification remains open")
+    print("8 system purchase identities controlled; physical assembly/EOL/EVT qualification remains open")
     try:
-        display_output = output.relative_to(ROOT)
+        display_output = output.relative_to(ROOT).as_posix()
     except ValueError:
         display_output = output
     print(f"report: {display_output}")

@@ -141,7 +141,8 @@ Tests run in the order controlled by
 1. source control (`PWR-IPQ-001 PASS`), documentary procurement identity
    (`PWR-IPQ-002 PASS`) and the bounded native ECO;
 2. repeat ERC/PDF/human hierarchy gate after the legibility remediation and C20/C21 ECO (`PASS`);
-3. 25 C, +70 C and -40 C operating tests;
+3. 25 C, EVT +60 C and -20 C operating tests; -40 C and +70 C are repeated for
+   post-EVT series qualification;
 4. inrush and modem-burst tests;
 5. overload, prospective-short and primary-fuse coordination using a
    current/energy-limited fixture;
@@ -151,7 +152,7 @@ Tests run in the order controlled by
 9. INA226 range/error-state verification;
 10. independent evidence audit.
 
-An unprotected direct short of an RB40 is prohibited. The test fixture must limit
+An unprotected direct short of `DIO-BAT-LFP-12V50-H-REV-A` is prohibited. The test fixture must limit
 available current and energy, provide remote shutdown, use a guarded enclosure
 and capture source impedance before the fault is applied.
 

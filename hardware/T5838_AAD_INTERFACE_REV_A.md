@@ -82,7 +82,8 @@ T5838 pin 2 `SELECT` напрямую соединяется с GND на каж�
 - THSEL fanout edge/rise-time and one-wire write timing checked on four connected leaf boards;
 - AAD configuration verified after cold boot, brownout and mic-rail power cycle;
 - each WAKE channel verified independently, with an open connector, through both U17 OR stages, U18, and aggregate PA8;
-- AAD current and wake latency measured at −40, room and +70 °C;
+- AAD current and wake latency measured at EVT −20, room and +60 °C; repeat at
+  −40 and +70 °C for the post-EVT series qualification;
 - false wake rate evaluated on negative acoustic set and field noise.
 
 Точная pin-level authority: `hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv`. Электрическое обоснование и datasheet hashes: `hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md`.

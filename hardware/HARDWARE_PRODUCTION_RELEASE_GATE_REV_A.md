@@ -30,7 +30,7 @@ Unresolved job-specific DFM, stackup, via, assembly and housing evidence is now
 tracked as post-order follow-up and controlled ECO work after supplier feedback,
 not as a stop on the customer-owned purchase.
 
-The eight selected OTS system identities `RB40`, `SLP080S-12M`,
+The eight selected OTS system identities `DIO-BAT-LFP-12V50-H-REV-A`, `SLP080S-12M`,
 `SCC075010060R`, `SBS050150200`, `G30.B.108111`, `AA.166.A.301111`,
 `TI.89.B.2111W` and `CAB.0243` pass their documentary purchase-identity gate.
 They are ordered as exact manufacturer MPNs with `NO SUBSTITUTION`; the selected

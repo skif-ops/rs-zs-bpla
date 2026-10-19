@@ -28,37 +28,44 @@
   ],
   "targets": {
     "BAT1": {
-      "manufacturer": "RELiON",
-      "mpn": "RB40",
+      "manufacturer": "Epower Tech Co. Ltd",
+      "mpn": "DIO-BAT-LFP-12V50-H-REV-A",
       "evt_20_quantity_with_spares": 21,
       "official_sources": [
-        "https://www.relionbattery.com/products/lithium/rb40"
+        "hardware/reviews/EVT_BATTERY_50AH_HEATED_ACCEPTANCE_REV_A.md"
       ],
       "supplier_catalog_records": [
         {
-          "supplier": "Ameresco Solar",
-          "url": "https://www.amerescosolar.com/relion-rb40-lithium-iron-phosphate-128v-40ah-battery",
+          "supplier": "Epower Tech Co. Ltd",
+          "url": "supplier-package:12.8V-50Ah-2026-10-19",
           "claims_used": [
-            "Exact RELiON RB40 manufacturer-model binding",
-            "Supplier quotation route"
+            "12.8 V 50 Ah 640 Wh LiFePO4 configuration",
+            "Heated option required for -20 C EVT operation",
+            "Body and M8 terminal geometry"
           ]
         }
       ],
       "controlled_facts": {
         "nominal_voltage_v": 12.8,
-        "capacity_ah": 40,
-        "energy_wh": 512,
-        "dimensions_mm": [197, 166, 173],
-        "terminal": "M8 x 1.25",
-        "ingress_rating": "IP66",
+        "capacity_ah": 50,
+        "energy_wh": 640,
+        "usable_energy_at_80_percent_wh": 512,
+        "dimensions_mm": [198, 166, 170],
+        "maximum_height_with_terminal_mm": 184,
+        "terminal": "M8 studs",
+        "terminal_protrusion_mm": [12, 14],
+        "terminal_center_pitch_mm_approx": 143,
+        "mass_kg_approx": 5.2,
+        "heating_required": true,
+        "evt_minimum_ambient_c": -20,
         "discharge_temperature_c": [-20, 60],
-        "charge_temperature_c": [-20, 45]
+        "charge_temperature_c": [0, 55]
       },
-      "purchase_order_rule": "RELiON RB40 only; NO SUBSTITUTION; retain applicable UN38.3/SDS/route documents",
+      "purchase_order_rule": "DIO-BAT-LFP-12V50-H-REV-A heated configuration only; NO SUBSTITUTION; bind dimensions, M8 geometry, heater data and applicable UN38.3/SDS/route documents",
       "physical_validation_routes": [
-        "Every-unit polarity and open-circuit voltage at installation",
-        "Capacity, DCIR and BMS behavior during station assembly and EVT",
-        "Cold enclosure and charge-inhibit validation during EVT"
+        "Every-unit dimensions, heater configuration, polarity and open-circuit voltage at installation",
+        "Capacity, DCIR, BMS and heater threshold/current behavior during station assembly and EVT",
+        "Cold enclosure, warm-up energy and charge-inhibit validation at -20 C during EVT"
       ]
     },
     "PV1": {
@@ -130,7 +137,7 @@
       "purchase_order_rule": "Victron Energy SCC075010060R only; NO SUBSTITUTION with any adjacent SmartSolar current or voltage variant",
       "physical_validation_routes": [
         "Article and firmware identity at installation",
-        "RB40 charge-profile export plus VE.Smart binding during assembly and EOL",
+        "DIO-BAT-LFP-12V50-H-REV-A charge-profile export plus VE.Smart binding during assembly and EOL",
         "Reverse current, quiescent current, thermal, transient and cold-cutoff validation during EVT"
       ]
     },
@@ -162,7 +169,7 @@
       },
       "purchase_order_rule": "Victron Energy SBS050150200 only; NO SUBSTITUTION; 10 m denotes wireless range and must not be represented as lead length",
       "physical_validation_routes": [
-        "M10-eyelet to RB40-M8 retention stack during station assembly",
+        "M10-eyelet to DIO-BAT-LFP-12V50-H-REV-A M8 retention stack during station assembly",
         "Battery voltage and temperature accuracy plus VE.Smart pairing at EOL",
         "0 C cutoff, reconnect and network retention during cold EVT"
       ]
@@ -304,10 +311,10 @@
       {
         "item_id": "BAT1",
         "required_quantity": 21,
-        "supplier": "Ameresco Solar / RELiON",
+        "supplier": "Epower Tech direct quotation",
         "displayed_available_quantity": null,
         "quantity_coverage_confirmed": false,
-        "source": "https://www.amerescosolar.com/relion-rb40-lithium-iron-phosphate-128v-40ah-battery"
+        "source": "supplier-correspondence:2026-10-19"
       },
       {
         "item_id": "PV1",

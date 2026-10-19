@@ -40,6 +40,11 @@ def extend_unique(values: list[str], additions: list[str]) -> None:
             values.append(item)
 
 
+def canonical_text_sha256(path: Path) -> str:
+    """Hash controlled text as LF so Windows and CI produce the same binding."""
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
 def update_response(relative: str, value_prefix: str) -> None:
     path = ROOT / relative
     with path.open(encoding="utf-8-sig", newline="") as source:
@@ -398,7 +403,7 @@ def update_harness_request() -> None:
     data["source_binding"] = [
         {
             "path": item,
-            "sha256": hashlib.sha256((ROOT / item).read_bytes()).hexdigest(),
+            "sha256": canonical_text_sha256(ROOT / item),
         }
         for item in data["authority_inputs"]
         if item not in {BASELINE, MANUAL, "hardware/HARNESS_EVT_LENGTH_BASIS_REV_A.csv"}
@@ -472,7 +477,7 @@ def update_schedule() -> None:
             row["From_Terminal_MPN"] = "TE_8-34114-1_M8"
             row["Cut_Length_mm"] = "330"
             row["Length_Tolerance_mm"] = "5"
-            row["Release_Blocker"] = "EVT 5A plus70C minus40C crimp and strain validation"
+            row["Release_Blocker"] = "EVT 5A plus60C minus20C crimp and strain validation"
         row["Release_Status"] = "EVT_BUILD_RELEASED_FIRST_ARTICLE_REQUIRED"
     with path.open("w", encoding="utf-8", newline="") as target:
         writer = csv.DictWriter(target, fieldnames=fields, lineterminator="\n")

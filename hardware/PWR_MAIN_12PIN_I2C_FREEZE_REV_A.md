@@ -80,7 +80,8 @@ INA226 `ALERT` может быть включён в агрегированны�
 3. Pull-up source должен быть один авторитетный - PCB-MAIN. Номинал freeze после измерения общей ёмкости; стартовая расчётная зона 2.2-4.7 kOhm.
 4. Предусмотреть 22-47 Ohm series-damping footprints у master side для SCL/SDA, старт DNP/0 Ohm по SI review.
 5. SCL/SDA вести вдали от 3V8_MODEM switching/burst current conductors; в жгуте держать рядом с GND_DIGITAL и минимизировать петлю.
-6. Проверка на финальной длине жгута обязательна при -40 C, +70 C и LTE burst.
+6. Проверка на финальной длине жгута обязательна при EVT -20 C, +60 C и LTE burst;
+   -40 C и +70 C проверяются при последующей серийной квалификации.
 
 ## 5. EVT verification
 

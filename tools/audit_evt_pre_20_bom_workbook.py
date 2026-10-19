@@ -15,6 +15,7 @@ import argparse
 import csv
 import hashlib
 import json
+import posixpath
 import re
 import zipfile
 from pathlib import Path, PurePosixPath
@@ -69,7 +70,7 @@ def column_index(reference: str) -> int:
 def package_path(target: str, base: str = "xl") -> str:
     if target.startswith("/"):
         return target.lstrip("/")
-    return str(PurePosixPath(base) / target)
+    return posixpath.normpath(str(PurePosixPath(base) / target))
 
 
 class XlsxReader:

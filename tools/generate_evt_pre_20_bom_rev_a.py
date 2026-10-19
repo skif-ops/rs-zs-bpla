@@ -604,7 +604,7 @@ def main(*, check_only: bool = False) -> None:
         "ERJ-2GE0R00X": "-55..155",
         "MMICT5838-00-012": "-40..85",
         "U.FL-R-SMT-1(60)": "-40..90",
-        "RB40": "-20..60 discharge; -20..45 charge",
+        "DIO-BAT-LFP-12V50-H-REV-A": "-20..60 heated operation; 0..55 charge; -20..60 discharge",
         "SLP080S-12M": "-40..85",
         "SCC075010060R": "-30..60",
         "SBS050150200": "-10..60",

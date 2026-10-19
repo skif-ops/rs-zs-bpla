@@ -26,8 +26,6 @@ LOTS = (4, 10, 20)
 # deliberately rounded FX/import/logistics allowance; VAT and destination
 # delivery still require the final cart or quotation.
 PUBLIC_PRICES = {
-    "RB40": (60000, "$479.95", "USD", "PUBLIC_MANUFACTURER_PRICE",
-             "https://relionbattery.com/products/lithium/rb40"),
     "SLP080S-12M": (22200, "$177.63", "USD", "PUBLIC_DISTRIBUTOR_PRICE",
                     "https://www.mrsolar.com/solarland-slp080-12m-80w-12v-skinny-solar-panel-w-pro-charge-jbox/"),
     "SCC075010060R": (8200, "$65.45", "USD", "PUBLIC_DISTRIBUTOR_PRICE",
@@ -48,6 +46,7 @@ PUBLIC_PRICES = {
 # Exact-MPN engineering estimates for the material cost drivers.  These are
 # rounded planning values in RUB per piece, not supplier quotations.
 MPN_ESTIMATES = {
+    "DIO-BAT-LFP-12V50-H-REV-A": 60000,
     "0451008.MRL": 250,
     "2336582-1": 550,
     "43025-1200": 500,
@@ -192,7 +191,14 @@ def generate() -> str:
             confidence = "LOW"
             note = "Rounded engineering estimate pending supplier quotation."
 
-        if procurement_id in {"PR-001", "PR-002", "PR-003"}:
+        if mpn == "DIO-BAT-LFP-12V50-H-REV-A":
+            basis = "ENGINEERING_BUDGETARY_CEILING_PENDING_SUPPLIER_QUOTE"
+            confidence = "LOW"
+            note = (
+                "Temporary planning ceiling for the accepted heated 50 Ah configuration; "
+                "replace with the supplier quotation before commercial reconciliation."
+            )
+        elif procurement_id in {"PR-001", "PR-002", "PR-003"}:
             note = (
                 "Primary full-PCBA procurement track; assembly and EOL service estimate "
                 "excludes components and remains subject to the CM quotation."
@@ -213,7 +219,7 @@ def generate() -> str:
             "Displayed_source_price": displayed,
             "Source_currency": currency,
             "Source_URL": url,
-            "Checked_on": CHECKED_ON,
+            "Checked_on": "2026-10-19" if mpn == "DIO-BAT-LFP-12V50-H-REV-A" else CHECKED_ON,
             "Estimate_confidence": confidence,
             "Estimate_note": note,
         }
