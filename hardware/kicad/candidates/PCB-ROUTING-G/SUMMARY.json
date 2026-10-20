@@ -1,0 +1,138 @@
+{
+  "schema": "dioneya-pcb-main-routing-g-candidate-v1",
+  "base_board_sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739",
+  "candidate_sha256": "aec71de78a32ec09cfe446adf71a0862a211c05072c8336b158e6172aa242da4",
+  "delta": {
+    "base": "003 board, L1 moved",
+    "l1": [
+      "(at 52 19.75 180)",
+      "(at 53.75 40.75 180)"
+    ],
+    "nets": 123,
+    "segments": 2014,
+    "vias": 275,
+    "by_layer": {
+      "In3.Cu": 408,
+      "F.Cu": 1225,
+      "B.Cu": 381
+    },
+    "session_sha256": "cb8c1bf16b8d23f846292d757cf04fd844000443cfb5aabc2833a82be036f3e6",
+    "drc_rejected": [
+      "1V8_MIC",
+      "AAD_CFG",
+      "AAD_CFG_1V8_FANOUT",
+      "CELL_RI_U16",
+      "CELL_USB_BOOT_1V8",
+      "GNSS_ANT_GATE",
+      "GNSS_ANT_SHORT_N",
+      "LORA_NSS_U1",
+      "PDM_DATA1_1V8",
+      "SIM_MUX_EN"
+    ]
+  },
+  "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
+  "manufacturing_release": false,
+  "applied_to_authoritative_board": false,
+  "steps": {
+    "fill_base": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "drc_base": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "dump_base": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "fill_candidate": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "drc_candidate": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "dump_candidate": {
+      "rc": 0,
+      "stderr": ""
+    }
+  },
+  "drc": {
+    "base": {
+      "by_type": {
+        "warning:silk_over_copper": 164,
+        "warning:silk_overlap": 66
+      },
+      "unconnected": 421
+    },
+    "candidate": {
+      "by_type": {
+        "warning:silk_over_copper": 164,
+        "warning:silk_overlap": 66,
+        "warning:track_dangling": 5
+      },
+      "unconnected": 161
+    },
+    "new_fingerprint_count": 5,
+    "new_errors": 0,
+    "new_fingerprints": [
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [3V8_MODEM] on B.Cu, length 1.3404 mm"
+        ]
+      ],
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [3V8_MODEM_BB] on B.Cu, length 2.8951 mm"
+        ]
+      ],
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [CELL_DBG_TXD_TP] on F.Cu, length 0.5020 mm"
+        ]
+      ],
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [GNSS_ANT_SWITCHED] on B.Cu, length 2.5734 mm"
+        ]
+      ],
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [U8_VDD_EXT_1V8] on F.Cu, length 0.6020 mm"
+        ]
+      ]
+    ]
+  },
+  "continuity_summary": {
+    "B.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
+    "B.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+    "B.Cu|GND_DIGITAL": 0.8484,
+    "B.Cu|GND_MODEM": 0.8859,
+    "B.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
+    "F.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
+    "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+    "F.Cu|GND_DIGITAL": 0.925,
+    "F.Cu|GND_MIC": 0.0,
+    "F.Cu|GND_MODEM": 0.3268,
+    "F.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
+    "F.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": 0.0,
+    "In3.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+    "In3.Cu|GND_DIGITAL": 0.0,
+    "In3.Cu|GND_MIC": 0.0,
+    "In3.Cu|GND_MODEM": 0.0,
+    "In3.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
+    "In3.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": 0.0
+  }
+}
