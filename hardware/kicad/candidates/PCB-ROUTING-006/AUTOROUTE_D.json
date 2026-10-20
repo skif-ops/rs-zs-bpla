@@ -1,0 +1,74 @@
+{
+ "schema": "dioneya-pcb-routing-006-autoroute-v1",
+ "freerouting": "2.4.1",
+ "passes": 8,
+ "rc": 0,
+ "seconds": 1965,
+ "input_dsn_sha256": "bacdc81c142d4c0a3c22a703730e36753f4436a061eb29b623112742226a4a77",
+ "prep": {
+  "base": "session-C input",
+  "fixed_c_items": 14,
+  "fixed_c_nets": [
+   "3V3_DIGITAL",
+   "LORA_MOSI_U1",
+   "SD_CK_U1",
+   "SD_DET"
+  ],
+  "polygon_pads_as_rect": 32,
+  "classes": {
+   "signal": 87,
+   "slow": 68,
+   "power": 12,
+   "burst": 3,
+   "locked": 16
+  },
+  "slow_route_classes": [
+   "LOW_SPEED_CONTROL",
+   "FIXTURE_DEBUG",
+   "ANALOG_SENSE_BIAS",
+   "MIC_WAKE_SIGNAL",
+   "I2C_OPEN_DRAIN",
+   "UART_SIGNAL"
+  ],
+  "not_autorouted": [
+   "3V3_DIGITAL",
+   "CELL_RF",
+   "CELL_RF_ANT",
+   "CELL_USB_DM_TP",
+   "CELL_USB_DM_U8",
+   "CELL_USB_DP_TP",
+   "CELL_USB_DP_U8",
+   "GND_DIGITAL",
+   "GND_MIC",
+   "GND_MODEM",
+   "GNSS_RF_ANT_BIASED",
+   "GNSS_RF_DC_BLOCK",
+   "GNSS_RF_FILTERED",
+   "LORA_RF_ANT",
+   "LORA_RF_MODULE",
+   "USB_DM_CONN",
+   "USB_DM_U1",
+   "USB_DP_CONN",
+   "USB_DP_U1"
+  ]
+ },
+ "session_c_sha256": "66d7cc6c60b08fd4e4c458bae20425c01af33830d1e924b0effcc3d6384188ab",
+ "session_sha256": "ccb12b2d98c7e388ee2cac54d470cd155421dac6c748409762bdc802d08638f2",
+ "log_tail": [
+  "2026-09-26 08:41:51.840 WARN   Power-plane validation failed:",
+  "   - Vias and Anti-Pads: Plated holes passing through the board, surrounded by circular voids (anti-pads) to prevent shorting.",
+  "2026-09-26 08:41:52.422 INFO   [85448C\\11C6EB] Auto-routing stage started on board '5193312b2085f29a2e6544b183541ac0' for 173 unrouted items.",
+  "2026-09-26 08:46:00.178 INFO   [85448C\\11C6EB] Auto-routing pass #1 on board '5193312b2085f29a2e6544b183541ac0' was completed in 246.53 seconds with score 216.17 (167 unrouted and 956 violations), using 242.02 CPU second",
+  "2026-09-26 08:46:29.358 WARN   BasicBoard.normalizeTraces: reached 2000 iterations for net 'I2C2_SDA_BUS' \u2014 stopping to prevent hang. The board geometry for this net may be oscillating (split/combine cycle); traces are k",
+  "2026-09-26 08:50:24.816 INFO   [85448C\\11C6EB] Auto-routing pass #2 on board '6b768bc4f8cdef8215babe0e75198239' was completed in 263.89 seconds with score 222.74 (164 unrouted and 956 violations), using 500.02 CPU second",
+  "2026-09-26 08:51:06.352 WARN   BasicBoard.normalizeTraces: reached 2000 iterations for net '1V8_MIC' \u2014 stopping to prevent hang. The board geometry for this net may be oscillating (split/combine cycle); traces are kept a",
+  "2026-09-26 08:54:21.370 INFO   [85448C\\11C6EB] Auto-routing pass #3 on board '61988dc7a08b86c68240f64c51ad7f08' was completed in 235.80 seconds with score 229.30 (161 unrouted and 956 violations), using 731.79 CPU second",
+  "2026-09-26 08:58:11.044 INFO   [85448C\\11C6EB] Auto-routing pass #4 on board '658c894cf78541947f393ef2f17bd156' was completed in 228.93 seconds with score 227.11 (162 unrouted and 956 violations), using 955.48 CPU second",
+  "2026-09-26 09:02:28.658 INFO   [85448C\\11C6EB] Auto-routing pass #5 on board '663a17758b824513c16daa8bfb414bcd' was completed in 256.86 seconds with score 229.30 (161 unrouted and 956 violations), using 1207.54 CPU secon",
+  "2026-09-26 09:06:31.313 INFO   [85448C\\11C6EB] Auto-routing pass #6 on board 'e606c38252e1200fd19a4343253d853a' was completed in 241.89 seconds with score 233.68 (159 unrouted and 956 violations), using 1443.91 CPU secon",
+  "2026-09-26 09:10:30.972 INFO   [85448C\\11C6EB] Auto-routing pass #7 on board 'fb55ab19e97766fac4c0939b6c5735ff' was completed in 238.90 seconds with score 222.74 (164 unrouted and 956 violations), using 1678.52 CPU secon",
+  "2026-09-26 09:14:33.263 INFO   [85448C\\11C6EB] Auto-routing pass #8 on board 'fb55ab19e97766fac4c0939b6c5735ff' was completed in 0.00 seconds with score 233.68 (159 unrouted and 956 violations), using 1914.90 CPU seconds",
+  "2026-09-26 09:14:33.974 INFO   [85448C\\11C6EB] Auto-routing stage completed: started with 173 unrouted nets, completed in 1961.65 seconds, final score: 233.68 (159 unrouted and 956 violations), using 1915.88 total CPU se",
+  "2026-09-26 09:14:34.017 INFO   [85448C\\11C6EB] Job '85448C\\11C6EB' finished with state: COMPLETED (elapsed: 32 minutes 42.14 seconds, finished at UTC: 2026-09-26T09:14:34.016443067Z)."
+ ]
+}
