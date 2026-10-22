@@ -3,6 +3,7 @@ command codec and the shared firmware vector; fwreq/fw messages; the release rep
 answer to a request (store and repository rules, QoS 0 on the fw topic); the operator route (heartbeat keys 18..20: server/tools/test_firmware_packet.py)."""
 import hashlib
 import importlib.util
+import os
 import time
 import uuid
 from pathlib import Path
@@ -129,7 +130,8 @@ def test_repository_and_fw_sign(tmp_path):
 
     key = tmp_path / "release.pem"
     assert pki_main(["fw-release-key", "--out", str(key)]) == 0
-    assert (key.stat().st_mode & 0o777) == 0o600
+    if os.name == "posix":
+        assert (key.stat().st_mode & 0o777) == 0o600
     assert pki_main(["fw-release-key", "--out", str(key)]) == 2         # never overwritten
     image_path = tmp_path / "app.bin"
     image_path.write_bytes(_image(version=9, size=3000))

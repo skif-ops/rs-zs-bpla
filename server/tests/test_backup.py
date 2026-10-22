@@ -1,6 +1,7 @@
 """station/backup.py: the archive holds consistent copies of the databases taken while they are written, the audio
 and the other files as they are, and no live database files; tar.gz and zip; the command line."""
 import gc
+import os
 import sqlite3
 import tarfile
 import zipfile
@@ -103,7 +104,8 @@ def test_restore_puts_the_archive_back_and_keeps_what_it_replaced(tmp_path, caps
     assert (tmp_path / "data" / "audio" / "1" / "7" / "pre.wav").read_bytes() == b"RIFF" + bytes(100)
     assert (tmp_path / "output" / "report.txt").read_text() == "x" and not (tmp_path / "output" / "stray.txt").exists()
     assert (tmp_path / "output" / "backups" / "older.tar.gz").exists()           # output/backups is kept
-    assert (tmp_path / "data" / "operators.json").stat().st_mode & 0o777 == 0o600
+    if os.name == "posix":
+        assert (tmp_path / "data" / "operators.json").stat().st_mode & 0o777 == 0o600
     assert not list(tmp_path.glob(".restore_*"))
     (before,) = list((tmp_path / "output" / "backups").glob("before_restore_*.tar.gz"))
     with tarfile.open(before) as t:                             # what was replaced is still there, consistent

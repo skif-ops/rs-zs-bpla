@@ -6,9 +6,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import sys
+import tempfile
+import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,11 +39,36 @@ def fail(message: str) -> None:
     raise ValueError(message)
 
 
+def prepare_package(path: Path) -> tuple[Path, tempfile.TemporaryDirectory[str] | None]:
+    if path.is_dir():
+        return path, None
+    if not path.is_file() or path.suffix.lower() != ".zip":
+        fail(f"package directory or ZIP archive is required: {path}")
+    temporary_root = ROOT / "outputs"
+    temporary_root.mkdir(parents=True, exist_ok=True)
+    temporary = tempfile.TemporaryDirectory(prefix="evt-pre-20-release-", dir=temporary_root)
+    destination = Path(temporary.name)
+    with zipfile.ZipFile(path) as archive:
+        for member in archive.infolist():
+            parts = PurePosixPath(member.filename).parts
+            if not parts or PurePosixPath(member.filename).is_absolute() or ".." in parts:
+                fail(f"unsafe ZIP member: {member.filename!r}")
+        archive.extractall(destination)
+    candidates = [
+        candidate.parent
+        for candidate in destination.rglob("release_manifest.json")
+        if (candidate.parent / "SHA256SUMS.txt").is_file()
+    ]
+    if len(candidates) != 1:
+        fail(f"ZIP must contain exactly one release package root, found {len(candidates)}")
+    return candidates[0], temporary
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("package", nargs="?", type=Path, default=DEFAULT_PACKAGE)
     args = parser.parse_args()
-    package = args.package.resolve()
+    package, temporary = prepare_package(args.package.resolve())
     manifest_path = package / "release_manifest.json"
     sums_path = package / "SHA256SUMS.txt"
     if not manifest_path.is_file() or not sums_path.is_file():
@@ -128,6 +155,8 @@ def main() -> int:
     print("STM32 Ed25519 release signature: PASS")
     print("private material scan: PASS")
     print("hardware gate retained: PASS")
+    if temporary is not None:
+        temporary.cleanup()
     return 0
 
 

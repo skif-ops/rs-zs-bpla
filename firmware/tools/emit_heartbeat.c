@@ -3,8 +3,15 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#if defined(_WIN32)
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 int main(void) {
+#if defined(_WIN32)
+  if (_setmode(_fileno(stdout), _O_BINARY) == -1) return 2;
+#endif
   zs_heartbeat_t message = {0};
   uint8_t encoded[1024];
   size_t size;

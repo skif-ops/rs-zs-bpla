@@ -16,6 +16,7 @@ mosquitto ACL and the CRL are rendered from both tables.
 
 from __future__ import annotations
 
+import contextlib
 import datetime as dt
 import sqlite3
 import threading
@@ -129,10 +130,15 @@ class Registry:
             if "engineer_key" not in columns:  # registries created before the B.9 session role (2026-09-23)
                 c.execute("ALTER TABLE stations ADD COLUMN engineer_key TEXT")
 
-    def _conn(self) -> sqlite3.Connection:
+    @contextlib.contextmanager
+    def _conn(self):
         c = sqlite3.connect(self.path, timeout=10)
         c.row_factory = sqlite3.Row
-        return c
+        try:
+            with c:
+                yield c
+        finally:
+            c.close()
 
     def _audit(self, c: sqlite3.Connection, serial: str | None, action: str, detail: str = "") -> None:
         c.execute("INSERT INTO audit(at, serial, action, detail) VALUES (?,?,?,?)", (_now(), serial, action, detail))

@@ -235,7 +235,7 @@ def main() -> int:
             "dual-SIM contract overclaims or omits target evidence")
     require("dual_sim_failover_controller: PORTABLE_SAFE_SEQUENCE_EXPLICIT_MODEM_OFF_MUX_HIGH_Z_RAIL_OFF_RECOVERY_HOLD_RETRY_ICCID_QG1_QG2_PASS_TARGET_PENDING" in target and
             "dual_sim_bg95_bridge: PORTABLE_QPOWD_CELL_STATUS_FULL_ICCID_EXACT_PENDING_PROFILE_ONLINE_TLS_GATE_QG1_QG2_PASS_TARGET_PENDING" in target and
-            "dual_sim_gpio_power_binding: PORTABLE_EXACT_REV_A_GPIO_POLARITY_INTERLOCK_AND_OPTIONAL_FIXTURE_READBACK_INTERFACE_QG1_QG2_PASS" in target,
+            "dual_sim_gpio_power_binding: TARGET_EXACT_REV_A_GPIO_INTERLOCK_BUILD_PASS_U13_3V8_MODEM_AND_100_CYCLE_VALIDATION_PENDING" in target,
             "target boundary for dual-SIM failover is not explicit")
     require("DEC-031" in decisions and "DEC-035" in decisions and
             "DEC-036" in decisions and

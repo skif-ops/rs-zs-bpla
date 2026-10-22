@@ -489,29 +489,29 @@ def main() -> int:
         in target_status and
         "command_bg95_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_FIXED_LENGTH_ACK_SESSION_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING"
         in target_status and
-        "command_mqtt_binding: PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        "command_mqtt_binding: TARGET_BG95_SESSION_FRAMED_SERIALIZED_BUILD_PASS_HARDWARE_MODEM_VALIDATION_PENDING"
         in target_status and
-        "command_mqtt_subscription_ack_binding: PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        "command_mqtt_subscription_ack_binding: TARGET_BG95_DOWN_ACK_BINDING_BUILD_PASS_HARDWARE_VALIDATION_PENDING"
         in target_status,
-        "target BG95 command blockers are not bounded",
+        "target BG95 command binding status drift",
     )
     require(
         "command_result_journal: PORTABLE_ATOMIC_QG1_QG2_PASS_NOR_ERASE_ISOLATED_SHARED_NONOVERLAP_BOUND_TARGET_SLOT_COUNT_ENDURANCE_PENDING"
         in target_status and
         "command_journal_nor_adapter: PORTABLE_ERASE_ISOLATED_SHARED_ARCHIVE_COMMAND_OUTBOX_NONOVERLAP_QG1_QG2_PASS_TARGET_SLOT_COUNT_ENDURANCE_PENDING"
         in target_status and
-        "command_journal_flash_binding: PORTABLE_NOR_ERASE_ISOLATED_SHARED_NONOVERLAP_QG1_QG2_PASS_TARGET_SLOT_COUNT_OCTOSPI_ENDURANCE_BLOCKER"
+        "command_journal_flash_binding: TARGET_NOR_ERASE_ISOLATED_BINDING_BUILD_PASS_ENDURANCE_VALIDATION_PENDING"
         in target_status,
-        "target command journal storage blocker is not bounded",
+        "target command journal storage status drift",
     )
-    require("command_journal_slot_count: MISSING_BLOCKER" in target_status,
-            "target command journal slot-count blocker is not explicit")
+    require("command_journal_slot_count: LOCKED_16_BUILD_PASS" in target_status,
+            "target command journal slot-count status drift")
     require(
         "nor_boot_probe: PORTABLE_W25Q512JV_EXACT_JEDEC_SFDP_CAPACITY_QE_RESTORE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_PENDING"
         in target_status and
-        "nor_octospi_binding: PORTABLE_W25Q512JV_PROBE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_BLOCKER"
+        "nor_octospi_binding: TARGET_W25Q512JV_OSPI_BUILD_PASS_SAMPLE_VALIDATION_PENDING"
         in target_status,
-        "target exact NOR boot-probe blocker is not bounded",
+        "target exact NOR boot-probe status drift",
     )
 
     require("PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING" in icd,

@@ -1,8 +1,15 @@
 #include "zs_protocol.h"
 #include <stdio.h>
 #include <string.h>
+#if defined(_WIN32)
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 int main(int argc, char **argv) {
+#if defined(_WIN32)
+  if (_setmode(_fileno(stdout), _O_BINARY) == -1) return 4;
+#endif
   zs_detection_t m;
   memset(&m, 0, sizeof(m));
 

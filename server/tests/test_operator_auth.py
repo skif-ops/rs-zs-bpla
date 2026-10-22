@@ -3,6 +3,7 @@ roles and permissions, the second factor of engineers and admins, API tokens wit
 throttling, the audit log, the event stream, and the station bench routes left to their own guard."""
 import io
 import json
+import os
 import sqlite3
 import time
 from pathlib import Path
@@ -443,9 +444,11 @@ def test_passwords_and_cli(tmp_path: Path, monkeypatch, capsys):
     assert anna["tenants"] == ["north"] and anna["stations"] == [17, 18] and anna["second_factor"]
     assert list(listing["tokens"].values())[0]["scopes"] == ["read", "audio.request"]
     assert "password" not in json.dumps(listing) and "totp\"" not in json.dumps(listing)
-    assert oct(path.stat().st_mode & 0o777) == "0o600"
+    if os.name == "posix":
+        assert oct(path.stat().st_mode & 0o777) == "0o600"
     state = path.with_name("operator_state.sqlite3")
-    assert oct(state.stat().st_mode & 0o777) == "0o600"
+    if os.name == "posix":
+        assert oct(state.stat().st_mode & 0o777) == "0o600"
     assert oa.main([*cli, "audit-verify"]) == 0
     capsys.readouterr()
     assert oa.main([*cli, "audit"]) == 0
