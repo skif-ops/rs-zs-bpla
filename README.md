@@ -85,6 +85,7 @@ Gerber, прошивки, бинарники, корпуса и серверны
 - [`config/EVT_PRE_20_BASELINE.yaml`](config/EVT_PRE_20_BASELINE.yaml) — машинно-читаемая конфигурация.
 - [`docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv`](docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv) — реестр поставки и gates.
 - [`docs/OPEN_INPUTS_FOR_FREEZE.csv`](docs/OPEN_INPUTS_FOR_FREEZE.csv) — входные данные, блокирующие финальный выпуск.
+- [`docs/EVT_PRE_20_LONG_RANGE_ACOUSTIC_HEAD_TRADE_STUDY_REV_A.pdf`](docs/EVT_PRE_20_LONG_RANGE_ACOUSTIC_HEAD_TRADE_STUDY_REV_A.pdf) — физика дальнего акустического тракта, сравнение микрофонов, отражателей и резонаторов, план прототипа LR-1.
 - [`hardware/EVT_PRE_20_BOM_POLICY_REV_A.md`](hardware/EVT_PRE_20_BOM_POLICY_REV_A.md) — BOM и количества.
 - [`hardware/EVT_PROGRAM_PROCUREMENT_VARIANTS_REV_A.csv`](hardware/EVT_PROGRAM_PROCUREMENT_VARIANTS_REV_A.csv) — реестр вариантов закупки 21 и 41.
 - [`hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv`](hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv) — вариант на 21 станцию.
@@ -108,5 +109,3 @@ WeAct STM32U585CIU6 не являются производственной до�
 зафиксирована как восьмислойная. Фабричный архив содержит Altium/CAM для PCB-MAIN,
 PCB-PWR и PCB-MIC без KiCad. Физические first article, EOL и EVT заполняются после
 изготовления и не отмечены как выполненные заранее.
-
-\n
