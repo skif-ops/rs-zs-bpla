@@ -85,7 +85,8 @@ Gerber, прошивки, бинарники, корпуса и серверны
 - [`config/EVT_PRE_20_BASELINE.yaml`](config/EVT_PRE_20_BASELINE.yaml) — машинно-читаемая конфигурация.
 - [`docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv`](docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv) — реестр поставки и gates.
 - [`docs/OPEN_INPUTS_FOR_FREEZE.csv`](docs/OPEN_INPUTS_FOR_FREEZE.csv) — входные данные, блокирующие финальный выпуск.
-- [`docs/EVT_PRE_20_LONG_RANGE_ACOUSTIC_HEAD_TRADE_STUDY_REV_B.pdf`](docs/EVT_PRE_20_LONG_RANGE_ACOUSTIC_HEAD_TRADE_STUDY_REV_B.pdf) — физика дальнего акустического тракта, классы электрических, поршневых, роторных, винтовых и турбинных целей, сравнение микрофонов, рупоров, отражателей и резонаторов, план прототипа LR-1.
+- [`docs/EVT_PRE_20_LONG_RANGE_ACOUSTIC_HEAD_TRADE_STUDY_REV_C.pdf`](docs/EVT_PRE_20_LONG_RANGE_ACOUSTIC_HEAD_TRADE_STUDY_REV_C.pdf) — актуальный двуязычный управляемый выпуск исследования дальнего акустического тракта: физика распространения, классы целей, сравнение микрофонов, рупоров, отражателей и резонаторов, план прототипа LR-1. Производственный baseline плат не изменён.
+- [`hardware/EVT_PRE_20_ACOUSTIC_TRADE_STUDY_REV_C.xlsx`](hardware/EVT_PRE_20_ACOUSTIC_TRADE_STUDY_REV_C.xlsx) — сводная книга вариантов, целевых классов, расчёта потерь на 2 км, матрицы физических испытаний и источников. Машиночитаемые таблицы сохранены рядом в CSV.
 - [`hardware/EVT_PRE_20_BOM_POLICY_REV_A.md`](hardware/EVT_PRE_20_BOM_POLICY_REV_A.md) — BOM и количества.
 - [`hardware/EVT_PROGRAM_PROCUREMENT_VARIANTS_REV_A.csv`](hardware/EVT_PROGRAM_PROCUREMENT_VARIANTS_REV_A.csv) — реестр вариантов закупки 21 и 41.
 - [`hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv`](hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv) — вариант на 21 станцию.

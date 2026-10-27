@@ -1,0 +1,9 @@
+test_id,stage,measurement,conditions,required_evidence,pass_or_hold_criterion,status
+LAB_RESPONSE,Laboratory response and phase,"Response, self-noise, pattern, phase",80-3000 Hz; 12 azimuths; 3 levels,Per-channel calibration files,Complete data for every channel,PLANNED
+WIND_0_2,Wind 0-2 m/s,20-500 Hz noise and impulses,Same mast and recording,"WAV, wind and windshield configuration","No clipping, SNR measured",PLANNED
+WIND_2_5,Wind 2-5 m/s,20-500 Hz noise and vibration,Same mast and recording,"WAV, wind and accelerometer if available",No unresolved vibration,PLANNED
+WIND_5_8,Wind 5-8 m/s,"Gusts, clipping and stability",Approved safe setup only,"WAV, wind, photographs and condition",No damage or clipping,PLANNED
+RANGE_SERIES,Range series,Raw narrowband SNR,"50, 100, 250, 500, 1000, 2000 m","Geometry, weather, track and WAV",Result by class and state,PLANNED
+TARGET_CLASSES,Real target classes,"Detection, misses, aspect and state",All classes plus background,"Pd, FAR, SNR and conditions",Pd and FAR approved before range claim,PLANNED
+SIMULTANEOUS_COMPARE,Simultaneous comparison,"T5838, shotgun, horns, reflector, resonators","One mast, time and algorithm",Synchronous WAV and calibration,Physical gain without separate tuning,PLANNED
+INTEGRATION_GATE,Integration gate,"Power, interface, protection, mechanics",After physical-head selection,"ICD, ECO and verification list",No production-board change without ECO,PLANNED
