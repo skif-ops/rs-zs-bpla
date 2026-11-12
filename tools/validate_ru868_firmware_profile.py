@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cross-check fail-closed RU868 candidate channels between config and firmware."""
+"""Cross-check the accepted fail-closed RU868 channel plan."""
 from __future__ import annotations
 
 import re
@@ -33,6 +33,8 @@ def main() -> None:
     profile = PROFILE.read_text(encoding="utf-8")
     source = SOURCE.read_text(encoding="utf-8")
     require("tx_enabled: false" in profile, "RU868 must remain fail-closed")
+    require("decision: ACCEPTED_FOR_EVT_PRE_20" in profile,
+            "RU868 frequency-plan decision is not synchronized")
     require("max_eirp_dbm: null" in profile and "duty_cycle: null" in profile,
             "unsigned power or duty-cycle value present")
     require(profile_channels(profile) == EXPECTED, "RU868 profile channel drift")
@@ -40,7 +42,7 @@ def main() -> None:
     require("zs_sx1262_frequency_allowed_ru868" in source, "firmware frequency guard missing")
     require(all(str(value) not in source for value in FORBIDDEN_LEGACY),
             "legacy RU868 frequency remains in firmware")
-    print("RU868 firmware/profile gate: PASS (7 candidates; legacy plan rejected; TX disabled)")
+    print("RU868 firmware/profile gate: PASS (frequency plan accepted; legacy plan rejected; field TX disabled pending hardware RF validation)")
 
 
 if __name__ == "__main__":

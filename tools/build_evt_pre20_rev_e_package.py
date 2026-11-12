@@ -19,7 +19,7 @@ D5_RELEASE = ROOT.parent / "repo_pcbmain" / "releases" / "evt-pre-20" / "2026-10
 D5_FULL = D5_RELEASE / "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20261002_REV_D5.zip"
 D5_TESTS = D5_RELEASE / "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_20261002_REV_D5.zip"
 FIRMWARE = OUTPUT / "EVT_PRE_20_BENCH_RELEASE_2026100601.zip"
-EOL_B01 = OUTPUT / "EVT_PRE_20_DIO_EVT_B01_И_EOL_ОСНАСТКА_20261009_REV_A.zip"
+EOL_B01 = OUTPUT / "EVT_PRE_20_DIO_EVT_B01_И_EOL_ОСНАСТКА_20261112_REV_B.zip"
 PKI_APP = OUTPUT / "PKI_WINDOWS_APP"
 DEPLOY_PUBLIC = Path(r"F:\Проекты\muhoed-deploy\pki\bundle")
 
@@ -148,16 +148,17 @@ def build_main(server_archive: Path, commit: str) -> None:
         "MFG_004_EOL_FIXTURE_DRILL_TEMPLATE_REV_A.pdf",
         "MFG_004_EOL_FIXTURE_DRILL_TEMPLATE_REV_A.dxf",
         "MFG_004_EOL_FIXTURE_CONTACT_MAP_REV_A.csv",
-        "MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_A.json",
+        "MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_B.json",
     ):
         package.add_file(f"02_Закупка_производство_сборка/EOL_оснастка_MFG_004/{name}", ROOT / "manufacturing" / name)
     package.add_zip("03_ПО_станции_и_приложение", FIRMWARE)
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.docx", ROOT / "docs" / "EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.docx")
     package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx", ROOT / "docs" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx")
     package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx")
     package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json")
-    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.docx", ROOT / "docs" / "EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.docx")
-    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx")
-    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.csv", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.csv")
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_B.docx", ROOT / "docs" / "EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_B.docx")
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.xlsx", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.xlsx")
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.csv", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.csv")
     package.add_file("04_Сертификаты_и_реестры/Выпуск_сертификатов_и_регистрация_станций.docx", DOCS / "05_Выпуск_сертификатов_и_регистрация_станций.docx")
     for name in ("muhoed-pki.exe", "dioneya-root-offline.exe", "SHA256SUMS.txt"):
         package.add_file(f"04_Сертификаты_и_реестры/Приложение_Windows/{name}", PKI_APP / name)
@@ -202,15 +203,15 @@ def build_tests(commit: str) -> None:
     package.add_file("00_Опись_и_контроль/Опись_и_статус_комплекта_Rev_E.docx", DOCS / "00_Опись_и_статус_комплекта_Rev_E.docx")
     package.add_zip("01_Программа_методики_и_формы_Rev_D5", D5_TESTS)
     package.add_file("02_Методика_дополнительного_дообучения/Методика_дополнительного_дообучения_Мухоед.docx", DOCS / "07_Методика_дополнительного_дообучения_Мухоед.docx")
-    package.add_file("03_Прошивка_и_EOL/Инструкция_по_прошивке_настройке_и_испытаниям_Rev_C.docx", ROOT / "docs" / "EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx")
+    package.add_file("03_Прошивка_и_EOL/Инструкция_по_прошивке_настройке_и_испытаниям_Rev_D.docx", ROOT / "docs" / "EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.docx")
     package.add_file("03_Прошивка_и_EOL/Порядок_разрешения_блокировки_прошивки_Rev_A.docx", ROOT / "docs" / "EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx")
     package.add_file("03_Прошивка_и_EOL/firmware_lock_interlock_rev_a.json", ROOT / "firmware" / "targets" / "evt_pre_20" / "release" / "firmware_lock_interlock_rev_a.json")
     package.add_file("03_Прошивка_и_EOL/Протокол_квалификации_DIO_EVT_B01_Rev_A.docx", ROOT / "docs" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx")
     package.add_file("03_Прошивка_и_EOL/Форма_квалификации_DIO_EVT_B01_Rev_A.xlsx", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx")
     package.add_file("03_Прошивка_и_EOL/qualification_DIO_EVT_B01_Rev_A.json", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json")
-    package.add_file("03_Прошивка_и_EOL/Физическая_программа_DIO_EVT_B01_и_MFG_004_Rev_A.docx", ROOT / "docs" / "EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.docx")
-    package.add_file("03_Прошивка_и_EOL/Реестр_измерений_DIO_EVT_B01_MFG_004_Rev_A.xlsx", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx")
-    package.add_file("03_Прошивка_и_EOL/Реестр_измерений_DIO_EVT_B01_MFG_004_Rev_A.csv", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.csv")
+    package.add_file("03_Прошивка_и_EOL/Физическая_программа_DIO_EVT_B01_и_MFG_004_Rev_B.docx", ROOT / "docs" / "EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_B.docx")
+    package.add_file("03_Прошивка_и_EOL/Реестр_измерений_DIO_EVT_B01_MFG_004_Rev_B.xlsx", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.xlsx")
+    package.add_file("03_Прошивка_и_EOL/Реестр_измерений_DIO_EVT_B01_MFG_004_Rev_B.csv", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.csv")
     for candidate in (
         OUTPUT / "ctest_final.txt",
         OUTPUT / "server_regression_summary_20261006.txt",

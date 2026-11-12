@@ -171,7 +171,7 @@ communications:
     pilot_frequency_windows_mhz: [[864.0, 865.0], [868.7, 869.2]]
     variants:
       - id: RU868
-        profile_status: OPEN_REGULATORY_AND_RF_VALIDATION
+        profile_status: FREQUENCY_PLAN_ACCEPTED_FIELD_TX_HARDWARE_RF_VALIDATION_PENDING
       - id: EU868
         profile_status: FUTURE_COMPATIBILITY_NOT_IN_PILOT
   ble:
