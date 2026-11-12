@@ -439,6 +439,7 @@ static void supervisor_task_fn(void *arg) {
     app_watchdog_service();
     app_commands_tick(now);
     app_fw_tick(now);
+    app_lora_set_service_mode(modes.mode == ZS_MODE_S4_SERVICE);
     if (capture_on && !capture_wanted(modes.mode)) capture_set(false);   /* the post-event window closed */
     outbox_retry_tick(now);
     gsm_probe_tick(now);
@@ -573,6 +574,24 @@ static zs_command_journal_io_t nor_command_io;
 static zs_event_outbox_io_t nor_outbox_io;
 static zs_boot_counter_t boot_counter;
 static bool stores_on_nor;
+static zs_nor_slot_store_t lora_profile_slots;
+static zs_lora_rf_profile_io_t lora_profile_io;
+static bool lora_profile_store_ready;
+
+static bool lora_profile_verify(void *ctx, const uint8_t *message, size_t message_size, const uint8_t signature[64]) {
+  (void)ctx;
+  return app_fw_verify_release_signature(message, message_size, signature);
+}
+
+static zs_lora_rf_profile_result_t lora_profile_install(const uint8_t record[ZS_LORA_RF_PROFILE_RECORD_BYTES]) {
+  zs_lora_rf_profile_t profile;
+  zs_lora_rf_profile_result_t result;
+  if (!lora_profile_store_ready) return ZS_LORA_RF_PROFILE_IO_ERROR;
+  result = zs_lora_rf_profile_commit(&lora_profile_io, record, app_fw_running_version(), lora_profile_verify, NULL, &profile);
+  if (result == ZS_LORA_RF_PROFILE_OK) app_lora_set_field_profile(&profile);
+  memset(&profile, 0, sizeof(profile));
+  return result;
+}
 
 static bool ram_read(void *ctx, uint8_t slot, uint32_t off, uint8_t *d, size_t n) {
   const size_t bytes = ctx == cfg_slots ? ZS_STATION_CONFIG_SLOT_BYTES : ZS_INSTALLATION_STORE_SLOT_BYTES;
@@ -609,6 +628,23 @@ static bool ble_service_mode(void *ctx, uint32_t *started) { (void)ctx; *started
 static zs_commissioning_role_t ble_peer_role(void *ctx) { (void)ctx; return ZS_COMMISSIONING_ROLE_INSTALLER; }   /* base role by pairing (B.7) */
 static bool ble_peer_secure(void *ctx) { (void)ctx; return ipc.link_state == 2u; }
 static bool ble_random(void *ctx, uint8_t *out, size_t n) { (void)ctx; return bsp_rng_fill(out, n); }
+static uint8_t ble_lora_control(void *ctx, const uint8_t *request, size_t size) {
+  (void)ctx;
+  if (!request || size == 0u) return ZS_BLE_STATUS_REJECTED_VALIDATION;
+  if (request[0] == 1u && size == 3u) {
+    const uint32_t seconds = (uint32_t)request[1] | ((uint32_t)request[2] << 8);
+    return app_lora_start_rf_test(seconds) ? ZS_BLE_STATUS_OK : ZS_BLE_STATUS_REJECTED_VALIDATION;
+  }
+  if (request[0] == 2u && size == 1u) { app_lora_stop_rf_test(); return ZS_BLE_STATUS_OK; }
+  if (request[0] == 3u && size == 1u + ZS_LORA_RF_PROFILE_RECORD_BYTES) {
+    const zs_lora_rf_profile_result_t result = lora_profile_install(&request[1]);
+    if (result == ZS_LORA_RF_PROFILE_OK) return ZS_BLE_STATUS_OK;
+    if (result == ZS_LORA_RF_PROFILE_IO_ERROR || result == ZS_LORA_RF_PROFILE_VERIFY_FAILED) return ZS_BLE_STATUS_STORAGE_ERROR;
+    return ZS_BLE_STATUS_REJECTED_VALIDATION;
+  }
+  return ZS_BLE_STATUS_REJECTED_VALIDATION;
+}
+static size_t ble_lora_status(void *ctx, uint8_t *out, size_t capacity) { (void)ctx; return app_lora_encode_status(out, capacity); }
 /* Station secrets (B3 NOR record, zs_station_secrets): factory serial, pairing secret, B.9 engineer key, expected
    ICCIDs and command public keys.  Factory serial + pairing are written through the isolated TEST_UART before the
    first BLE session; the remaining fields arrive through authenticated BLE 0x0206. */
@@ -624,7 +660,8 @@ static zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_REV, APP
 /* v0.3 station_secrets over BLE: the service commits to the NOR record and hands the new record here to apply. */
 static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec);
 static zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
-                                         &cfg_io, &pos_io, &audit_io, &selftests, &identity, NULL, ble_random, &secrets_io, ble_secrets_changed};
+                                         &cfg_io, &pos_io, &audit_io, &selftests, &identity, NULL, ble_random, &secrets_io,
+                                         ble_secrets_changed, ble_lora_control, ble_lora_status};
 
 /* BLE task: the installation record from its store (none: GNSS position only); a read error keeps the current one. */
 static void installation_reload(void) {
@@ -804,16 +841,34 @@ static void bind_record_stores(void) {
                                  &nor_command_io, &nor_outbox_io, &cfg_io, &pos_io)) {
     stores_on_nor = true;
     {
-      /* runtime parameters: the last APP_PARAMS_NOR_BLOCKS blocks of the nRF image partition (addendum D) */
+      /* The nRF partition leaves two double-slot records at its end: signed LoRa profile, then runtime parameters. */
       static zs_nor_storage_layout_t nrf_layout;
       static zs_nor_slot_store_t params_slots;
       static zs_station_params_io_t params_io;
       zs_station_config_io_t slot_io;
+      zs_station_config_io_t lora_slot_io;
+      zs_lora_rf_profile_t lora_profile;
       const uint32_t params_bytes = APP_PARAMS_NOR_BLOCKS * nor_bindings.layout.erase_block_bytes;
+      const uint32_t lora_bytes = APP_LORA_PROFILE_NOR_BLOCKS * nor_bindings.layout.erase_block_bytes;
       nrf_layout = nor_bindings.layout;
-      nrf_layout.nrf_image_partition_bytes -= params_bytes;
+      nrf_layout.nrf_image_partition_bytes -= params_bytes + lora_bytes;
       app_nrf_update_bind(&nor, &nrf_layout, console_printf);
-      if (zs_nor_slot_store_init(&params_slots, &nor, nrf_layout.nrf_image_base_address + nrf_layout.nrf_image_partition_bytes, 2u, ZS_STATION_PARAMS_RECORD_BYTES) &&
+      if (zs_nor_slot_store_init(&lora_profile_slots, &nor, nrf_layout.nrf_image_base_address + nrf_layout.nrf_image_partition_bytes,
+                                 2u, ZS_STATION_CONFIG_SLOT_BYTES) &&
+          zs_nor_slot_store_config_io(&lora_profile_slots, &lora_slot_io)) {
+        lora_profile_io = (zs_lora_rf_profile_io_t){lora_slot_io.ctx, lora_slot_io.read, lora_slot_io.erase, lora_slot_io.write};
+        lora_profile_store_ready = true;
+        if (zs_lora_rf_profile_load(&lora_profile_io, app_fw_running_version(), lora_profile_verify, NULL, &lora_profile) == ZS_LORA_RF_PROFILE_OK) {
+          app_lora_set_field_profile(&lora_profile);
+          console_printf("lora: signed RU868 field profile v%lu loaded\r\n", (unsigned long)lora_profile.version);
+        } else {
+          app_lora_clear_field_profile();
+          console_printf("lora: no valid field profile, TX remains disabled\r\n");
+        }
+        memset(&lora_profile, 0, sizeof(lora_profile));
+      }
+      if (zs_nor_slot_store_init(&params_slots, &nor, nrf_layout.nrf_image_base_address + nrf_layout.nrf_image_partition_bytes + lora_bytes,
+                                 2u, ZS_STATION_PARAMS_RECORD_BYTES) &&
           zs_nor_slot_store_config_io(&params_slots, &slot_io)) {
         params_io = (zs_station_params_io_t){slot_io.ctx, slot_io.read, slot_io.erase, slot_io.write};
         app_commands_bind(&params_io, params_apply, console_printf);
@@ -1138,18 +1193,31 @@ static void console_exec(const char *cmd) {
     else console_printf("wdtest <1..8>: 1 audio 2 dsp 3 comms 4 ble 5 power 6 lora 7 gnss 8 rec\r\n");
   } else if (strcmp(cmd, "lora") == 0) {
     app_lora_status(console_printf);
+  } else if (strncmp(cmd, "lorarf test ", 12u) == 0) {
+    const unsigned seconds = (unsigned)strtoul(cmd + 12u, NULL, 10);
+    console_printf(app_lora_start_rf_test(seconds) ? "lorarf: RF test started for %u s, service-mode timeout is active\r\n" :
+                                                  "lorarf test <1..900>: enter physical service mode first\r\n", seconds);
+  } else if (strcmp(cmd, "lorarf stop") == 0) {
+    app_lora_stop_rf_test();
+    console_printf("lorarf: RF test stopped\r\n");
+  } else if (strncmp(cmd, "lorarf install ", 15u) == 0) {
+    uint8_t record[ZS_LORA_RF_PROFILE_RECORD_BYTES];
+    zs_lora_rf_profile_result_t result = ZS_LORA_RF_PROFILE_INVALID;
+    if (modes.mode == ZS_MODE_S4_SERVICE && parse_hex(cmd + 15u, record, sizeof(record))) result = lora_profile_install(record);
+    console_printf("lorarf: profile %s\r\n", zs_lora_rf_profile_result_name(result));
+    memset(record, 0, sizeof(record));
   } else if (strcmp(cmd, "lora on") == 0 || strcmp(cmd, "lora off") == 0) {
     app_lora_set_route_hint(cmd[5] == 'o' && cmd[6] == 'n');            /* bench: force the route hint */
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
     console_printf("commands: st lag pos pps audio dsp svc modes ble ping bledfu factoryid pairsec engkey simiccid secrets [clear]\r\n");
-    console_printf("          nrfimg nrfupd comms [on|off] power lora [on|off] clock cmds rec wd wdtest heap\r\n");
+    console_printf("          nrfimg nrfupd comms [on|off] power lora [on|off] lorarf [test <s>|stop|install <hex>] clock cmds rec wd wdtest heap\r\n");
   }
 }
 
 static void console_task_fn(void *arg) {
-  static char line[192];                               /* nrfimg put <off> <base64 of 96 bytes> is ~150 chars */
+  static char line[256];
   size_t len = 0u;
   (void)arg;
   console_printf("\r\nDioneya EVT-PRE-20 B1 bring-up, clock policy %s, %lu Hz\r\n", EVT_PRE_20_CLOCK_POLICY_ID, (unsigned long)SystemCoreClock);

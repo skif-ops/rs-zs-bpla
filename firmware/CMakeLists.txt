@@ -7,8 +7,11 @@ add_subdirectory(targets/evt_pre_20)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
+add_compile_definitions(_USE_MATH_DEFINES _CRT_SECURE_NO_WARNINGS)
 if(MSVC)
   add_compile_options("/FI${CMAKE_CURRENT_SOURCE_DIR}/include/zs_compiler_compat.h")
+endif()
+if(WIN32)
   add_library(m INTERFACE)
 endif()
 
@@ -88,6 +91,7 @@ add_library(zs_core
   src/zs_ed25519.c
   src/zs_lora_frame.c
   src/zs_lora_uplink.c
+  src/zs_lora_rf_profile.c
   src/zs_audio_chunk.c
   src/zs_task_watch.c
   src/zs_command_clock.c
@@ -242,6 +246,8 @@ add_executable(zs_lora_frame_tests tests/test_lora_frame.c)
 target_link_libraries(zs_lora_frame_tests zs_core m)
 add_executable(zs_lora_uplink_tests tests/test_lora_uplink.c)
 target_link_libraries(zs_lora_uplink_tests zs_core m)
+add_executable(zs_lora_rf_profile_tests tests/test_lora_rf_profile.c)
+target_link_libraries(zs_lora_rf_profile_tests zs_core m)
 add_executable(zs_sx1262_packet_tests tests/test_sx1262_packet.c)
 target_link_libraries(zs_sx1262_packet_tests zs_core m)
 add_executable(zs_audio_chunk_tests tests/test_audio_chunk.c)
@@ -268,7 +274,7 @@ target_include_directories(app_comms_sim_tests PRIVATE tests/host_sim targets/ev
 target_link_libraries(app_comms_sim_tests PRIVATE evt_pre_20_dual_sim_gpio)
 
 # station digital twin: portable stack + real comms task on the host against a scene, a scripted BG95 and the server twin
-if(NOT MSVC)
+if(UNIX)
   add_executable(zs_station_twin twin/station_twin.c twin/scene.c twin/array_render.c targets/evt_pre_20/app/app_comms.c)
   target_include_directories(zs_station_twin PRIVATE twin tests/host_sim targets/evt_pre_20/app)
   target_link_libraries(zs_station_twin PRIVATE evt_pre_20_dual_sim_gpio m)
@@ -426,6 +432,7 @@ add_test(NAME pipeline_sources COMMAND zs_pipeline_sources_tests)
 add_test(NAME ed25519 COMMAND zs_ed25519_tests)
 add_test(NAME lora_frame COMMAND zs_lora_frame_tests)
 add_test(NAME lora_uplink COMMAND zs_lora_uplink_tests)
+add_test(NAME lora_rf_profile COMMAND zs_lora_rf_profile_tests)
 add_test(NAME sx1262_packet COMMAND zs_sx1262_packet_tests)
 add_test(NAME audio_chunk COMMAND zs_audio_chunk_tests)
 add_test(NAME task_watch COMMAND zs_task_watch_tests)

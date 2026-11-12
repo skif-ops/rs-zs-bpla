@@ -1,14 +1,11 @@
 #ifndef APP_LORA_H
 #define APP_LORA_H
-/*
- * LoRa fallback task (LORA_BACKUP_ICD_v0_1 addendum A): zs_lora_uplink over the SX1262 on SPI1.  The regional gate
- * of the ICD applies: with APP_LORA_TX_ENABLED == 0 the task runs DRY - it brings the radio up (SPI/BUSY/reset are
- * exercised on the bench), encodes every frame the uplink would send, logs it to the console with its airtime, and
- * never asserts TXEN nor issues SetTx.  Setting APP_LORA_TX_ENABLED to 1 (after the signed RU868 profile and the RF
- * gate) turns the same path into the live transport.
- */
+/* SX1262 fallback uplink. Field TX needs a verified persistent RU868 profile. RF test TX is time-limited, available
+   only in physical service mode and never changes the persistent field authorization. */
 #include "zs_event_outbox.h"
 #include "zs_lora_frame.h"
+#include "zs_lora_rf_profile.h"
+#include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -18,6 +15,12 @@ void app_lora_bind(const zs_event_outbox_io_t *outbox, uint32_t station_id, cons
 void app_lora_remember_event(uint64_t event_id, uint8_t class_id, uint8_t confidence_u8, uint8_t presence_level, uint16_t f0_hz);
 /* Route hint from the supervisor: true while the GSM link is degraded. */
 void app_lora_set_route_hint(bool lora_preferred);
+void app_lora_set_service_mode(bool active);
+bool app_lora_start_rf_test(uint32_t seconds);
+void app_lora_stop_rf_test(void);
+void app_lora_set_field_profile(const zs_lora_rf_profile_t *profile);
+void app_lora_clear_field_profile(void);
+size_t app_lora_encode_status(uint8_t *out, size_t capacity);
 void app_lora_task(void *arg);
 void app_lora_status(void (*print)(const char *fmt, ...));
 #endif

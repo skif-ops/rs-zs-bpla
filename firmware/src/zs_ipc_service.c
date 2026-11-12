@@ -416,6 +416,27 @@ static void handle_self_test(zs_ipc_service_t *s, const uint8_t *p, size_t len) 
   (void)push_value(s, ZS_IPC_NOTIFY, ZS_CHAR_SELF_TEST, buf, n);
 }
 
+static bool push_lora_status(zs_ipc_service_t *s, bool notify) {
+  uint8_t buf[32];
+  const size_t n = s->port->lora_status ? s->port->lora_status(s->port->ctx, buf, sizeof(buf)) : 0u;
+  if (n == 0u) return false;
+  if (notify && !push_value(s, ZS_IPC_NOTIFY, ZS_CHAR_LORA_CONTROL, buf, n)) return false;
+  return push_value(s, ZS_IPC_READ_VALUE, ZS_CHAR_LORA_CONTROL, buf, n);
+}
+
+static void handle_lora_control(zs_ipc_service_t *s, const uint8_t *p, size_t len) {
+  uint32_t started;
+  uint8_t status;
+  if (!s->port->service_mode(s->port->ctx, &started)) { (void)send_status(s, ZS_CHAR_LORA_CONTROL, ZS_BLE_STATUS_NOT_IN_SERVICE_MODE); return; }
+  if (!s->port->peer_secure(s->port->ctx) || zs_ipc_service_role(s) != ZS_COMMISSIONING_ROLE_ENGINEER) {
+    (void)send_status(s, ZS_CHAR_LORA_CONTROL, ZS_BLE_STATUS_NOT_AUTHORIZED); return;
+  }
+  if (!s->port->lora_control || !s->port->lora_status) { (void)send_status(s, ZS_CHAR_LORA_CONTROL, ZS_BLE_STATUS_STORAGE_ERROR); return; }
+  status = s->port->lora_control(s->port->ctx, p, len);
+  if (status == ZS_BLE_STATUS_OK) (void)push_lora_status(s, true);
+  (void)send_status(s, ZS_CHAR_LORA_CONTROL, status);
+}
+
 static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t len) {
   switch (type) {
     case ZS_IPC_PONG:
@@ -426,7 +447,7 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
       if (len >= 1u) {
         s->link_state = p[0];
         if (p[0] == 0u) role_reset(s);                              /* the role lives with the link (B.9) */
-        else { (void)push_identity(s); (void)push_config(s); (void)push_installation(s, true); (void)push_role(s); (void)push_secrets(s); }
+        else { (void)push_identity(s); (void)push_config(s); (void)push_installation(s, true); (void)push_role(s); (void)push_secrets(s); (void)push_lora_status(s, false); }
       }
       break;
     case ZS_IPC_READ_REQUEST: {
@@ -437,6 +458,7 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
       else if (id == ZS_CHAR_INSTALLATION_POSITION) (void)push_installation(s, true);
       else if (id == ZS_CHAR_SESSION_ROLE) (void)push_role(s);
       else if (id == ZS_CHAR_STATION_SECRETS) (void)push_secrets(s);
+      else if (id == ZS_CHAR_LORA_CONTROL) (void)push_lora_status(s, false);
       break;
     }
     case ZS_IPC_CHAR_WRITE: {
@@ -447,6 +469,7 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
       else if (id == ZS_CHAR_SELF_TEST) handle_self_test(s, &p[2], len - 2u);
       else if (id == ZS_CHAR_SESSION_ROLE) handle_role_write(s, &p[2], len - 2u);
       else if (id == ZS_CHAR_STATION_SECRETS) handle_secrets_write(s, &p[2], len - 2u);
+      else if (id == ZS_CHAR_LORA_CONTROL) handle_lora_control(s, &p[2], len - 2u);
       else (void)send_status(s, id, ZS_BLE_STATUS_REJECTED_VALIDATION);
       break;
     }

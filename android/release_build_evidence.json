@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "release_id": "EVT_PRE_20_BENCH_RELEASE_2026100501",
+  "release_id": "EVT_PRE_20_BENCH_RELEASE_2026111201",
   "application_id": "ru.dioneya.commissioning",
-  "version_code": 2026100501,
-  "version_name": "0.1.0-bench.20261005",
+  "version_code": 2026111201,
+  "version_name": "0.1.1-bench.20261112",
   "tasks": {
     "testDebugUnitTest": "PASS",
     "assembleRelease": "PASS",
     "apksignerVerify": "PASS_V2_ONE_SIGNER"
   },
   "toolchain": {
-    "jdk": "Microsoft OpenJDK 21.0.12.1+1",
+    "jdk": "JetBrains Runtime OpenJDK 21.0.11+1",
     "gradle": "9.6.0",
     "gradle_distribution_sha256": "bbaeb2fef8710818cf0e261201dab964c572f92b942812df0c3620d62a529a01",
     "android_gradle_plugin": "9.4.0",
@@ -19,8 +19,8 @@
     "min_sdk": 28
   },
   "apk": {
-    "bytes": 353026,
-    "sha256": "39f45d4cd24cb2ce318d6e748cb9a581857e98ceeee0a4f2ddfcec9d6e7519fe",
+    "bytes": 360974,
+    "sha256": "b60661f98369b4731310faf57b78471f38315a5c4e3f7803c6c9e9ab891a3e30",
     "release_authorized": true,
     "scope": "BENCH_AND_EVT_HARDWARE_VALIDATION"
   },
@@ -41,6 +41,7 @@
     "install on approved Android device",
     "authenticated pairing with DIO-EVT-B01",
     "GATT configuration write and read-back",
-    "signed OTA and rollback end-to-end"
+    "signed OTA and rollback end-to-end",
+    "LoRa secure BLE status, timed RF test and signed profile installation end-to-end"
   ]
 }

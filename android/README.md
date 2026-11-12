@@ -17,8 +17,8 @@
 
 В каталоге `app` находится Kotlin/Android проект с unit tests и Android
 `BluetoothGatt` transport, подключённым к экранам выбора станции, установки и
-настройки сервера. Стендовый release APK `0.1.0-bench.20261005`
-(`versionCode 2026100501`) собран с обязательной внешней конфигурацией подписи.
+настройки сервера. Стендовый release APK `0.1.1-bench.20261112`
+(`versionCode 2026111201`) собран с обязательной внешней конфигурацией подписи.
 Формат подписанного OTA, release signing и CycloneDX SBOM закрыты стендовым
 релизным пакетом. BLE UUID, authenticated pairing, station GATT и OTA end-to-end
 проверяются на физическом стендовом изделии `DIO-EVT-B01`.

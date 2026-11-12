@@ -24,6 +24,9 @@ import ru.dioneya.commissioning.core.PhoneLocationProvider
 import ru.dioneya.commissioning.core.ble.BleSession
 import ru.dioneya.commissioning.core.ble.GattContractV01
 import ru.dioneya.commissioning.core.position.InstallationScreenController
+import ru.dioneya.commissioning.core.lora.LoRaRfController
+import ru.dioneya.commissioning.core.lora.LoRaRfProfilePackage
+import ru.dioneya.commissioning.core.lora.LoRaRfStatus
 import ru.dioneya.commissioning.core.role.EngineerKey
 import ru.dioneya.commissioning.core.role.SessionRoleController
 import ru.dioneya.commissioning.core.secrets.StationSecretsBundle
@@ -83,6 +86,9 @@ class InstallationActivity : Activity() {
         val secretsButton = Button(this).apply { text = getString(R.string.secrets_button) }
         secretsButton.setOnClickListener { showSecretsDialog() }
         root.addView(secretsButton)
+        val loraButton = Button(this).apply { text = getString(R.string.lora_button) }
+        loraButton.setOnClickListener { showLoRaDialog() }
+        root.addView(loraButton)
         val useLocation = Button(this).apply { text = getString(R.string.install_use_phone_location) }
         val read = Button(this).apply { text = getString(R.string.install_read) }
         val apply = Button(this).apply { text = getString(R.string.install_apply) }
@@ -157,7 +163,8 @@ class InstallationActivity : Activity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != RESULT_OK) return
         val uri = data?.data ?: return
-        val text = try { contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } } catch (_: Exception) { null }
+        val bytes = try { contentResolver.openInputStream(uri)?.use { it.readBytes() } } catch (_: Exception) { null }
+        val text = bytes?.toString(Charsets.UTF_8)
         when (requestCode) {
             REQUEST_KEY_FILE -> {
                 val key: EngineerKey? = text?.let { keyStore.importExport(it) }
@@ -174,7 +181,83 @@ class InstallationActivity : Activity() {
                     else -> confirmSecretsWrite(bundle)
                 }
             }
+            REQUEST_LORA_PROFILE -> {
+                val profile = bytes?.let { LoRaRfProfilePackage.parse(it) }
+                if (profile == null) status.text = getString(R.string.lora_profile_invalid)
+                else confirmLoRaProfile(profile)
+            }
         }
+    }
+
+    private fun showLoRaDialog() {
+        if (role != InstallationCommissioningRole.SERVICE_ENGINEER) {
+            status.text = getString(R.string.lora_engineer_required); return
+        }
+        val s = session ?: return
+        executor.execute {
+            val current = try { LoRaRfController(s).readStatus() } catch (_: Exception) { null }
+            runOnUiThread {
+                val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24, 12, 24, 0) }
+                box.addView(TextView(this).apply { text = current?.let { formatLoRaStatus(it) } ?: getString(R.string.lora_status_unavailable) })
+                box.addView(Button(this).apply {
+                    text = getString(R.string.lora_test_start)
+                    isEnabled = current?.radioReady == true
+                    setOnClickListener { confirmLoRaTest() }
+                })
+                box.addView(Button(this).apply { text = getString(R.string.lora_test_stop); setOnClickListener { runLoRa("test_stop") { it.stopTest() } } })
+                box.addView(Button(this).apply {
+                    text = getString(R.string.lora_profile_choose)
+                    isEnabled = current?.radioReady == true
+                    setOnClickListener { pickLoRaProfile() }
+                })
+                AlertDialog.Builder(this).setTitle(R.string.lora_title).setView(box).setNegativeButton(android.R.string.cancel, null).show()
+            }
+        }
+    }
+
+    private fun confirmLoRaTest() {
+        AlertDialog.Builder(this).setTitle(R.string.lora_test_start)
+            .setMessage(R.string.lora_test_warning)
+            .setPositiveButton(R.string.lora_test_confirm) { _, _ -> runLoRa("test_start") { it.startTest(300) } }
+            .setNegativeButton(android.R.string.cancel, null).show()
+    }
+
+    private fun pickLoRaProfile() {
+        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE); type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/octet-stream", "application/json", "text/plain"))
+        }, REQUEST_LORA_PROFILE)
+    }
+
+    private fun confirmLoRaProfile(profile: ByteArray) {
+        AlertDialog.Builder(this).setTitle(R.string.lora_profile_choose).setMessage(R.string.lora_profile_confirm)
+            .setPositiveButton(R.string.lora_profile_install) { _, _ -> runLoRa("field_profile") { it.installSignedProfile(profile) } }
+            .setNegativeButton(android.R.string.cancel, null).show()
+    }
+
+    private fun runLoRa(action: String, operation: (LoRaRfController) -> LoRaRfStatus) {
+        val s = session ?: return
+        status.text = getString(R.string.lora_working)
+        executor.execute {
+            try {
+                val result = operation(LoRaRfController(s))
+                appendLoRaAudit(action, "ok", result)
+                runOnUiThread { status.text = formatLoRaStatus(result) }
+            } catch (e: Exception) {
+                appendLoRaAudit(action, "error", null, e.message ?: "error")
+                runOnUiThread { status.text = getString(R.string.lora_failed, e.message ?: "error") }
+            }
+        }
+    }
+
+    private fun formatLoRaStatus(value: LoRaRfStatus) = getString(R.string.lora_status,
+        getString(if (value.radioReady) R.string.lora_radio_ready else R.string.lora_radio_not_ready), value.modeName,
+        value.frequencyHz / 1_000_000.0, value.spreadingFactor, value.txDbm, value.profileVersion, value.testRemainingSeconds)
+
+    private fun appendLoRaAudit(action: String, outcome: String, value: LoRaRfStatus?, detail: String = "") {
+        val safeDetail = detail.replace(Regex("[\\r\\n,]"), "_")
+        val line = "${System.currentTimeMillis()},$stationSerial,$action,$outcome,${value?.mode ?: -1},${value?.profileVersion ?: 0},${value?.frequencyHz ?: 0},$safeDetail\n"
+        openFileOutput("lora_rf_audit.csv", MODE_APPEND).use { it.write(line.toByteArray()) }
     }
 
     // ---- v0.3: station secrets over BLE (0x0206) ------------------------------------------------
@@ -310,5 +393,6 @@ class InstallationActivity : Activity() {
         private const val REQUEST_LOCATION = 45
         private const val REQUEST_KEY_FILE = 46
         private const val REQUEST_SECRETS_FILE = 47
+        private const val REQUEST_LORA_PROFILE = 48
     }
 }

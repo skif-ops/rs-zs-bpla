@@ -13,6 +13,7 @@
  */
 #include "app_comms.h"
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 void app_fw_boot_guard(void);
@@ -26,4 +27,5 @@ void app_fw_tick(uint32_t now_ms);
 /* Heartbeat keys 18..20. */
 void app_fw_fill_heartbeat(zs_detector_health_t *d);
 void app_fw_status(void (*print)(const char *fmt, ...));
+bool app_fw_verify_release_signature(const uint8_t *message, size_t message_size, const uint8_t signature[64]);
 #endif

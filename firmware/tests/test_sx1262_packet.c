@@ -67,7 +67,7 @@ int main(void) {
   { static const uint8_t expect[] = {0x8C, 0x0E, 0x02, 0x83}; assert(nops == 4u && memcmp(ops, expect, 4u) == 0); }
   assert(payload_written_n == 38u && memcmp(payload_written, frame, 38u) == 0 && gpio[PIN_TXEN] && !gpio[PIN_RXEN] && r.tx_count == 1u);
   /* SetTx timeout: 5000 ms * 64 = 320000 ticks = 0x04E200 */
-  assert(last_tx[1] == 0x04u && last_tx[2] == 0xE2u && last_tx[3] == 0x00u);
+  assert(last_tx_n == 4u && last_tx[1] == 0x04u && last_tx[2] == 0xE2u && last_tx[3] == 0x00u);
   /* TxDone via DIO1: read + clear, RF switch idle */
   dio1_level = true; irq_to_report = ZS_SX1262_IRQ_TX_DONE;
   assert(zs_sx1262_irq_pending(&r));

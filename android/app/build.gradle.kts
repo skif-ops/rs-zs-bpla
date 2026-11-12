@@ -29,8 +29,8 @@ android {
         applicationId = "ru.dioneya.commissioning"
         minSdk = 28
         targetSdk = 36
-        versionCode = providers.environmentVariable("DIONEA_ANDROID_VERSION_CODE").orElse("2026100501").get().toInt()
-        versionName = providers.environmentVariable("DIONEA_ANDROID_VERSION_NAME").orElse("0.1.0-bench.20261005").get()
+        versionCode = providers.environmentVariable("DIONEA_ANDROID_VERSION_CODE").orElse("2026111201").get().toInt()
+        versionName = providers.environmentVariable("DIONEA_ANDROID_VERSION_NAME").orElse("0.1.1-bench.20261112").get()
     }
 
     signingConfigs {

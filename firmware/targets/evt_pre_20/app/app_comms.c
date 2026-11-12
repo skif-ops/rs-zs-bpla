@@ -166,7 +166,6 @@ void app_comms_bind(const zs_event_outbox_io_t *outbox, const zs_command_journal
 static zs_net_trial_t net;
 static const zs_station_config_io_t *net_io;
 static void (*net_committed)(const zs_station_config_t *cfg);
-static bool net_switch;                     /* the accepting session ended: restart the modem with the candidate */
 void app_comms_bind_config_store(const zs_station_config_io_t *io, void (*committed)(const zs_station_config_t *cfg)) {
   net_io = io; net_committed = committed;
 }
@@ -677,7 +676,6 @@ void app_comms_reset(void) {
   bearing_drop();
   tracking = false;
   zs_net_trial_init(&net);                                     /* the candidate lived in RAM: a reset is a rollback */
-  net_switch = false;
   if (config_valid) config = stable_config;
   zs_fw_download_abort(&fw_dl);
   fw_phase = FW_IDLE;
@@ -740,7 +738,6 @@ static void check_session_done(uint32_t now) {
     if (net.state == ZS_NET_STATE_ACCEPTED) {
       /* the session that accepted a network configuration did its work (its ACK is out): the same S3 goes on with a
          fresh bring-up under the candidate instead of ending */
-      net_switch = true;
       if (hooks.log) hooks.log("net: switching to configuration v%lu\r\n", (unsigned long)net.candidate.version);
       (void)zs_bg95_request_graceful_power_off(&modem, now);
       set_phase(COMMS_STOPPING);
@@ -831,7 +828,6 @@ void app_comms_step(void) {
                     (unsigned long)(ZS_NET_TRIAL_TIMEOUT_MS / 60000u), (unsigned long)stable_config.version);
         if (wanted() && bound && config_valid) {
           config = *zs_net_trial_config(&net, &stable_config);     /* the candidate while accepted / on trial */
-          net_switch = false;
         }
         if (wanted() && bound && config_valid && config.apn[0][0] != '\0') {
           if (zs_net_trial_busy(&net)) {
