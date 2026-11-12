@@ -18,6 +18,19 @@ function Find-One([string]$Root, [string]$Name) {
     return $matches[0].FullName
 }
 
+function Get-Sha256([string]$Path) {
+    $stream = [System.IO.File]::OpenRead($Path)
+    $algorithm = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = $algorithm.ComputeHash($stream)
+        return -join ($bytes | ForEach-Object { $_.ToString("x2") })
+    }
+    finally {
+        $algorithm.Dispose()
+        $stream.Dispose()
+    }
+}
+
 try {
     $root = [System.IO.Path]::GetFullPath($PackageRoot)
     $rootPrefix = $root.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
@@ -55,7 +68,7 @@ try {
         if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
             Fail "File listed in SHA256SUMS.txt is missing: $relative"
         }
-        $actual = (Get-FileHash -LiteralPath $fullPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        $actual = Get-Sha256 $fullPath
         if ($actual -ne $expectedHash) {
             Fail "SHA-256 mismatch: $relative"
         }
@@ -88,7 +101,7 @@ try {
     }
     foreach ($item in $expected.GetEnumerator()) {
         $filePath = Find-One $root $item.Key
-        $actual = (Get-FileHash -LiteralPath $filePath -Algorithm SHA256).Hash.ToLowerInvariant()
+        $actual = Get-Sha256 $filePath
         if ($actual -ne $item.Value.ToLowerInvariant()) {
             Fail "Release contract mismatch: $($item.Key)"
         }
