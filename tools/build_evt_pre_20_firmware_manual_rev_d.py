@@ -402,7 +402,12 @@ def add_table(document: Document, rows: list[list[str]]) -> None:
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = True
     for row_index, values in enumerate(rows):
-        cells = table.add_row().cells
+        row = table.add_row()
+        row_properties = row._tr.get_or_add_trPr()
+        row_properties.append(OxmlElement("w:cantSplit"))
+        if row_index == 0:
+            row_properties.append(OxmlElement("w:tblHeader"))
+        cells = row.cells
         for column_index, cell in enumerate(cells):
             value = values[column_index].strip() if column_index < len(values) else ""
             cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER

@@ -75,15 +75,22 @@ def main() -> None:
         repo / "android/track_status.yaml": package / "03_Приложение_монтажника/track_status.yaml",
         repo / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.docx": package / "04_Инструкции/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.docx",
         repo / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.md": package / "04_Инструкции/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.md",
+        repo / "docs/evt_pre_20_rev_e/06_Инструкция_монтажника_обновление_станции.docx": package / "04_Инструкции/Инструкция_монтажника_EVT_PRE_20_REV_F.docx",
+        repo / "docs/evt_pre_20_rev_e/06_Инструкция_монтажника_обновление_станции.md": package / "04_Инструкции/Инструкция_монтажника_EVT_PRE_20_REV_F.md",
+        repo / "docs/evt_pre_20_rev_e/09_Пошаговая_инструкция_сборщика_EVT_PRE_20.docx": package / "04_Инструкции/Пошаговая_инструкция_сборщика_EVT_PRE_20_REV_B.docx",
+        repo / "docs/evt_pre_20_rev_e/09_Пошаговая_инструкция_сборщика_EVT_PRE_20.md": package / "04_Инструкции/Пошаговая_инструкция_сборщика_EVT_PRE_20_REV_B.md",
+        repo / "docs/EVT_PRE_20_FIRMWARE_INSTALLER_SYNC_2026-11-12.md": package / "05_Релизные_документы/EVT_PRE_20_FIRMWARE_INSTALLER_SYNC_2026-11-12.md",
         contract_path: package / "05_Релизные_документы/bench_release_contract_2026111201.json",
         repo / "firmware/targets/evt_pre_20/release/BENCH_RELEASE_PROFILE_REV_C.md": package / "05_Релизные_документы/BENCH_RELEASE_PROFILE_REV_C.md",
         repo / "firmware/targets/evt_pre_20/release/option_bytes_bench_rev_a.json": package / "05_Релизные_документы/option_bytes_bench_rev_a.json",
         repo / "firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json": package / "05_Релизные_документы/firmware_lock_interlock_rev_a.json",
         repo / "firmware/targets/evt_pre_20/target_status.yaml": package / "05_Релизные_документы/target_status.yaml",
         repo / "firmware/RELEASE_NOTES.md": package / "05_Релизные_документы/RELEASE_NOTES.md",
-        repo / "tools/sign_evt_pre_20_stm32_release.py": package / "06_Открытые_инструменты_проверки/sign_evt_pre_20_stm32_release.py",
-        repo / "tools/sign_lora_rf_profile.py": package / "06_Открытые_инструменты_проверки/sign_lora_rf_profile.py",
-        repo / "tools/validate_mqtt_command_transport.py": package / "06_Открытые_инструменты_проверки/validate_mqtt_command_transport.py",
+        repo / "tools/verify_evt_pre_20_release.ps1": package / "06_Проверка_комплекта/verify_package.ps1",
+        repo / "tools/PROVERIT_KOMPLEKT.bat": package / "06_Проверка_комплекта/ПРОВЕРИТЬ_КОМПЛЕКТ.bat",
+        repo / "tools/sign_evt_pre_20_stm32_release.py": package / "07_Инженерные_инструменты_выпуска/sign_evt_pre_20_stm32_release.py",
+        repo / "tools/sign_lora_rf_profile.py": package / "07_Инженерные_инструменты_выпуска/sign_lora_rf_profile.py",
+        repo / "tools/validate_mqtt_command_transport.py": package / "07_Инженерные_инструменты_выпуска/validate_mqtt_command_transport.py",
     }
 
     for source, destination in files.items():
@@ -121,7 +128,7 @@ def main() -> None:
 
 Порядок применения:
 
-1. Проверить SHA256SUMS.txt.
+1. Распаковать архив и запустить `06_Проверка_комплекта/ПРОВЕРИТЬ_КОМПЛЕКТ.bat`. Дождаться PASS.
 2. Выполнить прошивку STM32 и nRF52840 по инструкции Rev D.
 3. Установить подписанный APK приложения монтажника.
 4. Выполнить электрический EOL, самотесты, BLE, обновление и откат.
@@ -129,7 +136,7 @@ def main() -> None:
 6. Проверить RF-тракт, мощность, полосу, побочные излучения, скважность, установленную антенну и протокол LoRa.
 7. Подписать протокол. После индивидуального EOL PASS установить отдельно выпущенный подписанный полевой профиль через приложение монтажника.
 
-Повторная прошивка для включения LoRa после утвержденных испытаний не требуется. Полевой профиль в архив не включен намеренно. Закрытых ключей, паролей и keystore в архиве нет. Блокировка прошивки запрещена до полного аппаратного PASS, полной регрессии и индивидуального EOL PASS.
+Повторная прошивка для включения LoRa после утвержденных испытаний не требуется. Полевой профиль в архив не включен намеренно. Закрытх ключей, паролей и keystore в архиве нет. Блокировка прошивки запрещена до полного аппаратного PASS, полной регрессии и индивидуального EOL PASS. Папка `07_Инженерные_инструменты_выпуска` не предназначена для монтажника и сборщика.
 
 English summary
 
