@@ -284,11 +284,11 @@ def main() -> int:
         ], "Summary: 4/10/20 station quantities mismatch")
         require(summary[8] == [
             "Build-lot unit", "EVT-20", "20 stations", "DIO-EVT-001..020",
-            "Purchase gate", "BLOCKED",
-        ], "Summary: EVT-20 build-lot unit or blocked purchase gate mismatch")
+            "Purchase gate", "ORDER_PLACED",
+        ], "Summary: EVT-20 build-lot unit or placed-order gate mismatch")
         require(summary[9] == [
             "Procurement variants", "21 = 20 + bench", "41 = 20 + 20 + bench",
-            "41 serials reserved", "Selection", "CUSTOMER_TO_SELECT",
+            "41 serials reserved", "Selection", "EVT-PROC-41_ORDERED",
         ], "Summary: 21/41 procurement variants or 41-serial reservation mismatch")
         require(summary[14][1] == "PASS", "Summary: QG-1 status is not PASS")
         require(summary[15][0] == "QG-2 technical BOM",

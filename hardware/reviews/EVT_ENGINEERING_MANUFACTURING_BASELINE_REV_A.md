@@ -13,20 +13,22 @@ unrouted board or incomplete Review B as released for manufacture.
 
 ## 1. PCB-MAIN
 
-Use the published JLCPCB six-layer construction `JLC06161H-3313`, or an
+Use the published JLCPCB eight-layer construction `JLC08161H-3313`, or an
 equivalent customer-selected process that meets every controlled number:
 
 - order thickness `1.6 mm`; public construction `1.54 mm`, tolerance `±10%`;
 - outer copper `1 oz`, inner copper `0.5 oz`, green LPI mask, ENIG;
 - controlled impedance `±10%`;
-- L1-to-L2 50-ohm single-ended width `0.1509 mm`;
-- L1-to-L2 90-ohm differential width/gap `0.1537/0.2032 mm`;
+- controlled-impedance geometry must follow the released PCB-MAIN Rev.B
+  fabrication drawing and the selected factory stack calculator;
 - continuous reference below RF and USB; no plane split under either geometry;
 - select the standard impedance option and obtain the standard coupon/TDR
   report when the checkout offers it.
 
-These values authorize layout. Native DRC, CAM review and independent Review B
-remain required before upload.
+The released order baseline is PCB-MAIN COMPLETE-105 Rev.B with eight copper
+layers. Native DRC, CAM review and independent Review B remain part of the
+controlled evidence. Any factory stack or impedance comment must be processed
+as an engineering disposition without silently changing the ordered design.
 
 ## 2. PCB-PWR
 

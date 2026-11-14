@@ -59,7 +59,7 @@ delivery.
 
 `EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json`
 
-JSON SHA-256: `0b4f239c2c2914c79afb5d47bd30c56355a538e7ac6c1cf9d1ca82a4382bca5c`
+JSON SHA-256: `d7743a1e14757281ab3df8a0af33b5a0abc2cfa5c182cf93ccbf04949def81ee`
 
 ## Release boundary
 

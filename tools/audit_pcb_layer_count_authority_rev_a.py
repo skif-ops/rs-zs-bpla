@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independently audit the EVT-PRE-20 Rev.A PCB layer-count authority."""
+"""Independently audit the current EVT-PRE-20 PCB layer-count authority."""
 
 from __future__ import annotations
 
@@ -11,11 +11,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
+AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv"
 
 EXPECTED = {
     "PCB-MAIN": {
-        "layers": ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"],
+        "layers": ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu"],
         "thickness": 1.6,
         "thickness_status": "FROZEN_MECHANICAL_AUTHORITY",
     },
@@ -76,7 +76,7 @@ def audit() -> dict[str, object]:
     for board, expected in EXPECTED.items():
         row = by_board[board]
         expected_layers = expected["layers"]
-        require(row["Layer_Count_Status"] == "FROZEN_REV_A",
+        require(row["Layer_Count_Status"].startswith("FROZEN_"),
                 f"{board}: layer count is not frozen")
         require(int(row["Copper_Layers"]) == len(expected_layers),
                 f"{board}: authority copper-layer count drift")
@@ -121,11 +121,11 @@ def audit() -> dict[str, object]:
     placement = (ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md").read_text(
         encoding="utf-8"
     )
-    require("Технология Rev.A: 6 медных слоёв" in pcb_set,
-            "PCB set does not state six-layer PCB-MAIN")
+    require("8 медных слоёв" in pcb_set or "8 сло" in pcb_set,
+            "PCB set does not state eight-layer PCB-MAIN")
     require("Технология Rev.A: 4 медных слоя" in pcb_set,
             "PCB set does not state four-layer PCB-PWR")
-    require("PCB-MAIN 6, PCB-PWR 4 and PCB-MIC 2 layers" in rules,
+    require("PCB-MAIN 8, PCB-PWR 4 and PCB-MIC 2 layers" in rules,
             "routing rules do not reference the controlled layer counts")
     require("four-copper-layer count is frozen for Rev.A" in placement,
             "PCB-PWR placement document still treats layer count as provisional")

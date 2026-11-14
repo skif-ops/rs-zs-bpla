@@ -41,7 +41,7 @@
 | PCB-PWR | `DIM-003` `18/18`; 90×60×1.6 mm; H1-H4 M3 NPTH; `JLC04161H-3313A`; 70/35 µm copper; ≥18 µm hole wall; расчётная силовая геометрия; точный ECO-002 применён, 14 принятых сегментов; application gate PASS | input-protection qualification, оставшаяся трассировка, rail-drop/load-step/fault/+70 °C evidence, DRC, CAM, checkout DFM, Review B |
 | PCB-MIC | copper subgate и стандартный двухслойный/PCBA процесс; 9/9 engineering closures | first-panel bore/acoustic inspection, CAM comparison, общий Review B и physical EVT |
 | Жгуты | 38 проводников; точные wire MPN; длины `275/440/330 mm` с 10% запасом; 16/16 engineering closures | first-off crimp height/pull, 100% continuity/polarity/cross-short/resistance, installed-route SI/thermal/cold/strain EVT |
-| BOM | QG-1 PASS; technical QG-2 PASS; per-lot 4/10/20 и aggregate 41-station procurement plan | коммерческий заказ и hardware manufacturing release |
+| BOM | QG-1 PASS; technical QG-2 PASS; варианты на 21 и 41 станцию синхронизированы; закупка оформлена по конфигурации PCB-MAIN 8L, PCB-PWR 4L, PCB-MIC 2L | входной контроль, замечания фабрики и hardware manufacturing release |
 | Внешние ответы | бывшие wait gates закрыты `85/85` инженерным EVT baseline | factory e-mail не требуется; реальные checkout parser/DFM ошибки останавливают заказ и идут через ECO |
 
 Закрытия в response-регистрах принадлежат проектной инженерии по решению
@@ -105,10 +105,12 @@ Gerber, прошивки, бинарники, корпуса и серверны
 могут отдельно продвигаться в `develop` и `main`. Макетная плата 70×90 мм и
 WeAct STM32U585CIU6 не являются производственной документацией EVT-PRE-20.
 
-## Финальный производственный комплект REV_D7
+## Актуальный производственный комплект REV_D11
 
-Финальная документальная выдача для закупки и производства EVT-PRE-20 находится в
-[`releases/EVT_PRE_20_REV_D7`](releases/EVT_PRE_20_REV_D7/README.md). PCB-MAIN Rev.B
-зафиксирована как восьмислойная. Фабричный архив содержит Altium/CAM для PCB-MAIN,
-PCB-PWR и PCB-MIC без KiCad. Физические first article, EOL и EVT заполняются после
-изготовления и не отмечены как выполненные заранее.
+Исправленная полная выдача после оформления закупки находится в
+[`releases/EVT_PRE_20_REV_D11`](releases/EVT_PRE_20_REV_D11/README.md). PCB-MAIN Rev.B
+зафиксирована как восьмислойная, BOM и закупочные реестры соответствуют заказанной
+конфигурации. Фабричный архив содержит Altium/CAM для PCB-MAIN, PCB-PWR и PCB-MIC
+без KiCad и побайтно наследует проверенный комплект REV_D10. Включенные DOCX проходят
+автоматическую и визуальную проверку утвержденного шаблона. Физические first article,
+EOL и EVT заполняются после изготовления и не отмечены как выполненные заранее.

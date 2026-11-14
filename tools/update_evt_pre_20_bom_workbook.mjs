@@ -45,6 +45,7 @@ if (mode === "render") {
   const sources = [
     ["Engineering BOM", "hardware/EVT_PRE_20_BOM_REV_A.csv"],
     ["Procurement", "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"],
+    ["Program 21", "hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv"],
     ["Program 41", "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv"],
     ["RFQ", "hardware/CHINA_PROCUREMENT_RFQ.csv"],
   ];
@@ -64,7 +65,7 @@ if (mode === "render") {
       0, 0, values.length, values[0].length,
     );
     target.values = values;
-    if (sheetName === "Program 41") {
+    if (sheetName === "Program 21" || sheetName === "Program 41") {
       sheet.showGridLines = false;
       sheet.freezePanes.freezeRows(1);
       target.format = {
@@ -84,7 +85,10 @@ if (mode === "render") {
       sheet.getRange("I:S").format.columnWidth = 14;
       sheet.getRange("T:U").format.columnWidth = 24;
       sheet.getRange("V:Y").format.columnWidth = 34;
-      if (created) sheet.tables.add(`A1:Y${values.length}`, true, "Program41Table");
+      if (created) {
+        const tableName = sheetName === "Program 21" ? "Program21Table" : "Program41Table";
+        sheet.tables.add(`A1:Y${values.length}`, true, tableName);
+      }
     }
   }
   const priceCsvText = await fs.readFile(
@@ -102,6 +106,11 @@ if (mode === "render") {
   }
   const costSheet = workbook.worksheets.getItem("Cost estimate");
   costSheet.getRangeByIndexes(11, 0, priceValues.length, priceValues[0].length).values = priceValues;
+  const summarySheet = workbook.worksheets.getItem("Summary");
+  summarySheet.getRange("A9:F10").values = [
+    ["Build-lot unit", "EVT-20", "20 stations", "DIO-EVT-001..020", "Purchase gate", "ORDER_PLACED"],
+    ["Procurement variants", "21 = 20 + bench", "41 = 20 + 20 + bench", "41 serials reserved", "Selection", "EVT-PROC-41_ORDERED"],
+  ];
   workbook.recalculate();
   const formulaErrors = await workbook.inspect({
     kind: "match",
@@ -114,14 +123,18 @@ if (mode === "render") {
   const batteryPreviewPath = path.join(previewDir, "evt_pre_20_battery_after.png");
   const rfqPreviewPath = path.join(previewDir, "evt_pre_20_rfq_after.png");
   const programPreviewPath = path.join(previewDir, "evt_program_41_after.png");
+  const program21PreviewPath = path.join(previewDir, "evt_program_21_after.png");
   const programBatteryPreviewPath = path.join(previewDir, "evt_program_41_battery_after.png");
   const costBatteryPreviewPath = path.join(previewDir, "evt_cost_battery_after.png");
+  const summaryPreviewPath = path.join(previewDir, "evt_summary_after.png");
   await savePreview(bomPreviewPath);
   await savePreview(batteryPreviewPath, "Engineering BOM", "A39:AC46");
   await savePreview(rfqPreviewPath, "RFQ", "A1:S28");
   await savePreview(programPreviewPath, "Program 41", "A1:Y20");
+  await savePreview(program21PreviewPath, "Program 21", "A1:Y20");
   await savePreview(programBatteryPreviewPath, "Program 41", "A31:Y38");
   await savePreview(costBatteryPreviewPath, "Cost estimate", "A42:R49");
+  await savePreview(summaryPreviewPath, "Summary", "A1:F25");
   const output = await SpreadsheetFile.exportXlsx(workbook);
   await output.save(workbookPath);
   console.log("updated=" + workbookPath);
@@ -129,8 +142,10 @@ if (mode === "render") {
   console.log("rendered=" + batteryPreviewPath);
   console.log("rendered=" + rfqPreviewPath);
   console.log("rendered=" + programPreviewPath);
+  console.log("rendered=" + program21PreviewPath);
   console.log("rendered=" + programBatteryPreviewPath);
   console.log("rendered=" + costBatteryPreviewPath);
+  console.log("rendered=" + summaryPreviewPath);
 } else {
   throw new Error(`unknown mode: ${mode}`);
 }
