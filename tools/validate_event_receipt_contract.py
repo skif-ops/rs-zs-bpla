@@ -366,11 +366,11 @@ def main() -> int:
         "target status overclaims or omits portable receipt evidence",
     )
     require(
-        "mqtt_uart_session_binding: PORTABLE_BOUNDED_RAW_UART_FRAMER_SINGLE_TX_OWNER_QG1_QG2_PASS_TARGET_USART_DMA_ISR_CACHE_AND_MODEM_BLOCKER"
+        "mqtt_uart_session_binding: TARGET_USART1_SESSION_BUILD_PASS_BG95_HARDWARE_VALIDATION_PENDING"
         in target and
-        "event_receipt_mqtt_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_SESSION_ROUTED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        "event_receipt_mqtt_binding: TARGET_QMTRECV_SESSION_BINDING_BUILD_PASS_BG95_HARDWARE_VALIDATION_PENDING"
         in target,
-            "target receipt MQTT binding blocker is not explicit")
+            "target receipt MQTT binding status drift")
     require(
         "event_bg95_receipt_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_SESSION_ROUTED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING"
         in target,
@@ -387,9 +387,9 @@ def main() -> int:
         "target status overclaims or omits BG95 event uplink evidence",
     )
     require(
-        "event_mqtt_uplink_binding: PORTABLE_FIXED_LENGTH_BINARY_QMTPUB_SESSION_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_AND_HARDWARE_BLOCKER"
+        "event_mqtt_uplink_binding: TARGET_QMTPUB_SESSION_BINDING_BUILD_PASS_BG95_HARDWARE_VALIDATION_PENDING"
         in target,
-        "target event MQTT uplink binding blocker is not bounded",
+        "target event MQTT uplink binding status drift",
     )
     require("validate_event_receipt_contract.py" in ci,
             "event receipt QG-1 is not bound to CI")

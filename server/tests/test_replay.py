@@ -2,12 +2,14 @@
 bearings in metres around the stations; the page draws them.  The scene is the synthetic one of the fusion tests."""
 
 import math
+from pathlib import Path
 
 import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from station.replay import MAX_WINDOW_US, TRACK_MARGIN_US, ReplayError, build_replay, replay_sources
+from station.replay import (EPISODE_GAP_US, MAX_WINDOW_US, TRACK_MARGIN_US, ReplayError, build_replay,
+                            latest_episode_start_us, replay_sources)
 from tests.test_bearing_fusion import ARRIVALS, FRAME, STATIONS, bridge, feed, truth  # noqa: F401  (bridge is a fixture)
 
 
@@ -32,9 +34,16 @@ def test_replay_of_a_track_in_local_metres(fused):
     assert abs(stations[1]["n"]) < 1.0 and abs(stations[1]["u"]) < 1.0
     (track,) = r["tracks"]
     assert track["track_id"] == summary["track_id"] and track["stations"] == [1, 2]
+    assert track["class"]["code"] == "uav_piston" and track["class"]["confidence"] > 0
+    assert track["class"]["type_status"] == "UNKNOWN" and track["class"]["type_confidence"] == 0
     assert len(track["points"]) == summary["points"]
     times = [p["t_us"] for p in track["points"]]
     assert times == sorted(times)
+    assert r["window"]["target_last_us"] == times[-1]
+    assert r["window"]["episode_first_us"] == times[0]
+    # Sound reaches a station after the target emitted it.  The API therefore exposes target time separately from
+    # the overall last sample, so the live cursor does not move beyond the target and hide it.
+    assert r["window"]["last_us"] >= r["window"]["target_last_us"]
     # points in the replay frame follow the truth (shifted by the origin: station 1 is at the scene's 0, 0)
     offset = np.array(STATIONS[1][:2]) - np.array([stations[1]["e"], stations[1]["n"]])
     errs = [np.linalg.norm(np.array([p["e"], p["n"]]) + offset - truth(p["t_us"] * 1e-6)[:2]) for p in track["points"]]
@@ -46,6 +55,20 @@ def test_replay_of_a_track_in_local_metres(fused):
     assert len(r["bearings"]) == 2 * len(ARRIVALS)
     assert {b["station_id"] for b in r["bearings"]} == {1, 2}
     assert all(0.0 <= b["azimuth_deg"] < 360.0 and b["sigma_deg"] > 0 for b in r["bearings"])
+    assert all(b["track_id"] == summary["track_id"] for b in r["bearings"])
+    assert all(b["bearing_key"].startswith(f'{b["station_id"]}:') for b in r["bearings"])
+    assert all(isinstance(b["track_event_id"], str) for b in r["bearings"])
+
+
+def test_latest_live_episode_is_recovered_from_persisted_track_times():
+    first = 1_000_000
+    second = first + 2_000_000
+    next_episode = second + EPISODE_GAP_US + 1
+    assert latest_episode_start_us([]) is None
+    assert latest_episode_start_us([second, first, second]) == first
+    assert latest_episode_start_us([first, second, next_episode, next_episode + 1_000_000]) == next_episode
+    # Exactly seven seconds is an ordinary calculation gap; only a longer silence separates episodes.
+    assert latest_episode_start_us([first, first + EPISODE_GAP_US]) == first
 
 
 def test_replay_of_an_event_and_of_explicit_times(fused):
@@ -96,4 +119,36 @@ def test_replay_api_and_page(fused, monkeypatch):
     page = client.get("/replay")
     assert page.status_code == 200
     assert 'id="replay-canvas"' in page.text and "/static/js/replay.js" in page.text and 'href="/replay"' in page.text
-    assert client.get("/static/js/replay.js").status_code == 200
+    assert '<option value="1" selected>×1</option>' in page.text
+    assert 'id="replay-geometry" checked' in page.text
+    assert 'id="replay-target-body"' in page.text and "Цели в текущий момент" in page.text
+    assert "<th>Тип</th><th>Достоверность</th>" in page.text
+    assert 'id="ro-alt"' not in page.text
+    script = client.get("/static/js/replay.js")
+    assert script.status_code == 200
+    assert "function bearingsAt" in script.text and "for (const b of bearingsAt" in script.text
+    assert "LIVE_EPISODE_GAP_US = 7000000" in script.text
+    assert "data.window.episode_first_us" in script.text
+    assert "liveEpisodeStartUs" in script.text
+    assert "LIVE_ACTIVITY_HOLD_MS = 4000" in script.text
+    assert "LIVE_BEARING_HOLD_MS = 6000" in script.text
+    assert "LIVE_VISUAL_FADE_MS = 1500" in script.text
+    assert "bearingUs / 1000 + LIVE_BEARING_HOLD_MS" in script.text
+    assert "liveTrackUntil.set(msg.track.track_id, receivedAt + LIVE_ACTIVITY_HOLD_MS)" in script.text
+    assert "if (liveActive && !active.length) return" in script.text
+    assert "● Тревога · сопровождение" in script.text
+    assert "● Тревога · уточнение координат" in script.text
+    assert "● Поиск целей · анализ продолжается" in script.text
+    assert "● Контроль участка · активных целей нет" in script.text
+    assert "const visible = liveActive ? active" in script.text
+    assert "function targetClassification" in script.text
+    assert "classification.confidence" in script.text
+
+
+def test_live_coverage_refresh_is_bound_to_one_geometry_snapshot():
+    """Changing live station groups cannot combine an old raster with new hearing circles or require a page switch."""
+    script = (Path(__file__).resolve().parents[1] / "static" / "js" / "replay.js").read_text(encoding="utf-8")
+    assert "loadCoverage();\n    draw();" in script
+    assert "coverageSpec()?.key !== spec.key" in script
+    assert "coverage = { g, off, key: spec.key, stations: spec.stations }" in script
+    assert "for (const s of stations)" in script

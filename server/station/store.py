@@ -42,6 +42,9 @@ CREATE INDEX IF NOT EXISTS idx_outbox_time ON alert_outbox(created_us);
 CREATE TABLE IF NOT EXISTS alert_episodes(alert_id TEXT PRIMARY KEY, tenant TEXT NOT NULL, started_us INTEGER NOT NULL, last_activity_us INTEGER NOT NULL, level TEXT NOT NULL, stations TEXT NOT NULL, class TEXT NOT NULL, ended_us INTEGER);
 CREATE INDEX IF NOT EXISTS idx_episode_open ON alert_episodes(tenant, ended_us);
 CREATE TABLE IF NOT EXISTS alert_tracks(track_id TEXT PRIMARY KEY, alert_id TEXT NOT NULL, last_point_us INTEGER NOT NULL, ended_us INTEGER);
+CREATE TABLE IF NOT EXISTS alert_decisions(decision_id INTEGER PRIMARY KEY AUTOINCREMENT, alert_id TEXT NOT NULL, tenant TEXT NOT NULL, decided_us INTEGER NOT NULL, actor TEXT NOT NULL, disposition TEXT NOT NULL CHECK(disposition IN ('confirmed_target','false_alarm','technical_event')), comment TEXT NOT NULL DEFAULT '');
+CREATE INDEX IF NOT EXISTS idx_alert_decision_current ON alert_decisions(alert_id, decision_id DESC);
+CREATE INDEX IF NOT EXISTS idx_alert_decision_time ON alert_decisions(decided_us);
 CREATE TABLE IF NOT EXISTS alert_cursors(consumer TEXT PRIMARY KEY, seq INTEGER NOT NULL, updated_us INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS station_tenants(station_id INTEGER PRIMARY KEY, tenant TEXT NOT NULL, updated_us INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS fusion_state(name TEXT PRIMARY KEY, value TEXT NOT NULL, updated_us INTEGER NOT NULL);
@@ -558,6 +561,72 @@ class EventStore:
     def alert_tracks_of(self,alert_id:str)->list[str]:
         with self._conn() as c: rows=c.execute("SELECT track_id FROM alert_tracks WHERE alert_id=? ORDER BY track_id",(alert_id,)).fetchall()
         return [r['track_id'] for r in rows]
+    @staticmethod
+    def _decision(r)->dict[str,Any]:
+        return {'decision_id':r['decision_id'],'alert_id':r['alert_id'],'tenant':r['tenant'],'decided_us':r['decided_us'],
+                'actor':r['actor'],'disposition':r['disposition'],'comment':r['comment']}
+    def alert_decisions(self,alert_id:str)->list[dict[str,Any]]:
+        """Every operator decision for an alert, newest first.  Corrections append a revision; history is immutable."""
+        with self._conn() as c:
+            rows=c.execute("SELECT * FROM alert_decisions WHERE alert_id=? ORDER BY decision_id DESC",(alert_id,)).fetchall()
+        return [self._decision(r) for r in rows]
+    def save_alert_decision(self,alert_id:str,actor:str,disposition:str,comment:str='',now_us:int|None=None)->dict[str,Any]|None:
+        """Append an operator decision and return it; None when the alert episode does not exist."""
+        if disposition not in {'confirmed_target','false_alarm','technical_event'}: raise ValueError('invalid alert disposition')
+        when=int(time.time()*1e6) if now_us is None else int(now_us)
+        with self.lock,self._conn() as c:
+            episode=c.execute("SELECT tenant FROM alert_episodes WHERE alert_id=?",(alert_id,)).fetchone()
+            if episode is None: return None
+            cur=c.execute("INSERT INTO alert_decisions(alert_id,tenant,decided_us,actor,disposition,comment) VALUES(?,?,?,?,?,?)",
+                          (alert_id,episode['tenant'],when,actor,disposition,comment))
+            row=c.execute("SELECT * FROM alert_decisions WHERE decision_id=?",(cur.lastrowid,)).fetchone()
+        return self._decision(row)
+    def list_alert_episodes(self,limit:int=200,*,before_us:int|None=None,before_id:str|None=None,tenant:str|None=None,tenants:list[str]|None=None,
+                            stations:list[int]|None=None,disposition:str|None=None)->list[dict[str,Any]]:
+        """Alert journal, newest episode first, with its current operator decision and linked track ids.
+
+        ``stations`` and ``tenants`` are authorization filters.  ``disposition='pending'`` selects episodes without a
+        decision.  A correction never overwrites history; the greatest decision_id is the current decision.
+        """
+        where,args=[],[]
+        if before_us is not None:
+            if before_id is None:
+                where.append("e.started_us<?"); args.append(int(before_us))
+            else:
+                where.append("(e.started_us<? OR (e.started_us=? AND e.alert_id<?))")
+                args.extend((int(before_us),int(before_us),before_id))
+        if tenant is not None: where.append("e.tenant=?"); args.append(tenant)
+        if tenants is not None:
+            where.append("e.tenant IN (SELECT value FROM json_each(?))"); args.append(json.dumps(tenants))
+        if stations is not None:
+            where.append("EXISTS(SELECT 1 FROM json_each(e.stations) s WHERE s.value IN (SELECT value FROM json_each(?)))")
+            args.append(json.dumps(stations))
+        if disposition == 'pending': where.append("d.decision_id IS NULL")
+        elif disposition is not None: where.append("d.disposition=?"); args.append(disposition)
+        sql=("SELECT e.*,d.decision_id,d.decided_us,d.actor,d.disposition,d.comment FROM alert_episodes e "
+             "LEFT JOIN alert_decisions d ON d.decision_id=(SELECT MAX(x.decision_id) FROM alert_decisions x WHERE x.alert_id=e.alert_id)"
+             +(" WHERE "+" AND ".join(where) if where else "")+" ORDER BY e.started_us DESC,e.alert_id DESC LIMIT ?")
+        with self._conn() as c:
+            rows=c.execute(sql,(*args,max(1,min(limit,2000)))).fetchall()
+            ids=[r['alert_id'] for r in rows]
+            tracks={i:[] for i in ids}
+            if ids:
+                marks=','.join('?'*len(ids))
+                for track in c.execute(f"SELECT alert_id,track_id FROM alert_tracks WHERE alert_id IN ({marks}) ORDER BY track_id",ids):
+                    tracks[track['alert_id']].append(track['track_id'])
+        out=[]
+        for r in rows:
+            item=self._episode(r); item['tracks']=tracks[item['alert_id']]
+            item['decision']=None if r['decision_id'] is None else self._decision(r)
+            out.append(item)
+        return out
+    def get_alert_journal(self,alert_id:str)->dict[str,Any]|None:
+        episode=self.get_episode(alert_id)
+        if episode is None: return None
+        episode['tracks']=self.alert_tracks_of(alert_id)
+        episode['decisions']=self.alert_decisions(alert_id)
+        episode['decision']=episode['decisions'][0] if episode['decisions'] else None
+        return episode
     def alert_cursor(self,consumer:str)->int|None:
         with self._conn() as c: row=c.execute("SELECT seq FROM alert_cursors WHERE consumer=?",(consumer,)).fetchone()
         return row['seq'] if row else None
@@ -636,7 +705,8 @@ class EventStore:
         Returns what was removed per table (``audio_files``: WAV files unlinked)."""
         now=int(time.time()*1e6) if now_us is None else now_us
         cutoff={'events':now-retention_days*DAY_US,'outbox':now-outbox_days*DAY_US,'audio':now-audio_retention_days*DAY_US}
-        removed={table:0 for table,_,_ in self._RETAINED}; removed.update(audio_files=0,track_members=0,alert_tracks=0,audio_parts=0)
+        removed={table:0 for table,_,_ in self._RETAINED}; removed.update(audio_files=0,track_members=0,alert_tracks=0,
+                                                                               alert_decisions=0,audio_parts=0)
         files:list[str]=[]
         with self.lock,self._conn() as c:                         # the lock is taken per transaction, not for the whole run
             removed['audio_parts']=c.execute("DELETE FROM audio_parts WHERE received_us<?",(now-2*DAY_US,)).rowcount   # abandoned uploads
@@ -650,6 +720,7 @@ class EventStore:
         with self.lock,self._conn() as c:
             removed['track_members']=c.execute("DELETE FROM track_members WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)").rowcount
             removed['alert_tracks']=c.execute("DELETE FROM alert_tracks WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)").rowcount
+            removed['alert_decisions']=c.execute("DELETE FROM alert_decisions WHERE alert_id NOT IN (SELECT alert_id FROM alert_episodes)").rowcount
         removed['audio_files']=self._remove_audio_files(files)
         return removed
     def _remove_audio_files(self,paths:list[str])->int:

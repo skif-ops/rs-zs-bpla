@@ -27,7 +27,7 @@
 #define APP_STATION_SERIAL           "DIO-EVT-B01"   /* safe fallback until EOL factoryid is loaded from NOR */
 #define APP_STATION_ID               901u
 #define APP_STATION_HW_REV           "Rev.A"
-#define APP_STATION_FW_VERSION       "0.1.0-evt.20261016"
+#define APP_STATION_FW_VERSION       "0.1.1-bench.20261112"
 #define APP_STATION_BL_VERSION       "0.1.0"
 #define APP_UART_CONSOLE_BAUD        115200u   /* LPUART1 PC0/PC1 diagnostic console */
 #define APP_UART_RX_RING             512u
@@ -73,14 +73,16 @@
 #define APP_COMMS_DEGRADED_AFTER     3u       /* consecutive S3 sessions ended by the watchdog -> GSM degraded */
 #define APP_COMMS_MAX_DEGRADED_MS    60000u   /* S3 watchdog while degraded (default policy: 180 s) */
 #define APP_GSM_PROBE_MS             1800000u /* while degraded: try GSM again every 30 min (capped S3) */
-/* LoRa fallback (ICD addendum A). TX stays disabled until the signed RU868 profile and the RF gate are closed:
-   the task runs DRY (radio bring-up + frame log only). Carrier from config/lora/RU868.yaml, +14 dBm = 25 mW RU limit. */
-#define APP_LORA_TX_ENABLED          0
+/* LoRa fallback (ICD addendum A). Field TX is fail-closed until a signed RU868 profile is stored. A service-mode
+   RF test may transmit the fixed test packet for at most 15 minutes and stops immediately when service mode ends. */
 #define APP_LORA_FREQUENCY_HZ        868900000u
 #define APP_LORA_SF                  9u
 #define APP_LORA_BW_HZ               125000u
 #define APP_LORA_TX_DBM              14
 #define APP_LORA_PROFILE_ID          1u
+#define APP_LORA_RF_TEST_MAX_S       900u
+#define APP_LORA_RF_TEST_PERIOD_MS   10000u
+#define APP_LORA_PROFILE_NOR_BLOCKS  2u
 #define APP_PRIO_LORA                3
 #define APP_STACK_LORA               768
 /* Hardware watchdog: IWDG timeout and the task-liveness window (longest normal block: INA226 re-probe 5 s). */

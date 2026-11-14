@@ -43,3 +43,8 @@ def test_the_server_reports_its_build_in_health_and_on_every_page(auth):
     assert label.startswith(settings.app_version)
     page = c.get("/login").text                                  # public: the footer is on the pages before login too
     assert f"Мухоед {label}" in page and 'class="app-footer"' in page
+    assert '<span class="app-brand-name">Мухоед</span>' in page
+    assert '<span class="app-brand-description">сервер акустической системы Дионея</span>' in page
+    asset_version = build_info.current(settings.app_version).commit or settings.app_version
+    assert f'/static/css/styles.css?v={asset_version}' in page
+    assert f'/static/js/app.js?v={asset_version}' in page

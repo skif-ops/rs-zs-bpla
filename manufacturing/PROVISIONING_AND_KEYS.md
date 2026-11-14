@@ -60,13 +60,13 @@ ICCID и IMSI являются идентификаторами, а не клю�
 5. Выпустить station package и этикетку. Station package не содержит station private key, но содержит pairing secret и engineer key, поэтому защищается как секретный EOL-материал.
 6. На EOL-рабочем месте объединить certificate, CA chain и локальный private key.
 7. Через TEST_UART выполнить `factoryid <SERIAL> <pairing_secret_hex>`, холодный перезапуск и read-back только признаков serial/pairing.
-8. Сформировать station secrets с `/run/tls/command-signing.key`, обновить ACL и выполнить commissioning по инструкции Rev C.
+8. Сформировать station secrets с `/run/tls/command-signing.key`, обновить ACL и выполнить commissioning по инструкции Rev D.
 
 ## BG95
 
 В BG95 до соединения загружаются CA, client certificate и client key. Реализованная последовательность `zs_bg95_provision` удаляет прежний файл, выполняет `QFUPL`, сверяет `+QFUPL` size/checksum и `QFLST`, затем задает `QSSLCFG clientcert/clientkey`. Ответ `OK` без проверки size, checksum и списка файлов не является доказательством загрузки.
 
-Для действующего профиля используются `dioneya.ru:8883`, SSL context 1 и `ca_reference=dioneya-root`. Связка с фактической EOL UART и выбранной версией BG95 проверяется на `DIO-EVT-B01`.
+Для действующего профиля используются `dioneya.ru:8883`, SSL context 1 и `ca_reference=dioneya-root`. Команды идут от STM32 USART1 через штатный MAIN UART BG95. Площадки `TP_CELL_DBG` относятся к DEBUG UART и не используются для AT-команд. Portable state machine прошла host-тесты, но target service binding, безопасный источник трех файлов и новый подписанный firmware release еще требуются. После выпуска интеграция проверяется на `DIO-EVT-B01`.
 
 ## Station secrets
 
@@ -76,4 +76,4 @@ ICCID и IMSI являются идентификаторами, а не клю�
 
 Provisioning receipt содержит serial, station ID, tenant, публичные идентификаторы, маскированные ICCID references, certificate fingerprint, key generation mode, firmware release, tool versions, операторов, timestamps, ACL revision и результаты connection tests. Временные файлы с секретами удаляются. Старые сертификаты при ротации отзываются, CRL и ACL обновляются, Mosquitto перезапускается.
 
-Полная процедура жизненного цикла сертификатов приведена в `docs/EVT_PRE_20_PKI_CERTIFICATE_LIFECYCLE_INSTRUCTION_REV_A.md`; последовательность EOL и прошивки — в `docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.md`.
+Полная пошаговая процедура приведена в `docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.md`.

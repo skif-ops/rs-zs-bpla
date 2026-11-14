@@ -8,9 +8,11 @@ const artifactModule = pathToFileURL(path.join(nodeModules, "@oai", "artifact-to
 const { SpreadsheetFile, Workbook } = await import(artifactModule);
 
 const root = path.resolve(import.meta.dirname, "..");
-const inputPath = path.join(root, "manufacturing", "MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_A.json");
-const outputPath = path.join(root, "manufacturing", "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx");
-const previewDir = path.join(root, "outputs", "qa_mfg004_b01_eol_xlsx");
+const revision = (process.env.EOL_REV ?? "A").toUpperCase();
+if (!/^[AB]$/.test(revision)) throw new Error(`unsupported EOL revision ${revision}`);
+const inputPath = path.join(root, "manufacturing", `MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_${revision}.json`);
+const outputPath = path.join(root, "manufacturing", `MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_${revision}.xlsx`);
+const previewDir = path.join(root, "outputs", `qa_mfg004_b01_eol_xlsx_rev_${revision.toLowerCase()}`);
 const record = JSON.parse(await fs.readFile(inputPath, "utf8"));
 
 const workbook = Workbook.create();
@@ -67,7 +69,7 @@ summary.getRange("A15:B26").values = [
   ["PASS строк / PASS rows", null],
   ["FAIL строк / FAIL rows", null],
   ["HOLD строк / HOLD rows", null],
-  ["Открытые критерии / OPEN criteria (не число станций / not station count)", null],
+  ["OPEN limits", null],
   ["Готовых строк / Ready rows", null],
   ["MSA PASS", null],
   ["Полная регрессия / Full regression", "NOT_RUN"],
@@ -78,13 +80,7 @@ summary.getRange("A15:B26").values = [
 summary.getRange("B17").formulas = [[`=COUNTIF('Measurements'!$X$${firstMeasurement}:$X$${lastMeasurement},"PASS")`]];
 summary.getRange("B18").formulas = [[`=COUNTIF('Measurements'!$X$${firstMeasurement}:$X$${lastMeasurement},"FAIL")`]];
 summary.getRange("B19").formulas = [[`=COUNTIF('Measurements'!$X$${firstMeasurement}:$X$${lastMeasurement},"HOLD")`]];
-const openLimitCount = record.steps.filter((item) =>
-  String(item.limit_state).includes("OPEN") || String(item.limit_state).startsWith("PARTIAL")
-).length;
-// The artifact exporter does not cache wildcard COUNTIF reliably. This count is
-// derived from the controlled program at build time and is regenerated whenever
-// the EOL program changes.
-summary.getRange("B20").values = [[openLimitCount]];
+summary.getRange("B20").formulas = [[`=COUNTIF('Measurements'!$K$${firstMeasurement}:$K$${lastMeasurement},"OPEN_B01_FREEZE")+COUNTIF('Measurements'!$K$${firstMeasurement}:$K$${lastMeasurement},"PARTIAL_APPROVED_MIN_ONLY")+COUNTIF('Measurements'!$K$${firstMeasurement}:$K$${lastMeasurement},"SOFTWARE_INTEGRATION_PENDING")`]];
 summary.getRange("B21").formulas = [[`=COUNTIF('Measurements'!$AA$${firstMeasurement}:$AA$${lastMeasurement},"READY")`]];
 summary.getRange("B22").formulas = [[`=COUNTIF('MSA'!$E$${firstMsa}:$E$${lastMsa},"PASS")`]];
 summary.getRange("B26").formulas = [[`=IF(B18>0,"FAIL",IF(AND(B21=B16,B22=${record.msa.length},B23="PASS",B24<>"",B25<>"",B24<>B25),"PASS",IF(COUNTIF('Measurements'!$X$${firstMeasurement}:$X$${lastMeasurement},"NOT_RUN")=B16,"NOT_RUN","HOLD")))`]];
@@ -150,11 +146,11 @@ measurements.getRange("A4:AA4").format = { fill: dark, font: { name: font, size:
 const measurementRows = record.steps.map((t) => [t.order, t.test_id, t.phase, t.fixture_group, t.contacts, t.action_ru, t.action_en, t.metric, t.unit, t.engineering_target, t.limit_state, t.lower_limit === "" ? null : t.lower_limit, t.upper_limit === "" ? null : t.upper_limit, t.expected_discrete, null, "", "", "", "", "", "", "", "", t.initial_status, "", "", null]);
 measurements.getRange(`A${firstMeasurement}:AA${lastMeasurement}`).values = measurementRows;
 for (let row = firstMeasurement; row <= lastMeasurement; row++) {
-  measurements.getRange(`AA${row}`).formulas = [[`=IF(X${row}<>"PASS","NOT_PASS",IF(OR(ISNUMBER(SEARCH("OPEN",K${row})),ISNUMBER(SEARCH("PARTIAL",K${row}))),"LIMIT_OPEN",IF(AND(OR(L${row}<>"",M${row}<>"",N${row}<>""),OR(O${row}<>"",P${row}<>""),Q${row}<>"",R${row}<>"",S${row}<>"",LEN(T${row})=64,U${row}<>"",V${row}<>"",U${row}<>V${row},W${row}<>""),"READY","INCOMPLETE")))`]];
+  measurements.getRange(`AA${row}`).formulas = [[`=IF(X${row}<>"PASS","NOT_PASS",IF(OR(ISNUMBER(SEARCH("OPEN",K${row})),ISNUMBER(SEARCH("PARTIAL",K${row})),ISNUMBER(SEARCH("PENDING",K${row}))),"LIMIT_OPEN",IF(AND(OR(L${row}<>"",M${row}<>"",N${row}<>""),OR(O${row}<>"",P${row}<>""),Q${row}<>"",R${row}<>"",S${row}<>"",LEN(T${row})=64,U${row}<>"",V${row}<>"",U${row}<>V${row},W${row}<>""),"READY","INCOMPLETE")))`]];
 }
 measurements.getRange(`K${firstMeasurement}:Z${lastMeasurement}`).format.fill = amber;
 measurements.getRange(`X${firstMeasurement}:X${lastMeasurement}`).dataValidation = { rule: { type: "list", values: record.allowed_statuses } };
-measurements.getRange(`K${firstMeasurement}:K${lastMeasurement}`).dataValidation = { rule: { type: "list", values: ["APPROVED_DOCUMENTARY", "APPROVED_NUMERIC", "OPEN_B01_FREEZE", "PARTIAL_APPROVED_MIN_ONLY"] } };
+measurements.getRange(`K${firstMeasurement}:K${lastMeasurement}`).dataValidation = { rule: { type: "list", values: ["APPROVED_DOCUMENTARY", "APPROVED_NUMERIC", "OPEN_B01_FREEZE", "PARTIAL_APPROVED_MIN_ONLY", "SOFTWARE_INTEGRATION_PENDING"] } };
 measurements.getRange(`A${firstMeasurement}:AA${lastMeasurement}`).format.wrapText = true;
 measurements.getRange(`X${firstMeasurement}:X${lastMeasurement}`).conditionalFormats.add("containsText", { text: "PASS", format: { fill: green, font: { bold: true, color: "#375623" } } });
 measurements.getRange(`X${firstMeasurement}:X${lastMeasurement}`).conditionalFormats.add("containsText", { text: "FAIL", format: { fill: red, font: { bold: true, color: "#9C0006" } } });
@@ -196,7 +192,7 @@ const evidenceRows = [
   ["01_fixture", "Схема, карта pogo, приемка и MSA MFG-004", "MFG-004 schematic, pogo map, acceptance and MSA", "YES", "", ""],
   ["02_power", "Сопротивления, rail waveforms, ток и thermal", "Resistance, rail waveforms, current and thermal", "YES", "", ""],
   ["03_programming", "STM32 и nRF logs, option bytes, verify", "STM32 and nRF logs, option bytes and verify", "YES", "", ""],
-  ["04_modem", "BG95 debug, USB recovery и redacted AT logs", "BG95 debug, USB recovery and redacted AT logs", "YES", "", ""],
+  ["04_modem", revision === "B" ? "BG95 debug, USB recovery и redacted MAIN UART provisioning logs" : "BG95 debug, USB recovery и redacted AT logs", revision === "B" ? "BG95 debug, USB recovery and redacted MAIN UART provisioning logs" : "BG95 debug, USB recovery and redacted AT logs", "YES", "", ""],
   ["05_audio", "WAV, mapping, THSEL, wake и calibration", "WAV, mapping, THSEL, wake and calibration", "YES", "", ""],
   ["06_rf_time", "GNSS PPS, LTE, LoRa и setup calibration", "GNSS PPS, LTE, LoRa and setup calibration", "YES", "", ""],
   ["07_server", "Heartbeat, event, receipt и reconnect", "Heartbeat, event, receipt and reconnect", "YES", "", ""],

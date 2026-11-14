@@ -218,8 +218,8 @@
     "order_checkout": "customer confirms stackup, copper, finish, impedance option and zero unresolved file-parser/DFM errors",
     "harness": "100 percent continuity, polarity and cross-short; first-off crimp height and destructive pull; end-to-end resistance; strain relief and flex",
     "electrical": "rail drop, startup, modem burst, I2C at 100 kHz and four-channel PDM/AAD",
-    "thermal": "+70 C powered thermal run at representative maximum load",
-    "cold": "-40 C continuity and functional start; includes M8 ring-terminal joint",
+    "thermal": "+60 C powered EVT thermal run at representative maximum load; +70 C is a post-EVT series test",
+    "cold": "-20 C EVT continuity and functional start; includes heated battery and M8 ring-terminal joint; -40 C is a post-EVT series test",
     "acoustic": "four-channel phase/gain/noise and unobstructed PCB-MIC acoustic path",
     "series_transfer": "repeat DFM, process-capability, environmental and supplier/tooling qualification before serial lot"
   }

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -12,8 +13,18 @@ if str(SERVER_ROOT) not in sys.path:
 
 from station.cbor_codec import decode_detection_cbor, decode_heartbeat_cbor
 
-exe = REPO_ROOT / "firmware" / "build" / "zs_emit_detection"
-heartbeat_exe = REPO_ROOT / "firmware" / "build" / "zs_emit_heartbeat"
+build_dir = Path(os.environ.get("ZS_FIRMWARE_BUILD_DIR", REPO_ROOT / "firmware" / "build"))
+
+
+def host_executable(name: str) -> Path:
+    path = build_dir / name
+    if os.name == "nt" and not path.exists():
+        path = path.with_suffix(".exe")
+    return path
+
+
+exe = host_executable("zs_emit_detection")
+heartbeat_exe = host_executable("zs_emit_heartbeat")
 
 full_raw = subprocess.check_output([str(exe)])
 full = decode_detection_cbor(full_raw)

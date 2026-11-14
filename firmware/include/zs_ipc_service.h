@@ -53,6 +53,9 @@ typedef struct {
      station uses to apply a new record (engineer key pointer, SIM ICCIDs). Both optional. */
   const zs_station_secrets_io_t *secrets_io;
   void (*secrets_changed)(void *ctx, const zs_station_secrets_t *secrets);
+  /* Diagnostics 0x0304. The service enforces physical service mode, authenticated BLE and engineer role first. */
+  uint8_t (*lora_control)(void *ctx, const uint8_t *request, size_t request_size);
+  size_t (*lora_status)(void *ctx, uint8_t *out, size_t capacity);
 } zs_ipc_service_port_t;
 
 /* B.9 session_role characteristic (0x0205): read = [role]; write [0x01] asks for a challenge, the station notifies

@@ -102,6 +102,7 @@ READ = "read"                         # pages, data APIs, the event stream
 AUDIO_LISTEN = "audio.listen"         # event audio: may contain speech
 AUDIO_REQUEST = "audio.request"
 ANALYSIS_RUN = "analysis.run"         # one-file analysis, localization
+ALERT_CONFIRM = "alert.confirm"       # confirm and classify an alert episode in the operator journal
 DATASET_EDIT = "dataset.edit"         # add, train, delete
 STATION_COMMAND = "station.command"   # network configuration (and later reboot, parameters)
 STATION_FIRMWARE = "station.firmware" # firmware and model updates
@@ -114,12 +115,12 @@ PERMISSIONS = (READ, AUDIO_LISTEN, AUDIO_REQUEST, ANALYSIS_RUN, DATASET_EDIT, ST
                KEYS_ROTATE, USERS_MANAGE, SCOPES_MANAGE, AUDIT_READ)   # the scopes a token may have
 ROLE_PERMISSIONS = {
     "viewer": {READ},
-    "operator": {READ, AUDIO_LISTEN, AUDIO_REQUEST, ANALYSIS_RUN},
-    "engineer": {READ, AUDIO_LISTEN, AUDIO_REQUEST, ANALYSIS_RUN, DATASET_EDIT, STATION_COMMAND, STATION_FIRMWARE,
+    "operator": {READ, AUDIO_LISTEN, AUDIO_REQUEST, ANALYSIS_RUN, ALERT_CONFIRM},
+    "engineer": {READ, AUDIO_LISTEN, AUDIO_REQUEST, ANALYSIS_RUN, ALERT_CONFIRM, DATASET_EDIT, STATION_COMMAND, STATION_FIRMWARE,
                  SCOPES_MANAGE},
     "admin": {READ, USERS_MANAGE, SCOPES_MANAGE, KEYS_ROTATE, AUDIT_READ},
     "service": {READ},
-    SUPERUSER_ROLE: set(PERMISSIONS) | {AUDIT_CONTROL},
+    SUPERUSER_ROLE: set(PERMISSIONS) | {ALERT_CONFIRM, AUDIT_CONTROL},
 }
 ROLES = tuple(ROLE_PERMISSIONS)
 GRANTABLE_ROLES = tuple(r for r in ROLES if r != SUPERUSER_ROLE)
@@ -140,6 +141,7 @@ PERMISSION_RULES: list[tuple[set[str], re.Pattern, str]] = [
     ({"POST"}, re.compile(r"^/api/v1/firmware/rollouts(?:/[^/]+(?:/(?:pause|resume|cancel|revert)|/stations/\d+/skip))?$"), STATION_FIRMWARE),
     ({"POST"}, re.compile(r"^/(?:dataset/(?:add|train|delete)|api/dataset/train)$"), DATASET_EDIT),
     ({"POST"}, re.compile(r"^/(?:single/analyze|api/analyze-single|localization/analyze|api/localize)$"), ANALYSIS_RUN),
+    ({"POST"}, re.compile(r"^/api/v1/journal/[^/]+/decision$"), ALERT_CONFIRM),
     ({"GET", "HEAD", "PUT"}, re.compile(r"^/api/v1/access/(?:accounts(?:/[^/]+/scope)?|catalog)$"), SCOPES_MANAGE),
     ({"GET", "HEAD"}, re.compile(r"^/api/v1/admin/audit-logging$"), AUDIT_READ),
     ({"PUT"}, re.compile(r"^/api/v1/admin/audit-logging$"), AUDIT_CONTROL),

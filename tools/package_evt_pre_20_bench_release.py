@@ -207,7 +207,7 @@ def main() -> int:
     }
     android_files = {
         args.apk: output / "03_ANDROID/dioneya-commissioning-0.1.0-bench.20261005.apk",
-        ROOT / "android/app/build/outputs/apk/release/output-metadata.json": output / "03_ANDROID/output-metadata.json",
+        args.apk.parent / "output-metadata.json": output / "03_ANDROID/output-metadata.json",
         args.android_cert: output / "03_ANDROID/android_bench_release_certificate.pem",
     }
     documentation_files = {

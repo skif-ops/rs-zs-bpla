@@ -10,7 +10,7 @@ the server keeps every explanation open and decides on a moving window:
    have sent their bearings (stations more than LAG_S behind those two do not hold the steps back).  A step uses only
    the bearings up to its time, and a segment only from the bearing that made it a segment, so the decisions do not
    depend on the order in which the stations' batches arrive.
-2. Hypotheses.  Every combination of active segments (a bearing within track_segments.ACTIVE_S) of two to four
+2. Hypotheses.  Every combination of active segments (a bearing within track_segments.ACTIVE_S) of two to five
    stations that may hear one target (target_match) is a hypothesis.  Its rays are intersected on the 1 s grid of
    emission times of the last WINDOW_S seconds (fusion/bearing_fusion.py: each station's bearing at emission +
    range / c); bearings off their segment's own course (own_course) are left out.  A point counts for the hypothesis
@@ -28,8 +28,10 @@ the server keeps every explanation open and decides on a moving window:
    explanation of the step.
 5. Deferred decision and continuity.  A hypothesis continues the track whose current segments it shares most (one to
    one), when its new points pass the gate of that track's prediction (constant-velocity Kalman filter); otherwise it
-   is dropped.  A new hypothesis becomes a track only after it has been the choice for PUBLISH_STEPS steps in a row
-   (WEAK_PUBLISH_STEPS when a station gives one of its segments little confidence; such a segment takes part only
+   is dropped.  A new hypothesis becomes a track only after it has been the choice for PUBLISH_STEPS steps in a row;
+   a well-conditioned three-to-five-station hypothesis already contains STRONG_FIXES independent geometric fixes and
+   therefore needs only STRONG_PUBLISH_STEPS consecutive choices.  WEAK_PUBLISH_STEPS applies when a station gives
+   one of its segments little confidence; such a segment takes part only
    in a well conditioned hypothesis with two other stations' sure segments, or in an unambiguous pair continuing a
    track of its segments).  Three or more stations make a new track when they are well conditioned
    (STRONG_FIXES points meeting with a horizontal error up to STRONG_ERROR_M); far away the rays of three stations meet
@@ -64,7 +66,7 @@ STEP_US = 1_000_000
 WINDOW_S = 20.0                  # the evidence of a hypothesis: emission times of the last 20 s (+ range / c)
 LAG_S = 5.0                      # a station this far behind the second latest one does not hold the steps back
 CATCH_UP_STEPS = 120             # steps one batch may advance (a gap in the stream is jumped)
-MAX_STATIONS = 4                 # hypotheses of up to four stations
+MAX_STATIONS = 5                 # five simultaneous hearers must remain one target, not a disjoint 3+2 explanation
 MAX_UNITS_PER_STATION = 4        # the latest segments of a station taken into account
 MAX_CANDIDATES = 64              # the best hypotheses competing in the global choice
 MIN_FIXES = 3                    # a hypothesis needs this many points in its window
@@ -73,7 +75,8 @@ CHI2_PER_DOF = 9.0               # ...and three or more rays meet within 3 sigma
 KINEMATIC_LIMIT = 3.0            # rms miss of a quadratic path, in the points' horizontal errors
 RIVAL_MIN_S = 5.0                # a rival segment counts when it overlaps the pair this long
 RIVAL_REFUTED = 0.5              # a rival pairing is refuted when its rays cross behind a station or out of range this often
-PUBLISH_STEPS = 5                # a new track: the choice of five steps in a row...
+PUBLISH_STEPS = 5                # a new two-ray track: the choice of five steps in a row...
+STRONG_PUBLISH_STEPS = 2         # a well-conditioned 3..5-station fix already carries five geometric confirmations
 WEAK_CONFIDENCE = 0.5            # ...or, when a station gives one of its segments less confidence than this (median of
 WEAK_PUBLISH_STEPS = 12          # its recent bearings: its bins or comb pairs barely agree), of twelve steps
 STRONG_FIXES = 5                 # ...with three or more stations, this many meeting points...
@@ -84,6 +87,11 @@ GATE_MIN_M = 30.0
 REGATE_POINTS = 3                # three points of the track's own segments in a row off the prediction restart the filter
 BACKFILL_S = 15.0                # a new track shows the points of its last 15 s (+ range / c)
 RANGE_GUESS_M = 2000.0           # first range of the iteration on the sound delay
+RANGE_ITERATIONS = 3             # fixed-point contraction v/c leaves < 40 m at 5 km even at 80 m/s
+RANGE_CONVERGENCE_M = 8.0        # 23 ms of sound travel and < 2 m target motion at EVT speeds
+PAIR_RANGE_ITERATIONS = 5        # a two-ray fix needs the tighter range iteration for the independent height gate
+PAIR_RANGE_CONVERGENCE_M = 2.0   # otherwise a crossing of different-height targets can look height-consistent
+FAST_CONTINUE_WINDOW_S = 6.0     # recent fixes retained for a confirmed association (at least STRONG_FIXES)
 TRACK_IDLE_S = 20.0              # a track without a new point this long is over (the output API ends it a little later:
                                  # integration/alert_producer.TRACK_END_US); a later hypothesis of its segments is a new track
 KALMAN_ACCEL = 6.0
@@ -202,7 +210,9 @@ def _solve(units, t: float, now: float, heard: list | None = None):
     arrival time) of every sample: the result is final once the bearings around them are in."""
     ranges = [RANGE_GUESS_M] * len(units)
     solved = None
-    for k in range(5):
+    iterations = PAIR_RANGE_ITERATIONS if len(units) == 2 else RANGE_ITERATIONS
+    convergence_m = PAIR_RANGE_CONVERGENCE_M if len(units) == 2 else RANGE_CONVERGENCE_M
+    for k in range(iterations):
         az, el, sg = [], [], []
         for u, r in zip(units, ranges):
             ta = t + r / C
@@ -224,7 +234,7 @@ def _solve(units, t: float, now: float, heard: list | None = None):
         new = [float(np.linalg.norm(solved[0][:2] - o[:2])) for o in origins]
         if max(new) > MAX_RANGE_M:
             return "refuted"
-        converged = k > 0 and max(abs(a - b) for a, b in zip(new, ranges)) < 2.0
+        converged = k > 0 and max(abs(a - b) for a, b in zip(new, ranges)) < convergence_m
         ranges = new
         if converged:
             break
@@ -254,17 +264,25 @@ class HypothesisTrackFusion:
     def __init__(self, store):
         self.store = store
         self._segments_cache: dict[tuple[int, int], list[track_segments.Segment]] = {}
+        self._segment_states: dict[tuple[int, int], track_segments.SplitState] = {}
         self._fix_cache: dict[tuple, object] = {}
         self._signature_cache: dict[tuple, target_match.Signature] = {}
         self._course_cache: dict[Member, dict] = {}
         self._complete: dict[int, float] = {}
+        self._established_fixes: dict[tuple[Member, ...], list[tuple[float, Fix]]] = {}
+        self.fast_path_steps = 0
+        self.direct_path_steps = 0
         self._state = store.fusion_state(STATE) or {"step": None, "frame": None, "tracks": {}, "waiting": {}}
 
     # ---- inputs ---------------------------------------------------------------------------------------------------
     def _segments(self, station_id: int, track_event_id: int) -> list[track_segments.Segment]:
         key = (station_id, track_event_id)
         if key not in self._segments_cache:
-            self._segments_cache[key] = station_segments(self.store, station_id, track_event_id)
+            rows = [r for r in self.store.list_bearings(station_id=station_id, track_event_id=track_event_id, limit=50000)
+                    if r["time_trust"] in TRUSTED_TIME]
+            segments, state = track_segments.split_incremental(rows, self._segment_states.get(key))
+            self._segments_cache[key] = segments
+            self._segment_states[key] = state
         return self._segments_cache[key]
 
     def _frame(self, position) -> EnuFrame:
@@ -358,15 +376,171 @@ class HypothesisTrackFusion:
                    and (not confirmed or (tr["confirmed"] and now - tr["confirmed_s"] <= CONTINUE_S))
                    for tr in self._state["tracks"].values())
 
+    def _established(self, units: list[Unit], by_station: dict[int, list[Unit]], now: float) -> list[Hypothesis] | None:
+        """Continue a complete, already confirmed association without rebuilding its Cartesian search.
+
+        Five stations hearing two sources produce ten active segments.  Re-enumerating every pair, triple, four-ray
+        and five-ray explanation for every new second is useful only until the two tracks are associated.  Once the
+        active segments are covered exactly by confirmed tracks, their recent well-conditioned fixes are sufficient
+        to continue them.  Any new, missing, weak or incompatible segment returns to the full search immediately.
+        """
+        if not self._state["tracks"]:
+            return None
+        by_member = {u.member: u for u in units}
+        active = set(by_member)
+        used: set[Member] = set()
+        out: list[Hypothesis] = []
+        for tr in self._state["tracks"].values():
+            members = tuple(tuple(m) for m in tr.get("cur", ()))
+            if len(members) < 3 or not tr.get("confirmed") or any(m not in by_member for m in members):
+                continue
+            combo = tuple(by_member[m] for m in members)
+            if set(members) & used or any(not target_match.compatible(a.signature, b.signature)
+                                          for a, b in itertools.combinations(combo, 2)):
+                return None
+            if any(_weak_unit(u) for u in combo):
+                return None
+            key = tuple(sorted(members))
+            fixes = list(self._established_fixes.get(key, ()))
+            hi = min(u.last_s for u in combo)
+            if fixes:
+                start = math.floor(fixes[-1][0]) + 1
+            else:
+                lo = max(max(u.first_s for u in combo), now - FAST_CONTINUE_WINDOW_S) - MAX_RANGE_M / C
+                start = math.floor(lo)
+            for t in np.arange(start, hi, 1.0):
+                fix = self._cached("fix", combo, float(t), now)
+                if fix is None:
+                    cache_key = ("fix", tuple(u.member for u in combo), float(t))
+                    if cache_key not in self._fix_cache:
+                        break                   # its possible late acoustic arrivals have not all reached us yet
+                    continue                    # final no-fix geometry at one instant must not block later valid fixes
+                if not fix.consistent:
+                    self._established_fixes.pop(key, None)
+                    return None                 # changed geometry: rebuild all competing associations
+                fixes.append((float(t), fix))
+            fixes = fixes[-max(STRONG_FIXES, int(FAST_CONTINUE_WINDOW_S)):]
+            if len(fixes) < STRONG_FIXES:
+                return None
+            good = sum(f.rays - 1 for _, f in fixes if f.consistent)
+            bad = sum(f.rays - 1 for _, f in fixes if not f.consistent)
+            score = float(good - bad)
+            times = np.array([t for t, _ in fixes])
+            xy = np.array([f.xyz[:2] for _, f in fixes])
+            error = float(np.median([f.horizontal_error_m for _, f in fixes]))
+            tt = times - times.mean()
+            design = np.vstack([np.ones_like(tt), tt, tt ** 2]).T
+            miss = xy - design @ np.linalg.lstsq(design, xy, rcond=None)[0]
+            kinematic = float(np.sqrt(np.mean(np.sum(miss ** 2, axis=1)))) / max(error, 15.0)
+            if kinematic > KINEMATIC_LIMIT:
+                score -= (kinematic - KINEMATIC_LIMIT) * len(fixes)
+            hypothesis = Hypothesis(combo, fixes, score, False)
+            if score <= 0 or not hypothesis.strong():
+                return None
+            self._established_fixes[key] = fixes
+            used.update(members)
+            out.append(hypothesis)
+        if not out or used != active:
+            return None
+        self.fast_path_steps += 1
+        return sorted(out, key=lambda h: (-h.score, h.members))
+
+    def _separable(self, units: list[Unit], now: float) -> list[Hypothesis] | None:
+        """Build maximal hypotheses directly when acoustic signatures split the active segments unambiguously.
+
+        Distinct fundamental frequencies give one compatible segment per station and target.  In that case all
+        smaller pair/triple/four-station subsets contain no additional association information; evaluating the
+        maximal component preserves the five-station fix while avoiding the Cartesian search.  If a component has
+        two segments of one station, the sources are acoustically ambiguous and the full hypothesis search remains
+        authoritative.
+        """
+        if len(units) < 3:
+            return None
+        # A station that reports several simultaneous sources gives their fundamentals on the bearing segments.  A
+        # gap larger than OTHER_SOURCE_RATIO is therefore stronger evidence than the deliberately broad interstation
+        # Doppler compatibility (F0_RATIO_MAX): use it when every resulting band has one segment per station.
+        components: list[list[Unit]] = []
+        if all(u.signature.f0_hz is not None for u in units):
+            for unit in sorted(units, key=lambda u: u.signature.f0_hz):
+                if (not components or
+                        unit.signature.f0_hz / components[-1][-1].signature.f0_hz > target_match.OTHER_SOURCE_RATIO):
+                    components.append([])
+                components[-1].append(unit)
+            if any(len(c) < 3 or len({u.station for u in c}) != len(c) for c in components):
+                components = []
+        if not components:
+            links = [set() for _ in units]
+            for i, a in enumerate(units):
+                for j in range(i + 1, len(units)):
+                    b = units[j]
+                    if a.station != b.station and target_match.compatible(a.signature, b.signature):
+                        links[i].add(j)
+                        links[j].add(i)
+            remaining = set(range(len(units)))
+            while remaining:
+                todo = [remaining.pop()]
+                indexes = []
+                while todo:
+                    i = todo.pop()
+                    indexes.append(i)
+                    neighbours = links[i] & remaining
+                    remaining.difference_update(neighbours)
+                    todo.extend(neighbours)
+                combo = [units[i] for i in indexes]
+                stations = [u.station for u in combo]
+                if len(combo) < 3 or len(stations) != len(set(stations)):
+                    return None
+                components.append(combo)
+
+        out = []
+        for component in components:
+            combo = tuple(sorted(component, key=lambda u: u.member))
+            lo = max(max(u.first_s for u in combo), now - WINDOW_S) - MAX_RANGE_M / C
+            hi = min(u.last_s for u in combo)
+            if hi - lo < MIN_FIXES:
+                return None
+            fixes = []
+            for t in np.arange(math.floor(lo), hi, 1.0):
+                fix = self._cached("fix", combo, float(t), now)
+                if fix is not None:
+                    fixes.append((float(t), fix))
+            if len(fixes) < MIN_FIXES:
+                return None
+            good = sum(f.rays - 1 for _, f in fixes if f.consistent)
+            bad = sum(f.rays - 1 for _, f in fixes if not f.consistent)
+            score = float(good - bad)
+            times = np.array([t for t, _ in fixes])
+            xy = np.array([f.xyz[:2] for _, f in fixes])
+            error = float(np.median([f.horizontal_error_m for _, f in fixes]))
+            tt = times - times.mean()
+            design = np.vstack([np.ones_like(tt), tt, tt ** 2]).T
+            miss = xy - design @ np.linalg.lstsq(design, xy, rcond=None)[0]
+            kinematic = float(np.sqrt(np.mean(np.sum(miss ** 2, axis=1)))) / max(error, 15.0)
+            if kinematic > KINEMATIC_LIMIT:
+                score -= (kinematic - KINEMATIC_LIMIT) * len(fixes)
+            hypothesis = Hypothesis(combo, fixes, score, False)
+            if score <= 0 or not hypothesis.strong():
+                return None
+            out.append(hypothesis)
+        self.direct_path_steps += 1
+        return sorted(out, key=lambda h: (-h.score, h.members))
+
     def _hypotheses(self, units: list[Unit], now: float) -> list[Hypothesis]:
         by_station: dict[int, list[Unit]] = {}
         for u in units:
             by_station.setdefault(u.station, []).append(u)
         self._by_station = by_station
+        established = self._established(units, by_station, now)
+        if established is not None:
+            return established
+        separable = self._separable(units, now)
+        if separable is not None:
+            return separable
         stations = sorted(by_station)
         near = {(a, b) for a in stations for b in stations if a < b
                 and float(np.linalg.norm(by_station[a][0].origin[:2] - by_station[b][0].origin[:2])) <= 2.0 * MAX_RANGE_M}
         crossing: set[tuple[Member, Member]] = set()           # pairs whose rays gave fixes: a larger hypothesis builds on them
+        strong_triples: set[frozenset[Member]] = set()         # confirmed three-ray cores used to extend to four/five stations
         out = []
         for k in range(2, min(MAX_STATIONS, len(stations)) + 1):
             for chosen in itertools.combinations(stations, k):
@@ -377,6 +551,14 @@ class HypothesisTrackFusion:
                         continue
                     if k > 2 and any(not any((a.member, b.member) in crossing for b in combo if b is not a) for a in combo):
                         continue                                 # every ray must cross another one of the hypothesis
+                    if k > 3 and strong_triples:
+                        members = {u.member for u in combo}
+                        # With several targets per station, enumerating every 4/5-ray Cartesian product grows
+                        # exponentially.  A real larger hypothesis must extend well-conditioned three-ray evidence:
+                        # every added ray has to belong to at least one such core inside this combination.
+                        cores = [core for core in strong_triples if core <= members]
+                        if not cores or any(not any(u.member in core for core in cores) for u in combo):
+                            continue
                     lo = max(max(u.first_s for u in combo), now - WINDOW_S) - MAX_RANGE_M / C
                     hi = min(u.last_s for u in combo)
                     if hi - lo < MIN_FIXES:
@@ -415,6 +597,8 @@ class HypothesisTrackFusion:
                         h = Hypothesis(tuple(combo), fixes, score, ambiguous)
                         if k >= 3 and weak and not h.strong():
                             continue                             # ...that meet its ray well
+                        if k == 3 and h.strong():
+                            strong_triples.add(frozenset(h.members))
                         out.append(h)
         out.sort(key=lambda h: (-h.score, h.members))
         return out[:MAX_CANDIDATES]
@@ -516,7 +700,12 @@ class HypothesisTrackFusion:
             tr = tracks[track_id]
             kf = self._kalman(tr["kf"])
             new = [(t, f) for t, f in chosen[i].fixes if t > tr["last_s"]][:5]
-            if new and sum(not self._gated(kf, t, f) for t, f in new) > len(new) // 2:
+            # An unchanged set of source segments is stronger identity evidence than the motion prediction.  Let the
+            # REGATE_POINTS path below reset a stale filter after a close pass; the early gate remains authoritative
+            # when a different association is trying to take over the track.
+            same_members = set(chosen[i].members) == {tuple(m) for m in tr["cur"]}
+            if (not same_members and new
+                    and sum(not self._gated(kf, t, f) for t, f in new) > len(new) // 2):
                 refused.add(i)                                   # not the motion of that track: no decision yet
                 continue
             assigned[i] = track_id
@@ -534,7 +723,9 @@ class HypothesisTrackFusion:
                 key = repr(h.members)
                 waiting[key] = waiting.get(key, 0) + 1
                 seen.add(key)
-                if waiting[key] < (WEAK_PUBLISH_STEPS if h.weak() else PUBLISH_STEPS):
+                required = (WEAK_PUBLISH_STEPS if h.weak() else
+                            STRONG_PUBLISH_STEPS if len(h.units) >= 3 and h.strong() else PUBLISH_STEPS)
+                if waiting[key] < required:
                     continue
                 track_id = self._new_track_id(h.members)
                 tracks[track_id] = {"cur": [], "last_s": now - BACKFILL_S - MAX_RANGE_M / C, "kf": None, "confirmed": False,

@@ -41,6 +41,7 @@ object GattContractV01 {
     val CHAR_STATUS: UUID = uuid(0x0301)               // read/notify
     val CHAR_GNSS_INTEGRITY: UUID = uuid(0x0302)       // read/notify
     val CHAR_SELF_TEST: UUID = uuid(0x0303)            // write 0x01 = run all; notify: CBOR {id: [code, detail]}
+    val CHAR_LORA_CONTROL: UUID = uuid(0x0304)         // engineer/service only: timed RF test and signed field profile
     val CHAR_LOG_CHUNK: UUID = uuid(0x0401)
     val CHAR_OTA_MANIFEST: UUID = uuid(0x0501)
     val CHAR_OTA_IMAGE_CHUNK: UUID = uuid(0x0502)
@@ -62,6 +63,10 @@ object GattContractV01 {
     const val WRITE_STATUS_STORAGE_ERROR = 0x05
 
     const val SELF_TEST_RUN_ALL: Byte = 0x01
+    const val LORA_OP_TEST: Byte = 0x01
+    const val LORA_OP_STOP: Byte = 0x02
+    const val LORA_OP_INSTALL_PROFILE: Byte = 0x03
+    const val LORA_PROFILE_BYTES = 96
 
     /** session_role (B.9): roles and operations. */
     const val ROLE_NONE = 0

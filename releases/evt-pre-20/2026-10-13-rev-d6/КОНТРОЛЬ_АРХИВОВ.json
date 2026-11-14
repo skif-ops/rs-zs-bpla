@@ -1,0 +1,149 @@
+{
+  "schema": "dioneya-evt-pre-20-archive-control-v7",
+  "revision": "REV_D6_NORMALIZED_PCB_ORDER_STRUCTURE",
+  "date": "2026-10-13",
+  "result": "PASS",
+  "technical_baseline": "REV_D5_2026-10-02_UNCHANGED",
+  "pcb_pwr_structure": "NORMALIZED_01_FABRICATION_02_ASSEMBLY_03_SOURCES_AND_CONTROL",
+  "pcb_mic_order": "ALREADY_PLACED_NO_CHANGE_NO_CANCELLATION",
+  "review_b_archive_separate_from_full_production_zip": true,
+  "archives": [
+    {
+      "name": "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20261013_REV_D6.zip",
+      "sha256": "35e2b19bcde065fa00df1ac867846547493fb3dc26f278d2f9f68575ef6c2ea8",
+      "bytes": 27308195,
+      "entries": 147,
+      "extensions": {
+        ".blend": 2,
+        ".csv": 11,
+        ".docx": 11,
+        ".json": 18,
+        ".pdf": 6,
+        ".png": 8,
+        ".py": 1,
+        ".step": 48,
+        ".stl": 24,
+        ".svg": 8,
+        ".xlsx": 6,
+        ".zip": 4
+      }
+    },
+    {
+      "name": "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_20261013_REV_D6.zip",
+      "sha256": "af1f4a5e3453e00b96ac7bf1e5c5b7bacea2d0e560e7db1fe714f81bee6a7b82",
+      "bytes": 7009758,
+      "entries": 222,
+      "extensions": {
+        ".csv": 20,
+        ".d356": 2,
+        ".docx": 8,
+        ".drl": 5,
+        ".g1": 2,
+        ".g2": 2,
+        ".g3": 1,
+        ".g4": 1,
+        ".g5": 1,
+        ".g6": 1,
+        ".gba": 1,
+        ".gbl": 2,
+        ".gbo": 2,
+        ".gbp": 2,
+        ".gbr": 22,
+        ".gbrjob": 3,
+        ".gbs": 2,
+        ".gm1": 2,
+        ".gta": 1,
+        ".gtl": 2,
+        ".gto": 2,
+        ".gtp": 2,
+        ".gts": 2,
+        ".ipc": 1,
+        ".json": 31,
+        ".kicad_dru": 2,
+        ".kicad_mod": 40,
+        ".kicad_pcb": 3,
+        ".kicad_pro": 3,
+        ".kicad_sch": 16,
+        ".kicad_sym": 3,
+        ".lib": 1,
+        ".log": 1,
+        ".pdf": 17,
+        ".png": 2,
+        ".rpt": 2,
+        ".step": 1,
+        ".txt": 1,
+        ".xlsx": 4,
+        "<none>": 6
+      }
+    },
+    {
+      "name": "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_20261013_REV_D6.zip",
+      "sha256": "d15a833c793f40568995d6b876942bc689682ec8f611a830726281235d33da54",
+      "bytes": 130826,
+      "entries": 15,
+      "extensions": {
+        ".csv": 5,
+        ".docx": 4,
+        ".json": 5,
+        ".xlsx": 1
+      }
+    },
+    {
+      "name": "EVT_PRE_20_ЖГУТЫ_И_КАБЕЛИ_20261013_REV_D6.zip",
+      "sha256": "4ef795f86bae8b663ab7b8ef884cda40b176906127ff8b0da1a299e7df273aa2",
+      "bytes": 211757,
+      "entries": 9,
+      "extensions": {
+        ".csv": 4,
+        ".docx": 2,
+        ".pdf": 2,
+        ".xlsx": 1
+      }
+    },
+    {
+      "name": "EVT_PRE_20_СБОРКА_И_КОРПУСА_20261013_REV_D6.zip",
+      "sha256": "5b0a8effac7449110731fe83fe1cc1d896c4d8b95baefdd8111707f4af83a6ee",
+      "bytes": 9710762,
+      "entries": 122,
+      "extensions": {
+        ".blend": 2,
+        ".csv": 6,
+        ".docx": 4,
+        ".json": 15,
+        ".pdf": 3,
+        ".png": 8,
+        ".py": 1,
+        ".step": 48,
+        ".stl": 24,
+        ".svg": 8,
+        ".xlsx": 3
+      }
+    },
+    {
+      "name": "EVT_PRE_20_PCB_MIC_REVIEW_B_20261013_REV_D6.zip",
+      "sha256": "f2d23633418f74bb396068a05b65c52b41514f2e7eb3d378310af0f4cf114cef",
+      "bytes": 1216667,
+      "entries": 43,
+      "extensions": {
+        ".csv": 2,
+        ".docx": 2,
+        ".drl": 2,
+        ".gbr": 9,
+        ".gbrjob": 1,
+        ".json": 9,
+        ".kicad_dru": 1,
+        ".kicad_mod": 2,
+        ".kicad_pcb": 1,
+        ".kicad_pro": 1,
+        ".kicad_sch": 1,
+        ".kicad_sym": 1,
+        ".lib": 1,
+        ".pdf": 4,
+        ".png": 2,
+        ".rpt": 1,
+        ".xlsx": 1,
+        "<none>": 2
+      }
+    }
+  ]
+}

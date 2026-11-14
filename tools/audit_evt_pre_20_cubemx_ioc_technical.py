@@ -172,7 +172,8 @@ def main() -> None:
     require("opened and regenerated" in contract["release_gate"]["reason"], "CubeMX open/regenerate requirement missing")
     status = (TARGET / "target_status.yaml").read_text(encoding="utf-8")
     require("do_not_release: true" in status, "target is not release-blocked")
-    require("CUBEMX_OPEN_REGENERATE_BLOCKER" in status, "target status lost CubeMX validation blocker")
+    require("GENERATED_PINOUT_IOC_CELLULAR_SAFE_DEFAULTS_QG1_QG2_PASS_CUBEMX_OPEN_REGENERATE_REQUIRED" in status,
+            "target CubeMX validation status drift")
     decisions = (ROOT / "docs/DECISION_LOG.csv").read_text(encoding="utf-8")
     require("DEC-022" in decisions and "PD8 to PC2" in decisions, "EXTI conflict decision is not traceable")
     require(

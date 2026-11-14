@@ -41,11 +41,19 @@ services:
       - ../../config/tls:/run/tls:ro
     depends_on:
       - mqtt
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=2).read()"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 3s
 
   mqtt_bridge_bench:
     image: dioneya-bench-server:local
     restart: unless-stopped
-    cpus: 0.5
+    # Bearing fusion is single threaded.  Half a core makes the controlled five-station/two-target
+    # episode accumulate work faster than real time and then replay stale tracks to the operator.
+    cpus: 1.0
     mem_limit: 256m
     command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge-bench.crt.pem", "--key", "/run/tls/bridge-bench.key.pem"]
     environment:
@@ -55,8 +63,10 @@ services:
       - ../data:/app/data
       - ../../config/tls:/run/tls:ro
     depends_on:
-      - mqtt
-      - server
+      mqtt:
+        condition: service_started
+      server:
+        condition: service_healthy
 
   twin_sender:
     image: dioneya-bench-server:local

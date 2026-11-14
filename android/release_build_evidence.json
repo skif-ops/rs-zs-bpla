@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "release_id": "EVT_PRE_20_RELEASE_CANDIDATE_2026101601",
+  "release_id": "EVT_PRE_20_BENCH_RELEASE_2026111201",
   "application_id": "ru.dioneya.commissioning",
-  "version_code": 2026101601,
-  "version_name": "0.1.0-evt.20261016",
+  "version_code": 2026111201,
+  "version_name": "0.1.1-bench.20261112",
   "tasks": {
-    "cleanTestDebugUnitTestAssembleRelease": "PASS",
-    "jvm_unit_tests": "72_PASS_0_FAILURES_0_ERRORS_0_SKIPPED",
+    "testDebugUnitTest": "PASS",
+    "assembleRelease": "PASS",
     "apksignerVerify": "PASS_V2_ONE_SIGNER"
   },
   "toolchain": {
-    "jdk": "Microsoft OpenJDK 21.0.12.1+1",
+    "jdk": "JetBrains Runtime OpenJDK 21.0.11+1",
     "gradle": "9.6.0",
     "gradle_distribution_sha256": "bbaeb2fef8710818cf0e261201dab964c572f92b942812df0c3620d62a529a01",
     "android_gradle_plugin": "9.4.0",
@@ -19,30 +19,29 @@
     "min_sdk": 28
   },
   "apk": {
-    "bytes": 353018,
-    "sha256": "4aac5e997107f76c25e080e08dad934f9526e0174ab8071c8cd31ea06b0b5ec8",
+    "bytes": 360974,
+    "sha256": "b60661f98369b4731310faf57b78471f38315a5c4e3f7803c6c9e9ab891a3e30",
     "release_authorized": true,
-    "scope": "EVT_BUILD_B01_CHARACTERIZATION_AND_EOL_LIMIT_FREEZE"
+    "scope": "BENCH_AND_EVT_HARDWARE_VALIDATION"
   },
   "signer": {
     "algorithm": "RSA",
     "key_bits": 3072,
-    "certificate_sha256": "a7ba19ca151d213da46b80bed73dd740b3c2e7a0132cc06ab3a56cd792e3cd6e",
+    "certificate_sha256": "64b9b31cc6e64bdbc09457254501812634872a8e05de1a95e7d8c638dbfed90a",
     "public_key_sha256": "745d2f8a0a576e083cedaee6726759d5adbe072f754a08c1cac99987020eb6bf",
-    "private_material_in_repository": false,
-    "certificate_subject": "CN=Dioneya-EVT-Release-Candidate-20261016",
-    "certificate_validity": "2026-10-16..2036-10-13"
+    "private_material_in_repository": false
   },
   "runtime_dependencies": [
     "org.jetbrains.kotlin:kotlin-stdlib:2.2.10",
     "org.jetbrains:annotations:13.0",
     "com.google.zxing:core:3.5.3"
   ],
-  "source_commit_binding": "release package release_candidate_contract.json and repository release commit",
+  "source_commit_binding": "release package release_manifest.json",
   "hardware_validation_pending": [
     "install on approved Android device",
     "authenticated pairing with DIO-EVT-B01",
     "GATT configuration write and read-back",
-    "signed OTA and rollback end-to-end"
+    "signed OTA and rollback end-to-end",
+    "LoRa secure BLE status, timed RF test and signed profile installation end-to-end"
   ]
 }

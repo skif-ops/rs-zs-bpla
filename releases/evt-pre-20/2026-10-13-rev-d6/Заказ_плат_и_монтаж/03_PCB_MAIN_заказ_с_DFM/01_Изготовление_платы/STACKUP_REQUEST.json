@@ -1,0 +1,81 @@
+{
+  "schema": "dioneya-pcb-main-fab-stackup-request-v1",
+  "revision": "B",
+  "board": "PCB-MAIN",
+  "layers": 8,
+  "finished_thickness_mm": 1.6,
+  "surface_finish": "ENIG",
+  "outer_copper_finished_oz": 1.0,
+  "inner_copper_finished_oz": 0.5,
+  "preferred_fabricator_stack_candidate": "JLC08161H-3313",
+  "preferred_stack_status": "PUBLISHED_STANDARD_EXAMPLE_ORDER_SELECTION_PENDING",
+  "dielectric_thicknesses": "READ_FROM_SELECTED_ORDER_STACKUP",
+  "impedance_control": "NOT_ORDERED_EVT_FULL_LOT_AS_ROUTED",
+  "layer_functions_top_to_bottom": [
+    [
+      "F.Cu",
+      "signal_components"
+    ],
+    [
+      "In1.Cu",
+      "GND_DIGITAL_GND_MODEM_split_plane"
+    ],
+    [
+      "In2.Cu",
+      "GND_MIC_plane"
+    ],
+    [
+      "In3.Cu",
+      "signal"
+    ],
+    [
+      "In4.Cu",
+      "GND_DIGITAL_GND_MODEM_split_plane"
+    ],
+    [
+      "In5.Cu",
+      "signal"
+    ],
+    [
+      "In6.Cu",
+      "GND_DIGITAL_reference_plane"
+    ],
+    [
+      "B.Cu",
+      "signal_test_pads"
+    ]
+  ],
+  "fabrication_notes": [
+    "Select epoxy-filled and copper-capped POFV and use the 76-coordinate order CSV/map; 74 are source-flagged and two are CAM overrides at C6.1/D11.1.",
+    "Minimum 0.15 mm drilled through vias and 0.25 mm finished via diameter are present.",
+    "Board design DRC rules: 0.10 mm trace/space, 0.20 mm hole-to-copper, 0.20 mm hole-to-hole and edge-to-copper.",
+    "Published JLCPCB options support 8 layers, 1.6 mm, ENIG, 1 oz outer/0.5 oz inner copper, 0.15/0.25 mm minimum via and POFV; see official capability screen.",
+    "Do not infer dielectric spacing from the default KiCad stackup or the illustrative JLC08161H-3313 blog table; record the selected order stack and dielectric values.",
+    "Choose minimum via and POFV options, then verify the fabricator's production files against the coordinate map before panel release; resolve deviations through ECO."
+  ],
+  "supplier_sources": [
+    "https://jlcpcb.com/capabilities/Capab",
+    "https://jlcpcb.com/help/article/multi-layer-pcb-standard-laminated-structures",
+    "https://jlcpcb.com/blog/multilayer-pcb-design-guidelines",
+    "https://jlcpcb.com/help/article/pcb-via-covering"
+  ],
+  "official_capability_screen": "JLCPCB_OFFICIAL_CAPABILITY_SCREEN_REV_B_105.json",
+  "generated_job_sha256_before_control": "87a5bef4bd9c57c410507fc3fb0a412dda1ed104a7a1c2626ebd0a1e991f3953",
+  "controlled_job_sha256": "afe379e3ee84e9bcc2060b5eb4bef91f9ac20f31e6894b48bed817d5ea453720",
+  "pofv_order_csv": "VIA_FILL_CAP_76_ORDER_REV_D.csv",
+  "pofv_order_count": 76,
+  "native_board_flagged_count": 74,
+  "pofv_cam_override": [
+    "C6.1 X41.75 Y30.40",
+    "D11.1 X80.01 Y20.50"
+  ],
+  "as_routed_impedance_inventory": [
+    "PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.csv",
+    "PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.xlsx"
+  ],
+  "impedance_note_ru": "По решению заказчика EVT-плата остаётся без переразводки. Ширины и слои извлечены из нативной платы. Опорные слои являются кандидатами; непрерывность земли под каждой трассой и импеданс на выбранном стеке не подтверждены. Контроль импеданса и численные цели фабрике не заказываются. Вся партия 22 PCBA изготавливается без паузы; два изделия выбираются после изготовления для ВЧ-испытаний EVT. При отклонениях выполняется контроль партии и ECO.",
+  "impedance_note_en": "By customer decision the EVT PCB remains as routed. Widths and layers were extracted from the native board. Reference layers are candidates; ground continuity and impedance on the selected stack are unverified. Controlled impedance and numerical targets are not ordered. The full lot of 22 PCBAs is made without a pause; two units are sampled afterward for EVT RF tests. Deviations require lot disposition and an ECO.",
+  "panel_release_gate": "SELECTED_FACTORY_STACK_DFM_AND_POFV_76_CONFIRMATION",
+  "order_sequence": "FULL_LOT_22_NO_FIRST_ARTICLE_PAUSE",
+  "post_lot_sample_pcba": 2
+}

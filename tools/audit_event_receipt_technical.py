@@ -4,15 +4,17 @@
 from __future__ import annotations
 
 from contextlib import redirect_stderr
+import gc
 import hashlib
 import io
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
+
+from host_c_audit import compile_c_binary
 
 import cbor2
 
@@ -125,8 +127,6 @@ def audit_vector() -> None:
 
 
 def audit_firmware_runtime() -> None:
-    compiler = shutil.which("cc") or shutil.which("gcc")
-    require(compiler is not None, "host C compiler is unavailable")
     tests = (
         (
             "zs_nor_tests",
@@ -236,30 +236,19 @@ def audit_firmware_runtime() -> None:
     )
     with tempfile.TemporaryDirectory(prefix="zs-event-fw-qg2-") as directory:
         for test_name, sources in tests:
-            binary = Path(directory) / test_name
-            result = subprocess.run(
-                [
-                    compiler,
-                    "-std=gnu11",
-                    "-Wall",
-                    "-Wextra",
-                    "-Wpedantic",
-                    "-Werror",
-                    "-O2",
-                    "-UNDEBUG",
-                    f"-I{ROOT / 'firmware/include'}",
-                    f"-I{ROOT / 'firmware/generated'}",
-                    *(str(ROOT / source) for source in sources),
-                    "-lm",
-                    "-o",
-                    str(binary),
-                ],
-                check=False,
-                capture_output=True,
-                text=True,
+            binary, result = compile_c_binary(
+                root=ROOT,
+                directory=directory,
+                test_name=test_name,
+                sources=sources,
+                include_dirs=(
+                    ROOT / "firmware/include",
+                    ROOT / "firmware/generated",
+                ),
             )
             require(result.returncode == 0,
-                    f"firmware test compile failed ({test_name}): {result.stderr}")
+                    f"firmware test compile failed ({test_name}): "
+                    f"{result.stdout}{result.stderr}")
             result = subprocess.run(
                 [str(binary)], check=False, capture_output=True, text=True
             )
@@ -372,6 +361,8 @@ def main() -> int:
         receipt = decode_event_receipt(maximum.actions[0][2])
         require(receipt.event_id == 0xFFFFFFFFFFFFFFFF,
                 "full uint64 event ID was truncated")
+        del fusion, store
+        gc.collect()
 
     print("Event application receipt QG-2 independent runtime audit: PASS")
     print("- server runtime plus bounded raw-UART BG95 session, fixed-length uplink, binary receipt, exact W25Q512JV boot probe, erase-isolated NOR lifecycle and shared non-overlap binding verified")

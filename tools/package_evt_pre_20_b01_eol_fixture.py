@@ -10,19 +10,19 @@ import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "outputs" / "EVT_PRE_20_DIO_EVT_B01_И_EOL_ОСНАСТКА_20261009_REV_A.zip"
-ZIP_TIME = (2026, 10, 9, 12, 0, 0)
+OUTPUT = ROOT / "outputs" / "EVT_PRE_20_DIO_EVT_B01_И_EOL_ОСНАСТКА_20261112_REV_B.zip"
+ZIP_TIME = (2026, 11, 12, 12, 0, 0)
 
 
 FILES = {
-    "01_Программа_B01/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.docx": ROOT / "docs/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.docx",
-    "01_Программа_B01/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.md": ROOT / "docs/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.md",
+    "01_Программа_B01/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_B.docx": ROOT / "docs/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_B.docx",
+    "01_Программа_B01/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_B.md": ROOT / "docs/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_B.md",
     "01_Программа_B01/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx": ROOT / "docs/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx",
     "01_Программа_B01/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.md": ROOT / "docs/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.md",
     "02_EOL_оснастка_MFG_004/MFG_004_EOL_FIXTURE_DRILL_TEMPLATE_REV_A.pdf": ROOT / "manufacturing/MFG_004_EOL_FIXTURE_DRILL_TEMPLATE_REV_A.pdf",
     "02_EOL_оснастка_MFG_004/MFG_004_EOL_FIXTURE_DRILL_TEMPLATE_REV_A.dxf": ROOT / "manufacturing/MFG_004_EOL_FIXTURE_DRILL_TEMPLATE_REV_A.dxf",
     "02_EOL_оснастка_MFG_004/MFG_004_EOL_FIXTURE_CONTACT_MAP_REV_A.csv": ROOT / "manufacturing/MFG_004_EOL_FIXTURE_CONTACT_MAP_REV_A.csv",
-    "02_EOL_оснастка_MFG_004/MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_A.json": ROOT / "manufacturing/MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_A.json",
+    "02_EOL_оснастка_MFG_004/MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_B.json": ROOT / "manufacturing/MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_B.json",
     "02_EOL_оснастка_MFG_004/EOL_TEST_SPEC.md": ROOT / "manufacturing/EOL_TEST_SPEC.md",
     "02_EOL_оснастка_MFG_004/EOL_SOFTWARE_LIMITS_REV_A.json": ROOT / "manufacturing/EOL_SOFTWARE_LIMITS_REV_A.json",
     "03_Распиновка_и_подключение/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md": ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
@@ -31,14 +31,15 @@ FILES = {
     "03_Распиновка_и_подключение/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv": ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
     "03_Распиновка_и_подключение/HARNESS_LOGICAL_PINOUT_REV_A.csv": ROOT / "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "03_Распиновка_и_подключение/CONNECTOR_FREEZE_REV_A.csv": ROOT / "hardware/CONNECTOR_FREEZE_REV_A.csv",
-    "04_Прошивка_и_восстановление/EVT_PRE_20_BENCH_RELEASE_2026100601.zip": ROOT / "outputs/EVT_PRE_20_BENCH_RELEASE_2026100601.zip",
+    "04_Прошивка_и_восстановление/EVT_PRE_20_BENCH_RELEASE_2026100601.zip": ROOT / "releases/evt-pre-20/2026-10-06-rev-e/EVT_PRE_20_BENCH_RELEASE_2026100601.zip",
     "04_Прошивка_и_восстановление/bench_release_contract.json": ROOT / "firmware/targets/evt_pre_20/release/bench_release_contract.json",
     "04_Прошивка_и_восстановление/option_bytes_bench_rev_a.json": ROOT / "firmware/targets/evt_pre_20/release/option_bytes_bench_rev_a.json",
     "04_Прошивка_и_восстановление/firmware_lock_interlock_rev_a.json": ROOT / "firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json",
-    "04_Прошивка_и_восстановление/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx": ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx",
-    "04_Прошивка_и_восстановление/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md": ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md",
-    "05_Формы_результатов/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx": ROOT / "manufacturing/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx",
-    "05_Формы_результатов/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.csv": ROOT / "manufacturing/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.csv",
+    "04_Прошивка_и_восстановление/RELEASE_NOTES.md": ROOT / "firmware/RELEASE_NOTES.md",
+    "04_Прошивка_и_восстановление/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.docx": ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.docx",
+    "04_Прошивка_и_восстановление/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.md": ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.md",
+    "05_Формы_результатов/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.xlsx": ROOT / "manufacturing/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.xlsx",
+    "05_Формы_результатов/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.csv": ROOT / "manufacturing/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_B.csv",
     "05_Формы_результатов/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx": ROOT / "manufacturing/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx",
     "05_Формы_результатов/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json": ROOT / "manufacturing/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json",
     "05_Формы_результатов/EOL_RESULT_REGISTER.csv": ROOT / "manufacturing/EOL_RESULT_REGISTER.csv",
@@ -48,17 +49,19 @@ FILES = {
     "06_Методики_EVT/EVT_MATRIX.csv": ROOT / "tests/EVT_MATRIX.csv",
     "06_Методики_EVT/EVT_AUD_SI_REV_A.md": ROOT / "tests/EVT_AUD_SI_REV_A.md",
     "07_Проверяющие_утилиты/build_evt_pre_20_b01_eol_sources.py": ROOT / "tools/build_evt_pre_20_b01_eol_sources.py",
+    "07_Проверяющие_утилиты/build_evt_pre_20_b01_eol_sources_rev_b.py": ROOT / "tools/build_evt_pre_20_b01_eol_sources_rev_b.py",
     "07_Проверяющие_утилиты/build_evt_pre_20_b01_physical_eol_doc.py": ROOT / "tools/build_evt_pre_20_b01_physical_eol_doc.py",
     "07_Проверяющие_утилиты/build_evt_pre_20_b01_eol_measurement_xlsx.mjs": ROOT / "tools/build_evt_pre_20_b01_eol_measurement_xlsx.mjs",
     "07_Проверяющие_утилиты/build_mfg004_eol_fixture_drawing.py": ROOT / "tools/build_mfg004_eol_fixture_drawing.py",
     "07_Проверяющие_утилиты/validate_evt_pre_20_b01_eol_package.py": ROOT / "tools/validate_evt_pre_20_b01_eol_package.py",
     "07_Проверяющие_утилиты/validate_evt_pre_20_b01_hardware_qualification.py": ROOT / "tools/validate_evt_pre_20_b01_hardware_qualification.py",
+    "07_Проверяющие_утилиты/validate_evt_pre_20_firmware_readiness_rev_d.py": ROOT / "tools/validate_evt_pre_20_firmware_readiness_rev_d.py",
     "07_Проверяющие_утилиты/package_evt_pre_20_b01_eol_fixture.py": ROOT / "tools/package_evt_pre_20_b01_eol_fixture.py",
 }
 
 
-README = """DIO-EVT-B01 и EOL оснастка MFG-004 Rev A
-Дата: 09.10.2026
+README = """DIO-EVT-B01 и EOL оснастка MFG-004 Rev B
+Дата: 12.11.2026
 
 Состав:
 1. Операционная программа физической квалификации DIO-EVT-B01.
@@ -77,10 +80,10 @@ README = """DIO-EVT-B01 и EOL оснастка MFG-004 Rev A
 5. Заполнять основной реестр XLSX в 05_Формы_результатов.
 6. Сохранять raw evidence и SHA-256 каждой записи.
 
-Текущее состояние: физические испытания и MSA NOT_RUN. Прошивка не блокируется. OPEN_B01_FREEZE дает HOLD, а не PASS.
+Текущее состояние: физические испытания и MSA NOT_RUN. Интеграция загрузки TLS-материала через STM32 имеет SOFTWARE_INTEGRATION_PENDING. Прошивка не блокируется. OPEN_B01_FREEZE и SOFTWARE_INTEGRATION_PENDING дают HOLD, а не PASS.
 
 English summary
-This archive is the controlled physical qualification and EOL fixture package for DIO-EVT-B01. It includes the MFG-004 drill template, the exact 31-contact map, the signed bench software release, the measurement register and verification tools. Physical results and fixture MSA are NOT RUN. Undefined mandatory limits produce HOLD. Firmware locking remains denied until a separate production release is approved.
+This archive is the controlled physical qualification and EOL fixture package for DIO-EVT-B01. It includes the MFG-004 drill template, the exact 31-contact map, the signed bench software release, the measurement register and verification tools. Physical results and fixture MSA are NOT RUN. BG95 MAIN UART TLS provisioning integration is pending. Undefined mandatory limits and pending mandatory integration produce HOLD. Firmware locking remains denied until a separate production release is approved.
 """
 
 
@@ -99,8 +102,8 @@ def main() -> None:
     payloads["00_Опись/README_RU_EN.txt"] = README.encode("utf-8")
     manifest = {
         "schema": 1,
-        "package_id": "EVT_PRE_20_DIO_EVT_B01_EOL_FIXTURE_20261009_REV_A",
-        "status": "READY_FOR_FIXTURE_BUILD_AND_B01_EXECUTION_RESULTS_NOT_RUN",
+        "package_id": "EVT_PRE_20_DIO_EVT_B01_EOL_FIXTURE_20261112_REV_B",
+        "status": "READY_FOR_FIXTURE_BUILD_SOFTWARE_INTEGRATION_AND_HARDWARE_RESULTS_PENDING",
         "physical_results": "NOT_RUN",
         "fixture_msa": "NOT_RUN",
         "firmware_lock": "DENIED",

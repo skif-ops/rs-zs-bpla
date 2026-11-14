@@ -38,6 +38,17 @@ def independent_record_hash() -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def msvc_environment_script() -> Path | None:
+    roots = (
+        Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")),
+        Path(os.environ.get("ProgramFiles", r"C:\Program Files")),
+    )
+    candidates = []
+    for root in roots:
+        candidates.extend(root.glob("Microsoft Visual Studio/*/*/Common7/Tools/VsDevCmd.bat"))
+    return sorted(candidates, reverse=True)[0] if candidates else None
+
+
 def main() -> int:
     source = (ROOT / "firmware/src/zs_installation_commissioning.c").read_text(encoding="utf-8")
     test = (ROOT / "firmware/tests/test_installation_commissioning.c").read_text(encoding="utf-8")
@@ -57,19 +68,44 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="zs-commissioning-qg2-") as tmp:
         binary = Path(tmp) / ("installation_commissioning_qg2.exe" if os.name == "nt" else "installation_commissioning_qg2")
-        command = [
-            os.environ.get("CC", "cc"), "-std=gnu11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
-            f"-I{ROOT / 'firmware/include'}",
+        sources = [
             str(ROOT / "firmware/src/zs_sha256.c"),
             str(ROOT / "firmware/src/zs_position_trust.c"),
             str(ROOT / "firmware/src/zs_installation_store.c"),
             str(ROOT / "firmware/src/zs_installation_commissioning.c"),
             str(ROOT / "firmware/tests/test_installation_commissioning.c"),
         ]
-        if os.name != "nt":
-            command.append("-lm")
-        command.extend(("-o", str(binary)))
-        subprocess.run(command, check=True, cwd=ROOT)
+        compiler = os.environ.get("CC")
+        if os.name == "nt" and not compiler:
+            vsdevcmd = msvc_environment_script()
+            require(vsdevcmd is not None, "Visual Studio C compiler environment not found")
+            command = [
+                "cl", "/nologo", "/std:c11", "/W4", "/WX",
+                f"/I{ROOT / 'firmware/include'}", *sources, f"/Fe:{binary}",
+            ]
+            command_line = subprocess.list2cmdline(command)
+            compile_script = Path(tmp) / "compile_msvc.cmd"
+            compile_script.write_text(
+                "@echo off\r\n"
+                f'call "{vsdevcmd}" -arch=x64 >nul\r\n'
+                "if errorlevel 1 exit /b %errorlevel%\r\n"
+                f"{command_line}\r\n",
+                encoding="utf-8",
+            )
+            subprocess.run(
+                ["cmd.exe", "/d", "/c", str(compile_script)],
+                check=True,
+                cwd=tmp,
+            )
+        else:
+            command = [
+                compiler or "cc", "-std=gnu11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
+                f"-I{ROOT / 'firmware/include'}", *sources,
+            ]
+            if os.name != "nt":
+                command.append("-lm")
+            command.extend(("-o", str(binary)))
+            subprocess.run(command, check=True, cwd=tmp)
         completed = subprocess.run([str(binary)], check=True, cwd=ROOT,
                                    text=True, capture_output=True)
         require("zs_installation_commissioning_tests: OK" in completed.stdout,

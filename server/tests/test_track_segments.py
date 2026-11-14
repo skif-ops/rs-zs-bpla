@@ -110,6 +110,24 @@ def test_the_split_does_not_change_when_more_bearings_arrive():
     assert early[0] == (track_segments.FIRST_SEGMENT, 60) and late[0] == early[0] and late[1][0] == early[1][0]
 
 
+def test_incremental_split_matches_full_rebuild_and_recovers_from_a_late_row():
+    az = [(300.0 + 0.2 * k) if k % 2 == 0 else (130.0 - 0.3 * k) for k in range(80)]
+    rows = rows_of(az)
+
+    def result(segments):
+        return [(s.key, s.formed_us, [(r["time_us"], r["azimuth_deg"]) for r in s.rows]) for s in segments]
+
+    state = None
+    for end in range(1, len(rows) + 1):
+        incremental, state = track_segments.split_incremental(rows[:end], state)
+        assert result(incremental) == result(track_segments.split(rows[:end]))
+
+    without_middle = rows[:35] + rows[36:]
+    _, state = track_segments.split_incremental(without_middle)
+    recovered, state = track_segments.split_incremental(rows, state)
+    assert result(recovered) == result(track_segments.split(rows))
+
+
 # ---- through the bridge ---------------------------------------------------------------------------------------------
 
 def test_a_station_switching_targets_feeds_both_tracks(bridge):  # noqa: F811

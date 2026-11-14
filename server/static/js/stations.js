@@ -6,6 +6,7 @@
 (function () {
   "use strict";
   const REFRESH_MS = 60000;
+  const ACTIVE_ALERT_HOLD_MS = 4000;
   const STATE_TEXT = { online: "на связи", late: "опаздывает", lost: "потеряна", never: "не выходила" };
   const LEVEL_RANK = { ok: 0, info: 1, warn: 2, alarm: 3 };
   const STATE_RANK = { online: 0, never: 1, late: 2, lost: 3 };
@@ -86,6 +87,26 @@
   let selectedTenant = "";
   let viewMode = "cards";
   const open = new Set();                // station ids with the details row open
+  const liveTracks = new Map();          // track_id -> { stations, until }, updated by dioneya.alert/1
+  const apiAlertUntil = new Map();        // active state received with the health snapshot
+
+  function applyActiveAlerts() {
+    const now = Date.now();
+    for (const [sid, until] of apiAlertUntil) if (until <= now) apiAlertUntil.delete(sid);
+    for (const [track, state] of liveTracks) if (state.until <= now) liveTracks.delete(track);
+    const active = new Set(apiAlertUntil.keys());
+    for (const state of liveTracks.values()) for (const sid of state.stations) active.add(sid);
+    let changed = false;
+    for (const r of data.stations) {
+      const isActive = active.has(r.station_id);
+      changed = changed || Boolean(r.active_alert) !== isActive;
+      r.active_alert = isActive;
+      r.level = isActive ? "alarm" : (r.health_level || r.level);
+      r.problems = (r._healthProblems || r.problems || []).slice();
+      if (isActive) r.problems.unshift({ code: "active_alert", level: "alarm", text: "участвует в активной тревоге" });
+    }
+    return changed;
+  }
 
   function quickMatch(r) {
     if (!quick) return true;
@@ -184,7 +205,7 @@
     const overview = $("st-overview");
     overview.replaceChildren();
     rows.forEach((r) => {
-      const card = el("button", "st-station-card st-level-" + r.level);
+      const card = el("button", "st-station-card st-level-" + r.level + " st-state-" + r.state + (r.active_alert ? " st-active-alert" : ""));
       card.type = "button";
       card.setAttribute("aria-label", stationName(r) + ", ID " + r.station_id + ", " + (STATE_TEXT[r.state] || r.state) + ". Открыть подробности");
       const top = el("span", "st-station-top");
@@ -230,7 +251,7 @@
     const rows = visible();
     renderOverview(rows);
     rows.forEach((r) => {
-      const tr = el("tr", "st-row st-level-" + r.level);
+      const tr = el("tr", "st-row st-level-" + r.level + " st-state-" + r.state + (r.active_alert ? " st-active-alert" : ""));
       tr.dataset.id = r.station_id;
       columns.forEach((c) => {
         const td = el("td", (c.num ? "st-num-col" : "") + (c.wrap ? " st-wrap-cell" : ""));
@@ -248,7 +269,7 @@
 
   function renderSummary() {
     const pool = selectedTenant ? data.stations.filter((r) => r.tenant === selectedTenant) : data.stations;
-    const s = selectedTenant ? {
+    const s = {
       total: pool.length,
       online: pool.filter((r) => r.state === "online").length,
       late: pool.filter((r) => r.state === "late").length,
@@ -259,7 +280,7 @@
       battery_low: pool.filter((r) => r.problems.some((p) => p.code === "battery_low")).length,
       gnss: pool.filter((r) => r.problems.some((p) => /^(gnss_|position_|time_)/.test(p.code))).length,
       updating: pool.filter((r) => r.problems.some((p) => p.code === "fw_update" || p.code === "net_trial")).length,
-    } : (data.summary || {});
+    };
     document.querySelectorAll("#st-summary .st-num").forEach((n) => { n.textContent = s[n.dataset.key] ?? "–"; });
     document.querySelectorAll("#st-summary .st-card").forEach((b) => b.classList.toggle("st-active", b.dataset.filter === quick));
     const hours = (v) => v ? (v / 3600).toLocaleString("ru-RU", { maximumFractionDigits: 1 }) + " ч" : "";
@@ -273,6 +294,11 @@
       const res = await fetch("/api/v1/stations/health", { headers: { accept: "application/json" }, cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       data = await res.json(); receivedAt = Date.now();
+      for (const r of data.stations) {
+        r._healthProblems = (r.problems || []).filter((p) => p.code !== "active_alert");
+        if (r.active_alert) apiAlertUntil.set(r.station_id, Date.now() + ACTIVE_ALERT_HOLD_MS);
+      }
+      applyActiveAlerts();
       const tenantSelect = $("st-tenant");
       const tenants = [...new Set(data.stations.map((r) => r.tenant).filter(Boolean))].sort();
       tenantSelect.replaceChildren(new Option("Все доступные", ""));
@@ -297,9 +323,26 @@
   $("st-view-table").addEventListener("click", () => setView("table"));
   $("st-refresh").addEventListener("click", load);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+  window.addEventListener("muhoed:alert-message", (event) => {
+    const msg = event.detail || {};
+    if (msg.type === "track.update" && msg.live_current === true && msg.track?.track_id) {
+      liveTracks.set(msg.track.track_id, {
+        stations: (msg.track.stations || []).map(Number).filter(Number.isSafeInteger),
+        until: Date.now() + ACTIVE_ALERT_HOLD_MS,
+      });
+    } else if (msg.type === "track.end" && msg.track?.track_id) {
+      liveTracks.delete(msg.track.track_id);
+    } else if (msg.type === "alert.end") {
+      liveTracks.clear(); apiAlertUntil.clear();
+    } else {
+      return;
+    }
+    applyActiveAlerts(); renderSummary(); renderBody();
+  });
 
   renderHead();
   setView("cards");
   load();
+  setInterval(() => { if (applyActiveAlerts()) { renderSummary(); renderBody(); } }, 1000);
   setInterval(() => { if (!document.hidden) load(); else renderBody(); }, REFRESH_MS);
 })();

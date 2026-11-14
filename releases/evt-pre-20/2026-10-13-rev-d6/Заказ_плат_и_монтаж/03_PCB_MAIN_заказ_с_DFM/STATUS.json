@@ -1,0 +1,9 @@
+{
+  "board": "PCB-MAIN",
+  "status": "FAB_DFM_ORDER_PACKAGE",
+  "board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "drc_errors": 0,
+  "unconnected": 0,
+  "erc_errors": 0,
+  "factory_stack_approved": false
+}

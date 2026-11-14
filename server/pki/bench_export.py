@@ -7,6 +7,7 @@ metadata for bench stations, and can be refreshed before restarting bench_server
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 import os
 import sqlite3
 from pathlib import Path
@@ -31,7 +32,8 @@ def export(source: Path, target: Path) -> int:
         raise FileExistsError(temporary)
     try:
         Registry(temporary)
-        with sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True) as live, sqlite3.connect(temporary) as bench:
+        with closing(sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True)) as live, \
+                closing(sqlite3.connect(temporary)) as bench, bench:
             rows = live.execute("SELECT " + ",".join(COLUMNS) + " FROM stations WHERE tenant='bench'").fetchall()
             bench.executemany("INSERT INTO stations (" + ",".join(COLUMNS) + ") VALUES (" +
                               ",".join("?" for _ in COLUMNS) + ")", rows)

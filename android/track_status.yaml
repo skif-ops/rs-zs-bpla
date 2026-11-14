@@ -1,12 +1,12 @@
 track_id: dioneya_android_commissioning
-status: RELEASE_CANDIDATE_SIGNED_HARDWARE_VALIDATION_PENDING
+status: BENCH_RELEASE_SIGNED_HARDWARE_VALIDATION_PENDING
 source_status: IMPLEMENTED_WITH_VALIDATORS_TESTS_BLE_TRANSPORT_AND_POSITION_READBACK_HASH
-apk_status: RELEASE_CANDIDATE_SIGNED
+apk_status: BENCH_RELEASE_SIGNED
 release_build:
   status: PASS
   evidence: android/release_build_evidence.json
-  version_code: 2026101601
-  version_name: 0.1.0-evt.20261016
+  version_code: 2026111201
+  version_name: 0.1.1-bench.20261112
   signature_scheme: APK_V2
   private_material_in_repository: false
 local_debug_build:
@@ -52,16 +52,21 @@ required_features:
   - signed_resumable_ota
   - ab_status_and_rollback_report
   - redacted_log_export
+  - lora_rf_status_and_timed_test
+  - signed_lora_field_profile_installation
+  - local_lora_operation_audit
 software_release_items:
   - ble_service_characteristic_uuids_source_bound
   - qr_decoder_and_identity_validation_implemented
   - ota_manifest_and_signature_contract_implemented
   - release_signing_pass
   - cyclonedx_1_6_sbom_generated
+  - lora_engineer_service_control_build_and_unit_test_pass
 hardware_validation_pending:
   - station_gatt_hardware_validation
   - printed_qr_and_pairing_on_DIO_EVT_B01
   - signed_ota_and_rollback_end_to_end
+  - lora_secure_ble_rf_test_and_signed_profile_end_to_end
 security:
   product_signing_private_key_in_app: false
   station_private_key_in_app: false

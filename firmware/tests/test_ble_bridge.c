@@ -180,7 +180,7 @@ static void world_init(world_t *W) {
   for (unsigned i = 0u; i < 32u; i++) W->engineer_key[i] = (uint8_t)(0xa0u + i);
   memset(W->sec.slots, 0xff, sizeof(W->sec.slots));
   W->sec_io = (zs_station_secrets_io_t){&W->sec, sec_read, sec_erase, sec_write};
-  W->sport = (zs_ipc_service_port_t){W, stm_uart_send, now_ms, service_mode, peer_role, peer_secure, &W->cfg_io, &W->pos_io, &W->audit_io, &W->selftest, &W->identity, W->engineer_key, rnd, &W->sec_io, secrets_changed};
+  W->sport = (zs_ipc_service_port_t){W, stm_uart_send, now_ms, service_mode, peer_role, peer_secure, &W->cfg_io, &W->pos_io, &W->audit_io, &W->selftest, &W->identity, W->engineer_key, rnd, &W->sec_io, secrets_changed, NULL, NULL};
   zs_ble_bridge_init(&W->bridge, &W->bport);
   assert(zs_ipc_service_init(&W->service, &W->sport));
 }

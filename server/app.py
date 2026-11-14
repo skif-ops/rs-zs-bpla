@@ -117,6 +117,13 @@ async def replay_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "replay.html")
 
 
+@app.get("/journal", response_class=HTMLResponse)
+async def journal_page(request: Request) -> HTMLResponse:
+    """Operator journal: one row per alert episode and an immutable history of operator decisions."""
+
+    return templates.TemplateResponse(request, "journal.html")
+
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request) -> HTMLResponse:
     """Administration: accounts, station visibility, the audit log (each part for the permissions it needs)."""

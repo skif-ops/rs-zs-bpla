@@ -1,0 +1,97 @@
+{
+  "schema": "dioneya-pcb-main-enclosure-appearance-v2",
+  "status": "PRELIMINARY_PRINT_AND_CAST_PHYSICAL_FIT_REQUIRED",
+  "appearance_basis": "Рисунок1.png approved exterior",
+  "source_board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "electrical_configuration": "UNCHANGED_PCB_MAIN_AND_HARNESSES",
+  "outer_mm": [
+    200.0,
+    145.0,
+    59.0
+  ],
+  "board_origin_mm": [
+    42.0,
+    29.0,
+    9.0
+  ],
+  "board_allocation_mm": [
+    110.0,
+    75.0,
+    1.6
+  ],
+  "corner_clips_mm": 16,
+  "corner_softening_radius_mm": 2,
+  "front_lid_outer_bevel_mm": 2,
+  "front_recess_depth_mm": 0.85,
+  "fastener_centres_mm": [
+    [
+      15.0,
+      15.0
+    ],
+    [
+      185.0,
+      15.0
+    ],
+    [
+      185.0,
+      130.0
+    ],
+    [
+      15.0,
+      130.0
+    ]
+  ],
+  "blind_visual_indicator_seat": {
+    "centre_mm": [
+      138,
+      33
+    ],
+    "diameter_mm": 13,
+    "status": "APPEARANCE_ONLY_NOT_ELECTRICAL"
+  },
+  "approved_logo": {
+    "source_file": "DIONEYA_LOGO_STACKED_MONO_RELIEF_REV_A.svg",
+    "source_sha256": "62ac484ed28325afb5d534464f1d833b48974dcfd998072db4ca76b7bce45733",
+    "form": "0.6 mm raised monochrome relief on cover",
+    "artwork_width_mm": 48,
+    "path_rings": 11,
+    "colour_artwork_file": "DIONEYA_LOGO_STACKED_REV_A.svg",
+    "colour_artwork_sha256": "0ced4c4d5f1c608224b5d688d07636d8bbb13e847713e836bb2f7e87d9890dba",
+    "colour": "optional weatherproof marking; outdoor durability test pending"
+  },
+  "cover_pilot_d_mm": 2.5,
+  "cover_clearance_d_mm": 3.2,
+  "cover_counterbore_d_mm": 6.5,
+  "registration_lip_clearance_mm": 0.6,
+  "pcb_housing_overlap_mm3": 0.0,
+  "edge_clearance_mm": {
+    "west": 39,
+    "east": 45,
+    "south": 26,
+    "north": 38,
+    "below_board": 5,
+    "above_board": 44.4
+  },
+  "service_pull_clearance_mm": {
+    "J_PWR_west_35": 4,
+    "J_MIC_north_20": 18,
+    "J_MIC_east_20": 25,
+    "J_SIM_USB_SD_south_20": 6
+  },
+  "fit_limit": "PCB outline is an allocation solid; connector, antenna, gland, real PCBA, gasket and mast bracket require physical fit",
+  "first_article_checks": [
+    "real PCB-MAIN PCBA and connector access",
+    "gasket and IP water test",
+    "side antenna and cable gland positions",
+    "mast bracket strength and screws",
+    "ASA print shrinkage/warping and corner finish",
+    "UV and thermal qualification"
+  ],
+  "files": {
+    "DIO-3DP-UP-001B_body.step": "a608511af6a5142b22bf8d265ee99e77ba003cf3831c8cec3453c604b0aecc4e",
+    "DIO-3DP-UP-001B_body.stl": "89f6037bc35f2581e481b1816602f03645593e108b9268788da1b1563d719e5d",
+    "DIO-3DP-UP-001B_fit_assembly.step": "533b56e16e2f4deef2476e0dc7c4f1a02f7f3bc39ea64dd94e7cef643e50aa98",
+    "DIO-3DP-UP-001B_lid.step": "b86cdb4bb6783221712558653b8419cdb632a88fb50b31115f46b2fc7d010ce5",
+    "DIO-3DP-UP-001B_lid.stl": "981389ab4d52d28bec7aac97fa89be7ff839b6340c8fa16d1e62c07b38156250"
+  }
+}

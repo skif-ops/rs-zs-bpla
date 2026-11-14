@@ -275,6 +275,15 @@ def test_two_targets_are_kept_apart_by_class_or_fundamental(bridge, tmp_path, cl
     classes = {m["track"]["track_id"]: m["track"]["class"] for m in store.list_alerts(0, limit=10000) if m["type"] == "track.update"}
     assert sorted(c["code"] for c in classes.values()) == sorted(["uav_piston", "uav_electric" if class_b == 3 else "uav_piston"])
     assert sorted(round(c["f0_hz"]) for c in classes.values()) == sorted([round(np.median([110.0, 104.0])), round(np.median([f0_b, f0_b * 1.05]))])
+    # The operator's replay keeps the classification attached to each fused target as well; one target's label must
+    # not be copied to every visible row when several targets are active.
+    from station.replay import build_replay
+    summaries = store.list_tracks()
+    replay = build_replay(store, since_us=min(t["first_time_us"] for t in summaries),
+                          until_us=max(t["last_time_us"] for t in summaries))
+    assert sorted(t["class"]["code"] for t in replay["tracks"]) == sorted(
+        ["uav_piston", "uav_electric" if class_b == 3 else "uav_piston"],
+    )
 
 
 # ---- consumers: HTTP polling and WebSocket -------------------------------------------------------------------------

@@ -26,13 +26,22 @@
       <button class="btn btn-outline-primary replay-btn" id="replay-now" type="button" hidden>К текущему</button>
       <label for="replay-speed" class="replay-speed-label">Скорость</label>
       <select class="form-control replay-select replay-speed" id="replay-speed" aria-label="Скорость">
-        <option value="1">×1</option>
+        <option value="1" selected>×1</option>
         <option value="2">×2</option>
-        <option value="5" selected>×5</option>
+        <option value="5">×5</option>
         <option value="10">×10</option>
       </select>
     </div>
     <div class="replay-timeline"><span id="replay-time-start">—</span><input class="replay-slider" id="replay-slider" type="range" min="0" max="1" step="100" value="0" disabled aria-label="Время на шкале сопровождения"><span id="replay-time-end">—</span></div>
+    <section class="replay-targets" aria-labelledby="replay-targets-title">
+      <h2 id="replay-targets-title">Цели в текущий момент</h2>
+      <div class="table-responsive">
+        <table class="replay-target-table">
+          <thead><tr><th>Цель</th><th>Тип</th><th>Достоверность</th><th>Высота</th><th>Скорость</th><th>Курс</th><th>Погрешность</th><th>Станции</th><th>Угол лучей</th></tr></thead>
+          <tbody id="replay-target-body" aria-live="polite"><tr><td colspan="9" class="text-muted">Активных целей в текущий момент нет</td></tr></tbody>
+        </table>
+      </div>
+    </section>
     <p class="replay-hint">Колесо мыши — масштаб; перетаскивание — сдвиг; двойной щелчок — показать всё; пробел — пуск/пауза; стрелки — шаг 1 с.</p>
   </div>
 
@@ -50,23 +59,13 @@
         <dt>От начала</dt><dd id="ro-rel">—</dd>
       </dl>
 
-      <h2 class="replay-subtitle">Цель</h2>
-      <dl class="replay-readout" id="replay-target">
-        <dt>Высота</dt><dd id="ro-alt">—</dd>
-        <dt>Скорость</dt><dd id="ro-speed">—</dd>
-        <dt>Курс</dt><dd id="ro-course">—</dd>
-        <dt>Погрешность</dt><dd id="ro-err">—</dd>
-        <dt>Станции</dt><dd id="ro-stations">—</dd>
-        <dt>Угол лучей</dt><dd id="ro-crossing">—</dd>
-      </dl>
-
       <h2 class="replay-subtitle">Пеленги станций</h2>
       <ul class="replay-bearings" id="ro-bearings"><li class="text-muted">—</li></ul>
       <p class="replay-note">Лучи показывают, откуда станции слышали звук. Точка общего трека учитывает время распространения звука. Круг вокруг точки показывает погрешность.</p>
 
-      <details class="replay-advanced"><summary>Зоны слышимости и настройки</summary>
-        <label class="replay-check"><input type="checkbox" id="replay-geometry"> Показать зоны и слепые направления</label>
-        <div id="replay-geometry-opts" hidden>
+      <details class="replay-advanced" open><summary>Зоны слышимости и настройки</summary>
+        <label class="replay-check"><input type="checkbox" id="replay-geometry" checked> Показать зоны и слепые направления</label>
+        <div id="replay-geometry-opts">
         <label class="form-label" for="replay-geo-range">Дальность слышимости, м</label>
         <input class="form-control replay-select" id="replay-geo-range" type="number" min="100" max="5000" step="100" value="2000">
         <label class="form-label" for="replay-geo-height">Высота цели над станциями, м</label>
@@ -81,5 +80,5 @@
     </div>
   </div>
 </div>
-<script src="/static/js/replay.js"></script>
+<script src="/static/js/replay.js?v={{ build.commit or build.version }}"></script>
 {% endblock %}

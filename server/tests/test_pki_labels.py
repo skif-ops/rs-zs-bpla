@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-
 import pytest
 
 from pki import ca as pki
@@ -108,7 +107,7 @@ def test_nrf_boot_key_create_show_and_refuse_overwrite(tmp_path, capsys):
     out = capsys.readouterr().out
     k = nrf_boot_key.load(tmp_path)
     assert k.key_path.exists() and (tmp_path / "nrf-boot" / "nrf-boot.pub.pem").exists()
-    if os.name != "nt":
+    if os.name == "posix":
         assert oct(k.key_path.stat().st_mode & 0o777) == "0o600"
     assert k.public_fingerprint_hex in out and "SB_CONFIG_BOOT_SIGNATURE_KEY_FILE" in out
     meta = (tmp_path / "nrf-boot" / "nrf-boot.json").read_text()

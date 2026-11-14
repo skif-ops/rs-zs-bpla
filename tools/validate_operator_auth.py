@@ -51,7 +51,7 @@ def main() -> int:
         'SECOND_FACTOR_ROLES = {"engineer", "admin", SUPERUSER_ROLE}',
         # the superuser skif_root and the switch of the audit log of actions (2026-10-02)
         'SUPERUSER_NAME = "skif_root"',
-        'SUPERUSER_ROLE: set(PERMISSIONS) | {AUDIT_CONTROL}',
+        'SUPERUSER_ROLE: set(PERMISSIONS) | {ALERT_CONFIRM, AUDIT_CONTROL}',
         "def ensure_superuser(",
         "_not_superuser(name,",
         '"must_change": True, "totp_at_login": True',

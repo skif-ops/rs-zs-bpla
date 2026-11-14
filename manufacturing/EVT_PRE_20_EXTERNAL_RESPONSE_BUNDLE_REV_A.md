@@ -62,7 +62,7 @@ External reply waiting is closed. The following are intentionally not waived:
 2. independent Review B and manufacturing-release signatures;
 3. first-article inspection and functional smoke tests;
 4. PCB-PWR current/thermal and protection qualification;
-5. harness continuity, crimp pull, resistance, strain, `+70 C`/`-40 C`, I2C
+5. harness continuity, crimp pull, resistance, strain, EVT `+60 C`/`-20 C`, I2C
    and PDM/AAD checks;
 6. full assembled EVT electrical, RF, acoustic and environmental validation.
 

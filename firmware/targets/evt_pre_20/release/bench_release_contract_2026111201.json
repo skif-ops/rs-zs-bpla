@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "release_id": "EVT_PRE_20_BENCH_RELEASE_2026111201",
+  "station_release_code": 2026111201,
+  "status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
+  "stm32": {
+    "target": "STM32U585VIT6Q",
+    "version": 2026111201,
+    "signature": "Ed25519 over DIO-FW-V1 plus canonical CBOR manifest",
+    "key_id_hex": "04b418857c5001b2",
+    "expected_image_sha256": "98dd4076980ee80d3cd5d2ad6cf7cd84375203602bfe1da52cdff366087e1715",
+    "flash_used_bytes": 253624,
+    "ram123_used_bytes": 714184,
+    "option_byte_profile": "option_bytes_bench_rev_a.json",
+    "security_scope": "signed bench application with recovery retained and firmware lock forbidden"
+  },
+  "nrf52840": {
+    "target": "Raytac MDBT50Q-P1MV2 / nRF52840",
+    "version": "0.1.1+2026111201",
+    "signature": "MCUboot ECDSA P-256",
+    "public_key_fingerprint_sha256": "12fe7ff5b51a3482942024c2345b38928e8681da957382d7a4c10ae7bb96140d",
+    "expected_signed_image_sha256": "e2a10e2f8b68c4221f99509c7dd78728767301e7f867ae66c870601fbf6402b6",
+    "expected_merged_hex_sha256": "ae95386a77606d14d9273f4ed5abe1ff9dc68f9be9a8e755d937320bbd3cc554",
+    "sdk": "nRF Connect SDK v2.7.0",
+    "zephyr_sdk": "0.16.5",
+    "bootloader": "MCUboot, serial recovery, swap without scratch",
+    "signature_verified": true
+  },
+  "android": {
+    "application_id": "ru.dioneya.commissioning",
+    "version_code": 2026111201,
+    "version_name": "0.1.1-bench.20261112",
+    "apk_sha256": "b60661f98369b4731310faf57b78471f38315a5c4e3f7803c6c9e9ab891a3e30",
+    "signer_certificate_sha256": "64b9b31cc6e64bdbc09457254501812634872a8e05de1a95e7d8c638dbfed90a",
+    "min_sdk": 28,
+    "target_sdk": 36,
+    "release_signing_required": true,
+    "lora_control": "secure BLE, physical service mode and engineer role"
+  },
+  "lora_ru868": {
+    "field_tx_default": "OFF",
+    "service_rf_test": "installer application, 300 seconds by default, 900 seconds maximum, automatic stop",
+    "field_activation": "signed runtime profile after hardware RF and per-station EOL PASS",
+    "field_profile_in_release": false,
+    "reflash_after_rf_pass_required": false,
+    "activation_requires": [
+      "ELECTRICAL_EOL_PASS",
+      "STM32_NRF_SELFTEST_PASS",
+      "RF_PATH_PASS",
+      "CONDUCTED_RF_PASS",
+      "INSTALLED_ANTENNA_PASS",
+      "LORA_PROTOCOL_PASS",
+      "SIGNED_TEST_PROTOCOL",
+      "PER_STATION_EOL_PASS"
+    ]
+  },
+  "private_material_allowed_in_package": false,
+  "hardware_validation_required": true,
+  "firmware_lock_interlock": {
+    "status": "LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING",
+    "locking_enabled_in_release": false,
+    "policy": "firmware_lock_interlock_rev_a.json",
+    "production_lock_requires_separate_release": true,
+    "per_station_eol_pass_required": true
+  }
+}

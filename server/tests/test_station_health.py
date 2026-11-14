@@ -102,6 +102,30 @@ def test_row_and_summary():
                                     "battery_low": 1, "gnss": 1, "updating": 1}
 
 
+def test_active_alert_stations_uses_only_fresh_open_tracks():
+    assert health.ACTIVE_ALERT_US == 4_000_000
+
+    class AlertStore:
+        def open_episode(self, tenant):
+            return {"alert_id": "A-" + tenant, "level": "alert", "last_activity_us": NOW,
+                    "stations": [17, 18, 19]}
+
+        def open_alert_tracks(self, alert_id):
+            return [{"track_id": "fresh", "updated_us": NOW - 1_000_000},
+                    {"track_id": "stale", "updated_us": NOW - health.ACTIVE_ALERT_US - 1}]
+
+        def get_track(self, track_id):
+            return {"stations": [17, 18] if track_id == "fresh" else [19]}
+
+    assert health.active_alert_stations(AlertStore(), {"north"}, NOW) == {17, 18}
+
+    class StaleStore(AlertStore):
+        def open_alert_tracks(self, alert_id):
+            return [{"track_id": "stale", "updated_us": NOW - health.ACTIVE_ALERT_US - 1}]
+
+    assert health.active_alert_stations(StaleStore(), {"north"}, NOW) == set()
+
+
 def test_received_time_is_the_server_clock_and_old_rows_fall_back(tmp_path: Path):
     store = EventStore(tmp_path / "zs.sqlite3")
     before = int(time.time() * 1e6)
@@ -147,3 +171,26 @@ def test_the_page_data_follows_the_account(field, tmp_path, monkeypatch):
     page = logged_in(app, "north").get("/stations")
     assert page.status_code == 200 and 'id="st-table"' in page.text and "/static/js/stations.js" in page.text
     assert 'href="/stations"' in page.text and 'aria-current="page"' in page.text   # the menu marks the open page
+    assert 'data-live-replay-link' in page.text
+    script = logged_in(app, "north").get("/static/js/stations.js").text
+    assert "ACTIVE_ALERT_HOLD_MS = 4000" in script and "st-active-alert" in script and "st-state-" in script
+
+
+def test_tenant_viewer_sees_registered_station_before_first_heartbeat(field, tmp_path, monkeypatch):
+    from pki.registry import Registry
+    from station import pki_registry
+
+    accounts, _store, app = field
+    monkeypatch.setenv(pki_registry.PKI_DIR_ENV, str(tmp_path / "pki"))
+    monkeypatch.setenv(pki_registry.PKI_TENANTS_ENV, "bench")
+    monkeypatch.setenv(pki_registry.PKI_INCLUDE_TWINS_ENV, "1")
+    registry = Registry(tmp_path / "pki" / "registry.sqlite3")
+    registry.add("DIO-TWIN-001")
+    accounts.add_user("bench_viewer", "viewer", PASSWORD)
+    accounts.set_scope("bench_viewer", ["bench"], [])
+
+    data = logged_in(app, "bench_viewer").get("/api/v1/stations/health").json()
+    assert data["summary"]["total"] == 1
+    assert data["summary"]["never"] == 1
+    assert data["stations"][0]["station_id"] == 9001
+    assert data["stations"][0]["state"] == "never"

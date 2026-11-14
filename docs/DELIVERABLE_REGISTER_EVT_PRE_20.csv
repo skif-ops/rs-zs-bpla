@@ -1,6 +1,6 @@
 ID,Раздел,Поставочный объект,Формат,Критичность,Статус,QG-1 полнота,QG-2 техника,Критерий выпуска
 CM-001,Управление,Ведомость документов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Все позиции реестра имеют владельца версию статус и путь
-CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,DRAFT,PASS,OPEN,Выбран EVT-20; варианты 4 и 10 сохранены только для сравнения; customer procurement handoff остаётся под техническим QG-2
+CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,CUSTOMER_PROCUREMENT_HANDOFF_SENT,PASS,PASS,Выбран EVT-20; программа 2x20 плюс стендовый образец передана заказчику в закупку; открытые DFM stackup via assembly housing evidence ведутся как follow-up/ECO после ответа фабрики
 CM-003,Управление,Матрица требований и трассировки,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Каждое требование связано с проверкой и evidence
 CM-004,Управление,Журнал решений и изменений,XLSX+CSV,P1,DRAFT,OPEN,OPEN,Все изменения имеют основание и влияние
 CM-005,Управление,Реестр рисков и отклонений,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Блокирующие риски имеют владельца и действие
@@ -8,7 +8,7 @@ CM-006,Управление,Манифест SHA-256,TXT+CSV,P0,PLANNED,OPEN,OPE
 SYS-001,Требования,ТЗ предсерийного EVT,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Согласовано для выбранного лота 4 10 или 20 изделий RU868 и будущей совместимости EU868
 SYS-002,Архитектура,Архитектура изделия и системы,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Нет конфликтов hardware firmware server Android
 SYS-003,Архитектура,ICD станция-сервер,DOCX+CBOR schema,P0,DRAFT,PASS,OPEN,Decoder explicitly accepts controlled schemas 1 3 4 and rejects unknown versions; target and field compatibility remain QG2
-SYS-004,Архитектура,Энергобаланс EVT-20 для 40 Ач и 80 Вт,XLSX+DOCX,P0,EVT_PURCHASE_IDENTITIES_CONTROLLED,PASS,OPEN,Exact RB40 SLP080S-12M SCC075010060R and SBS050150200 purchase identities are controlled with no substitution; measured S0-S4 cold system and 30-day result remain required during assembly and EVT
+SYS-004,Архитектура,Энергобаланс EVT-20 для 50 Ач и 80 Вт,XLSX+DOCX,P0,EVT_PURCHASE_IDENTITIES_CONTROLLED,PASS,OPEN,Exact heated DIO-BAT-LFP-12V50-H-REV-A plus SLP080S-12M SCC075010060R and SBS050150200 purchase identities are controlled with no substitution; measured S0-S4 heater cold system and 30-day result remain required during assembly and EVT
 SYS-005,Архитектура,Threat model и управление ключами,DOCX,P0,PLANNED,OPEN,OPEN,Ключи не включены в пакет; процессы provisioning описаны
 HW-M-000,PCB main,Комплект входных authority MAIN-AUTH-001..011,CSV+MD+JSON,P0,CONTROLLED_ECO_APPLIED,PASS,OPEN,Electrical capture input is complete; the accepted limited PCB-MAIN-MECH-ECO-001/002 chain and controlled full repack pass strict 2D clearance while routing 3D service evidence and independent Review B remain open
 HW-M-001,PCB main,Схема электрическая принципиальная,KICAD_SCH+PDF,P0,CONTROLLED_REVIEW_A,PASS,OPEN,Native label/netlist schematic and signed pin-net Review A plus commit-matched KiCad 9 ERC pass; human-readable hierarchical review PDF and independent design review remain required before release
@@ -36,7 +36,7 @@ HW-P-007,Power,PCB-PWR dual-buck placement ECO-001,KICAD_PCB+JSON+MD+AUDIT,P0,CO
 HW-C-001,Кабели,Схема соединения всех элементов,MD+CSV+PDF,P0,CONTROLLED_LOGICAL_PINOUT_AND_EVT_RF_PURCHASE_CHAIN,PASS,OPEN,Internal interfaces map to controlled nets; three CAB.0243 SMA bulkhead chains and exact antennas are purchase-controlled with no substitution; published cable temperature and bend radius are controlled while mate route shielding seal and installed RF validation remain open for assembly EOL and EVT
 HW-C-002,Кабели,Чертежи жгутов и распайка,MD+CSV+PDF,P0,EVT_BUILD_BASELINE_ACCEPTED,PASS,PASS,"Manufacturing schedule fixes connector cavities terminals exact wire MPNs colors labels and 275/440/330 mm cut lengths with 10 percent service margin; all 16 historical supplier rows are engineering closures; first-off crimp pull continuity resistance strain SI thermal cold and installed-route EVT checks remain open"
 HW-C-003,Кабели,Таблица разъёмов и mating parts,CSV+XLSX,P1,CONTROLLED,PASS,OPEN,CONNECTOR_FREEZE_REV_A is the sole connector authority; external RF power and enclosure endpoints plus crimp applicator validation remain open
-PROC-001,Закупка,Сводный BOM и программа 2x20 плюс стендовый образец,XLSX+CSV,P0,CONTROLLED_TECHNICAL_QG2,PASS,PASS,Per-lot EVT-20 quantities remain controlled and the aggregate procurement plan covers two lots of 20 plus one bench station for 41 stations with two EVT-20 reserve pools; customer-owned quotation and purchase plus hardware manufacturing release remain separate gates
+PROC-001,Закупка,Сводный BOM и программа 2x20 плюс стендовый образец,XLSX+CSV,P0,CUSTOMER_PROCUREMENT_HANDOFF_SENT,PASS,PASS,Per-lot EVT-20 quantities remain controlled and the aggregate procurement plan covers two lots of 20 plus one bench station for 41 stations with two EVT-20 reserve pools; customer-owned order is released from the engineering package; factory comments and formal manufacturing evidence are tracked as post-order follow-up/ECO
 PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,NON_BLOCKING_CUSTOMER_INPUT,PASS,N/A,Поставщик ссылка дата MOQ lead time stock являются необязательными коммерческими полями заказчика и не блокируют engineering release
 PROC-003,Закупка,Approved vendor list и аналоги,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Аналоги не снижают функциональность
 PROC-004,Закупка,План входного контроля,DOCX+forms,P0,DRAFT,OPEN,OPEN,Counterfeit ESD MSL functional sampling
@@ -85,8 +85,8 @@ EVT-006,Испытания,Энергетика S0-S4 solar battery,TEMPLATES+SC
 EVT-007,Испытания,Механика IP климат UV,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Вакуумные корпуса на выбранный лот 4 10 или 20; 3D как утверждённый равный резерв; ТПА только аудит исходных данных
 EVT-008,Испытания,Сводный отчёт и deviation closure,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Нет незакрытых blocker deviations
 AND-001,Android,Требования и UX flow,DOCX+FIGMA_or_SVG,P0,DRAFT,OPEN,OPEN,Сценарии монтажника и сервис-инженера приняты
-AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,DRAFT,OPEN,OPEN,Reproducible build and tests PASS
-AND-003,Android,BLE configuration client,KOTLIN,P0,PLANNED,OPEN,OPEN,Schema validation and auth PASS
+AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,IMPLEMENTED,PASS,PASS,Gradle 9.6.0 AGP 9.4.0 API 36 unit tests и debug assemble PASS 05.10.2026
+AND-003,Android,BLE configuration client,KOTLIN,P0,IMPLEMENTED_HOST_VALIDATED,PASS,OPEN,Исходный BluetoothGatt transport и контракты PASS; pairing UUID freeze и проверка с nRF52840 остаются после сборки станции
 AND-004,Android,Signed OTA client,KOTLIN,P0,PLANNED,OPEN,OPEN,Power loss resume hash signature rollback PASS
-AND-005,Android,APK arm64 и test APK,APK+SHA256+SIG,P0,PLANNED,OPEN,OPEN,Install Huawei/no GMS smoke PASS
+AND-005,Android,APK arm64 и test APK,APK+SHA256+SIG,P0,DEBUG_APK_BUILT,PASS,OPEN,Debug APK build PASS; release signing SBOM Huawei/no GMS smoke и станционный GATT остаются открыты
 AND-006,Android,SBOM privacy security test,JSON+DOCX,P0,DRAFT,OPEN,OPEN,Нет secrets critical vulnerabilities data leaks

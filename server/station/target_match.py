@@ -40,6 +40,8 @@ class Signature:
     confidence: float
     type_label: str | None
     f0_hz: float | None
+    type_confidence: float = 0.0
+    type_status: str = "UNKNOWN"
 
     @property
     def code(self) -> str:
@@ -51,6 +53,11 @@ class Signature:
         """The ``class`` object of dioneya.alert/1."""
         return {"code": self.code, "label": self.label, "confidence": round(self.confidence, 3),
                 "type": self.type_label, "f0_hz": None if self.f0_hz is None else round(self.f0_hz, 1)}
+
+    def as_replay_class(self) -> dict:
+        """Classification shown to an operator; the output protocol remains backward compatible."""
+        return {**self.as_class(), "type_confidence": round(self.type_confidence, 3),
+                "type_status": self.type_status}
 
 
 UNKNOWN = Signature(int(TargetClass.UNKNOWN), "UNKNOWN", True, 0.0, None, None)
@@ -69,11 +76,14 @@ def from_detections(detections: list[DetectionMessage]) -> Signature:
     known = [d for d in detections if not d.classification.unknown]
     best = max(known or detections, key=lambda d: d.classification.confidence)
     typed = [d for d in detections if d.hierarchy.type_status in ("PROVISIONAL", "STABLE") and d.hierarchy.type_id]
-    type_label = max(typed, key=lambda d: d.hierarchy.type_confidence).hierarchy.type_label if typed else None
+    typed_best = max(typed, key=lambda d: d.hierarchy.type_confidence) if typed else None
+    type_label = typed_best.hierarchy.type_label if typed_best else None
     f0s = [f for f in (_f0(d) for d in detections) if f is not None]
     f0 = median(f0s) if f0s else None
     return Signature(best.classification.class_id, best.classification.label, best.classification.unknown,
-                     best.classification.confidence, type_label, f0)
+                     best.classification.confidence, type_label, f0,
+                     typed_best.hierarchy.type_confidence if typed_best else 0.0,
+                     typed_best.hierarchy.type_status if typed_best else "UNKNOWN")
 
 
 def station_track_signature(store, station_id: int, track_event_id: int, segment=None) -> Signature:
@@ -101,7 +111,8 @@ def station_track_signature(store, station_id: int, track_event_id: int, segment
     # one it hears at the same time) the class is not known
     if signature.f0_hz is not None and max(own, signature.f0_hz) / min(own, signature.f0_hz) > OTHER_SOURCE_RATIO:
         return Signature(UNKNOWN.class_id, UNKNOWN.label, True, 0.0, None, own)
-    return Signature(signature.class_id, signature.label, signature.unknown, signature.confidence, signature.type_label, own)
+    return Signature(signature.class_id, signature.label, signature.unknown, signature.confidence, signature.type_label,
+                     own, signature.type_confidence, signature.type_status)
 
 
 def compatible(a: Signature, b: Signature) -> bool:
@@ -120,7 +131,11 @@ def merge(signatures: list[Signature]) -> Signature:
         return UNKNOWN
     known = [s for s in signatures if not s.unknown]
     best = max(known or signatures, key=lambda s: s.confidence)
-    types = [s.type_label for s in signatures if s.type_label]
+    typed = [s for s in signatures if s.type_label]
+    type_best = max(typed, key=lambda s: (({"UNKNOWN": 0, "PROVISIONAL": 1, "STABLE": 2}).get(s.type_status, 0),
+                                         s.type_confidence)) if typed else None
     f0s = [s.f0_hz for s in signatures if s.f0_hz is not None]
-    return Signature(best.class_id, best.label, best.unknown, best.confidence, types[0] if types else None,
-                     median(f0s) if f0s else None)
+    return Signature(best.class_id, best.label, best.unknown, best.confidence,
+                     type_best.type_label if type_best else None, median(f0s) if f0s else None,
+                     type_best.type_confidence if type_best else 0.0,
+                     type_best.type_status if type_best else "UNKNOWN")

@@ -77,12 +77,14 @@ def main() -> int:
 
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
     source_evidence = json.loads(SOURCE_EVIDENCE.read_text(encoding="utf-8"))
-    source_evidence_sha256 = hashlib.sha256(SOURCE_EVIDENCE.read_bytes()).hexdigest()
+    source_evidence_sha256 = hashlib.sha256(
+        SOURCE_EVIDENCE.read_bytes().replace(b"\r\n", b"\n")
+    ).hexdigest()
     procurement_identity_evidence = json.loads(
         PROCUREMENT_IDENTITY.read_text(encoding="utf-8")
     )
     procurement_identity_sha256 = hashlib.sha256(
-        PROCUREMENT_IDENTITY.read_bytes()
+        PROCUREMENT_IDENTITY.read_bytes().replace(b"\r\n", b"\n")
     ).hexdigest()
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     capture_status = json.loads(STATUS.read_text(encoding="utf-8"))

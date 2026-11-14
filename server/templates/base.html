@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Мухоед{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css?v={{ build.commit or build.version }}">
+    <link rel="stylesheet" href="/static/css/styles.css?v={{ build.commit or build.version }}">
   </head>
   <body{% if request.state.operator %} data-operator-name="{{ request.state.operator.name }}"{% endif %}>
     {% set path = request.url.path %}
     {% set p = request.state.operator.permissions if request.state.operator else [] %}
     {% macro item(href, label) -%}
       <a class="app-nav-link{% if path == href or path.startswith(href + '/') %} active{% endif %}" href="{{ href }}"
+         {% if href == "/replay" %}data-live-replay-link{% endif %}
          {% if path == href or path.startswith(href + '/') %}aria-current="page"{% endif %}>{{ label }}</a>
     {%- endmacro %}
     <header class="app-header">
       <div class="container app-header-inner">
-        <a class="app-brand" href="/">Мухоед</a>
+        <a class="app-brand" href="/" aria-label="Мухоед, сервер акустической системы Дионея">
+          <span class="app-brand-name">Мухоед</span>
+          <span class="app-brand-description">сервер акустической системы Дионея</span>
+        </a>
         <nav class="app-primary" aria-label="Оперативные экраны">
           {{ item("/", "Обзор") }}
           {{ item("/stations", "Станции") }}
@@ -35,6 +39,7 @@
                   {{ item("/", "Обзор") }}
                   {{ item("/stations", "Станции") }}
                   {{ item("/replay", "Сопровождение") }}
+                  {{ item("/journal", "Журнал тревог") }}
                 </nav>
               </div>
               <div class="app-menu-heading">Анализ и обучение</div>
@@ -66,7 +71,7 @@
     <footer class="app-footer">
       <div class="container">Мухоед {{ build.label }}</div>
     </footer>
-    <script src="/static/js/app.js"></script>
-    {% if request.state.operator %}<script src="/static/js/alert-watch.js"></script>{% endif %}
+    <script src="/static/js/app.js?v={{ build.commit or build.version }}"></script>
+    {% if request.state.operator %}<script src="/static/js/alert-watch.js?v={{ build.commit or build.version }}"></script>{% endif %}
   </body>
 </html>

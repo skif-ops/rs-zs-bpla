@@ -118,7 +118,9 @@ Changing `SIM_MUX_SEL` with Q3 on, U13 enabled, or `CELL_STATUS=HIGH` is a firmw
 
 - Verify all 55 authority rows against the final native symbols and the TE A2 land pattern.
 - Confirm both sockets are genuine `2336582-1`, or qualify one pin-, footprint-, temperature-, and lifecycle-compatible second source before lot release.
-- Measure socket VDD, RST, CLK, DATA, DET, U13 EN, and both selection states at -40 C, room temperature, and the hot qualification point.
+- Measure socket VDD, RST, CLK, DATA, DET, U13 EN, and both selection states at
+  EVT -20 C, room temperature and +60 C. Repeat at -40 C and +70 C for the
+  post-EVT series qualification.
 - Prove selected socket VDD remains at least 1.62 V, and prove the unselected VDD, RST, CLK, and DATA paths remain isolated.
 - Prove Q3 makes U13 High-Z at reset, brownout, firmware crash, and modem-off states.
 - Run ESD, edge-integrity, 5000 mechanical-cycle evidence review, and at least 100 powered slot-change cycles.

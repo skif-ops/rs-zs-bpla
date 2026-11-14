@@ -118,8 +118,9 @@ Before the remaining lot is released, run:
 1. rail-drop, startup and modem-burst tests;
 2. I2C at `100 kHz` through the 440 mm harness;
 3. four-channel PDM/AAD gain, phase, noise and wake tests;
-4. powered `+70 C` thermal run;
-5. `-40 C` continuity and functional start, including the M8 joint;
+4. powered EVT `+60 C` thermal run;
+5. EVT `-20 C` continuity and functional start, including the M8 joint and
+   configured battery heater; `-40 C`/`+70 C` remain post-EVT series tests;
 6. harness flex/strain and connector-retention checks;
 7. 100% PCB-MIC acoustic-path inspection.
 

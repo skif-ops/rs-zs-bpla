@@ -7,8 +7,11 @@ add_subdirectory(targets/evt_pre_20)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
+add_compile_definitions(_USE_MATH_DEFINES _CRT_SECURE_NO_WARNINGS)
 if(MSVC)
   add_compile_options("/FI${CMAKE_CURRENT_SOURCE_DIR}/include/zs_compiler_compat.h")
+endif()
+if(WIN32)
   add_library(m INTERFACE)
 endif()
 
@@ -88,6 +91,7 @@ add_library(zs_core
   src/zs_ed25519.c
   src/zs_lora_frame.c
   src/zs_lora_uplink.c
+  src/zs_lora_rf_profile.c
   src/zs_audio_chunk.c
   src/zs_task_watch.c
   src/zs_command_clock.c
@@ -242,6 +246,8 @@ add_executable(zs_lora_frame_tests tests/test_lora_frame.c)
 target_link_libraries(zs_lora_frame_tests zs_core m)
 add_executable(zs_lora_uplink_tests tests/test_lora_uplink.c)
 target_link_libraries(zs_lora_uplink_tests zs_core m)
+add_executable(zs_lora_rf_profile_tests tests/test_lora_rf_profile.c)
+target_link_libraries(zs_lora_rf_profile_tests zs_core m)
 add_executable(zs_sx1262_packet_tests tests/test_sx1262_packet.c)
 target_link_libraries(zs_sx1262_packet_tests zs_core m)
 add_executable(zs_audio_chunk_tests tests/test_audio_chunk.c)
@@ -268,7 +274,7 @@ target_include_directories(app_comms_sim_tests PRIVATE tests/host_sim targets/ev
 target_link_libraries(app_comms_sim_tests PRIVATE evt_pre_20_dual_sim_gpio)
 
 # station digital twin: portable stack + real comms task on the host against a scene, a scripted BG95 and the server twin
-if(NOT MSVC)
+if(UNIX)
   add_executable(zs_station_twin twin/station_twin.c twin/scene.c twin/array_render.c targets/evt_pre_20/app/app_comms.c)
   target_include_directories(zs_station_twin PRIVATE twin tests/host_sim targets/evt_pre_20/app)
   target_link_libraries(zs_station_twin PRIVATE evt_pre_20_dual_sim_gpio m)
@@ -352,89 +358,12 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(evt_pre_20_dual_sim_gpio_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_sim_orchestrator_tests PRIVATE -UNDEBUG)
   target_compile_options(app_comms_sim_tests PRIVATE -UNDEBUG)
-endif()
-
-# MSVC uses /U to undefine a preprocessor symbol. Keep the same Release-test
-# contract on Windows so assert() expressions are executed instead of removed.
-if(MSVC)
-  set(ZS_ASSERT_TEST_TARGETS
-    zs_core_tests
-    zs_driver_tests
-    zs_classifier_consensus_tests
-    zs_bg95_transport_tests
-    zs_dual_sim_tests
-    zs_dual_sim_bg95_tests
-    zs_bg95_event_uplink_tests
-    zs_bg95_event_receipt_tests
-    zs_bg95_command_transport_tests
-    zs_bg95_mqtt_session_tests
-    zs_command_transport_tests
-    zs_command_channel_tests
-    zs_command_journal_tests
-    zs_command_trust_tests
-    zs_mqtt_command_binding_tests
-    zs_event_outbox_tests
-    zs_event_receipt_tests
-    zs_mqtt_event_transport_tests
-    zs_heartbeat_telemetry_tests
-    zs_archive_tests
-    zs_nor_tests
-    zs_nor_command_journal_tests
-    zs_nor_event_outbox_tests
-    zs_nor_storage_layout_tests
-    zs_prehistory_tests
-    zs_audio_recorder_tests
-    zs_audio_upload_tests
-    zs_time_gap_tests
-    zs_time_spoof_tests
-    zs_spatial_tests
-    zs_protocol_size_tests
-    zs_position_trust_tests
-    zs_station_position_tests
-    zs_installation_store_tests
-    zs_installation_commissioning_tests
-    zs_station_config_tests
-    zs_bg95_provision_tests
-    zs_platform_tests
-    zs_fft_mixed_tests
-    zs_dsp_mcu_tests
-    zs_ina226_tests
-    zs_ble_bridge_tests
-    zs_nor_slot_store_tests
-    zs_air_gate_tests
-    zs_presence_tests
-    zs_mcumgr_serial_tests
-    zs_nor_image_store_tests
-    zs_station_pipeline_tests
-    zs_station_comms_tests
-    zs_boot_counter_tests
-    zs_station_secrets_tests
-    zs_command_keys_tests
-    zs_fw_update_tests
-    zs_model_tests
-    zs_fw_boot_tests
-    zs_net_trial_tests
-    zs_bearing_tests
-    zs_bearing_stream_tests
-    zs_comb_bearing_tests
-    zs_doa_sep_tests
-    zs_pipeline_sources_tests
-    zs_ed25519_tests
-    zs_lora_frame_tests
-    zs_lora_uplink_tests
-    zs_sx1262_packet_tests
-    zs_audio_chunk_tests
-    zs_task_watch_tests
-    zs_command_clock_tests
-    zs_command_set_tests
-    zs_station_params_tests
-    evt_pre_20_target_contract_tests
-    evt_pre_20_dual_sim_gpio_tests
-    evt_pre_20_sim_orchestrator_tests
-    app_comms_sim_tests
-  )
-  foreach(ZS_ASSERT_TEST_TARGET IN LISTS ZS_ASSERT_TEST_TARGETS)
-    target_compile_options(${ZS_ASSERT_TEST_TARGET} PRIVATE /UNDEBUG)
+elseif(MSVC)
+  get_property(zs_build_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+  foreach(zs_target IN LISTS zs_build_targets)
+    if(zs_target MATCHES "_tests$")
+      target_compile_options(${zs_target} PRIVATE /UNDEBUG)
+    endif()
   endforeach()
 endif()
 
@@ -503,6 +432,7 @@ add_test(NAME pipeline_sources COMMAND zs_pipeline_sources_tests)
 add_test(NAME ed25519 COMMAND zs_ed25519_tests)
 add_test(NAME lora_frame COMMAND zs_lora_frame_tests)
 add_test(NAME lora_uplink COMMAND zs_lora_uplink_tests)
+add_test(NAME lora_rf_profile COMMAND zs_lora_rf_profile_tests)
 add_test(NAME sx1262_packet COMMAND zs_sx1262_packet_tests)
 add_test(NAME audio_chunk COMMAND zs_audio_chunk_tests)
 add_test(NAME task_watch COMMAND zs_task_watch_tests)

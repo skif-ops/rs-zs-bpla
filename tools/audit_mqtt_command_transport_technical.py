@@ -4,15 +4,17 @@
 from __future__ import annotations
 
 from contextlib import redirect_stderr
+import gc
 import hashlib
 import io
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from types import SimpleNamespace
+
+from host_c_audit import compile_c_binary
 
 import cbor2
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
@@ -139,8 +141,6 @@ def audit_firmware_vector() -> None:
 
 
 def audit_firmware_bg95_runtime() -> None:
-    compiler = shutil.which("cc") or shutil.which("gcc")
-    require(compiler is not None, "host C compiler is unavailable")
     tests = (
         (
             "zs_nor_tests",
@@ -224,30 +224,18 @@ def audit_firmware_bg95_runtime() -> None:
     )
     with tempfile.TemporaryDirectory(prefix="zs-command-fw-qg2-") as directory:
         for test_name, sources in tests:
-            binary = Path(directory) / test_name
-            result = subprocess.run(
-                [
-                    compiler,
-                    "-std=gnu11",
-                    "-Wall",
-                    "-Wextra",
-                    "-Wpedantic",
-                    "-Werror",
-                    "-O2",
-                    "-UNDEBUG",
-                    f"-I{ROOT / 'firmware/include'}",
-                    f"-I{ROOT / 'firmware/generated'}",
-                    *(str(ROOT / source) for source in sources),
-                    "-lm",
-                    "-o",
-                    str(binary),
-                ],
-                check=False,
-                capture_output=True,
-                text=True,
+            binary, result = compile_c_binary(
+                root=ROOT,
+                directory=directory,
+                test_name=test_name,
+                sources=sources,
+                include_dirs=(
+                    ROOT / "firmware/include",
+                    ROOT / "firmware/generated",
+                ),
             )
             require(result.returncode == 0,
-                    f"{test_name} compile failed: {result.stderr}")
+                    f"{test_name} compile failed: {result.stdout}{result.stderr}")
             result = subprocess.run(
                 [str(binary)], check=False, capture_output=True, text=True
             )
@@ -366,12 +354,15 @@ def main() -> int:
             not store.due_commands(first_us + 3_000_000, 1_000_000),
             "ACKed command remained eligible for retry",
         )
-        with store._conn() as connection:
+        connection = store._conn()
+        try:
             row = connection.execute(
                 "SELECT acked,ack_result,ack_detail,completed_us,publish_count "
                 "FROM commands WHERE command_id=?",
                 (command.command_id,),
             ).fetchone()
+        finally:
+            connection.close()
         require(row["acked"] == 1 and row["ack_result"] == 0,
                 "ACK outcome was not stored")
         require(row["completed_us"] == first_us + 1_200_000,
@@ -412,6 +403,8 @@ def main() -> int:
                 "transient failure was incorrectly MQTT-acknowledged")
         require(error_log.getvalue().strip() == "MQTT processing error: RuntimeError",
                 "transient error log is absent or exposes exception details")
+        del store
+        gc.collect()
 
     print("MQTT signed command transport QG-2: PASS")
     print("scope: host runtime + signed vector + exact W25Q512JV boot probe + erase-isolated NOR journal + shared archive/command/outbox non-overlap + BG95 bounded raw-UART session/fixed ACK; target crypto/slot count/OCTOSPI/sample/USART-DMA/retain policy/hardware remain pending")
