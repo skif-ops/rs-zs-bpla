@@ -1,25 +1,25 @@
 {
   "release_id": "EVT_PRE_20_REV_D11",
   "date": "2026-11-14",
-  "source_commit": "f32944ad81dc806d4b01bccf12b8be257165f686",
+  "source_commit": "fad513d476595b8400b719dbabc0edf2a88c19f9",
   "overall": "PASS",
   "archives": {
     "FULL": {
       "filename": "EVT_PRE_20_REV_D11_FULL.zip",
-      "bytes": 48571962,
-      "sha256": "0848D2B1F48551256882358EA0944B91BC4446C28BE4E47D5503C69A4E925CB1",
-      "file_count": 1242,
+      "bytes": 55605826,
+      "sha256": "FA24867076BA9EC961242DD8834B5AC409FA55C242060BADEA2B5609686DF435",
+      "file_count": 1243,
       "root": "EVT_D11",
       "crc": "PASS",
-      "manifest_hashes_verified": 1241,
+      "manifest_hashes_verified": 1242,
       "full_extraction": "PASS",
       "kicad_absent": true,
       "private_keys_absent": true
     },
     "ALTIUM": {
       "filename": "EVT_PRE_20_REV_D11_ALTIUM.zip",
-      "bytes": 12356420,
-      "sha256": "78CCC96D023332AE9B272A689B2614D070DA15D589363F28457E51374E2D9A69",
+      "bytes": 12356391,
+      "sha256": "803AEDE3D928ECE2DA3546A7F62EC1BA06BEDD360ABD6353BAFE4FA8B6D5345A",
       "file_count": 315,
       "root": "EVT_D11_ALTIUM",
       "crc": "PASS",
@@ -30,8 +30,8 @@
     },
     "TESTS": {
       "filename": "EVT_PRE_20_REV_D11_TESTS.zip",
-      "bytes": 8205918,
-      "sha256": "4314D2A36529261975C65A41765A3BC263D8276F16BE9AC68C1DB8D76B7B07E5",
+      "bytes": 8205890,
+      "sha256": "CA75530E9F15D21D614B0CBCFD026E1CD905EFB02EACDCA819E5EDC8C7813D96",
       "file_count": 374,
       "root": "EVT_D11_TESTS",
       "crc": "PASS",
@@ -42,12 +42,12 @@
     },
     "SOFTWARE": {
       "filename": "EVT_PRE_20_REV_D11_SOFTWARE.zip",
-      "bytes": 3361080,
-      "sha256": "9FB8CA75B034A4DCD446753E1726F65395603EE82EAAD20238BD7A4F4BC1E5C5",
-      "file_count": 804,
+      "bytes": 6877543,
+      "sha256": "B6C9B9944FE8A61E0D62D1D933A5F85D9441915D02D229B6A0F969707ECA2997",
+      "file_count": 805,
       "root": "EVT_D11_SOFTWARE",
       "crc": "PASS",
-      "manifest_hashes_verified": 803,
+      "manifest_hashes_verified": 804,
       "full_extraction": "PASS",
       "kicad_absent": true,
       "private_keys_absent": true
@@ -59,20 +59,30 @@
   "procurement_state": "ORDER_PLACED",
   "software_artifact_status": {
     "release_id": "EVT_PRE_20_BENCH_RELEASE_2026111201",
+    "status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
+    "validated_release_archive": {
+      "included": true,
+      "archive": "EVT_PRE_20_BENCH_RELEASE_2026111201.zip",
+      "archive_sha256": "CD04D89E7457623E7AB472C5307B5D2E19E679AB21C2395C5E1ADF4D72FDCEE2",
+      "files": 45,
+      "validation": "PASS",
+      "stm32_signature": "PASS",
+      "nrf52840_fixed_hashes": "PASS",
+      "private_material_scan": "PASS"
+    },
     "apk": {
       "included": true,
       "sha256": "B60661F98369B4731310FAF57B78471F38315A5C4E3F7803C6C9E9AB891A3E30"
     },
     "stm32_signed_binary": {
-      "included": false,
-      "expected_sha256": "98DD4076980EE80D3CD5D2AD6CF7CD84375203602BFE1DA52CDFF366087E1715"
+      "included": true,
+      "sha256": "98DD4076980EE80D3CD5D2AD6CF7CD84375203602BFE1DA52CDFF366087E1715"
     },
     "nrf52840_signed_binary": {
-      "included": false,
-      "expected_sha256": "E2A10E2F8B68C4221F99509C7DD78728767301E7F867AE66C870601FBF6402B6"
+      "included": true,
+      "sha256": "E2A10E2F8B68C4221F99509C7DD78728767301E7F867AE66C870601FBF6402B6"
     },
-    "reason": "signed firmware artifacts are absent from the controlled workspace; obsolete 2026101601 images are intentionally excluded",
-    "flashing_permission": "DENIED_UNTIL_SIGNED_ARTIFACTS_RESTORED_AND_VALIDATED",
+    "flashing_permission": "ALLOWED_FOR_DIO_EVT_B01_AND_EVT_HARDWARE_VALIDATION",
     "firmware_lock": "FORBIDDEN_HARDWARE_VALIDATION_PENDING"
   },
   "altium_payload_byte_identical_to_rev_d10": true,
