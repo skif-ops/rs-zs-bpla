@@ -1,0 +1,166 @@
+{
+  "documents": [
+    {
+      "file": "00_Опись_и_статус_комплекта_Rev_E.docx",
+      "body_paragraphs": 36,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "01_Техническое_задание_EVT_PRE_20_Rev_E.docx",
+      "body_paragraphs": 50,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "02_Развертывание_Мухоеда_Windows11_Ubuntu2404.docx",
+      "body_paragraphs": 57,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "03_Руководство_администратора_Мухоед.docx",
+      "body_paragraphs": 30,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "04_Руководство_пользователя_Мухоед.docx",
+      "body_paragraphs": 21,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "05_Выпуск_сертификатов_и_регистрация_станций.docx",
+      "body_paragraphs": 35,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "06_Инструкция_монтажника_обновление_станции.docx",
+      "body_paragraphs": 72,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "07_Методика_дополнительного_дообучения_Мухоед.docx",
+      "body_paragraphs": 25,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "08_Проверка_сервера_dioneya_ru.docx",
+      "body_paragraphs": 26,
+      "tables": 0,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "09_Пошаговая_инструкция_сборщика_EVT_PRE_20.docx",
+      "body_paragraphs": 267,
+      "tables": 6,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_ASSEMBLY_SETUP_INSTRUCTION_REV_B.docx",
+      "body_paragraphs": 92,
+      "tables": 2,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx",
+      "body_paragraphs": 44,
+      "tables": 3,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_B.docx",
+      "body_paragraphs": 153,
+      "tables": 8,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_D.docx",
+      "body_paragraphs": 668,
+      "tables": 21,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx",
+      "body_paragraphs": 62,
+      "tables": 0,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_HARNESS_MANUFACTURING_WORK_INSTRUCTION_REV_B.docx",
+      "body_paragraphs": 81,
+      "tables": 3,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_INSTALLATION_COMMISSIONING_INSTRUCTION_REV_B.docx",
+      "body_paragraphs": 82,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_INSTRUCTION_REGISTER_REV_B.docx",
+      "body_paragraphs": 28,
+      "tables": 3,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_LONG_RANGE_ACOUSTIC_HEAD_TRADE_STUDY_REV_C.docx",
+      "body_paragraphs": 71,
+      "tables": 8,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_PKI_CERTIFICATE_LIFECYCLE_INSTRUCTION_REV_A.docx",
+      "body_paragraphs": 75,
+      "tables": 2,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_PROCUREMENT_VARIANTS_21_41_NOTICE_REV_D8.docx",
+      "body_paragraphs": 20,
+      "tables": 3,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_SERVER_DEPLOYMENT_BACKUP_OPERATIONS_INSTRUCTION_REV_A.docx",
+      "body_paragraphs": 52,
+      "tables": 1,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "file": "EVT_PRE_20_TIME_SYNCHRONIZATION_TRUST_INSTRUCTION_REV_A.docx",
+      "body_paragraphs": 59,
+      "tables": 2,
+      "status": "PASS",
+      "errors": []
+    }
+  ],
+  "overall": "PASS"
+}
