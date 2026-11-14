@@ -1,0 +1,49 @@
+{
+  "release_id": "EVT_PRE_20_REV_D9",
+  "date": "2026-10-16",
+  "archives": {
+    "FULL": {
+      "filename": "EVT_PRE_20_REV_D9_FULL.zip",
+      "bytes": 34566399,
+      "sha256": "D38D611DC70F9980F71C8A931C85AD9B052CB00F8A209E5C79931891AD630116",
+      "file_count": 861,
+      "directory_entries": 107,
+      "root": "EVT_D9",
+      "compression": "ZIP_DEFLATED",
+      "crc_test": "PASS",
+      "full_extraction": "PASS",
+      "max_member_path_characters": 116,
+      "kicad_absent": true,
+      "private_key_markers_absent": true
+    },
+    "ALTIUM": {
+      "filename": "EVT_PRE_20_REV_D9_ALTIUM.zip",
+      "bytes": 12356966,
+      "sha256": "1C858674794A5A8C7D25532FBDBA2308F32C75308698137C68B80B6397FD9DA2",
+      "file_count": 316,
+      "directory_entries": 49,
+      "root": "EVT_D9_ALTIUM",
+      "compression": "ZIP_DEFLATED",
+      "crc_test": "PASS",
+      "full_extraction": "PASS",
+      "max_member_path_characters": 134,
+      "kicad_absent": true,
+      "private_key_markers_absent": true
+    },
+    "TESTS": {
+      "filename": "EVT_PRE_20_REV_D9_TESTS.zip",
+      "bytes": 4736716,
+      "sha256": "350620F6A61F02F5EF104679C96F24C9DDDCD5EF6EB506D53F26B90726682C6A",
+      "file_count": 345,
+      "directory_entries": 41,
+      "root": "EVT_D9_TESTS",
+      "compression": "ZIP_DEFLATED",
+      "crc_test": "PASS",
+      "full_extraction": "PASS",
+      "max_member_path_characters": 110,
+      "kicad_absent": true,
+      "private_key_markers_absent": true
+    }
+  },
+  "overall": "PASS"
+}

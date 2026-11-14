@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """QG-2 independent technical audit of portable dual-SIM failover."""
 from pathlib import Path
+import os
 import re
 import shutil
 import subprocess
@@ -19,6 +20,17 @@ def macro(header: str, name: str) -> int:
     match = re.search(rf"^#define {re.escape(name)} (\d+)u$", header, re.MULTILINE)
     require(match is not None, f"missing numeric policy macro {name}")
     return int(match.group(1))
+
+
+def msvc_environment_script() -> Path | None:
+    roots = (
+        Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")),
+        Path(os.environ.get("ProgramFiles", r"C:\Program Files")),
+    )
+    candidates = []
+    for root in roots:
+        candidates.extend(root.glob("Microsoft Visual Studio/*/*/Common7/Tools/VsDevCmd.bat"))
+    return sorted(candidates, reverse=True)[0] if candidates else None
 
 
 def main() -> int:
@@ -82,9 +94,10 @@ def main() -> int:
     require("physical_sim_operator_and_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED" in target,
             "assembled-station evidence boundary drift")
     require("dual_sim_gpio_power_binding:" in target and
-            "BLOCKER" in next(line for line in target.splitlines()
-                              if "dual_sim_gpio_power_binding:" in line),
-            "target GPIO/power binding is not retained as blocker")
+            "TARGET_EXACT_REV_A_GPIO_INTERLOCK_BUILD_PASS_U13_3V8_MODEM_AND_100_CYCLE_VALIDATION_PENDING"
+            in next(line for line in target.splitlines()
+                    if "dual_sim_gpio_power_binding:" in line),
+            "target GPIO/power binding status drift")
     for pin_id in (
         "CELL_PWRKEY_CMD", "CELL_STATUS", "SIM_MUX_SEL", "SIM_MUX_EN",
         "SIM1_DET", "SIM2_DET", "PWR_GOOD", "EN_MODEM",
@@ -116,8 +129,10 @@ def main() -> int:
     require(mismatch_check < corrected_profile < accepted_link,
             "profile mismatch fail-closed runtime scenario is missing")
 
-    compiler = shutil.which("cc") or shutil.which("gcc")
-    require(compiler is not None, "host C compiler is unavailable")
+    compiler = os.environ.get("CC") or shutil.which("cc") or shutil.which("gcc")
+    vsdevcmd = msvc_environment_script() if os.name == "nt" and not compiler else None
+    require(compiler is not None or vsdevcmd is not None,
+            "host C compiler is unavailable")
     test_sets = (
         (
             "dual_sim_qg2",
@@ -146,20 +161,40 @@ def main() -> int:
     )
     with tempfile.TemporaryDirectory(prefix="zs-dual-sim-qg2-") as directory:
         for test_name, sources, success_text in test_sets:
-            binary = Path(directory) / test_name
-            compile_result = subprocess.run(
-                [
+            binary = Path(directory) / (test_name + (".exe" if os.name == "nt" else ""))
+            source_paths = [str(ROOT / source_name) for source_name in sources]
+            if vsdevcmd is not None:
+                command = [
+                    "cl", "/nologo", "/std:c11", "/W4", "/WX", "/O2",
+                    "/UNDEBUG", "/D_CRT_SECURE_NO_WARNINGS",
+                    f"/I{ROOT / 'firmware/include'}",
+                    f"/I{ROOT / 'firmware/targets/evt_pre_20/include'}",
+                    *source_paths, f"/Fe:{binary}",
+                ]
+                compile_script = Path(directory) / f"compile_{test_name}.cmd"
+                compile_script.write_text(
+                    "@echo off\r\n"
+                    f'call "{vsdevcmd}" -arch=x64 >nul\r\n'
+                    "if errorlevel 1 exit /b %errorlevel%\r\n"
+                    f"{subprocess.list2cmdline(command)}\r\n",
+                    encoding="utf-8",
+                )
+                compile_command = ["cmd.exe", "/d", "/c", str(compile_script)]
+            else:
+                compile_command = [
                     compiler,
                     "-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
                     "-O2", "-UNDEBUG", f"-I{ROOT / 'firmware/include'}",
                     f"-I{ROOT / 'firmware/targets/evt_pre_20/include'}",
-                    *(str(ROOT / source_name) for source_name in sources),
-                    "-o", str(binary),
-                ],
-                check=False, capture_output=True, text=True, cwd=ROOT,
+                    *source_paths, "-o", str(binary),
+                ]
+            compile_result = subprocess.run(
+                compile_command, check=False, capture_output=True, text=True,
+                cwd=directory,
             )
             require(compile_result.returncode == 0,
-                    f"strict {test_name} compile failed: {compile_result.stderr}")
+                    f"strict {test_name} compile failed: "
+                    f"{compile_result.stdout}{compile_result.stderr}")
             run_result = subprocess.run(
                 [str(binary)], check=False, capture_output=True, text=True, cwd=ROOT
             )

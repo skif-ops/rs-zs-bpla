@@ -1,0 +1,3 @@
+# Approved range for the standalone EVT EOL CSR and certificate tools.
+# Win ARM64 wheel availability is limited to 46.0.3 as of the release date.
+cryptography>=46.0.0,<=46.0.3

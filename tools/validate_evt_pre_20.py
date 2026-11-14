@@ -11,6 +11,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SERIALS = [f"DIO-EVT-{index:03d}" for index in range(1, 21)]
+EXPECTED_PROGRAM_EXTENSION_SERIALS = [
+    *[f"DIO-EVT-{index:03d}" for index in range(21, 41)],
+    "DIO-EVT-B01",
+]
 
 
 def read_csv(relative_path: str) -> list[dict[str, str]]:
@@ -26,18 +30,25 @@ def require(condition: bool, message: str) -> None:
 
 def validate_csv_shapes() -> None:
     for path in sorted(ROOT.rglob("*.csv")):
-        # Integration branches retain EVT-MB evidence under an isolated scope;
-        # that line has its own manifests and validation contract.
-        if "evt-mb" in path.parts:
+        relative = path.relative_to(ROOT)
+        if relative.parts[0] in {".git", "outputs"} or any(
+            part.startswith("build") for part in relative.parts
+        ):
             continue
         with path.open(encoding="utf-8-sig", newline="") as source:
-            rows = list(csv.reader(source))
-        require(bool(rows), f"empty CSV: {path.relative_to(ROOT)}")
+            sample = source.read(8192)
+            source.seek(0)
+            try:
+                dialect = csv.Sniffer().sniff(sample, delimiters=",;\t")
+            except csv.Error:
+                dialect = csv.excel
+            rows = list(csv.reader(source, dialect))
+        require(bool(rows), f"empty CSV: {relative}")
         width = len(rows[0])
         for line_number, row in enumerate(rows[1:], start=2):
             require(
                 len(row) == width,
-                f"CSV width mismatch: {path.relative_to(ROOT)}:{line_number}",
+                f"CSV width mismatch: {relative}:{line_number}",
             )
 
 
@@ -55,6 +66,45 @@ def validate_lot() -> None:
     )
     require(all(row["APN_Mode"] == "PUBLIC_ONLY" for row in lot), "pilot APN is not PUBLIC_ONLY")
     require(all(row["LoRa_Profile"] == "RU868_LOCKED" for row in lot), "selected-lot LoRa is not RU868")
+
+    program_extension = read_csv("manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv")
+    require(
+        [row["Serial"] for row in program_extension] == EXPECTED_PROGRAM_EXTENSION_SERIALS,
+        "second-set and bench serial range mismatch",
+    )
+    require(
+        len({row["Serial"] for row in [*lot, *program_extension]}) == 41,
+        "program serial identities are not unique across 2x20+1",
+    )
+    second_set = program_extension[:20]
+    bench = program_extension[20:]
+    require(
+        all(row["Lot"] == "EVT-PRE-20-LOT-2" for row in second_set),
+        "second EVT-20 set is not bound to its own lot",
+    )
+    require(
+        all(row["Housing_Technology"] == "VACUUM_CASTING_PRIMARY" for row in second_set),
+        "second EVT-20 set does not retain the primary vacuum-casting process",
+    )
+    require(
+        all(row["Status"] == "SECOND_GROUP_RESERVED_AWAITING_BUILD" for row in second_set),
+        "second EVT-20 serial reservation is incomplete or incorrectly released",
+    )
+    require(
+        len(bench) == 1
+        and bench[0]["Lot"] == "BENCH"
+        and bench[0]["Housing_Technology"] == "BENCH_FIXTURE"
+        and bench[0]["Status"] == "BENCH_UNIT_RESERVED",
+        "bench serial reservation differs from the controlled program",
+    )
+    require(
+        all(row["APN_Mode"] == "PUBLIC_ONLY" for row in program_extension),
+        "second-set or bench APN is not PUBLIC_ONLY",
+    )
+    require(
+        all(row["LoRa_Profile"] == "RU868_LOCKED" for row in program_extension),
+        "second-set or bench LoRa profile is not RU868",
+    )
 
     housing = read_csv("manufacturing/HOUSING_LOT_PLAN.csv")
     require([row["Serial"] for row in housing] == EXPECTED_SERIALS, "housing capacity serial range mismatch")
@@ -207,6 +257,14 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR DIM-003 request/mechanical-acceptance separation decision is missing",
     )
     require(
+        decisions["DEC-097"]["Status"] ==
+        "ACCEPTED_EVT_DIM_003_SERIAL_REVALIDATION_REQUIRED"
+        and "DIM-003 18/18" in decisions["DEC-097"]["Impact"]
+        and "four round" in decisions["DEC-097"]["Impact"]
+        and "serial enclosure revalidation" in decisions["DEC-097"]["Impact"],
+        "PCB-PWR DIM-003 EVT acceptance or serial-revalidation boundary is missing",
+    )
+    require(
         decisions["DEC-055"]["Status"] == "IMPLEMENTED_TWO_FABRICATOR_RESPONSES_PENDING"
         and "fabricator acceptance and numeric power geometry"
         in decisions["DEC-055"]["Decision"]
@@ -214,6 +272,642 @@ def validate_decisions_and_tests() -> None:
         and "two independent fabricators" in decisions["DEC-055"]["Impact"]
         and "0/24" in decisions["DEC-055"]["Impact"],
         "PCB-PWR stackup/copper request and numeric-geometry separation decision is missing",
+    )
+    require(
+        decisions["DEC-098"]["Status"] ==
+        "LOCKED_NUMERIC_EVT_ENGINEERING_INPUT_FINAL_JOB_ACCEPTANCE_PENDING"
+        and "JLC04161H-3313" in decisions["DEC-098"]["Impact"]
+        and "all 31 nets" in decisions["DEC-098"]["Impact"]
+        and "4.0 mm at 5 A" in decisions["DEC-098"]["Impact"]
+        and "3.0 mm at 4 A" in decisions["DEC-098"]["Impact"]
+        and "do not populate FAB-A or FAB-B rows" in decisions["DEC-098"]["Impact"],
+        "PCB-PWR conservative numeric EVT routing decision is missing or over-released",
+    )
+    require(
+        decisions["DEC-110"]["Status"] ==
+        "PASS_EVT_ENGINEERING_STACKUP_PROFILE_ROUTING_INPUT_AUTHORIZED_JOB_DFM_PENDING"
+        and "JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz"
+        in decisions["DEC-110"]["Impact"]
+        and "35 um routing calculation lower bound"
+        in decisions["DEC-110"]["Impact"]
+        and "job-specific DFM deviation channel"
+        in decisions["DEC-110"]["Impact"]
+        and "manufacturing blocks" in decisions["DEC-110"]["Impact"],
+        "PCB-PWR EVT stackup/order profile decision is missing or over-released",
+    )
+    require(
+        decisions["DEC-111"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "U3.4 to C4.1" in decisions["DEC-111"]["Impact"]
+        and "U4.4 to C6.1" in decisions["DEC-111"]["Impact"]
+        and "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
+        in decisions["DEC-111"]["Impact"]
+        and "authoritative board unchanged" in decisions["DEC-111"]["Impact"]
+        and "exact human acceptance before application" in decisions["DEC-111"]["Impact"]
+        and "Review B CAM and manufacturing blocks" in decisions["DEC-111"]["Impact"],
+        "PCB-PWR bootstrap routing candidate boundary is missing or over-released",
+    )
+    require(
+        decisions["DEC-112"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "1c7c3704" in decisions["DEC-112"]["Reason"]
+        and "86 to 86" in decisions["DEC-112"]["Reason"]
+        and "126 to 124" in decisions["DEC-112"]["Reason"]
+        and "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE"
+        in decisions["DEC-112"]["Impact"]
+        and "authoritative PCB-PWR board unchanged" in decisions["DEC-112"]["Impact"]
+        and "Review B CAM and manufacturing blocks" in decisions["DEC-112"]["Impact"],
+        "PCB-PWR bootstrap routing machine-gate closure is missing or over-released",
+    )
+    require(
+        decisions["DEC-113"]["Status"] ==
+        "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE_APPLICATION_PENDING"
+        and "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE"
+        in decisions["DEC-113"]["Reason"]
+        and "U3.4-C4.1" in decisions["DEC-113"]["Impact"]
+        and "U4.4-C6.1" in decisions["DEC-113"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-113"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-113"]["Impact"],
+        "PCB-PWR bootstrap routing acceptance boundary is missing",
+    )
+    require(
+        decisions["DEC-114"]["Status"] ==
+        "APPLICATION_EXACT_BOOTSTRAP_DELTA_COMMIT_BOUND_GATE_PENDING"
+        and "57d7b571" in decisions["DEC-114"]["Reason"]
+        and "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
+        in decisions["DEC-114"]["Impact"]
+        and "fresh commit-bound CI and PCB Native application gate"
+        in decisions["DEC-114"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-114"]["Impact"],
+        "PCB-PWR bootstrap routing application boundary is missing",
+    )
+    require(
+        decisions["DEC-115"]["Status"] ==
+        "PASS_EXACT_BOOTSTRAP_APPLICATION_REMAINING_ROUTING_NEXT"
+        and "ca27482a" in decisions["DEC-115"]["Reason"]
+        and "CI 598" in decisions["DEC-115"]["Reason"]
+        and "PCB Native 325" in decisions["DEC-115"]["Reason"]
+        and "86 to 86" in decisions["DEC-115"]["Reason"]
+        and "126 to 124" in decisions["DEC-115"]["Reason"]
+        and "neither overall routing nor Review B CAM DFM thermal or manufacturing complete"
+        in decisions["DEC-115"]["Impact"],
+        "PCB-PWR bootstrap routing application closure is missing or over-released",
+    )
+    require(
+        decisions["DEC-116"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_002_CREATION_SUBGATE"
+        in decisions["DEC-116"]["Reason"]
+        and "U1.1-C1.1" in decisions["DEC-116"]["Impact"]
+        and "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
+        in decisions["DEC-116"]["Impact"]
+        and "prohibit a narrow substitute" in decisions["DEC-116"]["Impact"]
+        and "exact human acceptance before application" in decisions["DEC-116"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-116"]["Impact"],
+        "PCB-PWR routing candidate 002 boundary is missing or over-released",
+    )
+    require(
+        decisions["DEC-117"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "186ad093" in decisions["DEC-117"]["Reason"]
+        and "86 to 86" in decisions["DEC-117"]["Reason"]
+        and "124 to 123" in decisions["DEC-117"]["Reason"]
+        and "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE"
+        in decisions["DEC-117"]["Impact"]
+        and "authoritative PCB-PWR board unchanged" in decisions["DEC-117"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-117"]["Impact"],
+        "PCB-PWR routing candidate 002 machine-gate closure is missing",
+    )
+    require(
+        decisions["DEC-118"]["Status"] ==
+        "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE_APPLICATION_PENDING"
+        and "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE"
+        in decisions["DEC-118"]["Reason"]
+        and "U1.1-C1.1" in decisions["DEC-118"]["Impact"]
+        and "do not authorize a narrow switch-node substitute"
+        in decisions["DEC-118"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-118"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-118"]["Impact"],
+        "PCB-PWR routing candidate 002 acceptance boundary is missing",
+    )
+    require(
+        decisions["DEC-119"]["Status"] ==
+        "APPLICATION_EXACT_LM74700_VCAP_DELTA_COMMIT_BOUND_GATE_PENDING"
+        and "b4b1ca81" in decisions["DEC-119"]["Reason"]
+        and "U1.1-C1.1" in decisions["DEC-119"]["Impact"]
+        and "prohibit narrow SW_3V8 or SW_3V3 substitution"
+        in decisions["DEC-119"]["Impact"]
+        and "fresh commit-bound CI and PCB Native application gate"
+        in decisions["DEC-119"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-119"]["Impact"],
+        "PCB-PWR routing candidate 002 application boundary is missing",
+    )
+    require(
+        decisions["DEC-120"]["Status"] ==
+        "PASS_EXACT_LM74700_VCAP_APPLICATION_REMAINING_ROUTING_NEXT"
+        and "328457c6" in decisions["DEC-120"]["Reason"]
+        and "CI 606" in decisions["DEC-120"]["Reason"]
+        and "PCB Native 333" in decisions["DEC-120"]["Reason"]
+        and "PCB-PWR Schematic 81" in decisions["DEC-120"]["Reason"]
+        and "86 to 86" in decisions["DEC-120"]["Reason"]
+        and "124 to 123" in decisions["DEC-120"]["Reason"]
+        and "U1.1-C1.1" in decisions["DEC-120"]["Impact"]
+        and "separate exact human gate" in decisions["DEC-120"]["Impact"]
+        and "Review B CAM DFM thermal or manufacturing"
+        in decisions["DEC-120"]["Impact"],
+        "PCB-PWR routing candidate 002 application closure is missing",
+    )
+    require(
+        decisions["DEC-121"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_003_CREATION_SUBGATE"
+        in decisions["DEC-121"]["Reason"]
+        and "J1.1-F1.1" in decisions["DEC-121"]["Impact"]
+        and "4.0 mm F.Cu" in decisions["DEC-121"]["Impact"]
+        and "exact human acceptance" in decisions["DEC-121"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-121"]["Impact"],
+        "PCB-PWR routing candidate 003 creation boundary is missing",
+    )
+    require(
+        decisions["DEC-122"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "4a1114ff" in decisions["DEC-122"]["Reason"]
+        and "CI 612" in decisions["DEC-122"]["Reason"]
+        and "PCB-PWR Schematic 86" in decisions["DEC-122"]["Reason"]
+        and "PCB Native 339" in decisions["DEC-122"]["Reason"]
+        and "86 to 86" in decisions["DEC-122"]["Reason"]
+        and "123 to 122" in decisions["DEC-122"]["Reason"]
+        and "ACCEPT_PCB_PWR_VBAT_RAW_ROUTING_003_SUBGATE"
+        in decisions["DEC-122"]["Impact"]
+        and "authoritative PCB-PWR board unchanged"
+        in decisions["DEC-122"]["Impact"]
+        and "buck hot-loop switch-node Kelvin return Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-122"]["Impact"],
+        "PCB-PWR routing candidate 003 machine-gate closure is missing",
+    )
+    require(
+        decisions["DEC-123"]["Status"] ==
+        "ACCEPT_PCB_PWR_VBAT_RAW_ROUTING_003_SUBGATE_APPLICATION_PENDING"
+        and "ACCEPT_PCB_PWR_VBAT_RAW_ROUTING_003_SUBGATE"
+        in decisions["DEC-123"]["Reason"]
+        and "J1.1-F1.1" in decisions["DEC-123"]["Impact"]
+        and "do not authorize buck hot-loop or switch-node routing"
+        in decisions["DEC-123"]["Impact"]
+        and "fresh commit-bound application gate"
+        in decisions["DEC-123"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-123"]["Impact"],
+        "PCB-PWR routing candidate 003 acceptance boundary is missing",
+    )
+    require(
+        decisions["DEC-124"]["Status"] ==
+        "APPLICATION_EXACT_VBAT_RAW_DELTA_COMMIT_BOUND_GATE_PENDING"
+        and "4356f40d" in decisions["DEC-124"]["Reason"]
+        and "J1.1-F1.1" in decisions["DEC-124"]["Impact"]
+        and "do not authorize buck hot-loop or switch-node routing"
+        in decisions["DEC-124"]["Impact"]
+        and "fresh commit-bound CI and PCB Native application gate"
+        in decisions["DEC-124"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-124"]["Impact"],
+        "PCB-PWR routing candidate 003 application boundary is missing",
+    )
+    require(
+        decisions["DEC-125"]["Status"] ==
+        "PASS_EXACT_VBAT_RAW_APPLICATION_REMAINING_ROUTING_NEXT"
+        and "514696e8" in decisions["DEC-125"]["Reason"]
+        and "CI 621" in decisions["DEC-125"]["Reason"]
+        and "PCB-PWR Schematic 89" in decisions["DEC-125"]["Reason"]
+        and "PCB Native 342" in decisions["DEC-125"]["Reason"]
+        and "86 to 86" in decisions["DEC-125"]["Reason"]
+        and "123 to 122" in decisions["DEC-125"]["Reason"]
+        and "J1.1-F1.1" in decisions["DEC-125"]["Impact"]
+        and "separate exact human gate" in decisions["DEC-125"]["Impact"]
+        and "Review B CAM DFM thermal or manufacturing"
+        in decisions["DEC-125"]["Impact"],
+        "PCB-PWR routing candidate 003 application closure is missing",
+    )
+    require(
+        decisions["DEC-126"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_004_CREATION_SUBGATE"
+        in decisions["DEC-126"]["Reason"]
+        and "U1.5-Q1.4" in decisions["DEC-126"]["Impact"]
+        and "four 0.5 mm F.Cu segments" in decisions["DEC-126"]["Impact"]
+        and "86 to 86" in decisions["DEC-126"]["Impact"]
+        and "122 to 121" in decisions["DEC-126"]["Impact"]
+        and "exact human acceptance" in decisions["DEC-126"]["Impact"]
+        and "input load copper buck hot-loop switch-node Kelvin feedback return Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-126"]["Impact"],
+        "PCB-PWR routing candidate 004 creation boundary is missing",
+    )
+    require(
+        decisions["DEC-127"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "987a8fd4" in decisions["DEC-127"]["Reason"]
+        and "CI 623" in decisions["DEC-127"]["Reason"]
+        and "PCB-PWR Schematic 91" in decisions["DEC-127"]["Reason"]
+        and "PCB Native 344" in decisions["DEC-127"]["Reason"]
+        and "86 to 86" in decisions["DEC-127"]["Reason"]
+        and "122 to 121" in decisions["DEC-127"]["Reason"]
+        and "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE"
+        in decisions["DEC-127"]["Impact"]
+        and "authoritative PCB-PWR board unchanged"
+        in decisions["DEC-127"]["Impact"]
+        and "input load copper buck hot-loop switch-node Kelvin feedback return Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-127"]["Impact"],
+        "PCB-PWR routing candidate 004 machine-gate closure is missing",
+    )
+    require(
+        decisions["DEC-128"]["Status"] ==
+        "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE_APPLICATION_PENDING"
+        and "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE"
+        in decisions["DEC-128"]["Reason"]
+        and "f5978882" in decisions["DEC-128"]["Reason"]
+        and "CI 624" in decisions["DEC-128"]["Reason"]
+        and "PCB-PWR Schematic 92" in decisions["DEC-128"]["Reason"]
+        and "PCB Native 345" in decisions["DEC-128"]["Reason"]
+        and "four 0.5 mm F.Cu segments U1.5-Q1.4" in decisions["DEC-128"]["Impact"]
+        and "do not authorize power-input load copper buck hot-loop switch-node Kelvin or feedback routing"
+        in decisions["DEC-128"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-128"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-128"]["Impact"],
+        "PCB-PWR routing candidate 004 acceptance boundary is missing",
+    )
+    require(
+        decisions["DEC-129"]["Status"] ==
+        "APPLICATION_EXACT_REV_GATE_DELTA_COMMIT_BOUND_GATE_PENDING"
+        and "15e2a253" in decisions["DEC-129"]["Reason"]
+        and "de211f42" in decisions["DEC-129"]["Reason"]
+        and "f5978882" in decisions["DEC-129"]["Reason"]
+        and "four 0.5 mm F.Cu segments U1.5-Q1.4"
+        in decisions["DEC-129"]["Impact"]
+        and "zero vias" in decisions["DEC-129"]["Impact"]
+        and "fresh commit-bound CI and PCB Native application gate"
+        in decisions["DEC-129"]["Impact"]
+        and "86 to 86" in decisions["DEC-129"]["Impact"]
+        and "122 to 121" in decisions["DEC-129"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-129"]["Impact"],
+        "PCB-PWR routing candidate 004 exact application boundary is missing",
+    )
+    require(
+        decisions["DEC-130"]["Status"] ==
+        "PASS_EXACT_REV_GATE_APPLICATION_REMAINING_ROUTING_NEXT"
+        and "b33de676" in decisions["DEC-130"]["Reason"]
+        and "57011fb5" in decisions["DEC-130"]["Reason"]
+        and "CI 641" in decisions["DEC-130"]["Reason"]
+        and "PCB-PWR Schematic 94" in decisions["DEC-130"]["Reason"]
+        and "PCB Native 347" in decisions["DEC-130"]["Reason"]
+        and "86 to 86" in decisions["DEC-130"]["Reason"]
+        and "122 to 121" in decisions["DEC-130"]["Reason"]
+        and "U1.5-Q1.4 REV_GATE" in decisions["DEC-130"]["Impact"]
+        and "neither overall routing nor Review B CAM DFM thermal or manufacturing complete"
+        in decisions["DEC-130"]["Impact"]
+        and "separate exact human gate" in decisions["DEC-130"]["Impact"],
+        "PCB-PWR routing candidate 004 application closure is missing",
+    )
+    require(
+        decisions["DEC-131"]["Status"] ==
+        "ACCEPTED_EVT_ENGINEERING_BASELINE_EXTERNAL_REPLIES_NOT_REQUIRED"
+        and "close 85 of 85 historical response rows"
+        in decisions["DEC-131"]["Impact"]
+        and "keep checkout DFM routing DRC CAM Review B first-article and physical EVT gates open"
+        in decisions["DEC-131"]["Impact"],
+        "EVT engineering-baseline decision is missing or over-released",
+    )
+    require(
+        decisions["DEC-132"]["Status"] ==
+        "ACCEPTED_PROGRAM_2X20_PLUS_1_TOTAL_41_TWO_RESERVE_POOLS"
+        and "two lots of 20 plus one bench station"
+        in decisions["DEC-132"]["Impact"]
+        and "two independent EVT-20 reserve pools"
+        in decisions["DEC-132"]["Impact"]
+        and "serials and travellers" in decisions["DEC-132"]["Impact"],
+        "2x20+1 program decision is missing or incomplete",
+    )
+    require(
+        decisions["DEC-133"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_005_CREATION_SUBGATE"
+        in decisions["DEC-133"]["Reason"]
+        and "full 2.1 mm copper cannot terminate" in decisions["DEC-133"]["Reason"]
+        and "fourteen F.Cu segments" in decisions["DEC-133"]["Impact"]
+        and "U3.3-C4.2-L1.1" in decisions["DEC-133"]["Impact"]
+        and "U4.3-C6.2-L2.1" in decisions["DEC-133"]["Impact"]
+        and "5d135a38774c4e223c1db8d6a3fc0e8c9c492fe3ba24f5e2ec4c1b00ab2166d7"
+        in decisions["DEC-133"]["Impact"]
+        and "86 to 86" in decisions["DEC-133"]["Impact"]
+        and "121 to 117" in decisions["DEC-133"]["Impact"]
+        and "pad-entry thermal qualification" in decisions["DEC-133"]["Impact"],
+        "PCB-PWR routing candidate 005 creation boundary is missing",
+    )
+    require(
+        decisions["DEC-134"]["Status"] ==
+        "PASS_MACHINE_GATE_PAD_ENTRY_REJECTED_SUPERSEDED_NO_APPLICATION"
+        and "ed93386d" in decisions["DEC-134"]["Reason"]
+        and "CI 652" in decisions["DEC-134"]["Reason"]
+        and "PCB Native 352" in decisions["DEC-134"]["Reason"]
+        and "86 to 86" in decisions["DEC-134"]["Reason"]
+        and "121 to 117" in decisions["DEC-134"]["Reason"]
+        and "4.578427 mm of 0.5 mm copper" in decisions["DEC-134"]["Reason"]
+        and "Do not accept or apply" in decisions["DEC-134"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-134"]["Impact"],
+        "PCB-PWR routing candidate 005 pad-entry rejection is missing",
+    )
+    require(
+        decisions["DEC-135"]["Status"] ==
+        "PASS_STATIC_ECO_002_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "project owner directed continue" in decisions["DEC-135"]["Reason"]
+        and "eliminates the former 4.578427 mm external 0.5 mm neck"
+        in decisions["DEC-135"]["Reason"]
+        and "U3 U4 C4 C6 C20 C21 L1 and L2" in decisions["DEC-135"]["Impact"]
+        and "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8"
+        in decisions["DEC-135"]["Impact"]
+        and "minimum external SW routed width is 2.1 mm"
+        in decisions["DEC-135"]["Impact"]
+        and "15.042756 mW" in decisions["DEC-135"]["Impact"]
+        and "commit-bound KiCad 9 exact acceptance and application"
+        in decisions["DEC-135"]["Impact"]
+        and "physical plus70C first-article" in decisions["DEC-135"]["Impact"],
+        "PCB-PWR buck power-stage ECO-002 creation boundary is missing",
+    )
+    require(
+        decisions["DEC-136"]["Status"] ==
+        "REJECTED_COMMIT_BOUND_KICAD9_DRC_NOT_FOR_APPLICATION"
+        and "85f50d0" in decisions["DEC-136"]["Reason"]
+        and "PCB Native run 353" in decisions["DEC-136"]["Reason"]
+        and "violations 86 to 124" in decisions["DEC-136"]["Reason"]
+        and "unconnected items 121 to 116" in decisions["DEC-136"]["Reason"]
+        and "Do not accept or apply" in decisions["DEC-136"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-136"]["Impact"]
+        and "without relaxing DRC" in decisions["DEC-136"]["Impact"],
+        "PCB-PWR ECO-002 rejected serialization evidence is missing",
+    )
+    require(
+        decisions["DEC-137"]["Status"] ==
+        "PASS_STATIC_ECO_002_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "project owner directed continue" in decisions["DEC-137"]["Reason"]
+        and "pad property and footprint-text" in decisions["DEC-137"]["Reason"]
+        and "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d"
+        in decisions["DEC-137"]["Impact"]
+        and "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
+        in decisions["DEC-137"]["Impact"]
+        and "relax no DRC rule" in decisions["DEC-137"]["Impact"]
+        and "121 to 117" in decisions["DEC-137"]["Impact"]
+        and "new exact human acceptance" in decisions["DEC-137"]["Impact"],
+        "PCB-PWR ECO-002 rotation-serialization remediation boundary is missing",
+    )
+    require(
+        decisions["DEC-138"]["Status"] ==
+        "REJECTED_COMMIT_BOUND_KICAD9_SILK_WARNING_DELTA_NOT_FOR_APPLICATION"
+        and "142c234" in decisions["DEC-138"]["Reason"]
+        and "PCB Native run 354" in decisions["DEC-138"]["Reason"]
+        and "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d"
+        in decisions["DEC-138"]["Reason"]
+        and "unconnected items 121 to 117" in decisions["DEC-138"]["Reason"]
+        and "violations 86 to 88" in decisions["DEC-138"]["Reason"]
+        and "silk_over_copper and silk_overlap" in decisions["DEC-138"]["Reason"]
+        and "Do not accept or apply" in decisions["DEC-138"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-138"]["Impact"]
+        and "only the C4 C6 and R2 reference anchors" in decisions["DEC-138"]["Impact"],
+        "PCB-PWR ECO-002 rejected silkscreen-warning evidence is missing",
+    )
+    require(
+        decisions["DEC-139"]["Status"] ==
+        "PASS_STATIC_ECO_002_SILK_REFERENCE_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ECO_002_SILK_REMEDIATION_CREATION_SUBGATE"
+        in decisions["DEC-139"]["Reason"]
+        and "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+        in decisions["DEC-139"]["Impact"]
+        and "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
+        in decisions["DEC-139"]["Impact"]
+        and "only the C4 C6 and R2 F.SilkS reference anchors"
+        in decisions["DEC-139"]["Impact"]
+        and "change no copper pads nets component poses or DRC rules"
+        in decisions["DEC-139"]["Impact"]
+        and "121 to 117" in decisions["DEC-139"]["Impact"]
+        and "new exact human acceptance" in decisions["DEC-139"]["Impact"],
+        "PCB-PWR ECO-002 silkscreen-reference remediation boundary is missing",
+    )
+    require(
+        decisions["DEC-140"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "75363101" in decisions["DEC-140"]["Reason"]
+        and "978d4ac9" in decisions["DEC-140"]["Reason"]
+        and "CI 678" in decisions["DEC-140"]["Reason"]
+        and "PCB-PWR Schematic 101" in decisions["DEC-140"]["Reason"]
+        and "PCB Native 355" in decisions["DEC-140"]["Reason"]
+        and "violations 86 to 85" in decisions["DEC-140"]["Reason"]
+        and "unconnected items 121 to 117" in decisions["DEC-140"]["Reason"]
+        and "zero new DRC fingerprint counts" in decisions["DEC-140"]["Reason"]
+        and "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+        in decisions["DEC-140"]["Impact"]
+        and "keep the authoritative PCB-PWR board unchanged"
+        in decisions["DEC-140"]["Impact"]
+        and "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+        in decisions["DEC-140"]["Impact"],
+        "PCB-PWR ECO-002 machine-gate closure is missing",
+    )
+    require(
+        decisions["DEC-141"]["Status"] ==
+        "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE_APPLICATION_PENDING"
+        and "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+        in decisions["DEC-141"]["Reason"]
+        and "44bbcd77" in decisions["DEC-141"]["Reason"]
+        and "CI 678" in decisions["DEC-141"]["Reason"]
+        and "PCB-PWR Schematic 101" in decisions["DEC-141"]["Reason"]
+        and "PCB Native 355" in decisions["DEC-141"]["Reason"]
+        and "move U3 U4 C4 C6 C20 C21 L1 and L2"
+        in decisions["DEC-141"]["Impact"]
+        and "eight reviewed F.Cu BOOT and SW segments"
+        in decisions["DEC-141"]["Impact"]
+        and "only C4 C6 R2 silkscreen reference anchors"
+        in decisions["DEC-141"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-141"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-141"]["Impact"],
+        "PCB-PWR ECO-002 exact acceptance boundary is missing",
+    )
+    require(
+        decisions["DEC-142"]["Status"] ==
+        "APPLICATION_EXACT_BUCK_POWER_STAGE_ECO_002_DELTA_COMMIT_BOUND_GATE_PENDING"
+        and "100f8123" in decisions["DEC-142"]["Reason"]
+        and "c1f5e11c" in decisions["DEC-142"]["Reason"]
+        and "44bbcd77" in decisions["DEC-142"]["Reason"]
+        and "byte-for-byte" in decisions["DEC-142"]["Impact"]
+        and "six unrelated predecessor traces" in decisions["DEC-142"]["Impact"]
+        and "violations 86 to 85" in decisions["DEC-142"]["Impact"]
+        and "unconnected 121 to 117" in decisions["DEC-142"]["Impact"]
+        and "zero new DRC fingerprint counts" in decisions["DEC-142"]["Impact"]
+        and "physical plus70C first-article" in decisions["DEC-142"]["Impact"],
+        "PCB-PWR ECO-002 exact application boundary is missing",
+    )
+    require(
+        decisions["DEC-143"]["Status"] ==
+        "PASS_EXACT_BUCK_POWER_STAGE_ECO_002_APPLICATION_REMAINING_ROUTING_NEXT"
+        and "a7af5d2f" in decisions["DEC-143"]["Reason"]
+        and "58a64273" in decisions["DEC-143"]["Reason"]
+        and "CI 692" in decisions["DEC-143"]["Reason"]
+        and "PCB-PWR Schematic 103" in decisions["DEC-143"]["Reason"]
+        and "PCB Native 357" in decisions["DEC-143"]["Reason"]
+        and "violations 86 to 85" in decisions["DEC-143"]["Reason"]
+        and "unconnected 121 to 117" in decisions["DEC-143"]["Reason"]
+        and "zero new DRC fingerprint counts" in decisions["DEC-143"]["Reason"]
+        and "exact 14-trace ECO-002 state" in decisions["DEC-143"]["Impact"]
+        and "neither overall routing nor Review B CAM DFM physical plus70C validation or manufacturing complete"
+        in decisions["DEC-143"]["Impact"]
+        and "separate exact human gate" in decisions["DEC-143"]["Impact"],
+        "PCB-PWR ECO-002 application closure is missing",
+    )
+    require(
+        decisions["DEC-144"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_CREATION_SUBGATE"
+        in decisions["DEC-144"]["Reason"]
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_VIA_PLANE_SCOPE_REVISION_SUBGATE"
+        in decisions["DEC-144"]["Reason"]
+        and "no DRC-clean F.Cu PGND escape corridor"
+        in decisions["DEC-144"]["Reason"]
+        and "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
+        in decisions["DEC-144"]["Impact"]
+        and "thirteen F.Cu" in decisions["DEC-144"]["Impact"]
+        and "eight project-standard 0.60/0.30 mm GND vias"
+        in decisions["DEC-144"]["Impact"]
+        and "two bounded In1.Cu local return planes"
+        in decisions["DEC-144"]["Impact"]
+        and "generic twelve-via 5 A rule is not satisfied"
+        in decisions["DEC-144"]["Impact"]
+        and "85 to 85" in decisions["DEC-144"]["Impact"]
+        and "117 to 108" in decisions["DEC-144"]["Impact"]
+        and "manufacturing blocks" in decisions["DEC-144"]["Impact"],
+        "PCB-PWR routing candidate 006 creation boundary is missing",
+    )
+    require(
+        decisions["DEC-145"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "702ed8c9" in decisions["DEC-145"]["Reason"]
+        and "b3a256c6" in decisions["DEC-145"]["Reason"]
+        and "CI 703" in decisions["DEC-145"]["Reason"]
+        and "PCB Native 360" in decisions["DEC-145"]["Reason"]
+        and "violations 85 to 85" in decisions["DEC-145"]["Reason"]
+        and "unconnected items 117 to 108" in decisions["DEC-145"]["Reason"]
+        and "zero DRC fingerprint delta" in decisions["DEC-145"]["Reason"]
+        and "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
+        in decisions["DEC-145"]["Impact"]
+        and "authoritative PCB-PWR board unchanged" in decisions["DEC-145"]["Impact"]
+        and "ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE"
+        in decisions["DEC-145"]["Impact"]
+        and "manufacturing blocks" in decisions["DEC-145"]["Impact"],
+        "PCB-PWR routing candidate 006 machine-gate closure is missing",
+    )
+    require(
+        decisions["DEC-146"]["Status"] ==
+        "ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE_APPLICATION_PENDING"
+        and "ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE"
+        in decisions["DEC-146"]["Reason"]
+        and "candidate 9a836eee" in decisions["DEC-146"]["Reason"]
+        and "CI 706" in decisions["DEC-146"]["Reason"]
+        and "PCB-PWR Schematic 106" in decisions["DEC-146"]["Reason"]
+        and "PCB Native 361" in decisions["DEC-146"]["Reason"]
+        and "thirteen reviewed F.Cu" in decisions["DEC-146"]["Impact"]
+        and "eight 0.60/0.30 mm GND vias" in decisions["DEC-146"]["Impact"]
+        and "two bounded In1.Cu local return planes" in decisions["DEC-146"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-146"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-146"]["Impact"],
+        "PCB-PWR routing candidate 006 human acceptance boundary is missing",
+    )
+    require(
+        decisions["DEC-100"]["Status"] ==
+        "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
+        and "77.362 percent" in decisions["DEC-100"]["Impact"]
+        and "56.630 percent" in decisions["DEC-100"]["Impact"]
+        and "add no copper" in decisions["DEC-100"]["Impact"]
+        and "human subgate acceptance" in decisions["DEC-100"]["Impact"],
+        "PCB-PWR buck placement ECO proposal decision is missing or over-released",
+    )
+    require(
+        decisions["DEC-107"]["Status"] ==
+        "ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE_APPLICATION_PENDING"
+        and "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
+        in decisions["DEC-107"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-107"]["Impact"],
+        "PCB-PWR warning-remediation acceptance boundary is missing",
+    )
+    require(
+        decisions["DEC-108"]["Status"] ==
+        "APPLICATION_EXACT_WARNING_REMEDIATION_COMMIT_BOUND_GATE_PENDING"
+        and "54083a35" in decisions["DEC-108"]["Reason"]
+        and "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
+        in decisions["DEC-108"]["Impact"]
+        and "preserve every component pose" in decisions["DEC-108"]["Impact"]
+        and "fresh commit-bound CI and PCB Native" in decisions["DEC-108"]["Impact"],
+        "PCB-PWR warning-remediation application boundary is missing",
+    )
+    require(
+        decisions["DEC-109"]["Status"] ==
+        "PASS_EXACT_WARNING_REMEDIATION_APPLICATION_ROUTING_AND_REVIEW_B_OPEN"
+        and "d22eb808" in decisions["DEC-109"]["Reason"]
+        and "f027aea4" in decisions["DEC-109"]["Reason"]
+        and "CI 592" in decisions["DEC-109"]["Reason"]
+        and "PCB Native 319" in decisions["DEC-109"]["Reason"]
+        and "violations 90 to 86" in decisions["DEC-109"]["Impact"]
+        and "unconnected 126 to 126" in decisions["DEC-109"]["Impact"]
+        and "Review B CAM and manufacturing blocks"
+        in decisions["DEC-109"]["Impact"],
+        "PCB-PWR warning-remediation application closure is missing or over-released",
+    )
+    require(
+        decisions["DEC-069"]["Status"] ==
+        "LOCKED_CUSTOMER_PROCUREMENT_BOUNDARY_TECHNICAL_GATES_RETAINED"
+        and "commercial procurement execution to the customer"
+        in decisions["DEC-069"]["Decision"]
+        and "job-specific stackup DFM stencil panel harness and mechanical technical responses"
+        in decisions["DEC-069"]["Impact"],
+        "customer procurement boundary decision is missing or weakens technical gates",
+    )
+    require(
+        decisions["DEC-070"]["Status"] ==
+        "LOCKED_PUBLIC_NUMERIC_ENGINEERING_BASIS_FINAL_FABRICATOR_ACCEPTANCE_PENDING"
+        and "JLC06161H-3313" in decisions["DEC-070"]["Decision"]
+        and "0.1509 mm" in decisions["DEC-070"]["Impact"]
+        and "0.1537 mm" in decisions["DEC-070"]["Impact"]
+        and "0.2032 mm" in decisions["DEC-070"]["Impact"]
+        and "do not populate FAB-A or FAB-B response rows"
+        in decisions["DEC-070"]["Impact"],
+        "PCB-MAIN public numeric routing-basis decision is missing or over-released",
+    )
+    require(
+        decisions["DEC-071"]["Status"] ==
+        "ENGINEERING_HOLD_CELLULAR_L2_CANDIDATE_READY_GNSS_ECO_PENDING"
+        and "RF/SI return-path review as ECO_REQUIRED"
+        in decisions["DEC-071"]["Decision"]
+        and "PCB-MAIN-RF-RETURN-001" in decisions["DEC-071"]["Impact"]
+        and "GNSS U9/FL1/C64 placement and routing ECO separate"
+        in decisions["DEC-071"]["Impact"]
+        and "manufacturing blocks" in decisions["DEC-071"]["Impact"],
+        "PCB-MAIN RF/SI ECO split decision is missing or over-released",
+    )
+    require(
+        decisions["DEC-147"]["Status"] ==
+        "ACCEPTED_PRIMARY_8L_SOURCE_RELEASE_GATES_OPEN"
+        and "PCB-MAIN 8-layer COMPLETE-105 Rev.B"
+        in decisions["DEC-147"]["Decision"]
+        and "JLC08161H-3313 preferred stack"
+        in decisions["DEC-147"]["Impact"]
+        and "preserve 6L as superseded"
+        in decisions["DEC-147"]["Impact"]
+        and "DFM impedance POFV Review B and first-article gates open"
+        in decisions["DEC-147"]["Impact"],
+        "PCB-MAIN accepted eight-layer primary-source decision is missing or over-released",
     )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
@@ -248,48 +942,105 @@ def validate_deliverable_register() -> None:
         in deliverables["HW-M-000"]["Критерий выпуска"],
         "PCB-MAIN mechanical authority does not record the controlled repack clearance state",
     )
+    main_layout = deliverables["HW-M-002"]["Критерий выпуска"]
     require(
-        "zero provisional footprints three controlled IPC candidates"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "strict 2D placement-clearance PASS"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "explicit pre-route constraints for all 186 native nets"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "factory stackup numeric RF/USB geometry"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "Review B remain open" in deliverables["HW-M-002"]["Критерий выпуска"],
-        "PCB-MAIN deliverable still reports a stale footprint disposition",
+        deliverables["HW-M-002"]["Статус"] == "EVT_8L_COMPLETE_105_ADOPTED"
+        and deliverables["HW-M-002"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-M-002"]["QG-2 техника"] == "OPEN"
+        and "PCB-MAIN COMPLETE-105 Rev.B" in main_layout
+        and "primary eight-layer EVT source" in main_layout
+        and "KiCad DRC 0 errors and 0 unconnected" in main_layout
+        and "selected-stack impedance/return-path" in main_layout
+        and "POFV" in main_layout
+        and "Altium antenna warnings" in main_layout
+        and "DFM and Review B remain open" in main_layout,
+        "PCB-MAIN deliverable does not match the accepted stackup and active routing state",
     )
     require(
-        deliverables["HW-M-011"]["Статус"] == "CONTROLLED_REQUEST"
+        deliverables["HW-M-011"]["Статус"] ==
+        "EVT_8L_BASELINE_ACCEPTED"
         and deliverables["HW-M-011"]["QG-1 полнота"] == "PASS"
-        and deliverables["HW-M-011"]["QG-2 техника"] == "OPEN"
-        and "two-fabricator packet and 22-row response template"
+        and deliverables["HW-M-011"]["QG-2 техника"] == "PASS"
+        and "JLC08161H-3313 is the preferred 8-layer 1.6 mm order stack"
         in deliverables["HW-M-011"]["Критерий выпуска"]
-        and "routing and manufacture are blocked"
+        and "selected dielectrics, impedance, return paths and DFM"
+        in deliverables["HW-M-011"]["Критерий выпуска"]
+        and "before panel release"
         in deliverables["HW-M-011"]["Критерий выпуска"],
-        "PCB-MAIN stackup/impedance request deliverable is missing or over-released",
+        "PCB-MAIN accepted stackup/impedance deliverable is missing or stale",
     )
     require(
-        deliverables["HW-M-012"]["Статус"] == "CONTROLLED_REQUEST"
+        deliverables["HW-M-012"]["Статус"] == "EVT_ENGINEERING_BASELINE_ACCEPTED"
         and deliverables["HW-M-012"]["QG-1 полнота"] == "PASS"
-        and deliverables["HW-M-012"]["QG-2 техника"] == "OPEN"
-        and "14-row response template" in deliverables["HW-M-012"]["Критерий выпуска"]
-        and "0 accepted responses" in deliverables["HW-M-012"]["Критерий выпуска"]
-        and "paste export Review B and manufacture are blocked"
+        and deliverables["HW-M-012"]["QG-2 техника"] == "PASS"
+        and "All 14 bounded" in deliverables["HW-M-012"]["Критерий выпуска"]
+        and "two-board first-article baseline" in deliverables["HW-M-012"]["Критерий выпуска"]
+        and "paste export still waits for native DRC and controlled CAM"
         in deliverables["HW-M-012"]["Критерий выпуска"],
-        "PCB-MAIN assembler DFM/stencil request deliverable is missing or over-released",
+        "PCB-MAIN accepted assembler-process deliverable is missing or stale",
+    )
+    pwr_layout = deliverables["HW-P-002"]["Критерий выпуска"]
+    require(
+        deliverables["HW-P-002"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-P-002"]["QG-2 техника"] == "OPEN"
+        and "exact applied power-stage ECO-002 totals 14 trace items" in pwr_layout
+        and "zero vias and zero copper zones" in pwr_layout
+        and "commit-bound application gate passed at CI 692 PCB-PWR Schematic 103 and PCB Native 357"
+        in pwr_layout
+        and "remaining routing DRC CAM checkout DFM" in pwr_layout,
+        "PCB-PWR deliverable does not match the active ECO-002 routing state",
     )
     require(
-        deliverables["HW-P-005"]["Статус"] == "CONTROLLED_REQUEST"
+        "accepted hot-loop 006 is now applied exactly with 35 trace items"
+        in pwr_layout
+        and "eight vias and two bounded In1.Cu return zones" in pwr_layout
+        and "separate application gate passed at CI 715 PCB Native 364"
+        in pwr_layout
+        and "85-to-85 DRC violations and 117-to-108 unconnected items"
+        in pwr_layout,
+        "PCB-PWR hot-loop application deliverable is missing",
+    )
+    require(
+        deliverables["HW-P-005"]["Статус"] == "EVT_ENGINEERING_BASELINE_ACCEPTED"
         and deliverables["HW-P-005"]["QG-1 полнота"] == "PASS"
-        and deliverables["HW-P-005"]["QG-2 техника"] == "OPEN"
-        and "two-fabricator 24-row" in deliverables["HW-P-005"]["Критерий выпуска"]
-        and "0/24 rows and 0/2 fabricator sets"
+        and deliverables["HW-P-005"]["QG-2 техника"] == "PASS"
+        and "All 24 historical response rows are project engineering closures"
         in deliverables["HW-P-005"]["Критерий выпуска"]
-        and "numeric power geometry routing Review B and manufacture remain blocked"
+        and "JLC04161H-3313A" in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "minimum 18 um hole wall plating"
+        in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "physical thermal drop fault DRC CAM checkout DFM Review B and manufacture remain separate gates"
         in deliverables["HW-P-005"]["Критерий выпуска"],
-        "PCB-PWR stackup/copper request deliverable is missing or over-released",
+        "PCB-PWR accepted stackup/copper deliverable is missing or stale",
+    )
+    require(
+        deliverables["HW-P-006"]["Статус"] == "CONTROLLED_ENGINEERING_INPUT"
+        and deliverables["HW-P-006"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-P-006"]["QG-2 техника"] == "OPEN"
+        and "all 31 nets to eight numeric classes"
+        in deliverables["HW-P-006"]["Критерий выпуска"]
+        and "4.0 mm at 5 A" in deliverables["HW-P-006"]["Критерий выпуска"]
+        and "Selected JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz"
+        in deliverables["HW-P-006"]["Критерий выпуска"]
+        and "manufacture remain open" in deliverables["HW-P-006"]["Критерий выпуска"],
+        "PCB-PWR numeric EVT routing-basis deliverable is missing or over-released",
+    )
+    require(
+        deliverables["HW-P-007"]["Статус"] ==
+        "CONTROLLED_WARNING_REMEDIATION_GATE_PASS_ROUTING_OPEN"
+        and deliverables["HW-P-007"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-P-007"]["QG-2 техника"] == "OPEN"
+        and "placement candidate moved only C4 C6 L1 L2"
+        in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "successor b1d221d5 is accepted and applied byte-for-byte"
+        in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "passed fresh CI 592 schematic 70 and Native 319"
+        in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "warning-only closure is credited"
+        in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "manufacture remain open"
+        in deliverables["HW-P-007"]["Критерий выпуска"],
+        "PCB-PWR buck placement ECO deliverable is missing or over-released",
     )
     require(
         deliverables["HW-A-002"]["Статус"] == "DRAFT"
@@ -300,9 +1051,12 @@ def validate_deliverable_register() -> None:
         "PCB-MIC candidate CAM deliverable state is stale or over-released",
     )
     require(
-        "4 10 и 20" in deliverables["PROC-001"]["Поставочный объект"]
-        and deliverables["PROC-001"]["QG-1 полнота"] == "PASS",
-        "production BOM deliverable is not bound to validated 4 10 20 quantities",
+        "2x20 плюс стендовый образец" in deliverables["PROC-001"]["Поставочный объект"]
+        and deliverables["PROC-001"]["QG-1 полнота"] == "PASS"
+        and deliverables["PROC-001"]["QG-2 техника"] == "PASS"
+        and "41 stations" in deliverables["PROC-001"]["Критерий выпуска"]
+        and "two EVT-20 reserve pools" in deliverables["PROC-001"]["Критерий выпуска"],
+        "production BOM deliverable is not bound to the 2x20+1 program",
     )
     require(
         deliverables["MFG-008"]["QG-1 полнота"] == "PASS",
@@ -310,26 +1064,52 @@ def validate_deliverable_register() -> None:
     )
     risks = {row["Risk_ID"]: row for row in read_csv("docs/RISK_REGISTER.csv")}
     require(
-        "three project IPC candidates" in risks["R-025"]["Mitigation"]
-        and "audited 186-net pre-route authority" in risks["R-025"]["Mitigation"]
-        and "two attributable fabricator stackup responses" in risks["R-025"]["Mitigation"]
-        and "all 14 selected-assembler DFM/stencil responses" in risks["R-025"]["Mitigation"]
-        and "controlled U9 zero-paste-to-process gate" in risks["R-025"]["Mitigation"]
-        and "missing one or both signed stackup responses" in risks["R-025"]["Trigger"]
-        and "guessed or unaccepted RF/USB geometry" in risks["R-025"]["Trigger"]
-        and "fewer than 14 accepted selected-assembler responses" in risks["R-025"]["Trigger"]
-        and "premature U9 paste" in risks["R-025"]["Trigger"],
-        "PCB-MAIN footprint risk still reports the superseded provisional set",
+        "accepted PCB-MAIN 8-layer production source" in risks["R-025"]["Risk"]
+        and "retired 6-layer source" in risks["R-025"]["Risk"]
+        and "PCB-MAIN COMPLETE-105 Rev.B" in risks["R-025"]["Mitigation"]
+        and "JLC08161H-3313 Rev.B authority" in risks["R-025"]["Mitigation"]
+        and "selected-stack dielectric and impedance review" in risks["R-025"]["Mitigation"]
+        and "POFV confirmation" in risks["R-025"]["Mitigation"]
+        and "Altium antenna-warning disposition" in risks["R-025"]["Mitigation"]
+        and "In5/In6 Gerbers" in risks["R-025"]["Trigger"]
+        and "selected-stack/POFV/DFM confirmation" in risks["R-025"]["Trigger"],
+        "PCB-MAIN production-layout risk does not match the accepted EVT baseline",
     )
     require(
         "selected EVT lot" in risks["R-018"]["Mitigation"],
         "RU868 configuration risk still assumes a fixed 20-unit build",
     )
     require(
-        "stackup/copper register at 0/24 and 0/2" in risks["R-027"]["Mitigation"]
-        and "fewer than 24 accepted stackup/copper responses" in risks["R-027"]["Trigger"]
-        and "fewer than 2 accepted fabricator sets" in risks["R-027"]["Trigger"],
+        "selected JLC04161H-3313A construction" in risks["R-027"]["Mitigation"]
+        and "controlled current-geometry table" in risks["R-027"]["Mitigation"]
+        and "checkout DFM" in risks["R-027"]["Mitigation"]
+        and "stackup mismatch" in risks["R-027"]["Trigger"],
         "PCB-PWR stackup/copper acceptance risk is not explicit",
+    )
+    require(
+        "JLC04161H-3313A 1.6 mm outer 2 oz inner 1 oz"
+        in risks["R-032"]["Mitigation"]
+        and "35 um as the width-screen lower bound" in risks["R-032"]["Mitigation"]
+        and "hole-wall plating below 18 um" in risks["R-032"]["Trigger"]
+        and "manufacturing output generated without Review B"
+        in risks["R-032"]["Trigger"],
+        "PCB-PWR engineering-basis promotion risk is not controlled",
+    )
+    require(
+        "exact hash-bound power-stage ECO-002 candidate 44bbcd77"
+        in risks["R-034"]["Mitigation"]
+        and "six retained predecessor traces" in risks["R-034"]["Mitigation"]
+        and "eight replacement or new BOOT and SW traces"
+        in risks["R-034"]["Mitigation"]
+        and "passed commit-bound application evidence at a7af5d2f"
+        in risks["R-034"]["Mitigation"]
+        and "physical plus70C first-article" in risks["R-034"]["Mitigation"]
+        and "change outside the accepted 14 trace items"
+        in risks["R-034"]["Trigger"]
+        and "ECO-002 application identity regression" in risks["R-034"]["Trigger"]
+        and "any unrelated footprint or silkscreen move"
+        in risks["R-034"]["Trigger"],
+        "PCB-PWR dual-buck placement-before-routing risk is not controlled",
     )
 
 
@@ -422,6 +1202,37 @@ def validate_hardware_baseline() -> None:
     require("ESP32-C3-MINI-1-N4` is superseded" in kicad_readme, "superseded ESP32-C3 history is not documented")
     require("STM32U585CIU6" in kicad_readme and "superseded" in kicad_readme, "superseded 48-pin MCU history is not documented")
     require("Do not reintroduce" in kicad_readme and "BQ24650/CN3791" in kicad_readme, "obsolete charger prohibition is missing")
+    require(
+        "exactly 14 accepted trace items" in kicad_readme
+        and "ECO-002 commit-bound application gate passed at CI #692" in kicad_readme,
+        "KiCad overview does not match the active PCB-PWR ECO-002 successor",
+    )
+    active_pwr_docs = {
+        ROOT / "README.md": (
+            "14 принятых сегментов",
+            "`PCB-PWR-BUCK-POWER-STAGE-ECO-002` теперь",
+        ),
+        ROOT / "BRANCH_SCOPE.md": (
+            "активны 14 trace items",
+            "application gate ECO-002",
+        ),
+        ROOT / "hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md": (
+            "exactly 14 accepted trace items",
+            "ECO-002 commit-bound application",
+        ),
+        ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md": (
+            "FOURTEEN CONTROLLED TRACE ITEMS",
+            "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
+        ),
+        ROOT / "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md": (
+            "14 accepted F.Cu trace items",
+            "ECO-002 commit-bound application gate",
+        ),
+    }
+    for path, markers in active_pwr_docs.items():
+        text = path.read_text(encoding="utf-8")
+        for marker in markers:
+            require(marker in text, f"{path.relative_to(ROOT)} missing {marker!r}")
     require("STM32U585VIT6Q" in capture_spec, "capture spec missing current MCU")
     require("12-pin" in pwr_addendum and "INA226" in pwr_addendum, "Rev.A 12-pin/INA226 capture addendum missing")
     require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")
@@ -496,24 +1307,27 @@ def validate_hardware_baseline() -> None:
         "stackup_impedance_handoff", {}
     )
     require(
-        main_handoff.get("status") == "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED"
+        main_handoff.get("status") == "EVT_PUBLIC_STANDARD_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
         and main_handoff.get("internal_packet_complete") is True
-        and main_handoff.get("complete") is False
-        and main_handoff.get("required_fabricator_slots") == ["FAB-A", "FAB-B"]
+        and main_handoff.get("complete") is True
+        and main_handoff.get("required_fabricator_slots") == []
         and main_handoff.get("accepted_fabricator_response_count") == 0
-        and main_handoff.get("selected_fabricator_slot") is None,
-        "PCB-MAIN stackup/impedance handoff is not internally ready and externally blocked",
+        and main_handoff.get("accepted_response_rows") == 22
+        and main_handoff.get("selected_fabricator_slot") is None
+        and main_handoff.get("selected_public_standard") == "JLC06161H-3313"
+        and main_handoff.get("external_reply_required") is False,
+        "PCB-MAIN EVT stackup/impedance baseline is not accepted",
     )
     require(
-        all(main_handoff.get(key) is False for key in (
+        all(main_handoff.get(key) is True for key in (
             "stackup_accepted",
             "rf_50ohm_numeric_geometry_accepted",
             "usb_90ohm_numeric_geometry_accepted",
             "routing_authorized",
-            "review_b_complete",
-            "manufacturing_release",
-        )),
-        "PCB-MAIN stackup request advanced an external, routing or release gate",
+        ))
+        and main_handoff.get("review_b_complete") is False
+        and main_handoff.get("manufacturing_release") is False,
+        "PCB-MAIN routing baseline or release boundary drifted",
     )
     for relative in (
         main_handoff.get("packet"),
@@ -525,39 +1339,41 @@ def validate_hardware_baseline() -> None:
     main_responses = read_csv(main_handoff["response_register"])
     require(len(main_responses) == 22
             and {row["Fabricator_Slot"] for row in main_responses} == {"FAB-A", "FAB-B"}
-            and all(row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
-                    and row["Blocking"] == "YES" for row in main_responses),
-            "PCB-MAIN stackup response register is not the blank 2 x 11 blocking template")
+            and all(row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+                    and row["Blocking"] == "NO" for row in main_responses),
+            "PCB-MAIN stackup response register is not closed by the EVT baseline")
 
     main_assembler_handoff = main_status["review_b"].get("evidence", {}).get(
         "assembler_dfm_stencil_handoff", {}
     )
     require(
         main_assembler_handoff.get("status") ==
-        "PACKET_READY_SELECTED_ASSEMBLER_RESPONSE_REQUIRED"
+        "EVT_STANDARD_PCBA_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
         and main_assembler_handoff.get("internal_packet_complete") is True
-        and main_assembler_handoff.get("complete") is False
+        and main_assembler_handoff.get("complete") is True
         and main_assembler_handoff.get("required_scope_references") ==
         ["U2", "U25", "U26", "U9"]
         and main_assembler_handoff.get("required_response_rows") == 14
-        and main_assembler_handoff.get("accepted_response_rows") == 0
+        and main_assembler_handoff.get("accepted_response_rows") == 14
         and main_assembler_handoff.get("selected_assembler_legal_entity") is None
-        and main_assembler_handoff.get("selected_manufacturing_site") is None,
-        "PCB-MAIN assembler DFM/stencil handoff is not internally ready and externally blocked",
+        and main_assembler_handoff.get("selected_manufacturing_site") is None
+        and main_assembler_handoff.get("assembler_selection_nonblocking_customer_action") is True
+        and main_assembler_handoff.get("external_reply_required") is False,
+        "PCB-MAIN standard PCBA baseline is not accepted",
     )
     require(
-        all(main_assembler_handoff.get(key) is False for key in (
+        all(main_assembler_handoff.get(key) is True for key in (
             "u2_land_mask_stencil_accepted",
             "u25_u26_land_mask_stencil_accepted",
             "u9_stencil_reflow_inspection_accepted",
             "pnp_polarity_accepted",
             "first_article_plan_accepted",
             "blocker_critical_dfm_closed",
-            "paste_export_authorized",
-            "review_b_complete",
-            "manufacturing_release",
+        ))
+        and all(main_assembler_handoff.get(key) is False for key in (
+            "paste_export_authorized", "review_b_complete", "manufacturing_release",
         )),
-        "PCB-MAIN assembler request advanced a process, paste or release gate",
+        "PCB-MAIN PCBA process or paste/release boundary drifted",
     )
     for relative in (
         main_assembler_handoff.get("packet"),
@@ -576,14 +1392,14 @@ def validate_hardware_baseline() -> None:
             row["Gate_ID"].startswith("ASM-MAIN-")
             and row["Assembler_Slot"] == "ASM-MAIN-CANDIDATE"
             and row["Required_Party"] == "SELECTED_ASSEMBLER"
-            and row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
-            and row["Blocking"] == "YES"
-            and not any(row[field] for field in (
+            and row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+            and row["Blocking"] == "NO"
+            and all(row[field] for field in (
                 "Response_Value", "Response_Reference", "Responder", "Response_Date"
             ))
             for row in main_assembler_responses
         ),
-        "PCB-MAIN assembler response register is not the blank 14-row blocking template",
+        "PCB-MAIN assembler response register lacks 14 EVT engineering closures",
     )
 
     pwr_status = json.loads(
@@ -595,8 +1411,107 @@ def validate_hardware_baseline() -> None:
         and pwr_status["manufacturing_release"] is False,
         "PCB-PWR was advanced by a pre-route stackup/copper request",
     )
+    hot_loop = pwr_status["native_layout"]["buck_input_hot_loop_routing_006"]
+    require(
+        hot_loop["status"] ==
+        "APPROVED_APPLIED_EXACT_BUCK_INPUT_HOT_LOOP_ROUTING_006_COMMIT_BOUND_KICAD9_GATE_PASS"
+        and hot_loop["active_board_sha256"] ==
+        "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
+        and hot_loop["exact_candidate_byte_identity"] is True
+        and hot_loop["authoritative_board_modified"] is True
+        and hot_loop["application_machine_gate"] ==
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
+        and hot_loop["application_ci_run_number"] == 715
+        and hot_loop["application_pcb_native_run_number"] == 364
+        and pwr_status["native_layout"]["copper_zones_present"] is True
+        and all(hot_loop[k] is False for k in
+                ("routing_complete", "review_b_complete", "manufacturing_release")),
+        "PCB-PWR hot-loop 006 application or manufacturing boundary drifted",
+    )
+    shunt_bulk = pwr_status["native_layout"]["vbat_sys_shunt_bulk_routing_007"]
+    require(
+        shunt_bulk["status"] in {
+            "APPROVED_APPLIED_EXACT_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPLICATION_GATE_PENDING",
+            "APPROVED_APPLIED_EXACT_VBAT_SYS_SHUNT_BULK_ROUTING_007_COMMIT_BOUND_KICAD9_GATE_PASS",
+        }
+        and shunt_bulk["active_board_sha256"] ==
+        "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
+        and shunt_bulk["exact_candidate_byte_identity"] is True
+        and shunt_bulk["authoritative_board_modified"] is True
+        and shunt_bulk["application_machine_gate"] in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+        }
+        and all(shunt_bulk[k] is False for k in
+                ("routing_complete", "review_b_complete", "manufacturing_release")),
+        "PCB-PWR shunt-bulk 007 application or manufacturing boundary drifted",
+    )
+    c13_c12 = pwr_status["native_layout"]["vbat_sys_c13_c12_routing_008"]
+    require(
+        c13_c12["status"] in {
+            "APPROVED_APPLIED_EXACT_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION_GATE_PENDING",
+            "APPROVED_APPLIED_EXACT_VBAT_SYS_C13_C12_ROUTING_008_COMMIT_BOUND_KICAD9_GATE_PASS",
+        }
+        and c13_c12["active_board_sha256"] ==
+        "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+        and c13_c12["exact_candidate_byte_identity"] is True
+        and c13_c12["authoritative_board_modified"] is True
+        and c13_c12["application_machine_gate"] in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+        }
+        and all(c13_c12[k] is False for k in
+                ("routing_complete", "review_b_complete", "manufacturing_release")),
+        "PCB-PWR C13-to-C12 008 application or manufacturing boundary drifted",
+    )
+    c13_c11 = pwr_status["native_layout"]["vbat_sys_c13_c11_routing_009"]
+    require(
+        c13_c11["status"] in {
+            "APPROVED_APPLIED_EXACT_VBAT_SYS_C13_C11_ROUTING_009_APPLICATION_GATE_PENDING",
+            "APPROVED_APPLIED_EXACT_VBAT_SYS_C13_C11_ROUTING_009_COMMIT_BOUND_KICAD9_GATE_PASS",
+        }
+        and c13_c11["active_board_sha256"] ==
+        "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+        and c13_c11["exact_candidate_byte_identity"] is True
+        and c13_c11["authoritative_board_modified"] is True
+        and c13_c11["application_machine_gate"] in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+        }
+        and all(c13_c11[k] is False for k in
+                ("routing_complete", "review_b_complete", "manufacturing_release")),
+        "PCB-PWR C13-to-C11 009 application or manufacturing boundary drifted",
+    )
+    output_bulk_010 = pwr_status["native_layout"]["output_3v8_bulk_routing_010"]
+    require(
+        output_bulk_010["status"] in {
+            "APPROVED_APPLIED_EXACT_3V8_OUTPUT_BULK_ROUTING_010_APPLICATION_GATE_PENDING",
+            "APPROVED_APPLIED_EXACT_3V8_OUTPUT_BULK_ROUTING_010_COMMIT_BOUND_KICAD9_GATE_PASS",
+        }
+        and output_bulk_010["active_board_sha256"] ==
+        "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+        and output_bulk_010["exact_candidate_byte_identity"] is True
+        and output_bulk_010["authoritative_board_modified"] is True
+        and output_bulk_010["application_machine_gate"] in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+        }
+        and all(output_bulk_010[k] is False for k in
+                ("routing_complete", "review_b_complete", "manufacturing_release")),
+        "PCB-PWR 3V8 output bulk 010 application or manufacturing boundary drifted",
+    )
     pwr_hierarchy = pwr_status.get("human_readable_hierarchy", {})
     pwr_hierarchy_control = pwr_hierarchy.get("control", {})
+    pwr_current_evidence = pwr_hierarchy.get("current_evidence", {})
+    pwr_evidence_complete = pwr_current_evidence.get("status") == \
+        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
+    expected_pwr_hierarchy_state = (
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
+        if pwr_evidence_complete else
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PENDING_HUMAN_REVIEW_PENDING"
+    )
     require(
         pwr_status.get("native_schematic", {}).get("page_count") == 5
         and pwr_status.get("native_schematic", {}).get("functional_child_sheets") == 4
@@ -606,33 +1521,37 @@ def validate_hardware_baseline() -> None:
         "tools/pcb_pwr_schematic_hierarchy.py"
         and pwr_hierarchy.get("independent_audit") ==
         "tools/audit_pcb_pwr_hierarchy_rev_a.py"
-        and pwr_hierarchy_control.get("state") ==
-        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_F1_VALUE_ECO_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
+        and pwr_hierarchy.get("review_record") ==
+        "hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md"
+        and (ROOT / pwr_hierarchy["review_record"]).is_file()
+        and pwr_hierarchy_control.get("state") == expected_pwr_hierarchy_state
         and pwr_hierarchy_control.get("pages") == 5
         and pwr_hierarchy_control.get("functional_child_sheets") == 4
-        and pwr_hierarchy_control.get("symbols") == 63
-        and pwr_hierarchy_control.get("physical_symbols") == 60
-        and pwr_hierarchy_control.get("wire_segments") == 185
+        and pwr_hierarchy_control.get("symbols") == 65
+        and pwr_hierarchy_control.get("physical_symbols") == 62
+        and pwr_hierarchy_control.get("wire_segments") == 189
         and pwr_hierarchy_control.get("cross_sheet_nets") == 9
         and pwr_hierarchy_control.get("hierarchical_labels") == 26
         and pwr_hierarchy_control.get("pin_net_semantic_sha256") ==
-        "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a"
+        "84a35aa607bac3ee65b5d8f60684e958277b2fa5a7ed01f810af32f0b52b73f7"
         and pwr_hierarchy_control.get("pin_net_review_a_retained") is True,
         "PCB-PWR human-readable hierarchy/electrical-equivalence control has drifted",
     )
     require(
         pwr_hierarchy_control.get("prior_evidence_superseded_by_f1_value_eco") is True
-        and all(pwr_hierarchy_control.get(key) is True for key in (
+        and pwr_hierarchy_control.get("prior_evidence_superseded_by_legibility_remediation") is True
+        and pwr_hierarchy_control.get("prior_evidence_superseded_by_cinhf_eco") is True
+        and all(pwr_hierarchy_control.get(key) is pwr_evidence_complete for key in (
             "native_kicad_9_erc_pass",
             "committed_erc_evidence",
             "committed_pdf_evidence",
         ))
+        and pwr_hierarchy_control.get("independent_human_review_complete") is True
         and all(pwr_hierarchy_control.get(key) is False for key in (
-            "independent_human_review_complete",
             "routing_authorized",
             "manufacturing_release",
         )),
-        "PCB-PWR hierarchy evidence or pending human/routing/release state has drifted",
+        "PCB-PWR hierarchy evidence, accepted human review or routing/release state has drifted",
     )
     for relative in (
         pwr_status.get("native_schematic", {}).get("path"),
@@ -646,25 +1565,26 @@ def validate_hardware_baseline() -> None:
     pwr_stackup_control = pwr_stackup.get("control", {})
     require(
         pwr_stackup_control.get("state") ==
-        "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING"
-        and pwr_stackup_control.get("required_fabricator_slots") == 2
+        "PASS_EVT_PUBLIC_STANDARD_AND_CALCULATED_GEOMETRY_ACCEPTED"
+        and pwr_stackup_control.get("required_fabricator_slots") == 0
         and pwr_stackup_control.get("required_response_rows") == 24
         and pwr_stackup_control.get("accepted_fabricator_slots") == 0
-        and pwr_stackup_control.get("accepted_response_rows") == 0
+        and pwr_stackup_control.get("accepted_response_rows") == 24
         and pwr_stackup_control.get("selected_fabricator_slot") is None
-        and pwr_stackup_control.get("complete") is False,
-        "PCB-PWR stackup/copper handoff is not internally ready and externally blocked",
+        and pwr_stackup_control.get("complete") is True
+        and pwr_stackup_control.get("external_reply_required") is False,
+        "PCB-PWR EVT stackup/copper baseline is not accepted",
     )
     require(
-        all(pwr_stackup_control.get(key) is False for key in (
+        all(pwr_stackup_control.get(key) is True for key in (
             "stackup_accepted",
             "copper_weights_and_plating_accepted",
             "numeric_power_geometry_authorized",
             "routing_authorized",
-            "review_b_complete",
-            "manufacturing_release",
-        )),
-        "PCB-PWR stackup request advanced an external, geometry, routing or release gate",
+        ))
+        and pwr_stackup_control.get("review_b_complete") is False
+        and pwr_stackup_control.get("manufacturing_release") is False,
+        "PCB-PWR numeric routing baseline or manufacturing-release boundary drifted",
     )
     for relative in (
         pwr_stackup.get("request_packet"),
@@ -679,15 +1599,51 @@ def validate_hardware_baseline() -> None:
         and {row["Fabricator_Slot"] for row in pwr_stackup_responses} == {"FAB-A", "FAB-B"}
         and all(
             row["Required_Party"] == "FABRICATOR"
-            and row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
-            and row["Blocking"] == "YES"
-            and not any(row[field] for field in (
+            and row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+            and row["Blocking"] == "NO"
+            and all(row[field] for field in (
                 "Response_Value", "Response_Reference", "Responder", "Response_Date"
             ))
             for row in pwr_stackup_responses
         ),
-        "PCB-PWR stackup/copper response register is not the blank 2 x 12 blocking template",
+        "PCB-PWR stackup/copper register lacks 24 EVT engineering closures",
     )
+    pwr_evt_basis = pwr_status.get("evt_routing_basis", {})
+    pwr_evt_basis_control = pwr_evt_basis.get("control", {})
+    require(
+        pwr_evt_basis.get("record") ==
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md"
+        and pwr_evt_basis.get("machine_contract") ==
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
+        and pwr_evt_basis.get("rule_manifest") ==
+        "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"
+        and pwr_evt_basis.get("independent_audit") ==
+        "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
+        and pwr_evt_basis_control.get("state") ==
+        "PASS_EVT_ENGINEERING_STACKUP_AND_NUMERIC_ROUTING_INPUT_JOB_DFM_PENDING"
+        and pwr_evt_basis_control.get("public_dielectric_reference") == "JLC04161H-3313"
+        and pwr_evt_basis_control.get("screen_finished_copper_um") == 35.0
+        and pwr_evt_basis_control.get("screen_temperature_rise_c") == 10.0
+        and pwr_evt_basis_control.get("net_count") == 31
+        and pwr_evt_basis_control.get("numeric_class_count") == 8
+        and pwr_evt_basis_control.get("engineering_routing_candidate_authorized") is True
+        and pwr_evt_basis_control.get("evt_ordering_profile_selected") is True
+        and all(pwr_evt_basis_control.get(key) is False for key in (
+            "final_stackup_accepted",
+            "final_numeric_power_geometry_authorized",
+            "routing_complete",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-PWR bounded EVT routing basis is missing, drifted or over-released",
+    )
+    for relative in (
+        pwr_evt_basis.get("record"),
+        pwr_evt_basis.get("machine_contract"),
+        pwr_evt_basis.get("rule_manifest"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-PWR EVT routing-basis file is missing: {relative}")
 
     mic_status = json.loads((ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8"))
     require(mic_status["assembly"] == "PCB-MIC", "PCB-MIC release-status identity mismatch")
@@ -722,9 +1678,7 @@ def validate_hardware_baseline() -> None:
             all(mic_review_a_evidence.get(key) for key in required_mic_review_a_evidence),
             "PCB-MIC signed Review A evidence links are incomplete",
         )
-    else:
-        require(mic_status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
-                "PCB-MIC release state is neither signed nor an explicit post-ECO candidate")
+    elif mic_status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO":
         require(mic_review_a["complete"] is False
                 and mic_review_a["status"] == "REVIEW_REQUIRED_AFTER_COPPER_ECO",
                 "PCB-MIC post-ECO Review A is not explicitly open")
@@ -758,32 +1712,82 @@ def validate_hardware_baseline() -> None:
         require(copper_gate.get("decision") == "ECO_REQUIRED"
                 and copper_gate.get("reviewer") and copper_gate.get("date"),
                 "PCB-MIC ECO_REQUIRED decision traceability is incomplete")
+    else:
+        require(
+            mic_status["release_state"] ==
+            "ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED",
+            "PCB-MIC release state is neither signed nor an explicit post-ECO candidate",
+        )
+        require(
+            mic_review_a["complete"] is False
+            and mic_review_a["status"] ==
+            "REPEAT_REQUIRED_AFTER_ACOUSTIC_CLEARANCE_ECO",
+            "PCB-MIC acoustic-clearance ECO does not explicitly require repeat Review A",
+        )
+        require(
+            all(mic_review_a.get(field) for field in ("reviewer", "date", "commit_sha"))
+            and re.fullmatch(r"[0-9a-f]{40}", mic_review_a["commit_sha"]) is not None,
+            "PCB-MIC historical Review-A traceability is incomplete after acoustic ECO",
+        )
+        current_hash = str(mic_review_a.get("current_source_sha256", ""))
+        approved_hash = str(mic_review_a.get("approved_native_board_sha256", ""))
+        require(
+            re.fullmatch(r"[0-9A-Fa-f]{64}", current_hash) is not None
+            and re.fullmatch(r"[0-9A-Fa-f]{64}", approved_hash) is not None
+            and current_hash.lower() != approved_hash.lower(),
+            "PCB-MIC acoustic ECO does not prove that the approved source changed",
+        )
+        required_evidence = mic_review_a.get("required_evidence", {})
+        require(
+            required_evidence.get("status") ==
+            "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A",
+            "PCB-MIC acoustic ECO is missing commit-bound evidence for repeat Review A",
+        )
+        mic_review_b = mic_status["review_b"]
+        require(
+            mic_review_b["status"] == "REOPENED_AFTER_ACOUSTIC_CLEARANCE_ECO"
+            and mic_review_b.get("copper_return_gate", {}).get("status") ==
+            "HISTORICAL_PASS_SOURCE_CHANGED_REPEAT_REQUIRED",
+            "PCB-MIC Review B was not reopened after the acoustic-clearance ECO",
+        )
     mic_handoff = mic_status["review_b"].get("manufacturing_handoff", {})
-    require(
-        mic_handoff.get("status") == "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED"
-        and mic_handoff.get("internal_packet_complete") is True
-        and mic_handoff.get("complete") is False,
-        "PCB-MIC manufacturing handoff is not internally ready and externally blocked",
-    )
-    require(
-        all(mic_handoff.get(key) is False for key in (
-            "fabricator_dfm_acceptance",
-            "assembler_dfm_acceptance",
-            "panelization_acceptance",
-            "depanel_acceptance",
-            "assembler_process_keepout_acceptance",
-            "review_b_complete",
-            "manufacturing_release",
-        )),
-        "PCB-MIC manufacturing handoff advanced an external or release gate",
-    )
-    for relative in (
-        mic_handoff.get("packet"),
-        mic_handoff.get("machine_contract"),
-        mic_handoff.get("response_register"),
-    ):
-        require(isinstance(relative, str) and (ROOT / relative).is_file(),
-                f"PCB-MIC manufacturing handoff file is missing: {relative}")
+    if mic_status["release_state"] == "ACOUSTIC_CLEARANCE_ECO_APPLIED_REVIEW_A_REPEAT_REQUIRED":
+        require(
+            mic_handoff.get("status") == "SOURCE_CHANGED_REGENERATE_OUTPUTS_AND_REPEAT_REVIEW"
+            and mic_handoff.get("internal_packet_complete") is False
+            and mic_handoff.get("complete") is False
+            and mic_handoff.get("review_b_complete") is False
+            and mic_handoff.get("manufacturing_release") is False,
+            "PCB-MIC manufacturing handoff was not reopened after the acoustic ECO",
+        )
+    else:
+        require(
+            mic_handoff.get("status") == "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
+            and mic_handoff.get("internal_packet_complete") is True
+            and mic_handoff.get("complete") is True
+            and mic_handoff.get("accepted_response_rows") == 9
+            and mic_handoff.get("external_reply_required") is False,
+            "PCB-MIC manufacturing baseline is not accepted",
+        )
+        require(
+            all(mic_handoff.get(key) is True for key in (
+                "fabricator_dfm_acceptance",
+                "assembler_dfm_acceptance",
+                "panelization_acceptance",
+                "depanel_acceptance",
+                "assembler_process_keepout_acceptance",
+            ))
+            and mic_handoff.get("review_b_complete") is False
+            and mic_handoff.get("manufacturing_release") is False,
+            "PCB-MIC process baseline or release boundary drifted",
+        )
+        for relative in (
+            mic_handoff.get("packet"),
+            mic_handoff.get("machine_contract"),
+            mic_handoff.get("response_register"),
+        ):
+            require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                    f"PCB-MIC manufacturing handoff file is missing: {relative}")
     require(
         mic_status["native_source"]["independent_schematic_audit"] ==
         "artifacts/pcb_mic_native_schematic_rev_a.json",
@@ -836,6 +1840,24 @@ def validate_policy_text() -> None:
     require("maximum_station_quantity: 20" in baseline, "baseline maximum serial capacity missing")
     require("supported_procurement_quantities: [4, 10, 20]" in baseline, "baseline 4 10 20 procurement options missing")
     require("selected_evt_quantity: 20" in baseline, "baseline does not select the locked 20-station EVT lot")
+    require("program_total_station_quantity: 41" in baseline,
+            "baseline does not control the 2x20+1 total")
+    require("program_procurement_variants: [21, 41]" in baseline,
+            "baseline does not expose the 21 and 41 procurement variants")
+    require("program_procurement_selection_status: CUSTOMER_TO_SELECT_21_PHASE1_OR_41_FULL_PROGRAM" in baseline,
+            "baseline procurement variant selection status differs")
+    require("program_procurement_authority_21: hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv" in baseline
+            and "program_procurement_authority_41: hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv" in baseline,
+            "baseline procurement variant authorities differ")
+    require("program_structure: TWO_EVT20_PRODUCTION_SETS_PLUS_ONE_BENCH" in baseline,
+            "baseline program structure differs")
+    require("program_spare_rule: TWO_EVT20_RESERVE_POOLS_BENCH_ADDS_NO_THIRD_RESERVE_POOL" in baseline,
+            "baseline program spare rule differs")
+    require("program_serial_register: manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv" in baseline
+            and "program_serial_status: RESERVED_DIO_EVT_021_THROUGH_040_AND_DIO_EVT_B01" in baseline
+            and "program_traveller_status: REQUIRED_BEFORE_BUILD" in baseline
+            and "program_serial_and_traveller_status: SERIALS_RESERVED_TRAVELLERS_REQUIRED_BEFORE_BUILD" in baseline,
+            "baseline second-set/bench traceability control differs")
     require("selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20" in baseline, "EVT-20 selection status is not locked")
     require("pilot_primary_quantity: 20" in baseline, "baseline vacuum quantity does not match selected EVT-20")
     require(

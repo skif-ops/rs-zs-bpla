@@ -1,0 +1,3117 @@
+PROTEL NETLIST 2.0
+[
+DESIGNATOR
+#FLG01
+FOOTPRINT
+
+PARTTYPE
+ERC_SOURCE_FLAG
+DESCRIPTION
+
+Comment
+ERC_SOURCE_FLAG
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+ERC_SOURCE_FLAG
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+ERC_SOURCE_FLAG
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+#FLG02
+FOOTPRINT
+
+PARTTYPE
+ERC_SOURCE_FLAG
+DESCRIPTION
+
+Comment
+ERC_SOURCE_FLAG
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+ERC_SOURCE_FLAG
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+ERC_SOURCE_FLAG
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+#FLG03
+FOOTPRINT
+
+PARTTYPE
+ERC_SOURCE_FLAG
+DESCRIPTION
+
+Comment
+ERC_SOURCE_FLAG
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+ERC_SOURCE_FLAG
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+ERC_SOURCE_FLAG
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C1
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+DESCRIPTION
+
+Comment
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C2
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+DESCRIPTION
+
+Comment
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C3
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+DESCRIPTION
+
+Comment
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C4
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+DESCRIPTION
+
+Comment
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C5
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+DESCRIPTION
+
+Comment
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C6
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+DESCRIPTION
+
+Comment
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 nF 25 V X7R CGA2B3X7R1E104K050BB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C7
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+2.2 uF 10 V X7R CGA3E1X7R1A225K080AC
+DESCRIPTION
+
+Comment
+2.2 uF 10 V X7R CGA3E1X7R1A225K080AC
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+2.2 uF 10 V X7R CGA3E1X7R1A225K080AC
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C8
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+2.2 uF 10 V X7R CGA3E1X7R1A225K080AC
+DESCRIPTION
+
+Comment
+2.2 uF 10 V X7R CGA3E1X7R1A225K080AC
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+2.2 uF 10 V X7R CGA3E1X7R1A225K080AC
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C9
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+DESCRIPTION
+
+Comment
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C10
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+DESCRIPTION
+
+Comment
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C11
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+DESCRIPTION
+
+Comment
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C12
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+DESCRIPTION
+
+Comment
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+4.7 uF 50 V X7R CGA6P3X7R1H475K250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C13
+FOOTPRINT
+CP_Elec_6.3x7.7
+PARTTYPE
+100 uF 35 V hybrid EEH-ZK1V101XP
+DESCRIPTION
+
+Comment
+100 uF 35 V hybrid EEH-ZK1V101XP
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:CP_Elec_6.3x7.7
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 uF 35 V hybrid EEH-ZK1V101XP
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C14
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+DESCRIPTION
+
+Comment
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C15
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+DESCRIPTION
+
+Comment
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C16
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+DESCRIPTION
+
+Comment
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C17
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+DESCRIPTION
+
+Comment
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C18
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+DESCRIPTION
+
+Comment
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C19
+FOOTPRINT
+C_1210_3225Metric
+PARTTYPE
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+DESCRIPTION
+
+Comment
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_1210_3225Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+22 uF 25 V X7R CGA6P3X7R1E226M250AB
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C20
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+DESCRIPTION
+
+Comment
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+C21
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+DESCRIPTION
+
+Comment
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 nF 50 V X7R CGA3E2X7R1H104K080AA
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+D1
+FOOTPRINT
+D_SMB
+PARTTYPE
+SMBJ18A CANDIDATE UNIDIRECTIONAL TVS
+DESCRIPTION
+
+Comment
+SMBJ18A CANDIDATE UNIDIRECTIONAL TVS
+Component Kind
+Standard
+Description
+
+Footprint
+Diode_SMD:D_SMB
+Ibis Model
+
+Library Name
+Device
+Library Reference
+D_Zener
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+SMBJ18A CANDIDATE UNIDIRECTIONAL TVS
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+F1
+FOOTPRINT
+Fuse_1206_3216Metric
+PARTTYPE
+0451008.MRL
+DESCRIPTION
+
+Comment
+0451008.MRL
+Component Kind
+Standard
+Description
+
+Footprint
+Fuse:Fuse_1206_3216Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+Fuse
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+0451008.MRL
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+J1
+FOOTPRINT
+Molex_43045-0213_MicroFit-2_Vertical
+PARTTYPE
+PWR_INPUT_43045-0213
+DESCRIPTION
+
+Comment
+PWR_INPUT_43045-0213
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x02
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+PWR_INPUT_43045-0213
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+J2
+FOOTPRINT
+Molex_43045-1202_MicroFit-12_RA
+PARTTYPE
+MAIN_PWR_43045-1202_12PIN
+DESCRIPTION
+
+Comment
+MAIN_PWR_43045-1202_12PIN
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaMain:Molex_43045-1202_MicroFit-12_RA
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x12
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+MAIN_PWR_43045-1202_12PIN
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+L1
+FOOTPRINT
+Coilcraft_XAL7030_472
+PARTTYPE
+XAL7030-472MEC 4.7uH
+DESCRIPTION
+
+Comment
+XAL7030-472MEC 4.7uH
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:Coilcraft_XAL7030_472
+Ibis Model
+
+Library Name
+Device
+Library Reference
+L
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+XAL7030-472MEC 4.7uH
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+L2
+FOOTPRINT
+Coilcraft_XAL7030_472
+PARTTYPE
+XAL7030-472MEC 4.7uH
+DESCRIPTION
+
+Comment
+XAL7030-472MEC 4.7uH
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:Coilcraft_XAL7030_472
+Ibis Model
+
+Library Name
+Device
+Library Reference
+L
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+XAL7030-472MEC 4.7uH
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+NT1
+FOOTPRINT
+NetTie-2_SMD_Pad0.5mm
+PARTTYPE
+2-pad copper net tie NET_TIE_COPPER_REV_A
+DESCRIPTION
+
+Comment
+2-pad copper net tie NET_TIE_COPPER_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+NetTie:NetTie-2_SMD_Pad0.5mm
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+2-pad copper net tie NET_TIE_COPPER_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+NT2
+FOOTPRINT
+NetTie-2_SMD_Pad0.5mm
+PARTTYPE
+2-pad copper net tie NET_TIE_COPPER_REV_A
+DESCRIPTION
+
+Comment
+2-pad copper net tie NET_TIE_COPPER_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+NetTie:NetTie-2_SMD_Pad0.5mm
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+2-pad copper net tie NET_TIE_COPPER_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+NT3
+FOOTPRINT
+NetTie-2_SMD_Pad0.5mm
+PARTTYPE
+2-pad copper net tie NET_TIE_COPPER_REV_A
+DESCRIPTION
+
+Comment
+2-pad copper net tie NET_TIE_COPPER_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+NetTie:NetTie-2_SMD_Pad0.5mm
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+2-pad copper net tie NET_TIE_COPPER_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+Q1
+FOOTPRINT
+CSD18540Q5B_DNK
+PARTTYPE
+CSD18540Q5B
+DESCRIPTION
+
+Comment
+CSD18540Q5B
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:CSD18540Q5B_DNK
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x08
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+CSD18540Q5B
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R1
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 0.1% ERA-2AEB104X
+DESCRIPTION
+
+Comment
+100 kOhm 0.1% ERA-2AEB104X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 kOhm 0.1% ERA-2AEB104X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R2
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+35.7 kOhm 0.1% ERA-2AEB3572X
+DESCRIPTION
+
+Comment
+35.7 kOhm 0.1% ERA-2AEB3572X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+35.7 kOhm 0.1% ERA-2AEB3572X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R3
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+86.6 kOhm 0.1% ERA-2AEB8662X
+DESCRIPTION
+
+Comment
+86.6 kOhm 0.1% ERA-2AEB8662X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+86.6 kOhm 0.1% ERA-2AEB8662X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R4
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 ohm ERJ-2GE0R00X
+DESCRIPTION
+
+Comment
+0 ohm ERJ-2GE0R00X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+0 ohm ERJ-2GE0R00X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R5
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 ohm ERJ-2GE0R00X
+DESCRIPTION
+
+Comment
+0 ohm ERJ-2GE0R00X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+0 ohm ERJ-2GE0R00X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R6
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1% ERJ-2RKF1003X
+DESCRIPTION
+
+Comment
+100 kOhm 1% ERJ-2RKF1003X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 kOhm 1% ERJ-2RKF1003X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R7
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+86.6 kOhm 0.1% ERA-2AEB8662X
+DESCRIPTION
+
+Comment
+86.6 kOhm 0.1% ERA-2AEB8662X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+86.6 kOhm 0.1% ERA-2AEB8662X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R8
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 ohm ERJ-2GE0R00X
+DESCRIPTION
+
+Comment
+0 ohm ERJ-2GE0R00X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+0 ohm ERJ-2GE0R00X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R9
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 ohm ERJ-2GE0R00X
+DESCRIPTION
+
+Comment
+0 ohm ERJ-2GE0R00X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+0 ohm ERJ-2GE0R00X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R10
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1% ERJ-2RKF1002X
+DESCRIPTION
+
+Comment
+10 kOhm 1% ERJ-2RKF1002X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+10 kOhm 1% ERJ-2RKF1002X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R11
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1% ERJ-2RKF1003X
+DESCRIPTION
+
+Comment
+100 kOhm 1% ERJ-2RKF1003X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100 kOhm 1% ERJ-2RKF1003X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R12
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1% ERJ-2RKF1002X
+DESCRIPTION
+
+Comment
+10 kOhm 1% ERJ-2RKF1002X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+10 kOhm 1% ERJ-2RKF1002X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R13
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+4.7 kOhm 1% ERJ-2RKF4701X
+DESCRIPTION
+
+Comment
+4.7 kOhm 1% ERJ-2RKF4701X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+4.7 kOhm 1% ERJ-2RKF4701X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R14
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+4.7 kOhm 1% ERJ-2RKF4701X
+DESCRIPTION
+
+Comment
+4.7 kOhm 1% ERJ-2RKF4701X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+4.7 kOhm 1% ERJ-2RKF4701X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R15
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1% ERJ-2RKF1002X
+DESCRIPTION
+
+Comment
+10 kOhm 1% ERJ-2RKF1002X
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+10 kOhm 1% ERJ-2RKF1002X
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+RSH1
+FOOTPRINT
+Vishay_WSK2512_4T_T1.19mm
+PARTTYPE
+WSK2512R0100FEA 10mOhm 1% 1W 4T
+DESCRIPTION
+
+Comment
+WSK2512R0100FEA 10mOhm 1% 1W 4T
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:Vishay_WSK2512_4T_T1.19mm
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x04
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+WSK2512R0100FEA 10mOhm 1% 1W 4T
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP1
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_VBAT_PROTECTED DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_VBAT_PROTECTED DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_VBAT_PROTECTED DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP2
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_SHUNT_SRC DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_SHUNT_SRC DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_SHUNT_SRC DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP3
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_SHUNT_LOAD DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_SHUNT_LOAD DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_SHUNT_LOAD DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP4
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_3V8 DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_3V8 DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_3V8 DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP5
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_PG_3V8 DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_PG_3V8 DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_PG_3V8 DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP6
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_PWR_GOOD DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_PWR_GOOD DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_PWR_GOOD DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP7
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_1V8 DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_1V8 DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_1V8 DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP8
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_FAULT DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_FAULT DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_FAULT DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP9
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_SCL DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_SCL DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_SCL DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+TP10
+FOOTPRINT
+TestPoint_DFT_1.7mm_NoPaste
+PARTTYPE
+TP_SDA DFT_PAD_1P70_NOPASTE_REV_A
+DESCRIPTION
+
+Comment
+TP_SDA DFT_PAD_1P70_NOPASTE_REV_A
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+TESTPOINT
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TP_SDA DFT_PAD_1P70_NOPASTE_REV_A
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+U1
+FOOTPRINT
+TI_DBV0006A_SOT23-6
+PARTTYPE
+LM74700QDBVRQ1
+DESCRIPTION
+
+Comment
+LM74700QDBVRQ1
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TI_DBV0006A_SOT23-6
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x06
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+LM74700QDBVRQ1
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+U2
+FOOTPRINT
+TI_DGS0010A_VSSOP10
+PARTTYPE
+INA226AIDGSR
+DESCRIPTION
+
+Comment
+INA226AIDGSR
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:TI_DGS0010A_VSSOP10
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x10
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+INA226AIDGSR
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+U3
+FOOTPRINT
+LMR60440_RAK0009A
+PARTTYPE
+LMR604403SRAKR 3V8
+DESCRIPTION
+
+Comment
+LMR604403SRAKR 3V8
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:LMR60440_RAK0009A
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x09
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+LMR604403SRAKR 3V8
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+U4
+FOOTPRINT
+LMR60440_RAK0009A
+PARTTYPE
+LMR604403SRAKR 3V3 AON
+DESCRIPTION
+
+Comment
+LMR604403SRAKR 3V3 AON
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaPWR:LMR60440_RAK0009A
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x09
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+LMR604403SRAKR 3V3 AON
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+U5
+FOOTPRINT
+TI_DBV0005A_SOT23-5
+PARTTYPE
+TPS7A2018PDBVR 1V8_MIC
+DESCRIPTION
+
+Comment
+TPS7A2018PDBVR 1V8_MIC
+Component Kind
+Standard
+Description
+
+Footprint
+DioneyaMain:TI_DBV0005A_SOT23-5
+Ibis Model
+
+Library Name
+DioneyaPWR
+Library Reference
+Conn_01x05
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+TPS7A2018PDBVR 1V8_MIC
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+(
+VBAT_SYS
+#FLG01-1 ERC_SOURCE_FLAG-PWR_SOURCE Power        
+C11-1 4.7 uF 50 V X7R CGA6P3X7R1H475K250AB-1 Passive      
+C12-1 4.7 uF 50 V X7R CGA6P3X7R1H475K250AB-1 Passive      
+C13-1 100 uF 35 V hybrid EEH-ZK1V101XP-1 Passive      
+C20-1 100 nF 50 V X7R CGA3E2X7R1H104K080AA-1 Passive      
+C21-1 100 nF 50 V X7R CGA3E2X7R1H104K080AA-1 Passive      
+RSH1-2 WSK2512R0100FEA 10mOhm 1% 1W 4T-CURRENT_LOAD Passive      
+U2-8 INA226AIDGSR-VBUS Input        
+U3-1 LMR604403SRAKR 3V8-VIN Power        
+U4-1 LMR604403SRAKR 3V3 AON-VIN Power        
+U4-9 LMR604403SRAKR 3V3 AON-EN Input        
+)
+(
+VBAT_RAW
+F1-1 0451008.MRL-1 Passive      
+J1-1 PWR_INPUT_43045-0213-VBAT_PLUS Passive      
+)
+(
+VBAT_PROTECTED
+C10-1 4.7 uF 50 V X7R CGA6P3X7R1H475K250AB-1 Passive      
+Q1-5 CSD18540Q5B-DRAIN Passive      
+Q1-6 CSD18540Q5B-DRAIN Passive      
+Q1-7 CSD18540Q5B-DRAIN Passive      
+Q1-8 CSD18540Q5B-DRAIN Passive      
+RSH1-1 WSK2512R0100FEA 10mOhm 1% 1W 4T-CURRENT_SOURCE Passive      
+TP1-1 TP_VBAT_PROTECTED DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U1-4 LM74700QDBVRQ1-CATHODE Input        
+)
+(
+VBAT_FUSED
+C1-2 100 nF 25 V X7R CGA2B3X7R1E104K050BB-2 Passive      
+C9-1 100 nF 50 V X7R CGA3E2X7R1H104K080AA-1 Passive      
+D1-1 SMBJ18A CANDIDATE UNIDIRECTIONAL TVS-K Passive      
+F1-2 0451008.MRL-2 Passive      
+Q1-1 CSD18540Q5B-SOURCE Passive      
+Q1-2 CSD18540Q5B-SOURCE Passive      
+Q1-3 CSD18540Q5B-SOURCE Passive      
+U1-3 LM74700QDBVRQ1-EN Input        
+U1-6 LM74700QDBVRQ1-ANODE Input        
+)
+(
+SW_3V8
+C4-2 100 nF 25 V X7R CGA2B3X7R1E104K050BB-2 Passive      
+L1-1 XAL7030-472MEC 4.7uH-1 Passive      
+U3-3 LMR604403SRAKR 3V8-SW Power        
+)
+(
+SW_3V3
+C6-2 100 nF 25 V X7R CGA2B3X7R1E104K050BB-2 Passive      
+L2-1 XAL7030-472MEC 4.7uH-1 Passive      
+U4-3 LMR604403SRAKR 3V3 AON-SW Power        
+)
+(
+SHUNT_SOURCE_SENSE
+RSH1-3 WSK2512R0100FEA 10mOhm 1% 1W 4T-SENSE_SOURCE Passive      
+TP2-1 TP_SHUNT_SRC DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U2-10 INA226AIDGSR-IN+ Input        
+)
+(
+SHUNT_LOAD_SENSE
+RSH1-4 WSK2512R0100FEA 10mOhm 1% 1W 4T-SENSE_LOAD Passive      
+TP3-1 TP_SHUNT_LOAD DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U2-9 INA226AIDGSR-IN- Input        
+)
+(
+RT_3V8
+R3-1 86.6 kOhm 0.1% ERA-2AEB8662X-1 Passive      
+R5-2 0 ohm ERJ-2GE0R00X-2 Passive      
+U3-8 LMR604403SRAKR 3V8-RT Input        
+)
+(
+RT_3V3
+R7-1 86.6 kOhm 0.1% ERA-2AEB8662X-1 Passive      
+R9-2 0 ohm ERJ-2GE0R00X-2 Passive      
+U4-8 LMR604403SRAKR 3V3 AON-RT Input        
+)
+(
+REV_GATE
+Q1-4 CSD18540Q5B-GATE Input        
+U1-5 LM74700QDBVRQ1-GATE Output       
+)
+(
+PWR_GOOD
+J2-7 MAIN_PWR_43045-1202_12PIN-PWR_GOOD OpenCollector
+R10-2 10 kOhm 1% ERJ-2RKF1002X-2 Passive      
+TP6-1 TP_PWR_GOOD DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U4-5 LMR604403SRAKR 3V3 AON-PG OpenCollector
+)
+(
+PG_3V8
+R15-1 10 kOhm 1% ERJ-2RKF1002X-1 Passive      
+TP5-1 TP_PG_3V8 DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U3-5 LMR604403SRAKR 3V8-PG OpenCollector
+)
+(
+MODE_3V8
+R4-1 0 ohm ERJ-2GE0R00X-1 Passive      
+R5-1 0 ohm ERJ-2GE0R00X-1 Passive      
+U3-7 LMR604403SRAKR 3V8-MODE/SYNC Input        
+)
+(
+MODE_3V3
+R8-1 0 ohm ERJ-2GE0R00X-1 Passive      
+R9-1 0 ohm ERJ-2GE0R00X-1 Passive      
+U4-7 LMR604403SRAKR 3V3 AON-MODE/SYNC Input        
+)
+(
+LM74700_VCAP
+C1-1 100 nF 25 V X7R CGA2B3X7R1E104K050BB-1 Passive      
+U1-1 LM74700QDBVRQ1-VCAP Output       
+)
+(
+I2C2_SDA
+J2-12 MAIN_PWR_43045-1202_12PIN-I2C2_SDA IO           
+R14-2 4.7 kOhm 1% ERJ-2RKF4701X-2 Passive      
+TP10-1 TP_SDA DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U2-4 INA226AIDGSR-SDA IO           
+)
+(
+I2C2_SCL
+J2-11 MAIN_PWR_43045-1202_12PIN-I2C2_SCL IO           
+R13-2 4.7 kOhm 1% ERJ-2RKF4701X-2 Passive      
+TP9-1 TP_SCL DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U2-5 INA226AIDGSR-SCL Input        
+)
+(
+GND_PWR
+#FLG02-1 ERC_SOURCE_FLAG-PWR_SOURCE Power        
+C2-2 100 nF 25 V X7R CGA2B3X7R1E104K050BB-2 Passive      
+C3-2 22 uF 25 V X7R CGA6P3X7R1E226M250AB-2 Passive      
+C5-2 22 uF 25 V X7R CGA6P3X7R1E226M250AB-2 Passive      
+C7-2 2.2 uF 10 V X7R CGA3E1X7R1A225K080AC-2 Passive      
+C8-2 2.2 uF 10 V X7R CGA3E1X7R1A225K080AC-2 Passive      
+C9-2 100 nF 50 V X7R CGA3E2X7R1H104K080AA-2 Passive      
+C10-2 4.7 uF 50 V X7R CGA6P3X7R1H475K250AB-2 Passive      
+C11-2 4.7 uF 50 V X7R CGA6P3X7R1H475K250AB-2 Passive      
+C12-2 4.7 uF 50 V X7R CGA6P3X7R1H475K250AB-2 Passive      
+C13-2 100 uF 35 V hybrid EEH-ZK1V101XP-2 Passive      
+C14-2 22 uF 25 V X7R CGA6P3X7R1E226M250AB-2 Passive      
+C15-2 22 uF 25 V X7R CGA6P3X7R1E226M250AB-2 Passive      
+C16-2 22 uF 25 V X7R CGA6P3X7R1E226M250AB-2 Passive      
+C17-2 22 uF 25 V X7R CGA6P3X7R1E226M250AB-2 Passive      
+C18-2 22 uF 25 V X7R CGA6P3X7R1E226M250AB-2 Passive      
+C19-2 22 uF 25 V X7R CGA6P3X7R1E226M250AB-2 Passive      
+C20-2 100 nF 50 V X7R CGA3E2X7R1H104K080AA-2 Passive      
+C21-2 100 nF 50 V X7R CGA3E2X7R1H104K080AA-2 Passive      
+D1-2 SMBJ18A CANDIDATE UNIDIRECTIONAL TVS-A Passive      
+J1-2 PWR_INPUT_43045-0213-VBAT_MINUS Passive      
+NT1-2 2-pad copper net tie NET_TIE_COPPER_REV_A-2 Passive      
+NT2-2 2-pad copper net tie NET_TIE_COPPER_REV_A-2 Passive      
+NT3-2 2-pad copper net tie NET_TIE_COPPER_REV_A-2 Passive      
+R2-2 35.7 kOhm 0.1% ERA-2AEB3572X-2 Passive      
+R3-2 86.6 kOhm 0.1% ERA-2AEB8662X-2 Passive      
+R4-2 0 ohm ERJ-2GE0R00X-2 Passive      
+R6-2 100 kOhm 1% ERJ-2RKF1003X-2 Passive      
+R7-2 86.6 kOhm 0.1% ERA-2AEB8662X-2 Passive      
+R8-2 0 ohm ERJ-2GE0R00X-2 Passive      
+R11-2 100 kOhm 1% ERJ-2RKF1003X-2 Passive      
+U1-2 LM74700QDBVRQ1-GND Power        
+U2-1 INA226AIDGSR-A1 Input        
+U2-2 INA226AIDGSR-A0 Input        
+U2-7 INA226AIDGSR-GND Power        
+U3-2 LMR604403SRAKR 3V8-PGND Power        
+U4-2 LMR604403SRAKR 3V3 AON-PGND Power        
+U5-2 TPS7A2018PDBVR 1V8_MIC-GND Power        
+)
+(
+GND_MODEM
+J2-2 MAIN_PWR_43045-1202_12PIN-GND_MODEM Passive      
+NT1-1 2-pad copper net tie NET_TIE_COPPER_REV_A-1 Passive      
+)
+(
+GND_MIC
+J2-6 MAIN_PWR_43045-1202_12PIN-GND_MIC Passive      
+NT3-1 2-pad copper net tie NET_TIE_COPPER_REV_A-1 Passive      
+)
+(
+GND_DIGITAL
+J2-4 MAIN_PWR_43045-1202_12PIN-GND_DIGITAL Passive      
+NT2-1 2-pad copper net tie NET_TIE_COPPER_REV_A-1 Passive      
+)
+(
+FB_3V8
+R1-2 100 kOhm 0.1% ERA-2AEB104X-2 Passive      
+R2-1 35.7 kOhm 0.1% ERA-2AEB3572X-1 Passive      
+U3-6 LMR604403SRAKR 3V8-FB Input        
+)
+(
+FAULT
+J2-8 MAIN_PWR_43045-1202_12PIN-FAULT OpenCollector
+R12-2 10 kOhm 1% ERJ-2RKF1002X-2 Passive      
+TP8-1 TP_FAULT DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U2-3 INA226AIDGSR-ALERT OpenCollector
+)
+(
+EN_MODEM
+J2-9 MAIN_PWR_43045-1202_12PIN-EN_MODEM Input        
+R6-1 100 kOhm 1% ERJ-2RKF1003X-1 Passive      
+U3-9 LMR604403SRAKR 3V8-EN Input        
+)
+(
+EN_AUX
+J2-10 MAIN_PWR_43045-1202_12PIN-EN_AUX Input        
+R11-1 100 kOhm 1% ERJ-2RKF1003X-1 Passive      
+U5-3 TPS7A2018PDBVR 1V8_MIC-EN Input        
+)
+(
+BOOT_3V8
+C4-1 100 nF 25 V X7R CGA2B3X7R1E104K050BB-1 Passive      
+U3-4 LMR604403SRAKR 3V8-BOOT Output       
+)
+(
+BOOT_3V3
+C6-1 100 nF 25 V X7R CGA2B3X7R1E104K050BB-1 Passive      
+U4-4 LMR604403SRAKR 3V3 AON-BOOT Output       
+)
+(
+3V8_MODEM
+C3-1 22 uF 25 V X7R CGA6P3X7R1E226M250AB-1 Passive      
+C14-1 22 uF 25 V X7R CGA6P3X7R1E226M250AB-1 Passive      
+C15-1 22 uF 25 V X7R CGA6P3X7R1E226M250AB-1 Passive      
+C16-1 22 uF 25 V X7R CGA6P3X7R1E226M250AB-1 Passive      
+J2-1 MAIN_PWR_43045-1202_12PIN-3V8_MODEM Passive      
+L1-2 XAL7030-472MEC 4.7uH-2 Passive      
+R1-1 100 kOhm 0.1% ERA-2AEB104X-1 Passive      
+TP4-1 TP_3V8 DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+)
+(
+3V3_DIGITAL
+#FLG03-1 ERC_SOURCE_FLAG-PWR_SOURCE Power        
+C2-1 100 nF 25 V X7R CGA2B3X7R1E104K050BB-1 Passive      
+C5-1 22 uF 25 V X7R CGA6P3X7R1E226M250AB-1 Passive      
+C7-1 2.2 uF 10 V X7R CGA3E1X7R1A225K080AC-1 Passive      
+C17-1 22 uF 25 V X7R CGA6P3X7R1E226M250AB-1 Passive      
+C18-1 22 uF 25 V X7R CGA6P3X7R1E226M250AB-1 Passive      
+C19-1 22 uF 25 V X7R CGA6P3X7R1E226M250AB-1 Passive      
+J2-3 MAIN_PWR_43045-1202_12PIN-3V3_DIGITAL Passive      
+L2-2 XAL7030-472MEC 4.7uH-2 Passive      
+R10-1 10 kOhm 1% ERJ-2RKF1002X-1 Passive      
+R12-1 10 kOhm 1% ERJ-2RKF1002X-1 Passive      
+R13-1 4.7 kOhm 1% ERJ-2RKF4701X-1 Passive      
+R14-1 4.7 kOhm 1% ERJ-2RKF4701X-1 Passive      
+R15-2 10 kOhm 1% ERJ-2RKF1002X-2 Passive      
+U2-6 INA226AIDGSR-VS Power        
+U4-6 LMR604403SRAKR 3V3 AON-FB Input        
+U5-1 TPS7A2018PDBVR 1V8_MIC-IN Power        
+)
+(
+1V8_MIC
+C8-1 2.2 uF 10 V X7R CGA3E1X7R1A225K080AC-1 Passive      
+J2-5 MAIN_PWR_43045-1202_12PIN-1V8_MIC Passive      
+TP7-1 TP_1V8 DFT_PAD_1P70_NOPASTE_REV_A-TEST Passive      
+U5-5 TPS7A2018PDBVR 1V8_MIC-OUT Power        
+)

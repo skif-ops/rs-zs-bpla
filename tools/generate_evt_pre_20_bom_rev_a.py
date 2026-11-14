@@ -19,9 +19,90 @@ ROOT = Path(__file__).resolve().parents[1]
 DRAFT = ROOT / "hardware/EVT_PRE_20_BOM_DRAFT.csv"
 OUT = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 PROCUREMENT_OUT = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+PROGRAM_21_OUT = ROOT / "hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv"
+PROGRAM_OUT = ROOT / "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv"
 MAIN_PASSIVE_SUPPORT = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
 PWR_PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 LOT_SIZES = (4, 10, 20)
+PROGRAM_PRODUCTION_LOTS = 2
+PROGRAM_LOT_STATIONS = 20
+PROGRAM_BENCH_STATIONS = 1
+PROGRAM_TOTAL_STATIONS = (
+    PROGRAM_PRODUCTION_LOTS * PROGRAM_LOT_STATIONS + PROGRAM_BENCH_STATIONS
+)
+
+
+# These are project-owned build-to-print article identities.  They make the
+# engineering/procurement BOM deterministic without pretending that the
+# customer has already selected a PCB fabricator, EMS, harness assembler or
+# vacuum-casting legal entity.  Supplier selection and every technical
+# manufacturing gate remain separate release inputs.
+BUILD_TO_PRINT_SCOPES = {
+    "ASM-MAIN": {
+        "mpn": "DIO-ASM-MAIN-REV-B",
+        "package": "8-layer PCB-MAIN COMPLETE-105 Rev.B PCBA build-to-print service scope; JLC08161H-3313; ENIG; POFV",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_EMS_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified EMS; quotation and purchase outside the engineering repository",
+        "notes": "PRIMARY procurement track; internal assembled-article identity only; routing DRC CAM DFM stencil Review B and EOL scope remain mandatory before build",
+    },
+    "PCB-MAIN": {
+        "mpn": "DIO-PCB-MAIN-REV-B",
+        "package": "8-layer FR-4 110x75x1.6 mm PCB-MAIN COMPLETE-105 Rev.B fabrication scope; JLC08161H-3313; ENIG; outer 1 oz; inner 0.5 oz; POFV",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_FAB_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified PCB fabricator; quotation and purchase outside the engineering repository",
+        "notes": "ALTERNATIVE quotation track only; internal bare-board identity only; final stackup impedance routing DRC CAM DFM coupon and Review B remain mandatory before fabrication",
+    },
+    "ASM-PWR": {
+        "mpn": "DIO-ASM-PWR-REV-A",
+        "package": "assembled 4-layer power PCB build-to-print service scope; EVT DIM-003 90x60x1.6 mm and H1-H4 accepted; outer 2 oz target; inner 1 oz target; final stackup pending DFM",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_EMS_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified EMS; quotation and purchase outside the engineering repository",
+        "notes": "PRIMARY procurement track; internal assembled-article identity only; final copper routing DRC CAM DFM Review B and current thermal fault EOL scope remain mandatory before build",
+    },
+    "PCB-PWR": {
+        "mpn": "DIO-PCB-PWR-REV-A",
+        "package": "4-layer FR-4 90x60x1.6 mm build-to-print fabrication scope; EVT DIM-003 and H1-H4 accepted; outer 2 oz target; inner 1 oz target; final stackup pending DFM",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_FAB_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified PCB fabricator; quotation and purchase outside the engineering repository",
+        "notes": "ALTERNATIVE quotation track only; internal bare-board identity only; selected copper and plating routing DRC CAM DFM serial mechanical revalidation and Review B remain mandatory before fabrication",
+    },
+    "ASM-MIC": {
+        "mpn": "DIO-ASM-MIC-REV-A",
+        "package": "2-layer microphone PCBA build-to-print service scope",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_EMS_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified EMS; quotation and purchase outside the engineering repository",
+        "notes": "PRIMARY procurement track; internal assembled-article identity only; final Review B CAM DFM acoustic-port process and selected-lot EOL remain mandatory before build",
+    },
+    "PCB-MIC": {
+        "mpn": "DIO-PCB-MIC-REV-A",
+        "package": "2-layer FR-4 microphone PCB build-to-print fabrication scope",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_FAB_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified PCB fabricator; quotation and purchase outside the engineering repository",
+        "notes": "ALTERNATIVE quotation track only; internal bare-board identity only; panelization final Review B CAM DFM net test and acoustic opening control remain mandatory before fabrication",
+    },
+    "HARNESS": {
+        "mpn": "DIO-HARNESS-SET-REV-A",
+        "package": "Controlled labeled station harness set Rev.A",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_PHYSICAL_RELEASE_PENDING",
+        "disposition": "CONTROLLED_BUILD_TO_PRINT_IDENTITY",
+        "channel": "Customer-selected qualified harness assembler; build only to the controlled drawing and schedule",
+        "notes": "Internal harness-set identity binds the controlled pinout drawing schedule housings and contacts; final cut lengths exact wire AVL crimp tooling physical electrical SI thermal FAI and selected assembler remain release gates",
+    },
+    "HSG-VC": {
+        "mpn": "DIO-HSG-VC-REV-A",
+        "package": "Vacuum-cast polyurethane housing set build-to-print scope",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_MECHANICAL_RELEASE_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified vacuum-casting supplier; quotation and purchase outside the engineering repository",
+        "notes": "Internal housing-set identity only; released source geometry material shrink inserts seals FAI leak fit acoustic RF and environmental evidence remain mandatory before build",
+    },
+}
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -61,6 +142,17 @@ def main(*, check_only: bool = False) -> None:
             row.setdefault(field, "")
     by_id = {r["Item_ID"]: r for r in rows}
 
+    # User-approved board reserve: every supported lot carries exactly two spare
+    # boards of each design.  This applies independently to the bare-PCB and
+    # assembled-PCBA procurement tracks; it must not scale as a percentage of lot size.
+    for board_item_id in (
+        "ASM-MAIN", "ASM-PWR", "ASM-MIC",
+        "PCB-MAIN", "PCB-PWR", "PCB-MIC",
+    ):
+        require(board_item_id in by_id, f"draft BOM board item missing: {board_item_id}")
+        by_id[board_item_id]["Spares"] = "2"
+        by_id[board_item_id]["Spare_policy"] = "FIXED_LOT_MIN"
+
     main_parts = freeze_map("hardware/MAIN_COMPONENT_FREEZE_REV_A.csv", "RefDes")
     power_parts = freeze_map("hardware/POWER_COMPONENT_FREEZE_REV_A.csv", "Component_ID")
     connectors = freeze_map("hardware/CONNECTOR_FREEZE_REV_A.csv", "Connector_ID")
@@ -95,6 +187,18 @@ def main(*, check_only: bool = False) -> None:
             r["Spare_policy"] = spare_policy
         if qty is not None:
             set_quantities(r, qty, int(r["Spares"] if spares is None else spares))
+
+    for item_id, scope in BUILD_TO_PRINT_SCOPES.items():
+        current = by_id[item_id]
+        update_existing(
+            item_id,
+            manufacturer="Dioneya controlled design",
+            mpn=scope["mpn"],
+            package=scope["package"],
+            status=scope["status"],
+            notes=scope["notes"],
+        )
+        current["China_source_policy"] = scope["channel"]
 
     for item_id, ref in {
         "U1": "U1", "U2": "U2", "U3": "U3", "U4": "U4", "U7": "U7",
@@ -501,7 +605,7 @@ def main(*, check_only: bool = False) -> None:
         "ERJ-2GE0R00X": "-55..155",
         "MMICT5838-00-012": "-40..85",
         "U.FL-R-SMT-1(60)": "-40..90",
-        "RB40": "-20..60 discharge; -20..45 charge",
+        "DIO-BAT-LFP-12V50-H-REV-A": "-20..60 heated operation; 0..55 charge; -20..60 discharge",
         "SLP080S-12M": "-40..85",
         "SCC075010060R": "-30..60",
         "SBS050150200": "-10..60",
@@ -509,11 +613,13 @@ def main(*, check_only: bool = False) -> None:
         "AA.166.A.301111": "-40..85",
         "TI.89.B.2111W": "-40..85",
         "CAB.0243": "-60..200",
+        "DIO-HARNESS-SET-REV-A": "-40..105 selected connector/contact envelope; station -40..70 qualification pending",
         "5040510601": "-40..105",
         "5040520098": "-40..105",
         "43025-1200": "-40..105",
         "43030-0038": "-40..105",
         "43030-0001": "-40..105",
+        "DIO-HARNESS-SET-EVT-A": "-40..105 EVT qualification",
     }
     known_temp.update(main_temp)
     known_temp.update(power_temp)
@@ -525,6 +631,7 @@ def main(*, check_only: bool = False) -> None:
         "BAT1", "PV1", "MPPT1", "MPPT-TEMP", "ANT-CELL", "ANT-GNSS",
         "ANT-LORA", "RF-PIGTAIL", "HARNESS",
     }
+    controlled_qualification_orderables = {"PWR-TVS-01", "PWR-FUSE-01"}
     for row in rows:
         item_id = row["Item_ID"]
         if row["Line_class"] and row["Population"] and row["Temperature_C"] and row["BOM_disposition"]:
@@ -534,7 +641,11 @@ def main(*, check_only: bool = False) -> None:
         elif item_id in pcb_ids:
             row["Line_class"], row["Population"], row["Temperature_C"] = "BARE_PCB", "N/A", "N/A"
         elif item_id.startswith("HSG-"):
-            row["Line_class"], row["Population"], row["Temperature_C"] = "MECHANICAL_OPTION", "N/A", "OPEN"
+            row["Line_class"], row["Population"] = "MECHANICAL_OPTION", "N/A"
+            row["Temperature_C"] = (
+                "-40..70 target; material and assembled-housing qualification pending"
+                if item_id == "HSG-VC" else "OPEN"
+            )
         elif item_id in system_ids:
             row["Line_class"], row["Population"] = "SYSTEM_ITEM", "FITTED"
             row["Temperature_C"] = known_temp.get(row["MPN"], "OPEN")
@@ -547,12 +658,16 @@ def main(*, check_only: bool = False) -> None:
 
         status = row["Status"]
         exact_identity = row["Manufacturer"] not in ("", "TBD") and row["MPN"] not in ("", "TBD")
-        if row["Line_class"] in {"PCBA_SERVICE", "BARE_PCB"}:
+        if item_id in BUILD_TO_PRINT_SCOPES:
+            row["BOM_disposition"] = BUILD_TO_PRINT_SCOPES[item_id]["disposition"]
+        elif row["Line_class"] in {"PCBA_SERVICE", "BARE_PCB"}:
             row["BOM_disposition"] = "BLOCKED_SUPPLIER_RELEASE" if status == "RFQ_REQUIRED" else "CONTROLLED"
         elif row["Line_class"] == "MECHANICAL_OPTION":
             row["BOM_disposition"] = "CONDITIONAL_NOT_RELEASED"
         elif not exact_identity or status.startswith(("OPEN", "RFQ_REQUIRED", "SOURCE_PACKAGE_REQUIRED")):
             row["BOM_disposition"] = "BLOCKED_SELECTION"
+        elif item_id in controlled_qualification_orderables:
+            row["BOM_disposition"] = "CONTROLLED_PENDING_VERIFICATION"
         elif status.startswith("CANDIDATE"):
             row["BOM_disposition"] = "BLOCKED_ENGINEERING_SELECTION"
         elif row["Temperature_C"] in ("", "OPEN", "TBD") or "TEMP_VERIFY" in status:
@@ -601,9 +716,10 @@ def main(*, check_only: bool = False) -> None:
     grouped: dict[tuple[str, ...], dict[str, object]] = {}
     for row in rows:
         exact_identity = row["Manufacturer"] not in {"", "TBD"} and row["MPN"] not in {"", "TBD"}
-        identity = row["MPN"] if exact_identity else row["Item_ID"]
+        build_to_print_scope = row["Item_ID"] in BUILD_TO_PRINT_SCOPES
+        identity = row["MPN"] if exact_identity and not build_to_print_scope else row["Item_ID"]
         key = (
-            "MPN" if exact_identity else "ITEM",
+            "MPN" if exact_identity and not build_to_print_scope else "ITEM",
             identity,
             row["Manufacturer"],
             row["Package"],
@@ -648,6 +764,93 @@ def main(*, check_only: bool = False) -> None:
                 output_row[field] = str(group[field])
         procurement_rows.append(output_row)
 
+    program_fields = [
+        "Program_Procurement_ID", "Procurement_ID", "Assemblies", "Item_IDs",
+        "Category", "Manufacturer", "MPN", "Package", "Value", "Variant",
+        "Population", "Qty_per_station", "Production_lots_20", "Bench_stations",
+        "Total_stations", "Base_qty_2x20_plus_1", "Spare_qty_two_evt20_lots",
+        "Procure_qty_2x20_plus_1", "Spare_policy", "Procurement_track",
+        "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
+        "Program_scope",
+    ]
+    program_21_fields = [
+        "Program_Procurement_ID", "Procurement_ID", "Assemblies", "Item_IDs",
+        "Category", "Manufacturer", "MPN", "Package", "Value", "Variant",
+        "Population", "Qty_per_station", "Production_lots_20", "Bench_stations",
+        "Total_stations", "Base_qty_1x20_plus_1", "Spare_qty_one_evt20_lot",
+        "Procure_qty_1x20_plus_1", "Spare_policy", "Procurement_track",
+        "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
+        "Program_scope",
+    ]
+    program_21_rows: list[dict[str, str]] = []
+    program_rows: list[dict[str, str]] = []
+    for procurement_row in procurement_rows:
+        quantity_20 = int(procurement_row["Qty_20"])
+        require(
+            quantity_20 % PROGRAM_LOT_STATIONS == 0,
+            f"{procurement_row['Procurement_ID']}: Qty_20 is not divisible by 20",
+        )
+        quantity_per_station = quantity_20 // PROGRAM_LOT_STATIONS
+        base_quantity = quantity_per_station * PROGRAM_TOTAL_STATIONS
+        program_spares = int(procurement_row["Spares_20"]) * PROGRAM_PRODUCTION_LOTS
+        item_ids = set(procurement_row["Item_IDs"].split(" | "))
+        if item_ids.issubset({"ASM-MAIN", "ASM-PWR", "ASM-MIC"}):
+            track = "PRIMARY_FULL_PCBA"
+        elif item_ids.issubset({"PCB-MAIN", "PCB-PWR", "PCB-MIC"}):
+            track = "ALTERNATIVE_BARE_PCB_QUOTATION_ONLY"
+        else:
+            track = "COMMON_PROGRAM_PROCUREMENT"
+        base_quantity_21 = quantity_per_station * 21
+        program_spares_21 = int(procurement_row["Spares_20"])
+        program_21_rows.append({
+            "Program_Procurement_ID": f"P21-{len(program_21_rows) + 1:03d}",
+            "Procurement_ID": procurement_row["Procurement_ID"],
+            **{
+                field: procurement_row[field]
+                for field in (
+                    "Assemblies", "Item_IDs", "Category", "Manufacturer", "MPN",
+                    "Package", "Value", "Variant", "Population", "Spare_policy",
+                    "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
+                )
+            },
+            "Qty_per_station": str(quantity_per_station),
+            "Production_lots_20": "1",
+            "Bench_stations": "1",
+            "Total_stations": "21",
+            "Base_qty_1x20_plus_1": str(base_quantity_21),
+            "Spare_qty_one_evt20_lot": str(program_spares_21),
+            "Procure_qty_1x20_plus_1": str(base_quantity_21 + program_spares_21),
+            "Procurement_track": track,
+            "Program_scope": (
+                "ONE_EVT20_PRODUCTION_SET_PLUS_ONE_BENCH; "
+                "one EVT-20 reserve pool; no separate reserve pool for bench"
+            ),
+        })
+        program_rows.append({
+            "Program_Procurement_ID": f"PG-{len(program_rows) + 1:03d}",
+            "Procurement_ID": procurement_row["Procurement_ID"],
+            **{
+                field: procurement_row[field]
+                for field in (
+                    "Assemblies", "Item_IDs", "Category", "Manufacturer", "MPN",
+                    "Package", "Value", "Variant", "Population", "Spare_policy",
+                    "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
+                )
+            },
+            "Qty_per_station": str(quantity_per_station),
+            "Production_lots_20": str(PROGRAM_PRODUCTION_LOTS),
+            "Bench_stations": str(PROGRAM_BENCH_STATIONS),
+            "Total_stations": str(PROGRAM_TOTAL_STATIONS),
+            "Base_qty_2x20_plus_1": str(base_quantity),
+            "Spare_qty_two_evt20_lots": str(program_spares),
+            "Procure_qty_2x20_plus_1": str(base_quantity + program_spares),
+            "Procurement_track": track,
+            "Program_scope": (
+                "TWO_EVT20_PRODUCTION_SETS_PLUS_ONE_BENCH; "
+                "two EVT-20 reserve pools; no third reserve pool for bench"
+            ),
+        })
+
     def render_csv(fieldnames: list[str], records: list[dict[str, str]]) -> str:
         buffer = io.StringIO(newline="")
         writer = csv.DictWriter(buffer, fieldnames=fieldnames, lineterminator="\n")
@@ -660,6 +863,8 @@ def main(*, check_only: bool = False) -> None:
         [{field: row.get(field, "") for field in fields} for row in rows],
     )
     procurement_text = render_csv(procurement_fields, procurement_rows)
+    program_21_text = render_csv(program_21_fields, program_21_rows)
+    program_text = render_csv(program_fields, program_rows)
     if check_only:
         require(OUT.is_file(), f"generated BOM is missing: {OUT.relative_to(ROOT)}")
         require(
@@ -674,15 +879,28 @@ def main(*, check_only: bool = False) -> None:
             PROCUREMENT_OUT.read_text(encoding="utf-8") == procurement_text,
             f"generated procurement BOM drift: run {Path(__file__).relative_to(ROOT)}",
         )
+        require(
+            PROGRAM_21_OUT.is_file()
+            and PROGRAM_21_OUT.read_text(encoding="utf-8") == program_21_text,
+            f"generated 1x20+1 program procurement drift: run {Path(__file__).relative_to(ROOT)}",
+        )
+        require(
+            PROGRAM_OUT.is_file() and PROGRAM_OUT.read_text(encoding="utf-8") == program_text,
+            f"generated 2x20+1 program procurement drift: run {Path(__file__).relative_to(ROOT)}",
+        )
     else:
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(detail_text, encoding="utf-8")
         PROCUREMENT_OUT.write_text(procurement_text, encoding="utf-8")
+        PROGRAM_21_OUT.write_text(program_21_text, encoding="utf-8")
+        PROGRAM_OUT.write_text(program_text, encoding="utf-8")
 
     print(
         f"{'Verified' if check_only else 'Generated'} {OUT.relative_to(ROOT)} with "
         f"{len(rows)} engineering rows and "
-        f"{PROCUREMENT_OUT.relative_to(ROOT)} with {len(procurement_rows)} procurement rows"
+        f"{PROCUREMENT_OUT.relative_to(ROOT)} with {len(procurement_rows)} procurement rows; "
+        f"{PROGRAM_21_OUT.relative_to(ROOT)} with {len(program_21_rows)} phase-1 rows and "
+        f"{PROGRAM_OUT.relative_to(ROOT)} with {len(program_rows)} full-program rows"
     )
 
 

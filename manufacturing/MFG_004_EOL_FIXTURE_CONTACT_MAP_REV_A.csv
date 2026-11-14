@@ -1,0 +1,32 @@
+﻿Fixture_Group,Contact,Board_View_X_mm,Board_View_Y_mm,Bottom_Fixture_View_X_mm,Bottom_Fixture_View_Y_mm,Pad,Pitch_mm,Pin_Name,Direction_at_DUT,Net,Required_Network,Safety_Class,Initial_State
+TP_BLE_SWD,1,84.00,23.00,26.00,23.00,CIRCLE_D1.7,2.54,VTREF,POWER_SENSE,3V3_DIGITAL,High-impedance debugger voltage-reference sense from the U11 rail; never source station power through this contact,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_BLE_SWD,2,86.54,23.00,23.46,23.00,CIRCLE_D1.7,2.54,SWDIO,DEBUG_BIDIR,NRF_SWDIO,Direct short route to U11 pad 51; no shared contact or net with STM32 SWDIO,HIGH_IMPEDANCE_UNTIL_DOMAIN_VALID,NOT_RUN
+TP_BLE_SWD,3,89.08,23.00,20.92,23.00,CIRCLE_D1.7,2.54,SWDCLK,DEBUG_INPUT,NRF_SWCLK,Direct short route to U11 pad 53; no shared contact or net with STM32 SWCLK,DRIVE_AFTER_VTREF_VALID,NOT_RUN
+TP_BLE_SWD,4,91.62,23.00,18.38,23.00,CIRCLE_D1.7,2.54,GND,POWER,GND,Direct short ground reference adjacent to SWDIO and SWDCLK fixture contacts,GROUND_FIRST,NOT_RUN
+TP_CELL_DBG,1,47.00,30.00,63.00,30.00,CIRCLE_D1.7,2.54,VREF_1V8,SENSE,U8_VDD_EXT_1V8,High-impedance sense only from U8 pad 29; fixture must never source VDD_EXT,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_CELL_DBG,2,49.54,30.00,60.46,30.00,CIRCLE_D1.7,2.54,DUT_TX,OUTPUT,CELL_DBG_TXD_1V8,Direct from U8 pad 23 to 1.8 V tolerant fixture input; exact protection remains MAIN-AUTH-010,HIGH_IMPEDANCE_UNTIL_DOMAIN_VALID,NOT_RUN
+TP_CELL_DBG,3,52.08,30.00,57.92,30.00,CIRCLE_D1.7,2.54,DUT_RX,INPUT,CELL_DBG_RXD_1V8,1.8 V fixture output to U8 pad 22; fixture high impedance until VREF_1V8 is valid,DRIVE_AFTER_VTREF_VALID,NOT_RUN
+TP_CELL_DBG,4,54.62,30.00,55.38,30.00,CIRCLE_D1.7,2.54,USB_BOOT,INPUT,CELL_USB_BOOT_1V8,Normally held LOW by board network; fixture may apply a current-limited 1.8 V HIGH only for the documented USB recovery power-on sequence and is high impedance otherwise,CURRENT_LIMITED_1V8_RECOVERY_ONLY,NOT_RUN
+TP_CELL_DBG,5,57.16,30.00,52.84,30.00,CIRCLE_D1.7,2.54,GND,POWER,GND_MODEM,Dedicated modem ground reference,GROUND_FIRST,NOT_RUN
+TP_CELL_USB,1,33.00,30.00,77.00,30.00,CIRCLE_D1.7,2.54,HOST_VBUS,POWER_IN,CELL_USB_VBUS,Fixture-controlled USB VBUS to U8 pad 8 only; never join J11 USB_VBUS_CONN or any station rail; exact protection remains MAIN-AUTH-010,ONLY_CONTROLLED_CURRENT_LIMITED_SOURCE,NOT_RUN
+TP_CELL_USB,2,35.54,30.00,74.46,30.00,CIRCLE_D1.7,2.54,USB_DP,BIDIR,CELL_USB_DP,90 Ohm differential fixture pair to U8 pad 9; never join J11 USB_DP,HIGH_IMPEDANCE_UNTIL_DOMAIN_VALID,NOT_RUN
+TP_CELL_USB,3,38.08,30.00,71.92,30.00,CIRCLE_D1.7,2.54,USB_DM,BIDIR,CELL_USB_DM,90 Ohm differential fixture pair to U8 pad 10; never join J11 USB_DM,HIGH_IMPEDANCE_UNTIL_DOMAIN_VALID,NOT_RUN
+TP_CELL_USB,4,40.62,30.00,69.38,30.00,CIRCLE_D1.7,2.54,GND,POWER,GND_MODEM,Dedicated modem ground reference,GROUND_FIRST,NOT_RUN
+TP_EOL,1,33.00,23.00,77.00,23.00,CIRCLE_D1.7,2.54,GND,POWER,GND,Common digital fixture return,GROUND_FIRST,NOT_RUN
+TP_EOL,2,35.54,23.00,74.46,23.00,CIRCLE_D1.7,2.54,VTREF_3V3,SENSE,3V3_DIGITAL,High-impedance voltage sense only; fixture must never source this rail,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_EOL,3,38.08,23.00,71.92,23.00,CIRCLE_D1.7,2.54,VSENSE_3V8,SENSE,3V8_MODEM,High-impedance voltage sense only; fixture must never source this rail,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_EOL,4,40.62,23.00,69.38,23.00,CIRCLE_D1.7,2.54,VSENSE_1V8,SENSE,1V8_MIC,High-impedance voltage sense only; fixture must never source this rail,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_EOL,5,43.16,23.00,66.84,23.00,CIRCLE_D1.7,2.54,DUT_TX,OUTPUT,TEST_UART_TX,Direct from U1 PC1 pin 16 LPUART1_TX to fixture input; exact series protection remains MAIN-AUTH-010,HIGH_IMPEDANCE_UNTIL_DOMAIN_VALID,NOT_RUN
+TP_EOL,6,45.70,23.00,64.30,23.00,CIRCLE_D1.7,2.54,DUT_RX,INPUT,TEST_UART_RX,Fixture output to U1 PC0 pin 15 LPUART1_RX; fixture is high impedance until VTREF is valid,DRIVE_AFTER_VTREF_VALID,NOT_RUN
+TP_EOL,7,48.24,23.00,61.76,23.00,CIRCLE_D1.7,2.54,PWR_GOOD,SENSE,PWR_GOOD,High-impedance observation only; do not drive the inter-board state line,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_EOL,8,50.78,23.00,59.22,23.00,CIRCLE_D1.7,2.54,FAULT,SENSE,FAULT,High-impedance observation only; do not drive the inter-board fault line,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_EOL,9,53.32,23.00,56.68,23.00,CIRCLE_D1.7,2.54,BOOT0,INPUT,BOOT0,Controlled recovery drive to U1 PH3-BOOT0 pin 94 only while reset is asserted; high impedance for normal boot,DRIVE_ONLY_WHILE_NRST_ASSERTED,NOT_RUN
+TP_EOL,10,55.86,23.00,54.14,23.00,CIRCLE_D1.7,2.54,REV0,SENSE,REV_STRAP0,High-impedance read of U1 PB8 pin 95 hardware-revision strap,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_EOL,11,58.40,23.00,51.60,23.00,CIRCLE_D1.7,2.54,REV1,SENSE,REV_STRAP1,High-impedance read of U1 PB9 pin 96 hardware-revision strap,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_EOL,12,60.94,23.00,49.06,23.00,CIRCLE_D1.7,2.54,I2C_SCL,BIDIR_OD,I2C2_SCL,Guarded open-drain service access to U1 PB13 pin 52 and INA226 bus; fixture adds no pull-up unless separately enabled,OPEN_DRAIN_NO_EXTRA_PULLUP,NOT_RUN
+TP_EOL,13,63.48,23.00,46.52,23.00,CIRCLE_D1.7,2.54,I2C_SDA,BIDIR_OD,I2C2_SDA,Guarded open-drain service access to U1 PB14 pin 53 and INA226 bus; fixture adds no pull-up unless separately enabled,OPEN_DRAIN_NO_EXTRA_PULLUP,NOT_RUN
+TP_MCU_SWD,1,69.00,23.00,41.00,23.00,CIRCLE_D1.7,2.54,VTREF,SENSE,3V3_DIGITAL,Fixture senses DUT target voltage and must never source station power,SENSE_ONLY_NEVER_SOURCE,NOT_RUN
+TP_MCU_SWD,2,71.54,23.00,38.46,23.00,CIRCLE_D1.7,2.54,SWDIO,BIDIR,SWDIO,Direct controlled recovery contact to U1 PA13 pin 72; exact protection remains MAIN-AUTH-010,HIGH_IMPEDANCE_UNTIL_DOMAIN_VALID,NOT_RUN
+TP_MCU_SWD,3,74.08,23.00,35.92,23.00,CIRCLE_D1.7,2.54,SWCLK,INPUT,SWCLK,Direct controlled recovery contact to U1 PA14 pin 76; exact protection remains MAIN-AUTH-010,DRIVE_AFTER_VTREF_VALID,NOT_RUN
+TP_MCU_SWD,4,76.62,23.00,33.38,23.00,CIRCLE_D1.7,2.54,NRST,BIDIR,NRST,Direct controlled recovery contact to U1 package pin 14; normal reset network remains MAIN-AUTH-010,HIGH_IMPEDANCE_UNTIL_DOMAIN_VALID,NOT_RUN
+TP_MCU_SWD,5,79.16,23.00,30.84,23.00,CIRCLE_D1.7,2.54,GND,POWER,GND,Ground contact mates before active fixture signals,GROUND_FIRST,NOT_RUN

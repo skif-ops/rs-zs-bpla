@@ -1,0 +1,32 @@
+{
+  "board": "PCB-MIC",
+  "release": "EVT_BUILD_AUTHORIZED_CUSTOMER_CHECKOUT_REQUIRED",
+  "drc_return_code": 0,
+  "erc_return_code": 0,
+  "gerber_return_code": 0,
+  "drill_return_code": 0,
+  "position_return_code": 0,
+  "ipc_d_356_return_code": 0,
+  "step_return_code": 0,
+  "schematic_pdf_return_code": 0,
+  "bom_return_code": 0,
+  "schema": "dioneya-evt-board-cam-candidate-v1",
+  "source_commit": "b6d9d620",
+  "review_b": "ACCEPTED",
+  "manufacturing_authorized": true,
+  "drc": {
+    "errors": 0,
+    "warnings": 0,
+    "unconnected_items": 0
+  },
+  "jlc_bom": {
+    "rows": 4,
+    "lcsc_ids_complete": false,
+    "note": "Manufacturer/MPN data is retained; LCSC mapping remains open in the assembler part map."
+  },
+  "jlc_cpl_rows": 4,
+  "desktop_release_basis": "hardware/reviews/EVT_FACTORY_PUBLIC_CAPABILITY_BASELINE_REV_B.json",
+  "specific_factory_job_confirmed": false,
+  "specific_factory_job_confirmation_owner": "CUSTOMER",
+  "post_build_evt_validation_required": true
+}

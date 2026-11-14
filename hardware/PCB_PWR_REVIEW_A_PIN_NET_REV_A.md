@@ -175,16 +175,15 @@ The native schematic must fail Review A regression if it:
 
 The native representation has been converted from the original one-page direct-label
 capture into one system overview and four functional child sheets. The controlled
-conversion contains 63 symbols, 185 explicit wire segments, 9 cross-sheet nets and
+conversion contains 65 symbols, 189 explicit wire segments, 9 cross-sheet nets and
 26 hierarchical labels. An independent audit compares every schematic pin with every
-pad/net on all 60 physical PCB positions and records semantic SHA-256
-`fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a`.
+pad/net on all 62 physical PCB positions and records semantic SHA-256
+`84a35aa607bac3ee65b5d8f60684e958277b2fa5a7ed01f810af32f0b52b73f7`.
 
 This exact equivalence retains the `PASS - PIN/NET AUTHORITY` decision above. Native
-KiCad 9.0.9 ERC now passes with zero violations on all five sheets, and the exported
-five-page A3 PDF plus JSON ERC report are commit-bound. This still does not accept the
-active post-ECO drawing as complete review evidence: an independent human functional
-review must be committed before routing starts.
+The C20/C21 local-CIN_HF ECO supersedes prior ERC/PDF and human decisions for the
+active source. Fresh commit-bound KiCad 9 ERC and five-page A3 PDF evidence are
+required, followed by independent human functional review, before routing starts.
 
 ## 9. Open items outside this Review A scope
 
@@ -209,7 +208,7 @@ review must be committed before routing starts.
 - final TVS and fuse values and coordination;
 - `L1/L2` are frozen as `XAL7030-472MEC` with the manufacturer land pattern;
   hot-loop placement, temperature rise, load-step and EMI evidence remain open;
-- all `C1-C19`, `R1-R15`, `NT1-NT3` and `TP1-TP10` now have exact candidate identity,
+- all `C1-C21`, `R1-R15`, `NT1-NT3` and `TP1-TP10` now have exact candidate identity,
   population, footprint and pin/net bindings in
   `PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`; capacitor DC-bias/cold-ESR/transient evidence,
   C13 manufacturer land-pattern comparison, assembly review and DFT accessibility

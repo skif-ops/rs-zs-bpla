@@ -14,7 +14,7 @@ AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 BOM_GENERATOR = ROOT / "tools/generate_evt_pre_20_bom_rev_a.py"
 
 EXPECTED_REFS = {
-    *(f"C{i}" for i in range(1, 20)),
+    *(f"C{i}" for i in range(1, 22)),
     *(f"R{i}" for i in range(1, 16)),
     "NT1", "NT2", "NT3",
     *(f"TP{i}" for i in range(1, 11)),
@@ -23,7 +23,7 @@ EXPECTED_DNP = {"R5", "R9", "R13", "R14", "R15"}
 EXPECTED_GROUPS = {
     "PWR-C-100N": ("CGA2B3X7R1E104K050BB", "Capacitor_SMD:C_0402_1005Metric", 4),
     "PWR-C-LDO": ("CGA3E1X7R1A225K080AC", "Capacitor_SMD:C_0603_1608Metric", 2),
-    "PWR-C-CIN-HF": ("CGA3E2X7R1H104K080AA", "Capacitor_SMD:C_0603_1608Metric", 1),
+    "PWR-C-CIN-HF": ("CGA3E2X7R1H104K080AA", "Capacitor_SMD:C_0603_1608Metric", 3),
     "PWR-C-INPUT": ("CGA6P3X7R1H475K250AB", "Capacitor_SMD:C_1210_3225Metric", 3),
     "PWR-C-BULK": ("EEH-ZK1V101XP", "Capacitor_SMD:CP_Elec_6.3x7.7", 1),
     "PWR-COUT-3V8": ("CGA6P3X7R1E226M250AB", "Capacitor_SMD:C_1210_3225Metric", 4),
@@ -95,7 +95,7 @@ def main() -> int:
 
     authority = read_rows()
     refs = {row["RefDes"] for row in authority}
-    require(len(authority) == 47 and refs == EXPECTED_REFS,
+    require(len(authority) == 49 and refs == EXPECTED_REFS,
             f"authority physical set drift: missing={sorted(EXPECTED_REFS-refs)} extra={sorted(refs-EXPECTED_REFS)}")
     require(len(refs) == len(authority), "duplicate passive/DFT RefDes")
     require({row["RefDes"] for row in authority if row["Population"] == "DNP"} == EXPECTED_DNP,
@@ -151,7 +151,7 @@ def main() -> int:
                 f"BOM generator still embeds hidden PCB-PWR passive MPN {forbidden}")
 
     print("PCB-PWR passive/DFT independent authority audit PASS")
-    print("47 refs; exact identity/footprint/population/net binding; BOM hidden constants absent")
+    print("49 refs; exact identity/footprint/population/net binding; BOM hidden constants absent")
     return 0
 
 

@@ -27,8 +27,8 @@ def main() -> int:
     args = parser.parse_args()
 
     authority = rows()
-    if len(authority) != 47:
-        raise RuntimeError(f"PCB-PWR passive authority must contain 47 physical rows, got {len(authority)}")
+    if len(authority) != 49:
+        raise RuntimeError(f"PCB-PWR passive authority must contain 49 physical rows, got {len(authority)}")
     by_ref = {row["RefDes"]: row for row in authority}
     if len(by_ref) != len(authority) or "" in by_ref:
         raise RuntimeError("PCB-PWR passive authority has duplicate or blank RefDes")
@@ -77,7 +77,7 @@ def main() -> int:
             raise RuntimeError(f"{ref}: controlled source binding did not round-trip")
 
     print("PCB-PWR passive/DFT authority binding PASS")
-    print("47 physical references carry controlled value, MPN, footprint and source")
+    print("49 physical references carry controlled value, MPN, footprint and source")
     return 0
 
 

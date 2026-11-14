@@ -37,6 +37,9 @@ PCB_MAIN_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_main_placement_clearance_
 PCB_MAIN_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_main_routing_authority_rev_a.py"
 PCB_PWR_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_pwr_placement_clearance_rev_a.py"
 PCB_PWR_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_pwr_routing_authority_rev_a.py"
+PCB_PWR_EVT_ROUTING_BASIS_AUDIT = (
+    ROOT / "tools" / "audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
+)
 PCB_PWR_DIM_003_AUDIT = ROOT / "tools" / "audit_pcb_pwr_dim_003_request_rev_a.py"
 PCB_PWR_STACKUP_COPPER_AUDIT = ROOT / "tools" / "audit_pcb_pwr_stackup_copper_request_rev_a.py"
 PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
@@ -85,15 +88,44 @@ def placement_candidate_audit(name: str) -> str | None:
     controls = {
         "PCB-MAIN": (
             PCB_MAIN_STATUS,
-            "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+            "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+            "RF_REMEDIATION_REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_"
+            "CELL_FIXTURE_APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
             "tools/audit_pcb_main_layout_candidate_rev_a.py",
         ),
-        "PCB-PWR": (
-            PCB_PWR_STATUS,
-            "OPEN_F1_VALUE_ECO_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
-            "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
-        ),
     }
+    if name == "PCB-PWR":
+        if not PCB_PWR_STATUS.is_file():
+            return None
+        status = json.loads(PCB_PWR_STATUS.read_text(encoding="utf-8"))
+        current_evidence = status.get("human_readable_hierarchy", {}).get(
+            "current_evidence", {}
+        )
+        evidence_complete = current_evidence.get("status") == (
+            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
+        )
+        expected = {
+            (
+                "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_"
+                "EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_"
+                "STACKUP_REQUEST_READY_ROUTING_PENDING"
+                if evidence_complete else
+                "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_AND_HUMAN_REVIEW_PENDING_"
+                "EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_"
+                "STACKUP_REQUEST_READY_ROUTING_PENDING"
+            )
+        }
+        if evidence_complete:
+            # The accepted engineering baseline authorizes bounded routing but does
+            # not make this partially routed board a final-DRC or fabrication source.
+            expected.add(
+                "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_"
+                "FITTED_2D_CLEARANCE_DIM_003_AND_EVT_STACKUP_GEOMETRY_"
+                "ACCEPTED_ROUTING_PENDING"
+            )
+        if status.get("review_b", {}).get("status") not in expected:
+            return None
+        return "tools/audit_pcb_pwr_layout_candidate_rev_a.py"
     if name not in controls:
         return None
     status_path, expected, audit = controls[name]
@@ -774,8 +806,9 @@ def main() -> int:
                         report["boards"][name]["routing_constraint_state"] = \
                             routing_report["state"]
                         report["boards"][name]["pcb_state"] = (
-                            "PLACEMENT_CANDIDATE_STRUCTURE_AND_2D_CLEARANCE_PASS_"
-                            "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
+                            "PLACEMENT_AND_ACCEPTED_RF_REMEDIATIONS_APPLIED_"
+                            "COMBINED_GATE_AND_REMAINING_ROUTING_PENDING_"
+                            "FAB_EXPORT_PROHIBITED"
                         )
                     elif name == "PCB-PWR":
                         clearance_output = ART / name / "placement_clearance_audit.json"
@@ -800,6 +833,17 @@ def main() -> int:
                         )
                         report["boards"][name]["routing_constraint_state"] = \
                             routing_report["status"]
+                        evt_basis_output = ART / name / "evt_routing_basis_audit.json"
+                        run([
+                            sys.executable,
+                            str(PCB_PWR_EVT_ROUTING_BASIS_AUDIT.relative_to(ROOT)),
+                            "--output", str(evt_basis_output),
+                        ])
+                        evt_basis_report = json.loads(
+                            evt_basis_output.read_text(encoding="utf-8")
+                        )
+                        report["boards"][name]["evt_routing_basis_state"] = \
+                            evt_basis_report["status"]
                         dim_003_output = ART / name / "dim_003_request_audit.json"
                         run([
                             sys.executable,
@@ -823,8 +867,9 @@ def main() -> int:
                         report["boards"][name]["stackup_copper_request_state"] = \
                             stackup_report["status"]
                         report["boards"][name]["pcb_state"] = (
-                            "FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_"
-                            "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
+                            "EVT_DIM_003_MOUNTING_FITTED_2D_CLEARANCE_PRE_ROUTE_"
+                            "CONSTRAINT_AND_NUMERIC_EVT_BASIS_PASS_ROUTING_DRC_"
+                            "AND_FAB_EXPORT_PROHIBITED"
                         )
                     else:
                         report["boards"][name]["pcb_state"] = \

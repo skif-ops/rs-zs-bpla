@@ -11,11 +11,14 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
+import json
 import math
 import re
 import tempfile
 import uuid
 from pathlib import Path
+from typing import Any
 
 from kiutils.board import Board
 from kiutils.footprint import Footprint
@@ -24,6 +27,33 @@ from kiutils.footprint import Footprint
 ROOT = Path(__file__).resolve().parents[1]
 PCB = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 LIB = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
+ECO_003_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
+)
+ECO_003_APPROVED_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
+ECO_004_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
+)
+ECO_004_APPROVED_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
+GROUND_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
+)
+GROUND_APPROVED_BOARD_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
+SIGNAL_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
+)
+SIGNAL_APPROVED_BOARD_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
+OCTOSPI_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
+)
+OCTOSPI_APPROVED_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_APPROVED_BOARD_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+RF_REMEDIATION_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+)
+RF_REMEDIATION_BOARD_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+ACTIVE_BOARD_SHA256 = "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739"  # accepted inner reroute 003 (footprints unchanged)
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -183,6 +213,10 @@ CONTROLLED = {
         "ST_LIS2DW12_LGA-12L.kicad_mod",
         "ST_DS11811_Rev9_and_TN0018_Rev8_LGA-12L_Pattern",
     ),
+    "U4": (
+        "STTS22H_UDFN-6L.kicad_mod",
+        "ST_DS12606_Rev8_Fig10_11",
+    ),
     "U11": (
         "Raytac_MDBT50Q-P1MV2.kicad_mod",
         "Raytac_MDBT50Q_Footprint_Design_Guide_230606",
@@ -265,6 +299,10 @@ def replace(old: Footprint, ref: str, filename: str, source: str, status: str) -
             pad.net = copy.deepcopy(authority.net)
             pad.pinFunction = authority.pinFunction
             pad.pinType = authority.pinType
+            # Preserve board-level electrical clearance overrides.  U3 uses a
+            # reviewed 0.12 mm local pad clearance which is intentionally
+            # absent from the reusable manufacturer land-pattern library.
+            pad.clearance = authority.clearance
     # Footprint-file rule areas use local coordinates, while the KiCad board
     # syntax stores their polygon points in board coordinates.  Transform them
     # explicitly so the pure-kiutils materializer matches pcbnew placement.
@@ -356,6 +394,174 @@ def materialize(source: Path, destination: Path) -> None:
     destination.write_text(board_text, encoding="utf-8")
 
 
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+_SERIALIZATION_ONLY_FIELDS = {
+    "filePath",
+    "generator",
+    "renderCache",
+    "tedit",
+    "tstamp",
+    "version",
+}
+
+
+def canonical(value: Any, field: str = "") -> Any:
+    """Return a serialization-neutral representation of KiCad objects."""
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        return round(value, 9)
+    if isinstance(value, dict):
+        return (
+            "dict",
+            tuple(
+                (str(key), canonical(item, str(key)))
+                for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+                if str(key) not in _SERIALIZATION_ONLY_FIELDS
+            ),
+        )
+    if isinstance(value, (list, tuple)):
+        items = [canonical(item) for item in value]
+        # KiCad/kiutils may reorder independent footprint children while
+        # retaining identical geometry.  Polygon point order remains ordered.
+        if field in {"graphicItems", "groups", "models", "pads", "zones"}:
+            items.sort(key=repr)
+        return ("list", tuple(items))
+    if isinstance(value, set):
+        return ("set", tuple(sorted((canonical(item) for item in value), key=repr)))
+    if hasattr(value, "__dict__"):
+        return (
+            type(value).__name__,
+            tuple(
+                (key, canonical(item, key))
+                for key, item in sorted(vars(value).items())
+                if key not in _SERIALIZATION_ONLY_FIELDS
+            ),
+        )
+    return repr(value)
+
+
+def verify_frozen_materialization(candidate: Path) -> None:
+    """Validate the signed ECO lineage and all controlled footprint semantics."""
+    if not ECO_003_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN ECO-003 application evidence is missing")
+    if not ECO_004_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN ECO-004 application evidence is missing")
+    if not GROUND_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN ground-domain application evidence is missing")
+    if not OCTOSPI_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN OctoSPI application evidence is missing")
+    if not RF_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN RF application evidence is missing")
+    if not RF_REMEDIATION_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN RF remediation application evidence is missing")
+    eco003 = json.loads(ECO_003_APPLICATION.read_text(encoding="utf-8"))
+    eco003_applied = eco003.get("applied", {})
+    eco004 = json.loads(ECO_004_APPLICATION.read_text(encoding="utf-8"))
+    eco004_applied = eco004.get("applied", {})
+    ground = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+    ground_baseline = ground.get("historical_baseline", {})
+    ground_applied = ground.get("applied", {})
+    signal = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
+    signal_applied = signal.get("applied", {})
+    octospi = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
+    octospi_applied = octospi.get("applied", {})
+    rf = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    rf_applied = rf.get("applied", {})
+    remediation = json.loads(
+        RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
+    )
+    remediation_applied = remediation.get("applied", {})
+    actual_board_sha256 = sha256(PCB)
+    if not (
+        eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
+        and eco003.get("decision") == "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO"
+        and eco003_applied.get("board_sha256") == ECO_003_APPROVED_BOARD_SHA256
+        and eco004.get("proposal_id") == "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004"
+        and eco004.get("decision") == "ACCEPT_STTS22H_FOOTPRINT_ECO_004"
+        and eco004.get("routing_engineering_continuation_authorized") is True
+        and eco004.get("candidate_or_future_copper_final_authorized") is False
+        and eco004.get("routing_complete") is False
+        and eco004.get("review_b_complete") is False
+        and eco004.get("cam_or_manufacturing_release") is False
+        and eco004_applied.get("track_segments") == 0
+        and eco004_applied.get("copper_zones") == 0
+        and eco004_applied.get("board_sha256") == ECO_004_APPROVED_BOARD_SHA256
+        and ground.get("proposal_id") == "PCB-MAIN-GROUND-DOMAIN-ROUTING-001"
+        and ground.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE"
+        and ground.get("status") ==
+        "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES"
+        and ground_baseline.get("board_sha256") == ECO_004_APPROVED_BOARD_SHA256
+        and ground_applied.get("board_sha256") == GROUND_APPROVED_BOARD_SHA256
+        and ground_applied.get("exact_candidate_byte_identity") is True
+        and ground.get("routing_complete") is False
+        and ground.get("review_b_complete") is False
+        and ground.get("cam_or_manufacturing_release") is False
+        and signal.get("decision") == "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE"
+        and signal_applied.get("board_sha256") == SIGNAL_APPROVED_BOARD_SHA256
+        and signal_applied.get("exact_candidate_byte_identity") is True
+        and signal.get("routing_complete") is False
+        and signal.get("review_b_complete") is False
+        and signal.get("cam_or_manufacturing_release") is False
+        and octospi.get("decision") ==
+        "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE"
+        and octospi.get("historical_baseline", {}).get("board_sha256") ==
+        SIGNAL_APPROVED_BOARD_SHA256
+        and octospi_applied.get("board_sha256") == OCTOSPI_APPROVED_BOARD_SHA256
+        and octospi_applied.get("exact_candidate_byte_identity") is True
+        and octospi.get("routing_complete") is False
+        and octospi.get("review_b_complete") is False
+        and octospi.get("cam_or_manufacturing_release") is False
+        and rf.get("decision") == "ACCEPT_RF_P0_ROUTING_SUBGATE"
+        and rf.get("historical_baseline", {}).get("board_sha256") ==
+        OCTOSPI_APPROVED_BOARD_SHA256
+        and rf_applied.get("board_sha256") == RF_APPROVED_BOARD_SHA256
+        and rf_applied.get("exact_candidate_byte_identity") is True
+        and rf.get("routing_complete") is False
+        and rf.get("review_b_complete") is False
+        and rf.get("cam_or_manufacturing_release") is False
+        and remediation.get("decision") ==
+        "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+        and remediation_applied.get("board_sha256") ==
+        RF_REMEDIATION_BOARD_SHA256
+        and remediation_applied.get("exact_reviewed_gnss_delta_identity") is True
+        and remediation.get("routing_complete") is False
+        and remediation.get("review_b_complete") is False
+        and remediation.get("cam_or_manufacturing_release") is False
+        and actual_board_sha256 == ACTIVE_BOARD_SHA256
+    ):
+        raise RuntimeError(
+            "PCB-MAIN ECO-003/ECO-004/ground-domain frozen-board authority mismatch"
+        )
+
+    controlled = set(CONTROLLED) | set(IPC_CANDIDATE_CONTROLLED)
+    approved_board = Board.from_file(str(PCB), encoding="utf-8")
+    candidate_board = Board.from_file(str(candidate), encoding="utf-8")
+    approved = {
+        ref_of(footprint): footprint
+        for footprint in approved_board.footprints
+        if ref_of(footprint) in controlled
+    }
+    regenerated = {
+        ref_of(footprint): footprint
+        for footprint in candidate_board.footprints
+        if ref_of(footprint) in controlled
+    }
+    if set(approved) != controlled or set(regenerated) != controlled:
+        raise RuntimeError("PCB-MAIN controlled footprint reference set mismatch")
+    mismatched = [
+        ref for ref in sorted(controlled)
+        if canonical(approved[ref]) != canonical(regenerated[ref])
+    ]
+    if mismatched:
+        raise RuntimeError(
+            "PCB-MAIN controlled footprint semantic mismatch: " + ", ".join(mismatched)
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
@@ -365,8 +571,17 @@ def main() -> int:
             candidate = Path(temp_dir) / PCB.name
             materialize(PCB, candidate)
             if candidate.read_bytes() != PCB.read_bytes():
-                raise SystemExit("PCB-MAIN controlled project-local footprints are stale; run materializer")
-        print("PCB-MAIN controlled project-local footprint materialization: PASS")
+                try:
+                    verify_frozen_materialization(candidate)
+                except RuntimeError as error:
+                    raise SystemExit(
+                        "PCB-MAIN controlled project-local footprints are stale: "
+                        f"{error}"
+                    ) from error
+        print(
+            "PCB-MAIN controlled project-local footprint materialization: PASS "
+            "(accepted routing-lineage board hash; semantic footprint match)"
+        )
     else:
         with tempfile.TemporaryDirectory() as temp_dir:
             candidate = Path(temp_dir) / PCB.name

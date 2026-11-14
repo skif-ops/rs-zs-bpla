@@ -37,13 +37,12 @@ static size_t write_station_id(uint32_t station_id, uint8_t *output) {
   return size;
 }
 
-static bool build_up_topic(uint8_t *topic, size_t *topic_size,
-                           const uint8_t *tenant, size_t tenant_size,
-                           uint32_t station_id) {
+static bool build_topic(uint8_t *topic, size_t *topic_size,
+                        const uint8_t *tenant, size_t tenant_size,
+                        uint32_t station_id, const uint8_t *suffix, size_t suffix_size) {
   static const uint8_t prefix[] = {'z', 's', '/', 'v', '1', '/'};
-  static const uint8_t suffix[] = {'/', 'u', 'p'};
   size_t offset = 0u;
-  if (sizeof(prefix) + tenant_size + 1u + 10u + sizeof(suffix) >
+  if (sizeof(prefix) + tenant_size + 1u + 10u + suffix_size >
       ZS_MQTT_EVENT_TOPIC_MAX_BYTES)
     return false;
   memcpy(&topic[offset], prefix, sizeof(prefix));
@@ -52,10 +51,24 @@ static bool build_up_topic(uint8_t *topic, size_t *topic_size,
   offset += tenant_size;
   topic[offset++] = (uint8_t)'/';
   offset += write_station_id(station_id, &topic[offset]);
-  memcpy(&topic[offset], suffix, sizeof(suffix));
-  offset += sizeof(suffix);
+  memcpy(&topic[offset], suffix, suffix_size);
+  offset += suffix_size;
   *topic_size = offset;
   return true;
+}
+
+static bool build_up_topic(uint8_t *topic, size_t *topic_size,
+                           const uint8_t *tenant, size_t tenant_size,
+                           uint32_t station_id) {
+  static const uint8_t suffix[] = {'/', 'u', 'p'};
+  return build_topic(topic, topic_size, tenant, tenant_size, station_id, suffix, sizeof(suffix));
+}
+
+static bool build_status_topic(uint8_t *topic, size_t *topic_size,
+                               const uint8_t *tenant, size_t tenant_size,
+                               uint32_t station_id) {
+  static const uint8_t suffix[] = {'/', 's', 't', 'a', 't', 'u', 's'};
+  return build_topic(topic, topic_size, tenant, tenant_size, station_id, suffix, sizeof(suffix));
 }
 
 bool zs_mqtt_event_transport_init(
@@ -70,6 +83,8 @@ bool zs_mqtt_event_transport_init(
       !tenant_is_valid(tenant, tenant_size) ||
       !build_up_topic(transport->up_topic, &transport->up_topic_size,
                       tenant, tenant_size, station_id) ||
+      !build_status_topic(transport->status_topic, &transport->status_topic_size,
+                          tenant, tenant_size, station_id) ||
       !zs_event_receipt_transport_init(&transport->receipt, station_id, tenant,
                                        tenant_size)) {
     memset(transport, 0, sizeof(*transport));
@@ -84,6 +99,32 @@ static void clear_message(zs_mqtt_event_message_t *message) {
   if (message) memset(message, 0, sizeof(*message));
 }
 
+void zs_mqtt_event_transport_set_time(zs_mqtt_event_transport_t *transport, uint32_t now_ms) {
+  if (transport) transport->now_ms = now_ms;
+}
+
+void zs_mqtt_event_transport_note_published(zs_mqtt_event_transport_t *transport) {
+  size_t free_slot = ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS;
+  if (!transport || transport->publication_item.event_id == 0u) return;
+  for (size_t i = 0u; i < ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS; i++) {
+    if (transport->receipt_hold[i].used && transport->receipt_hold[i].event_id == transport->publication_item.event_id) { free_slot = i; break; }
+    if (!transport->receipt_hold[i].used || (int32_t)(transport->now_ms - transport->receipt_hold[i].until_ms) >= 0) free_slot = i;
+  }
+  if (free_slot == ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS) return;              /* table full of live holds: the event is offered again */
+  transport->receipt_hold[free_slot].used = true;
+  transport->receipt_hold[free_slot].event_id = transport->publication_item.event_id;
+  transport->receipt_hold[free_slot].until_ms = transport->now_ms + ZS_MQTT_EVENT_RECEIPT_WAIT_MS;
+}
+
+static bool held_for_receipt(void *ctx, const zs_event_outbox_item_t *candidate) {
+  const zs_mqtt_event_transport_t *transport = ctx;
+  for (size_t i = 0u; i < ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS; i++) {
+    if (transport->receipt_hold[i].used && transport->receipt_hold[i].event_id == candidate->event_id &&
+        (int32_t)(transport->now_ms - transport->receipt_hold[i].until_ms) < 0) return true;
+  }
+  return false;
+}
+
 zs_mqtt_event_prepare_result_t zs_mqtt_event_transport_prepare(
     zs_mqtt_event_transport_t *transport,
     zs_mqtt_event_message_t *publication) {
@@ -96,8 +137,7 @@ zs_mqtt_event_prepare_result_t zs_mqtt_event_transport_prepare(
 
   memset(&transport->publication_item, 0,
          sizeof(transport->publication_item));
-  result = zs_event_outbox_peek(transport->outbox,
-                                &transport->publication_item);
+  result = zs_event_outbox_peek_filtered(transport->outbox, &transport->publication_item, held_for_receipt, transport);
   if (result == ZS_EVENT_OUTBOX_EMPTY) return ZS_MQTT_EVENT_EMPTY;
   if (result == ZS_EVENT_OUTBOX_INVALID_ARGUMENT)
     return ZS_MQTT_EVENT_INVALID_ARGUMENT;

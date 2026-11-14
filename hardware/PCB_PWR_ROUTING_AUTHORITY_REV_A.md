@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A pre-route constraint authority
 
-Status: `PASS / 31 NETS CLASSIFIED / DIM-003, STACKUP, ROUTING AND THERMAL EVIDENCE OPEN / NOT FOR MANUFACTURE`
+Status: `PASS / 31 NETS CLASSIFIED / DIM-003 AND EVT STACKUP ACCEPTED / NUMERIC EVT BASIS PASS / ROUTING AND PHYSICAL THERMAL EVIDENCE OPEN / NOT FOR MANUFACTURE`
 
 Machine authority: `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv`
 
@@ -15,26 +15,64 @@ CSV SHA-256: `53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1`
 Every one of the 31 non-empty PCB-PWR native nets has one explicit route class,
 return/reference-domain rule, topology, current basis, geometry rule, layer/via
 rule, aggressor-separation rule, priority and source authority. This closes only
-pre-route constraint coverage. It does not authorize routing while the outline,
-mounting pattern and terminal zones remain open under `DIM-003`.
-The internal `DIM-003` request packet is ready, but its attributable response
-register remains `0/18`; this is still an open routing prerequisite.
+pre-route constraint coverage. `DIM-003` is accepted `18/18` for the EVT test
+batch, including the outline, H1-H4 mounting pattern, terminal/service zones,
+fixture datum and conservative STEP envelope. Serial mechanical revalidation is
+mandatory. A separate conservative numeric overlay and the accepted
+`JLC04161H-3313A` process authorize bounded EVT engineering routing. Remaining
+routing and manufacturing release remain blocked by physical fault/thermal,
+DRC, CAM, checkout DFM and Review B gates below.
 
-The internal two-fabricator stackup/copper packet is also ready at
-`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`, but
-`PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv` remains `0/24` accepted across
-`0/2` fabricator slots. It provides no selected construction, copper weight,
-plating, via or manufacturing-minimum authority.
+Numeric overlay:
+`hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json`
 
-The committed board still has zero traces, zero vias and zero copper zones. The
-manifest does not guess final trace widths, copper weights, via-array counts or
-thermal geometry. Those values require the actual current envelope, DC-drop and
-fault-energy calculations, +70 °C thermal evidence and an accepted four-layer
-fabricator stackup.
+Per-net numeric rules:
+`hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv`
+
+The historical two-fabricator stackup/copper packet is retained at
+`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`. Its `24/24` rows are
+closed by project engineering under customer EVT authority. No factory reply is
+required; selected values are 1.6 mm, outer 70 µm, inner 35 µm, minimum average
+hole-wall plating 18 µm and ENIG.
+
+The historical ECO-002 board has 14 accepted F.Cu trace items, zero vias and
+zero zones; its ECO-002 commit-bound application gate passed at CI #692,
+PCB-PWR Schematic #103 and PCB Native
+#357. The accepted hot-loop candidate 006 has 35 trace items (including eight
+0.60/0.30 mm vias) and two bounded In1.Cu local return zones. Its commit-bound application gate passes
+at CI #715 and PCB Native #364 (KiCad 9 DRC 85 → 85; unconnected 117 → 108;
+zero DRC fingerprint delta). The authoritative successor now exactly matches
+accepted shunt-to-bulk candidate 007, adding only two F.Cu `VBAT_SYS` segments
+from `RSH1.2` to `C13.1` for 37 total trace items. Its candidate gate passed at
+CI #720 and PCB Native #367 (85 → 85 violations; unconnected 108 → 107); its
+separate application gate passes at CI #725, PCB-PWR Schematic #110 and PCB
+Native #370 with the same DRC comparison and zero fingerprint delta. Via-current and via-under-pad fabrication
+qualification, physical
++70 °C first-article validation and all other routing remain open. The
+accepted successor candidate 008 applies only the lower 3.0 mm F.Cu branch
+from `C13.1` to `C12.1`; its commit-bound gate passes at CI #731, PCB-PWR
+Schematic #112 and PCB Native #372 (85 → 85 violations, 107 → 106 unconnected,
+zero DRC fingerprint delta). It is now applied byte-for-byte for 39 total trace
+items; its separate application gate passes at CI #736, PCB-PWR Schematic
+#115, and PCB Native #377. Candidate 009 proposes the previously deferred
+U2-constrained upper branch from `C13.1` to `C11.1` as four `3.0 mm` F.Cu
+segments with `0.575 mm` minimum screened foreign-copper clearance. It is not
+applied byte-for-byte for 43 total trace items. Its candidate gate passes at
+CI #740, PCB-PWR Schematic #117 and PCB Native #379; its separate application
+gate is pending.
+
+The
+numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
+screen: 4.0 mm for the 5 A input/primary return, 3.0 mm for 4 A rails/returns,
+2.1 mm for local 4 A switch nodes and 0.5 mm for the 0.3 A rail/return. It also
+defines provisional transition arrays and DC-drop length ceilings for a candidate.
+These rules are accepted for EVT routing but are not physical current-capacity or
+thermal proof. Final release still requires the actual current/fault envelope,
+rail-drop/load-step checks and +70 °C evidence.
 
 The machine status binds a UUID/order-independent semantic board digest covering
 the layer stack, outline, complete footprint placement, pad/net assignment and
-absence of copper. The audit still reports the raw file SHA-256 for evidence, but
+the exact bounded routing state. The audit still reports the raw file SHA-256 for evidence, but
 does not mistake KiCad-generated UUID/order changes for an electrical or layout
 change.
 
@@ -72,26 +110,29 @@ the deterministic generator and the separately maintained audit.
   output-capacitor node to U4 FB, never from the switch node.
 - The 1V8 path uses the 0.3 A TPS7A20 rating; acoustic noise, actual load and
   +70 °C performance still require physical evidence.
-- Outer 2 oz / inner 1 oz remain request targets only. No numeric width, via
-  count or plane geometry becomes authoritative until stackup, copper weight,
-  current-density and thermal review are accepted.
+- Outer 2 oz / inner 1 oz and minimum 18 µm average hole-wall plating are the
+  accepted EVT order values. The 35 µm screen remains the conservative routing
+  lower bound. Numeric routing geometry is authorized, while via sharing,
+  fault-energy and physical thermal performance remain EVT validation items.
 
 ## Route-order input
 
 P0 covers return geometry, the complete power path, switch/boot loops, Kelvin
 sense and feedback. P1 covers local analog/gate/mode networks plus control,
-status and I²C. Within P0 the practical order is: freeze mechanics and stackup;
-plan `GND_PWR` and net-tie joins; close hot loops; route Kelvin/feedback; then
-size and route the high-current input and output paths.
+status and I²C. Within P0 the practical order is: preserve accepted EVT
+mechanics; plan `GND_PWR` and net-tie joins; close hot loops; route
+Kelvin/feedback; then route the high-current input and output paths against the
+numeric overlay. Final production geometry remains a later acceptance step.
 
 ## Exit criteria still open
 
 Constraint coverage may remain PASS only while all of these are explicit:
 
-- `DIM-003` frozen outline, mounting pattern, terminal/tool zones and PCB STEP;
-- two complete attributable fabricator response sets, selected four-layer
-  dielectric construction and accepted copper/plating authority;
-- current-density, DC-drop, via-array, fault-energy and +70 °C thermal analysis;
+- preservation of the accepted EVT `DIM-003` outline, H1-H4 exclusions,
+  terminal/tool zones and STEP envelope, plus serial revalidation before series;
+- preservation of the accepted `JLC04161H-3313A` checkout values with no
+  unresolved parser or DFM error;
+- physical DC-drop, via-sharing, fault-energy and +70 °C thermal evidence;
 - routed hot loops, switch nodes, Kelvin pair, feedback pickup, rail/return
   copper and all remaining nets;
 - zero-unrouted KiCad 9 DRC, native STEP and connector/tool-access review;
@@ -105,7 +146,9 @@ Run the controls with:
 ```bash
 python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
 python tools/audit_pcb_pwr_routing_authority_rev_a.py
+python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
+python tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py
 python tools/audit_pcb_pwr_dim_003_request_rev_a.py
 ```
 
-Neither command authorizes fabrication.
+None of these commands authorizes fabrication.

@@ -1,0 +1,90 @@
+{
+  "schema_version": "dioneya.pcb-pwr-buck-power-stage-eco-002-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-POWER-STAGE-ECO-002",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-23",
+  "decision": "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE",
+  "decision_input": "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE",
+  "decision_normalization": "The exact pending subgate token was received verbatim.",
+  "reviewed_github_commit_sha": "753631012b5b20a46452998e9ad46502e3e1e4e1",
+  "reviewed_tree_sha": "978d4ac932f8b8deeb965b595a226ab8e3e6cae8",
+  "gate_evidence_commit_sha": "753631012b5b20a46452998e9ad46502e3e1e4e1",
+  "gate_evidence_tree_sha": "978d4ac932f8b8deeb965b595a226ab8e3e6cae8",
+  "review_mapping": "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_REVIEW_COMMIT_MAPPING.json",
+  "review_mapping_sha256": "66051f7c8f83f074e1447719dc37106b90f751d87a032e3d949a9551f0400658",
+  "reviewed_proposal_sha256": "cde73461c70b18d71002f5ea7c4f28ff8d9a03ccf9919d62a0cb9b62bd155eb3",
+  "reviewed_proposal_record_sha256": "aede29883dc94211411121c0a992208b0bdc52e8afcaee0fd37da5b04c745738",
+  "reviewed_candidate_board_sha256": "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
+  "reviewed_candidate_semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
+  "reviewed_generator_sha256": "e4ab7290920f0b8c6f229e4701d2b82b78dc7638465a552d664221692ad40d1c",
+  "reviewed_audit_sha256": "ba6aa2bf1724740695636fa9984fbd2b4eeb1ee04f7066d1234653573c199ebb",
+  "approved_delta": {
+    "moved_footprints": [
+      "C20",
+      "C21",
+      "C4",
+      "C6",
+      "L1",
+      "L2",
+      "U3",
+      "U4"
+    ],
+    "routed_nets": [
+      "BOOT_3V8",
+      "BOOT_3V3",
+      "SW_3V8",
+      "SW_3V3"
+    ],
+    "removed_bootstrap_segments": 2,
+    "retained_unrelated_predecessor_segments": 6,
+    "added_segments": 8,
+    "minimum_external_sw_width_mm": 2.1,
+    "vias": 0,
+    "zones": 0,
+    "silkscreen_reference_anchors_changed": [
+      "C4",
+      "C6",
+      "R2"
+    ],
+    "pad_geometry_or_nets_changed": false,
+    "drc_rules_relaxed": false
+  },
+  "machine_gate": {
+    "status": "PASS_NO_NEW_DRC_FINGERPRINT_COUNTS_EXACT_FOUR_CONNECTION_REDUCTION",
+    "ci_run_number": 678,
+    "ci_run_id": 35825148575,
+    "pcb_pwr_schematic_run_number": 101,
+    "pcb_pwr_schematic_run_id": 35825148553,
+    "pcb_native_run_number": 355,
+    "pcb_native_run_id": 35825148569,
+    "pcb_native_job_id": 107065142085,
+    "artifact_id": 10735196330,
+    "artifact_digest": "sha256:f56da044252faf9f85587605d249c594f47dd8ca1cb0ad245283843526b0cd8c",
+    "base_violations": 86,
+    "candidate_violations": 85,
+    "base_unconnected": 121,
+    "candidate_unconnected": 117,
+    "new_drc_fingerprint_counts": 0,
+    "removed_drc_fingerprint_counts": 1
+  },
+  "pad_entry_disposition": {
+    "calculated_evt_screen_pass": true,
+    "minimum_external_sw_width_mm": 2.1,
+    "screen_35um_4a_70c_loss_mw": 15.042756,
+    "target_70um_4a_70c_loss_mw": 7.521378,
+    "physical_plus70c_first_article_validation_required": true
+  },
+  "authorization": {
+    "apply_exact_hash_bound_buck_power_stage_candidate": true,
+    "expected_authoritative_predecessor_sha256": "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+    "authorized_applied_board_sha256": "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
+    "preserve_unrelated_predecessor_copper": true,
+    "apply_only_the_reviewed_footprint_copper_and_silkscreen_delta": true,
+    "alter_reviewed_candidate_without_new_controlled_review": false,
+    "vin_pgnd_output_kelvin_or_feedback_routing_authorized": false,
+    "routing_complete": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}

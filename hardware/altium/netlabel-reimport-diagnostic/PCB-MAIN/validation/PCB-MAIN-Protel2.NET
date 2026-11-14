@@ -1,0 +1,12376 @@
+PROTEL NETLIST 2.0
+[
+DESIGNATOR
+C1
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C1_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C2
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C2_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C3
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C3_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C4
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C4_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C5
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C5_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C6
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+10 uF 10 V X5R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+10 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C6_GRM188R61A106KE69D
+Manufacturer
+Murata
+MPN
+GRM188R61A106KE69D
+Package
+0603
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C7
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C7_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C8
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C8_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C9
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+1 uF 16 V X5R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+1 uF 16 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C9_GRM155R61C105KA12D
+Manufacturer
+Murata
+MPN
+GRM155R61C105KA12D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C10
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C10_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C11
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+1 uF 16 V X5R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+1 uF 16 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C11_GRM155R61C105KA12D
+Manufacturer
+Murata
+MPN
+GRM155R61C105KA12D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C12
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C12_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C13
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+10 uF 10 V X5R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+10 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C13_GRM188R61A106KE69D
+Manufacturer
+Murata
+MPN
+GRM188R61A106KE69D
+Package
+0603
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C14
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+2.2 uF 10 V X5R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+2.2 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C14_GRM155R61A225KE15D
+Manufacturer
+Murata
+MPN
+GRM155R61A225KE15D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C15
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+2.2 uF 10 V X5R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+2.2 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C15_GRM155R61A225KE15D
+Manufacturer
+Murata
+MPN
+GRM155R61A225KE15D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C16
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C16_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C17
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C17_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C18
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C18_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C19
+FOOTPRINT
+C_0805_2012Metric
+PARTTYPE
+22 uF 10 V X5R
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0805_2012Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C19_GRM21BR61A226ME44L
+Manufacturer
+Murata
+MPN
+GRM21BR61A226ME44L
+Package
+0805
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C20
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+10 uF 10 V X5R
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+10 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C20_GRM188R61A106KE69D
+Manufacturer
+Murata
+MPN
+GRM188R61A106KE69D
+Package
+0603
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C21
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Winbond_W25Q512JV_RevB
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C21_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C22
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+1 uF 16 V X5R
+DESCRIPTION
+
+Authority
+Winbond_W25Q512JV_RevB
+Comment
+1 uF 16 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C22_GRM155R61C105KA12D
+Manufacturer
+Murata
+MPN
+GRM155R61C105KA12D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C23
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_LIS2DW12_DS11811_Rev9
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C23_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C24
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+10 uF 10 V X5R
+DESCRIPTION
+
+Authority
+ST_LIS2DW12_DS11811_Rev9
+Comment
+10 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C24_GRM188R61A106KE69D
+Manufacturer
+Murata
+MPN
+GRM188R61A106KE69D
+Package
+0603
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C25
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_LIS2DW12_DS11811_Rev9
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C25_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C26
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ST_STTS22H_DS12606_Rev8
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C26_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C27
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCES875C_RevC
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C27_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C28
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCES875C_RevC
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C28_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C29
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCES875C_RevC
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C29_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C30
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCAS286U_RevU
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C30_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C31
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCES882E_RevE
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C31_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C32
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCES882E_RevE
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C32_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C33
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCES875C_RevC
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C33_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C34
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCES875C_RevC
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C34_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C35
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SCES875C_RevC
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C35_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C36
+FOOTPRINT
+
+PARTTYPE
+100 uF 6.3 V 15 mOhm polymer
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 uF 6.3 V 15 mOhm polymer
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C36_T520D107M006ATE015
+Manufacturer
+KEMET
+MPN
+T520D107M006ATE015
+Package
+7343-31
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C37
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+220 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+220 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C37_GRM155R71E224KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E224KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C38
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+47 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+47 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C38_GRM155R71E473KA01D
+Manufacturer
+Murata
+MPN
+GRM155R71E473KA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C39
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+150 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+150 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C39_GRM1555C1H151JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H151JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C40
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C40_GRM1555C1H101JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H101JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C41
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+68 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+68 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C41_GRM1555C1H680JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H680JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C42
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+33 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+33 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C42_GRM1555C1H330JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H330JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C43
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+10 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C43_GRM1555C1H100JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H100JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C44
+FOOTPRINT
+
+PARTTYPE
+100 uF 6.3 V 15 mOhm polymer
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 uF 6.3 V 15 mOhm polymer
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C44_T520D107M006ATE015
+Manufacturer
+KEMET
+MPN
+T520D107M006ATE015
+Package
+7343-31
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C45
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C45_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C46
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+33 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+33 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C46_GRM1555C1H330JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H330JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C47
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+10 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C47_GRM1555C1H100JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H100JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C48
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+10 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C48_GRM155R71E103KA01D
+Manufacturer
+Murata
+MPN
+GRM155R71E103KA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C49
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_TS3A27518E_SCDS260F
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C49_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C50
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C50_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C51
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C51_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C52
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TE_C-2336582_A2
+Comment
+10 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C52_GRM155R71E103KA01D
+Manufacturer
+Murata
+MPN
+GRM155R71E103KA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C53
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TE_C-2336582_A2
+Comment
+10 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C53_GRM155R71E103KA01D
+Manufacturer
+Murata
+MPN
+GRM155R71E103KA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C54
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+33 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+33 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C54_GRM1555C1H330JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H330JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C55
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+33 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+33 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C55_GRM1555C1H330JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H330JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C56
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+33 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+33 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C56_GRM1555C1H330JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H330JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C57
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+33 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+33 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C57_GRM1555C1H330JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H330JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C58
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+33 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+33 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C58_GRM1555C1H330JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H330JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C59
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+33 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+33 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C59_GRM1555C1H330JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H330JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C60
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C60_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C61
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+10 uF 10 V X5R
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+10 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C61_GRM188R61A106KE69D
+Manufacturer
+Murata
+MPN
+GRM188R61A106KE69D
+Package
+0603
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C62
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C62_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C63
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 nF 16 V X7R
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+10 nF 16 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C63_GRM155R71C103KA01D
+Manufacturer
+Murata
+MPN
+GRM155R71C103KA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C64
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+47 pF 25 V C0G
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+47 pF 25 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C64_GRM1555C1E470JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1E470JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C65
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+ADI_LT6000_datasheet
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C65_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C66
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C66_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C67
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+10 uF 10 V X5R
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+10 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C67_GRM188R61A106KE69D
+Manufacturer
+Murata
+MPN
+GRM188R61A106KE69D
+Package
+0603
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C68
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C68_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C69
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+10 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C69_GRM1555C1H100JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H100JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C70
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+10 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C70_GRM1555C1H100JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H100JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C71
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+Raytac_MDBT50Q_Spec_Version_L
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C71_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C72
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+10 uF 10 V X5R
+DESCRIPTION
+
+Authority
+Raytac_MDBT50Q_Spec_Version_L
+Comment
+10 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C72_GRM188R61A106KE69D
+Manufacturer
+Murata
+MPN
+GRM188R61A106KE69D
+Package
+0603
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C73
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+TI_SN74LVC1G07_datasheet
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C73_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C74
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100 nF 25 V X7R
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+100 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C74_GRM155R71E104KE14D
+Manufacturer
+Murata
+MPN
+GRM155R71E104KE14D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C75
+FOOTPRINT
+C_0603_1608Metric
+PARTTYPE
+10 uF 10 V X5R
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+10 uF 10 V X5R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0603_1608Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C75_GRM188R61A106KE69D
+Manufacturer
+Murata
+MPN
+GRM188R61A106KE69D
+Package
+0603
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C76
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 nF 25 V X7R
+DESCRIPTION
+
+Authority
+GCT_MEM2052_official_product_data
+Comment
+10 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C76_GRM155R71E103KA01D
+Manufacturer
+Murata
+MPN
+GRM155R71E103KA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C77
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+4.7 nF 100 V X7R
+DESCRIPTION
+
+Authority
+PROJECT_EMC_BASELINE
+Comment
+4.7 nF 100 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C77_GRM155R72A472KA01D
+Manufacturer
+Murata
+MPN
+GRM155R72A472KA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C78
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 nF 25 V X7R
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+10 nF 25 V X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C78_GRM155R71E103KA01D
+Manufacturer
+Murata
+MPN
+GRM155R71E103KA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C79
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+10 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C79_GRM1555C1H100JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H100JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+C80
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+10 pF 50 V C0G
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+10 pF 50 V C0G
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+C80_GRM1555C1H100JA01D
+Manufacturer
+Murata
+MPN
+GRM1555C1H100JA01D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D1
+FOOTPRINT
+
+PARTTYPE
+5 V unidirectional 150 W TVS
+DESCRIPTION
+
+Authority
+Nexperia_PESD5V0S1UL_v5
+Comment
+5 V unidirectional 150 W TVS
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D1_PESD5V0S1UL
+Manufacturer
+Nexperia
+MPN
+PESD5V0S1UL
+Package
+SOD882
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D2
+FOOTPRINT
+
+PARTTYPE
+5 V unidirectional 150 W TVS
+DESCRIPTION
+
+Authority
+Nexperia_PESD5V0S1UL_v5
+Comment
+5 V unidirectional 150 W TVS
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D2_PESD5V0S1UL
+Manufacturer
+Nexperia
+MPN
+PESD5V0S1UL
+Package
+SOD882
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D3
+FOOTPRINT
+
+PARTTYPE
+5 V bidirectional 0.2 pF RF ESD
+DESCRIPTION
+
+Authority
+Nexperia_PESD5V0C1BSF_v3
+Comment
+5 V bidirectional 0.2 pF RF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D3_PESD5V0C1BSF
+Manufacturer
+Nexperia
+MPN
+PESD5V0C1BSF
+Package
+SOD962-2
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D4
+FOOTPRINT
+
+PARTTYPE
+5.5 V unidirectional 0.5 pF RF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+5.5 V unidirectional 0.5 pF RF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D4_TPD1E05U06DYAR
+Manufacturer
+Texas Instruments
+MPN
+TPD1E05U06DYAR
+Package
+SOD-523_DYA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D5
+FOOTPRINT
+
+PARTTYPE
+5 V bidirectional 0.2 pF RF ESD
+DESCRIPTION
+
+Authority
+Nexperia_PESD5V0C1BSF_v3
+Comment
+5 V bidirectional 0.2 pF RF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D5_PESD5V0C1BSF
+Manufacturer
+Nexperia
+MPN
+PESD5V0C1BSF
+Package
+SOD962-2
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D6
+FOOTPRINT
+
+PARTTYPE
+5.5 V 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+5.5 V 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D6_TPD1E05U06DYAR
+Manufacturer
+Texas Instruments
+MPN
+TPD1E05U06DYAR
+Package
+SOD-523_DYA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D7
+FOOTPRINT
+
+PARTTYPE
+5.5 V 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+5.5 V 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D7_TPD1E05U06DYAR
+Manufacturer
+Texas Instruments
+MPN
+TPD1E05U06DYAR
+Package
+SOD-523_DYA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D8
+FOOTPRINT
+
+PARTTYPE
+5.5 V 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+5.5 V 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D8_TPD1E05U06DYAR
+Manufacturer
+Texas Instruments
+MPN
+TPD1E05U06DYAR
+Package
+SOD-523_DYA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D9
+FOOTPRINT
+
+PARTTYPE
+5.5 V 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+5.5 V 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D9_TPD1E05U06DYAR
+Manufacturer
+Texas Instruments
+MPN
+TPD1E05U06DYAR
+Package
+SOD-523_DYA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D10
+FOOTPRINT
+
+PARTTYPE
+5.5 V 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+5.5 V 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D10_TPD1E05U06DYAR
+Manufacturer
+Texas Instruments
+MPN
+TPD1E05U06DYAR
+Package
+SOD-523_DYA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+D11
+FOOTPRINT
+
+PARTTYPE
+5.5 V 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+5.5 V 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+D11_TPD1E05U06DYAR
+Manufacturer
+Texas Instruments
+MPN
+TPD1E05U06DYAR
+Package
+SOD-523_DYA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+FB1
+FOOTPRINT
+L_1206_3216Metric
+PARTTYPE
+600 Ohm at 100 MHz
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+600 Ohm at 100 MHz
+Component Kind
+Standard
+Description
+
+Footprint
+Inductor_SMD:L_1206_3216Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+FB1_BLM31KN601SN1L
+Manufacturer
+Murata
+MPN
+BLM31KN601SN1L
+Package
+1206
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+FL1
+FOOTPRINT
+
+PARTTYPE
+1582.4 MHz wideband GNSS SAW
+DESCRIPTION
+
+Authority
+Abracon_ABSES5AF-L100KM_2025-09-16
+Comment
+1582.4 MHz wideband GNSS SAW
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+FL1_ABSES5AF-L100KM
+Manufacturer
+Abracon
+MPN
+ABSES5AF-L100KM
+Package
+1109-5
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J6
+FOOTPRINT
+
+PARTTYPE
+2336582-1
+DESCRIPTION
+
+Authority
+PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv
+Comment
+2336582-1
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J6_2336582-1
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+2336582-1
+Package
+TE_NanoSIM_H1.37
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J7
+FOOTPRINT
+
+PARTTYPE
+2336582-1
+DESCRIPTION
+
+Authority
+PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv
+Comment
+2336582-1
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J7_2336582-1
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+2336582-1
+Package
+TE_NanoSIM_H1.37
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J8
+FOOTPRINT
+
+PARTTYPE
+U.FL-R-SMT-1(60)
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+U.FL-R-SMT-1(60)
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J8_U.FL-R-SMT-1_60
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+U.FL-R-SMT-1(60)
+Package
+U.FL_SMT
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J9
+FOOTPRINT
+
+PARTTYPE
+U.FL-R-SMT-1(60)
+DESCRIPTION
+
+Authority
+PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv;PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+U.FL-R-SMT-1(60)
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J9_U.FL-R-SMT-1_60
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+U.FL-R-SMT-1(60)
+Package
+U.FL_SMT
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J10
+FOOTPRINT
+
+PARTTYPE
+U.FL-R-SMT-1(60)
+DESCRIPTION
+
+Authority
+PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv;PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+U.FL-R-SMT-1(60)
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J10_U.FL-R-SMT-1_60
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+U.FL-R-SMT-1(60)
+Package
+U.FL_SMT
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J11
+FOOTPRINT
+
+PARTTYPE
+USB4105-GF-A-120
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+USB4105-GF-A-120
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J11_USB4105-GF-A-120
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+USB4105-GF-A-120
+Package
+USB-C_16P_horizontal_top_mount_1.20mm_stake
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J12
+FOOTPRINT
+
+PARTTYPE
+MEM2052-00-195-00-A
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+MEM2052-00-195-00-A
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J12_MEM2052-00-195-00-A
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+MEM2052-00-195-00-A
+Package
+microSD_push-push_1.95mm_8P_CD
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J13
+FOOTPRINT
+
+PARTTYPE
+504050-0291
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+504050-0291
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J13_504050-0291
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+504050-0291
+Package
+Pico-Lock_1.5mm_2P_RA_SMT
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J_MIC1
+FOOTPRINT
+
+PARTTYPE
+504050-0691
+DESCRIPTION
+
+Authority
+HARNESS_LOGICAL_PINOUT_REV_A.csv
+Comment
+504050-0691
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J_MIC1_504050-0691
+Manufacturer
+Molex
+MPN
+504050-0691
+Package
+Pico-Lock_1.5_1x06_Right_Angle
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J_MIC2
+FOOTPRINT
+
+PARTTYPE
+504050-0691
+DESCRIPTION
+
+Authority
+HARNESS_LOGICAL_PINOUT_REV_A.csv
+Comment
+504050-0691
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J_MIC2_504050-0691
+Manufacturer
+Molex
+MPN
+504050-0691
+Package
+Pico-Lock_1.5_1x06_Right_Angle
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J_MIC3
+FOOTPRINT
+
+PARTTYPE
+504050-0691
+DESCRIPTION
+
+Authority
+HARNESS_LOGICAL_PINOUT_REV_A.csv
+Comment
+504050-0691
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J_MIC3_504050-0691
+Manufacturer
+Molex
+MPN
+504050-0691
+Package
+Pico-Lock_1.5_1x06_Right_Angle
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J_MIC4
+FOOTPRINT
+
+PARTTYPE
+504050-0691
+DESCRIPTION
+
+Authority
+HARNESS_LOGICAL_PINOUT_REV_A.csv
+Comment
+504050-0691
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J_MIC4_504050-0691
+Manufacturer
+Molex
+MPN
+504050-0691
+Package
+Pico-Lock_1.5_1x06_Right_Angle
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+J_PWR
+FOOTPRINT
+
+PARTTYPE
+43045-1202
+DESCRIPTION
+
+Authority
+HARNESS_LOGICAL_PINOUT_REV_A.csv
+Comment
+43045-1202
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+J_PWR_43045-1202
+Manufacturer
+Molex
+MPN
+43045-1202
+Package
+Micro-Fit_3.0_2x06_Right_Angle
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+L1
+FOOTPRINT
+L_1210_3225Metric
+PARTTYPE
+2.2 uH 20%
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+2.2 uH 20%
+Component Kind
+Standard
+Description
+
+Footprint
+Inductor_SMD:L_1210_3225Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+L1_LQH32PN2R2NN0L
+Manufacturer
+Murata
+MPN
+LQH32PN2R2NN0L
+Package
+1210
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+L2
+FOOTPRINT
+L_0402_1005Metric
+PARTTYPE
+27 nH 5%
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+27 nH 5%
+Component Kind
+Standard
+Description
+
+Footprint
+Inductor_SMD:L_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+L2_LQW15AN27NJ00D
+Manufacturer
+Murata
+MPN
+LQW15AN27NJ00D
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+Q1
+FOOTPRINT
+
+PARTTYPE
+MMBT3904,215
+DESCRIPTION
+
+Authority
+PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv
+Comment
+MMBT3904,215
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+Q1_MMBT3904_215
+Manufacturer
+Nexperia
+MPN
+MMBT3904,215
+Package
+SOT23
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+Q2
+FOOTPRINT
+
+PARTTYPE
+MMBT3904,215
+DESCRIPTION
+
+Authority
+PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv
+Comment
+MMBT3904,215
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+Q2_MMBT3904_215
+Manufacturer
+Nexperia
+MPN
+MMBT3904,215
+Package
+SOT23
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+Q3
+FOOTPRINT
+
+PARTTYPE
+MMBT3904,215
+DESCRIPTION
+
+Authority
+PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv
+Comment
+MMBT3904,215
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+Q3_MMBT3904_215
+Manufacturer
+Nexperia
+MPN
+MMBT3904,215
+Package
+SOT23
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+Q4
+FOOTPRINT
+
+PARTTYPE
+Complementary N and P channel 20 V
+DESCRIPTION
+
+Authority
+Vishay_Si1016X_RevE
+Comment
+Complementary N and P channel 20 V
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+Q4_Si1016X-T1-GE3
+Manufacturer
+Vishay
+MPN
+Si1016X-T1-GE3
+Package
+SOT-563_SC-89
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R1
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+ST_AN5373_Rev7
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R1_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R2
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+ST_AN2606
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R2_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R3
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R3_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R4
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R4_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R5
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R5_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R6
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R6_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R7
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+Winbond_W25Q512JV_RevB
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R7_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R8
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R8_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R9
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R9_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R10
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R10_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R11
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R11_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R12
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R12_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R13
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+2.2 kOhm 1%
+DESCRIPTION
+
+Authority
+I2C_UM10204
+Comment
+2.2 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R13_ERJ-2RKF2201X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF2201X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R14
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+2.2 kOhm 1%
+DESCRIPTION
+
+Authority
+I2C_UM10204
+Comment
+2.2 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R14_ERJ-2RKF2201X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF2201X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R15
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R15_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R16
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R16_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R17
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R17_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R18
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R18_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R19
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+TDK_T5838_DS-000383_Rev1.2
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R19_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R20
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+TDK_T5838_DS-000383_Rev1.2
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R20_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R21
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+TDK_T5838_DS-000383_Rev1.2
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R21_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R22
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+TDK_T5838_DS-000383_Rev1.2
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R22_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R23
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+TI_SCES882E_RevE
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R23_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R24
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+4.7 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+4.7 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R24_ERJ-2RKF4701X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF4701X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R25
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+47 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+47 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R25_ERJ-2RKF4702X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF4702X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R26
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+4.7 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+4.7 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R26_ERJ-2RKF4701X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF4701X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R27
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+47 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+47 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R27_ERJ-2RKF4702X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF4702X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R28
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R28_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R29
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R29_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R30
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R30_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R31
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R31_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R32
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R32_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R33
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R33_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R34
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R34_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R35
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R35_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R36
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R36_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R37
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R37_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R38
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+1 kOhm 1%
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+1 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R38_ERJ-2RKF1001X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1001X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R39
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R39_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R40
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R40_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R41
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+1 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+1 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R41_ERJ-2RKF1001X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1001X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R42
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R42_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R43
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R43_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R44
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+47 kOhm 1%
+DESCRIPTION
+
+Authority
+TI_TS3A27518E_SCDS260F
+Comment
+47 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R44_ERJ-2RKF4702X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF4702X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R45
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+TI_TS3A27518E_SCDS260F
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R45_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R46
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+TI_TS3A27518E_SCDS260F
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R46_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R47
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+TI_TS3A27518E_SCDS260F
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R47_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R48
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+TE_C-2336582_A2
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R48_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R49
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+TE_C-2336582_A2
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R49_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R50
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R50_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R51
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R51_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R52
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R52_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R53
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R53_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R54
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R54_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R55
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Quectel_BG95_HW_Design_v1.6
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R55_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R56
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R56_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R57
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R57_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R58
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R58_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R59
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+560 Ohm 5% 0.1 W
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+560 Ohm 5% 0.1 W
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R59_ERJ-2GEJ561X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GEJ561X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R60
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 5% 0.1 W
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+100 kOhm 5% 0.1 W
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R60_ERJ-2GEJ104X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GEJ104X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R61
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 5% 0.1 W
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+100 kOhm 5% 0.1 W
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R61_ERJ-2GEJ104X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GEJ104X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R62
+FOOTPRINT
+R_1206_3216Metric
+PARTTYPE
+10 Ohm 5% 0.25 W
+DESCRIPTION
+
+Authority
+u-blox_UBX-20053088_R05
+Comment
+10 Ohm 5% 0.25 W
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_1206_3216Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R62_ERJ-8GEYJ100V
+Manufacturer
+Panasonic
+MPN
+ERJ-8GEYJ100V
+Package
+1206
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R63
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R63_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R64
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R64_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R65
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R65_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R66
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R66_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R67
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R67_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R68
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R68_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R69
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R69_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R70
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R70_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R71
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R71_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R72
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R72_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R73
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+Ebyte_E22-M_v1.2
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R73_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R74
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+Raytac_MDBT50Q_Spec_Version_L
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R74_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R75
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+Raytac_MDBT50Q_Spec_Version_L
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R75_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R76
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+Raytac_MDBT50Q_Spec_Version_L
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R76_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R77
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+TI_SN74LVC1G07_datasheet
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R77_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R78
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+TI_SN74LVC1G07_datasheet
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R78_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R79
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R79_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R80
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R80_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R81
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R81_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R82
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R82_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R83
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R83_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R84
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R84_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R85
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R85_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R86
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R86_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R87
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R87_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R88
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R88_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R89
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+SD_Association_microSD
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R89_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R90
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+GCT_MEM2052_official_product_data
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R90_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R91
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+ST_STM32U585_DS13086_Rev10
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R91_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R92
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+ST_STM32U585_DS13086_Rev10
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R92_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R93
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+5.1 kOhm 1%
+DESCRIPTION
+
+Authority
+USB_Type-C_Release_2.5
+Comment
+5.1 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R93_ERJ-2RKF5101X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF5101X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R94
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+5.1 kOhm 1%
+DESCRIPTION
+
+Authority
+USB_Type-C_Release_2.5
+Comment
+5.1 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R94_ERJ-2RKF5101X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF5101X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R95
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+1 kOhm 1%
+DESCRIPTION
+
+Authority
+ST_STM32U585_DS13086_Rev10
+Comment
+1 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R95_ERJ-2RKF1001X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1001X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R96
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+100 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+100 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R96_ERJ-2RKF1003X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1003X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R97
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+1 MOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_EMC_BASELINE
+Comment
+1 MOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R97_ERJ-2RKF1004X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1004X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R98
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+PROJECT_EMC_BASELINE
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R98_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+DNP
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R99
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+10 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+10 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R99_ERJ-2RKF1002X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1002X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R100
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+1 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+1 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R100_ERJ-2RKF1001X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1001X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R101
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+22 Ohm 1%
+DESCRIPTION
+
+Authority
+PROJECT_EOL_DFT
+Comment
+22 Ohm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R101_ERJ-2RKF22R0X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF22R0X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R102
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+1 kOhm 1%
+DESCRIPTION
+
+Authority
+PROJECT_EOL_DFT
+Comment
+1 kOhm 1%
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R102_ERJ-2RKF1001X
+Manufacturer
+Panasonic
+MPN
+ERJ-2RKF1001X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+R103
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0 Ohm
+DESCRIPTION
+
+Authority
+PROJECT_MAIN_AUTH_010
+Comment
+0 Ohm
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+R103_ERJ-2GE0R00X
+Manufacturer
+Panasonic
+MPN
+ERJ-2GE0R00X
+Package
+0402
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+TP_BLE_SWD
+FOOTPRINT
+
+PARTTYPE
+TEST_PADS
+DESCRIPTION
+
+Authority
+PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv
+Comment
+TEST_PADS
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+TP_BLE_SWD_TEST_PADS
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+TEST_PADS
+Package
+POGO_FIXTURE_4P
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+TP_CELL_DBG
+FOOTPRINT
+
+PARTTYPE
+TEST_PADS
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+TEST_PADS
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+TP_CELL_DBG_TEST_PADS
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+TEST_PADS
+Package
+POGO_FIXTURE_5P
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+TP_CELL_USB
+FOOTPRINT
+
+PARTTYPE
+TEST_PADS
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+TEST_PADS
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+TP_CELL_USB_TEST_PADS
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+TEST_PADS
+Package
+POGO_FIXTURE_4P
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+TP_EOL
+FOOTPRINT
+
+PARTTYPE
+TEST_PADS
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+TEST_PADS
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+TP_EOL_TEST_PADS
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+TEST_PADS
+Package
+POGO_FIXTURE_13P
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+TP_MCU_SWD
+FOOTPRINT
+
+PARTTYPE
+TEST_PADS
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+TEST_PADS
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+TP_MCU_SWD_TEST_PADS
+Manufacturer
+CONTROLLED_AUTHORITY
+MPN
+TEST_PADS
+Package
+POGO_FIXTURE_5P
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U1
+FOOTPRINT
+
+PARTTYPE
+STM32U585VIT6Q
+DESCRIPTION
+
+Authority
+PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv
+Comment
+STM32U585VIT6Q
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U1_STM32U585VIT6Q
+Manufacturer
+STMicroelectronics
+MPN
+STM32U585VIT6Q
+Package
+LQFP100_14x14
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U2
+FOOTPRINT
+
+PARTTYPE
+W25Q512JVFIQ
+DESCRIPTION
+
+Authority
+PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv
+Comment
+W25Q512JVFIQ
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U2_W25Q512JVFIQ
+Manufacturer
+Winbond
+MPN
+W25Q512JVFIQ
+Package
+SOIC-16_300mil_F
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U3
+FOOTPRINT
+
+PARTTYPE
+LIS2DW12TR
+DESCRIPTION
+
+Authority
+PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv
+Comment
+LIS2DW12TR
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U3_LIS2DW12TR
+Manufacturer
+STMicroelectronics
+MPN
+LIS2DW12TR
+Package
+LGA-12_2x2mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U4
+FOOTPRINT
+
+PARTTYPE
+STTS22HTR
+DESCRIPTION
+
+Authority
+PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv
+Comment
+STTS22HTR
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U4_STTS22HTR
+Manufacturer
+STMicroelectronics
+MPN
+STTS22HTR
+Package
+UDFN-6L_2x2mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U5
+FOOTPRINT
+
+PARTTYPE
+Single rail-to-rail low-power op amp
+DESCRIPTION
+
+Authority
+ADI_LT6000_datasheet
+Comment
+Single rail-to-rail low-power op amp
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U5_LT6000IDCB_TRMPBF
+Manufacturer
+Analog Devices
+MPN
+LT6000IDCB#TRMPBF
+Package
+DFN-6_DCB_2x3mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U6
+FOOTPRINT
+
+PARTTYPE
+Single non-inverting open-drain buffer
+DESCRIPTION
+
+Authority
+TI_SN74LVC1G07_datasheet
+Comment
+Single non-inverting open-drain buffer
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U6_SN74LVC1G07DBVR
+Manufacturer
+Texas Instruments
+MPN
+SN74LVC1G07DBVR
+Package
+SOT-23-5_DBV
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U7
+FOOTPRINT
+
+PARTTYPE
+SN74AXC8T245PWR
+DESCRIPTION
+
+Authority
+PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv
+Comment
+SN74AXC8T245PWR
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U7_SN74AXC8T245PWR
+Manufacturer
+Texas Instruments
+MPN
+SN74AXC8T245PWR
+Package
+TSSOP-24_PW
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U8
+FOOTPRINT
+
+PARTTYPE
+BG95-M3
+DESCRIPTION
+
+Authority
+PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv
+Comment
+BG95-M3
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U8_BG95-M3
+Manufacturer
+Quectel
+MPN
+BG95-M3
+Package
+LGA-102_23.6x19.9mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U9
+FOOTPRINT
+
+PARTTYPE
+MAX-M10S-00B
+DESCRIPTION
+
+Authority
+PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv
+Comment
+MAX-M10S-00B
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U9_MAX-M10S-00B
+Manufacturer
+u-blox
+MPN
+MAX-M10S-00B
+Package
+LCC-18_9.7x10.1mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U10
+FOOTPRINT
+
+PARTTYPE
+E22-900M22S
+DESCRIPTION
+
+Authority
+PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv
+Comment
+E22-900M22S
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U10_E22-900M22S
+Manufacturer
+Ebyte
+MPN
+E22-900M22S
+Package
+SMD_20x14_22P_1.27mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U11
+FOOTPRINT
+
+PARTTYPE
+MDBT50Q-P1MV2
+DESCRIPTION
+
+Authority
+PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv
+Comment
+MDBT50Q-P1MV2
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U11_MDBT50Q-P1MV2
+Manufacturer
+Raytac
+MPN
+MDBT50Q-P1MV2
+Package
+nRF52840_SMD_10.5x15.5_61P_PCB_antenna
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U12
+FOOTPRINT
+
+PARTTYPE
+SDCIT2/32GB
+DESCRIPTION
+
+Authority
+PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+Comment
+SDCIT2/32GB
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U12_SDCIT2_32GB
+Manufacturer
+Kingston
+MPN
+SDCIT2/32GB
+Package
+microSD_card_8_contact
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U13
+FOOTPRINT
+
+PARTTYPE
+TS3A27518EPWR
+DESCRIPTION
+
+Authority
+PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv
+Comment
+TS3A27518EPWR
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U13_TS3A27518EPWR
+Manufacturer
+Texas Instruments
+MPN
+TS3A27518EPWR
+Package
+TSSOP-24_PW
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U14
+FOOTPRINT
+
+PARTTYPE
+ESDALC6V1-5P6
+DESCRIPTION
+
+Authority
+PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv
+Comment
+ESDALC6V1-5P6
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U14_ESDALC6V1-5P6
+Manufacturer
+STMicroelectronics
+MPN
+ESDALC6V1-5P6
+Package
+SOT666_1.6x1.6mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U15
+FOOTPRINT
+
+PARTTYPE
+ESDALC6V1-5P6
+DESCRIPTION
+
+Authority
+PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv
+Comment
+ESDALC6V1-5P6
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U15_ESDALC6V1-5P6
+Manufacturer
+STMicroelectronics
+MPN
+ESDALC6V1-5P6
+Package
+SOT666_1.6x1.6mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U16
+FOOTPRINT
+
+PARTTYPE
+SN74AXC8T245PWR
+DESCRIPTION
+
+Authority
+PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv
+Comment
+SN74AXC8T245PWR
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U16_SN74AXC8T245PWR
+Manufacturer
+Texas Instruments
+MPN
+SN74AXC8T245PWR
+Package
+TSSOP-24_PW
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U17
+FOOTPRINT
+
+PARTTYPE
+SN74LVC32APWR
+DESCRIPTION
+
+Authority
+PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv
+Comment
+SN74LVC32APWR
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U17_SN74LVC32APWR
+Manufacturer
+Texas Instruments
+MPN
+SN74LVC32APWR
+Package
+TSSOP-14_PW
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U18
+FOOTPRINT
+
+PARTTYPE
+SN74AXC1T45DRLR
+DESCRIPTION
+
+Authority
+PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv
+Comment
+SN74AXC1T45DRLR
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U18_SN74AXC1T45DRLR
+Manufacturer
+Texas Instruments
+MPN
+SN74AXC1T45DRLR
+Package
+SOT-5X3-6_DRL
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U19
+FOOTPRINT
+
+PARTTYPE
+4 channel 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+4 channel 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U19_TPD4E05U06DQAR
+Manufacturer
+Texas Instruments
+MPN
+TPD4E05U06DQAR
+Package
+USON-10_DQA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U20
+FOOTPRINT
+
+PARTTYPE
+4 channel 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+4 channel 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U20_TPD4E05U06DQAR
+Manufacturer
+Texas Instruments
+MPN
+TPD4E05U06DQAR
+Package
+USON-10_DQA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U21
+FOOTPRINT
+
+PARTTYPE
+4 channel 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+4 channel 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U21_TPD4E05U06DQAR
+Manufacturer
+Texas Instruments
+MPN
+TPD4E05U06DQAR
+Package
+USON-10_DQA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U22
+FOOTPRINT
+
+PARTTYPE
+4 channel 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+4 channel 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U22_TPD4E05U06DQAR
+Manufacturer
+Texas Instruments
+MPN
+TPD4E05U06DQAR
+Package
+USON-10_DQA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U23
+FOOTPRINT
+
+PARTTYPE
+4 channel 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+4 channel 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U23_TPD4E05U06DQAR
+Manufacturer
+Texas Instruments
+MPN
+TPD4E05U06DQAR
+Package
+USON-10_DQA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U24
+FOOTPRINT
+
+PARTTYPE
+4 channel 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+4 channel 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U24_TPD4E05U06DQAR
+Manufacturer
+Texas Instruments
+MPN
+TPD4E05U06DQAR
+Package
+USON-10_DQA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U25
+FOOTPRINT
+
+PARTTYPE
+2 channel 0.7 pF USB ESD
+DESCRIPTION
+
+Authority
+TI_TPD2EUSB30_datasheet
+Comment
+2 channel 0.7 pF USB ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U25_TPD2EUSB30DRTR
+Manufacturer
+Texas Instruments
+MPN
+TPD2EUSB30DRTR
+Package
+SOT-9X3_DRT
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U26
+FOOTPRINT
+
+PARTTYPE
+2 channel 0.7 pF USB ESD
+DESCRIPTION
+
+Authority
+TI_TPD2EUSB30_datasheet
+Comment
+2 channel 0.7 pF USB ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U26_TPD2EUSB30DRTR
+Manufacturer
+Texas Instruments
+MPN
+TPD2EUSB30DRTR
+Package
+SOT-9X3_DRT
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+U27
+FOOTPRINT
+
+PARTTYPE
+4 channel 0.5 pF ESD
+DESCRIPTION
+
+Authority
+TI_TPDxE05U06_RevO
+Comment
+4 channel 0.5 pF ESD
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+U27_TPD4E05U06DQAR
+Manufacturer
+Texas Instruments
+MPN
+TPD4E05U06DQAR
+Package
+USON-10_DQA
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+[
+DESIGNATOR
+X1
+FOOTPRINT
+
+PARTTYPE
+32.768 kHz full-swing LVCMOS
+DESCRIPTION
+
+Authority
+SiTime_SiT1552_Rev1.43
+Comment
+32.768 kHz full-swing LVCMOS
+Component Kind
+Standard
+Description
+
+Footprint
+
+Ibis Model
+
+Library Name
+DioneyaMain
+Library Reference
+X1_SiT1552AI-JE-DCC-32.768D
+Manufacturer
+SiTime
+MPN
+SiT1552AI-JE-DCC-32.768D
+Package
+CSP-4_1.5x0.8mm
+PCB3D
+
+Pin Info
+
+Population
+FITTED
+Signal Integrity
+
+Simulation
+
+
+*
+]
+(
+VREF+
+C10-1 100 nF 25 V X7R-1 Passive      
+C11-1 1 uF 16 V X5R-1 Passive      
+)
+(
+VCORE_1V1
+C14-1 2.2 uF 10 V X5R-1 Passive      
+C15-1 2.2 uF 10 V X5R-1 Passive      
+C16-1 100 nF 25 V X7R-1 Passive      
+C17-1 100 nF 25 V X7R-1 Passive      
+L1-2 2.2 uH 20%-2 Passive      
+U1-49 STM32U585VIT6Q-VDD11 Output       
+U1-98 STM32U585VIT6Q-VDD11 Passive      
+)
+(
+USB_VBUS_SENSE
+R95-2 1 kOhm 1%-2 Passive      
+R96-1 100 kOhm 1%-1 Passive      
+U1-68 STM32U585VIT6Q-PA9 Passive      
+)
+(
+USB_VBUS_CONN
+D6-1 5.5 V 0.5 pF ESD-1 Passive      
+J11-A4 USB4105-GF-A-120-VBUS Passive      
+J11-A9 USB4105-GF-A-120-VBUS Passive      
+J11-B4 USB4105-GF-A-120-VBUS Passive      
+J11-B9 USB4105-GF-A-120-VBUS Passive      
+R95-1 1 kOhm 1%-1 Passive      
+)
+(
+USB_SHIELD
+C77-1 4.7 nF 100 V X7R-1 Passive      
+J11-SHIELD USB4105-GF-A-120-SHELL Passive      
+R97-1 1 MOhm 1%-1 Passive      
+R98-1 0 Ohm-1 Passive      
+)
+(
+USB_DP_U1
+R91-1 22 Ohm 1%-1 Passive      
+U1-71 STM32U585VIT6Q-PA12 Passive      
+)
+(
+USB_DP_CONN
+J11-A6 USB4105-GF-A-120-D+ IO           
+J11-B6 USB4105-GF-A-120-D+ IO           
+R91-2 22 Ohm 1%-2 Passive      
+U25-1 2 channel 0.7 pF USB ESD-1 Passive      
+)
+(
+USB_DM_U1
+R92-1 22 Ohm 1%-1 Passive      
+U1-70 STM32U585VIT6Q-PA11 Passive      
+)
+(
+USB_DM_CONN
+J11-A7 USB4105-GF-A-120-D- IO           
+J11-B7 USB4105-GF-A-120-D- IO           
+R92-2 22 Ohm 1%-2 Passive      
+U25-2 2 channel 0.7 pF USB ESD-2 Passive      
+)
+(
+USB_CC2
+D8-1 5.5 V 0.5 pF ESD-1 Passive      
+J11-B5 USB4105-GF-A-120-CC2 Input        
+R94-1 5.1 kOhm 1%-1 Passive      
+)
+(
+USB_CC1
+D7-1 5.5 V 0.5 pF ESD-1 Passive      
+J11-A5 USB4105-GF-A-120-CC1 Input        
+R93-1 5.1 kOhm 1%-1 Passive      
+)
+(
+U13_EN_N
+Q3-3 MMBT3904,215-C OpenCollector
+R44-2 47 kOhm 1%-2 Passive      
+U13-20 TS3A27518EPWR-EN Input        
+)
+(
+U8_VDD_EXT_1V8
+C33-1 100 nF 25 V X7R-1 Passive      
+R30-1 10 kOhm 1%-1 Passive      
+R31-1 10 kOhm 1%-1 Passive      
+R41-1 1 kOhm 1%-1 Passive      
+TP_CELL_DBG-1 TEST_PADS-VREF_1V8 Passive      
+U8-29 BG95-M3-VDD_EXT Output       
+U16-1 SN74AXC8T245PWR-VCCA Passive      
+U16-2 SN74AXC8T245PWR-DIR1 Input        
+)
+(
+U8_STATUS_1V8
+U8-20 BG95-M3-STATUS Output       
+U16-4 SN74AXC8T245PWR-A2 Input        
+)
+(
+U8_RESET_N
+Q2-3 MMBT3904,215-C OpenCollector
+U8-17 BG95-M3-RESET_N Passive      
+)
+(
+U8_PWRKEY_N
+C48-1 10 nF 25 V X7R-1 Passive      
+Q1-3 MMBT3904,215-C OpenCollector
+U8-15 BG95-M3-PWRKEY Input        
+)
+(
+U8_MAIN_TXD_1V8
+R30-2 10 kOhm 1%-2 Passive      
+U8-35 BG95-M3-MAIN_TXD Output       
+U16-3 SN74AXC8T245PWR-A1 Input        
+)
+(
+U8_MAIN_RXD_1V8
+U8-34 BG95-M3-MAIN_RXD Input        
+U16-7 SN74AXC8T245PWR-A5 Output       
+)
+(
+U8_MAIN_RI_1V8
+R31-2 10 kOhm 1%-2 Passive      
+U8-39 BG95-M3-MAIN_RI Output       
+U16-5 SN74AXC8T245PWR-A3 Input        
+)
+(
+U8_MAIN_DTR_1V8
+U8-30 BG95-M3-MAIN_DTR Input        
+U16-8 SN74AXC8T245PWR-A6 Output       
+)
+(
+TEST_UART_TX_U1
+R101-1 22 Ohm 1%-1 Passive      
+U1-16 STM32U585VIT6Q-PC1 Passive      
+)
+(
+TEST_UART_TX_TP
+R101-2 22 Ohm 1%-2 Passive      
+TP_EOL-5 TEST_PADS-DUT_TX Passive      
+)
+(
+TEST_UART_RX_U1
+R102-2 1 kOhm 1%-2 Passive      
+U1-15 STM32U585VIT6Q-PC0 Passive      
+)
+(
+TEST_UART_RX_TP
+R102-1 1 kOhm 1%-1 Passive      
+TP_EOL-6 TEST_PADS-DUT_RX Passive      
+)
+(
+TAMPER_IN_U1
+C78-1 10 nF 25 V X7R-1 Passive      
+R100-2 1 kOhm 1%-2 Passive      
+U1-64 STM32U585VIT6Q-PC7 Passive      
+)
+(
+TAMPER_IN_CONN
+D9-1 5.5 V 0.5 pF ESD-1 Passive      
+J13-1 504050-0291-TAMPER Input        
+R99-2 10 kOhm 1%-2 Passive      
+R100-1 1 kOhm 1%-1 Passive      
+)
+(
+SWDIO
+TP_MCU_SWD-2 TEST_PADS-SWDIO Passive      
+U1-72 STM32U585VIT6Q-PA13 (JTMS/SWDIO) Passive      
+)
+(
+SWCLK
+TP_MCU_SWD-3 TEST_PADS-SWCLK Passive      
+U1-76 STM32U585VIT6Q-PA14 (JTCK/SWCLK) Passive      
+)
+(
+SMPS_SW
+L1-1 2.2 uH 20%-1 Passive      
+U1-46 STM32U585VIT6Q-VLXSMPS Passive      
+)
+(
+SIM_MUX_SEL
+R45-1 100 kOhm 1%-1 Passive      
+U1-97 STM32U585VIT6Q-PE0 Passive      
+U13-14 TS3A27518EPWR-IN2 Input        
+U13-24 TS3A27518EPWR-IN1 Input        
+)
+(
+SIM_MUX_EN
+R46-1 10 kOhm 1%-1 Passive      
+U1-1 STM32U585VIT6Q-PE2 Passive      
+)
+(
+SIM2_VDD_CONN
+C51-1 100 nF 25 V X7R-1 Passive      
+J7-1 2336582-1-C1_VCC Passive      
+U13-11 TS3A27518EPWR-NO1 IO           
+U13-16 TS3A27518EPWR-NO6 IO           
+U13-17 TS3A27518EPWR-NO4 IO           
+U15-1 ESDALC6V1-5P6-I/O1 IO           
+)
+(
+SIM2_RST_MUX
+R53-1 0 Ohm-1 Passive      
+U13-13 TS3A27518EPWR-NO2 IO           
+)
+(
+SIM2_RST_CONN
+C57-1 33 pF 50 V C0G-1 Passive      
+J7-2 2336582-1-C2_RST IO           
+R53-2 0 Ohm-2 Passive      
+U15-3 ESDALC6V1-5P6-I/O2 IO           
+)
+(
+SIM2_DET
+C53-1 10 nF 25 V X7R-1 Passive      
+J7-7 2336582-1-CD IO           
+R49-2 10 kOhm 1%-2 Passive      
+U1-4 STM32U585VIT6Q-PE5 Passive      
+U15-6 ESDALC6V1-5P6-I/O5 Input        
+)
+(
+SIM2_DATA_MUX
+R55-1 0 Ohm-1 Passive      
+U13-18 TS3A27518EPWR-NO5 IO           
+)
+(
+SIM2_DATA_CONN
+C59-1 33 pF 50 V C0G-1 Passive      
+J7-6 2336582-1-C7_IO IO           
+R55-2 0 Ohm-2 Passive      
+U15-5 ESDALC6V1-5P6-I/O4 IO           
+)
+(
+SIM2_CLK_MUX
+R54-1 0 Ohm-1 Passive      
+U13-15 TS3A27518EPWR-NO3 IO           
+)
+(
+SIM2_CLK_CONN
+C58-1 33 pF 50 V C0G-1 Passive      
+J7-3 2336582-1-C3_CLK Input        
+R54-2 0 Ohm-2 Passive      
+U15-4 ESDALC6V1-5P6-I/O3 IO           
+)
+(
+SIM1_VDD_CONN
+C50-1 100 nF 25 V X7R-1 Passive      
+J6-1 2336582-1-C1_VCC Passive      
+U13-2 TS3A27518EPWR-NC1 IO           
+U13-21 TS3A27518EPWR-NC4 IO           
+U13-22 TS3A27518EPWR-NC6 IO           
+U14-1 ESDALC6V1-5P6-I/O1 IO           
+)
+(
+SIM1_RST_MUX
+R50-1 0 Ohm-1 Passive      
+U13-1 TS3A27518EPWR-NC2 IO           
+)
+(
+SIM1_RST_CONN
+C54-1 33 pF 50 V C0G-1 Passive      
+J6-2 2336582-1-C2_RST IO           
+R50-2 0 Ohm-2 Passive      
+U14-3 ESDALC6V1-5P6-I/O2 IO           
+)
+(
+SIM1_DET
+C52-1 10 nF 25 V X7R-1 Passive      
+J6-7 2336582-1-CD IO           
+R48-2 10 kOhm 1%-2 Passive      
+U1-2 STM32U585VIT6Q-PE3 Passive      
+U14-6 ESDALC6V1-5P6-I/O5 Input        
+)
+(
+SIM1_DATA_MUX
+R52-1 0 Ohm-1 Passive      
+U13-19 TS3A27518EPWR-NC5 IO           
+)
+(
+SIM1_DATA_CONN
+C56-1 33 pF 50 V C0G-1 Passive      
+J6-6 2336582-1-C7_IO IO           
+R52-2 0 Ohm-2 Passive      
+U14-5 ESDALC6V1-5P6-I/O4 IO           
+)
+(
+SIM1_CLK_MUX
+R51-1 0 Ohm-1 Passive      
+U13-23 TS3A27518EPWR-NC3 IO           
+)
+(
+SIM1_CLK_CONN
+C55-1 33 pF 50 V C0G-1 Passive      
+J6-3 2336582-1-C3_CLK Input        
+R51-2 0 Ohm-2 Passive      
+U14-4 ESDALC6V1-5P6-I/O3 IO           
+)
+(
+SD_DET
+C76-1 10 nF 25 V X7R-1 Passive      
+J12-CD MEM2052-00-195-00-A-CARD_DETECT Output       
+R90-2 10 kOhm 1%-2 Passive      
+U1-7 STM32U585VIT6Q-PC13 Passive      
+U24-4 4 channel 0.5 pF ESD-4 Passive      
+)
+(
+SD_D3_U1
+R84-1 22 Ohm 1%-1 Passive      
+U1-79 STM32U585VIT6Q-PC11 Passive      
+)
+(
+SD_D3_CARD
+J12-2 MEM2052-00-195-00-A-CD/DAT3 IO           
+R84-2 22 Ohm 1%-2 Passive      
+R89-2 10 kOhm 1%-2 Passive      
+U12-2 SDCIT2/32GB-CD/DAT3 IO           
+U23-2 4 channel 0.5 pF ESD-2 Passive      
+)
+(
+SD_D2_U1
+R83-1 22 Ohm 1%-1 Passive      
+U1-78 STM32U585VIT6Q-PC10 Passive      
+)
+(
+SD_D2_CARD
+J12-1 MEM2052-00-195-00-A-DAT2 IO           
+R83-2 22 Ohm 1%-2 Passive      
+R88-2 10 kOhm 1%-2 Passive      
+U12-1 SDCIT2/32GB-DAT2 IO           
+U23-1 4 channel 0.5 pF ESD-1 Passive      
+)
+(
+SD_D1_U1
+R82-1 22 Ohm 1%-1 Passive      
+U1-66 STM32U585VIT6Q-PC9 Passive      
+)
+(
+SD_D1_CARD
+J12-8 MEM2052-00-195-00-A-DAT1 IO           
+R82-2 22 Ohm 1%-2 Passive      
+R87-2 10 kOhm 1%-2 Passive      
+U12-8 SDCIT2/32GB-DAT1 IO           
+U24-2 4 channel 0.5 pF ESD-2 Passive      
+)
+(
+SD_D0_U1
+R81-1 22 Ohm 1%-1 Passive      
+U1-65 STM32U585VIT6Q-PC8 Passive      
+)
+(
+SD_D0_CARD
+J12-7 MEM2052-00-195-00-A-DAT0 IO           
+R81-2 22 Ohm 1%-2 Passive      
+R86-2 10 kOhm 1%-2 Passive      
+U12-7 SDCIT2/32GB-DAT0 IO           
+U24-1 4 channel 0.5 pF ESD-1 Passive      
+)
+(
+SD_CMD_U1
+R80-1 22 Ohm 1%-1 Passive      
+U1-83 STM32U585VIT6Q-PD2 Passive      
+)
+(
+SD_CMD_CARD
+J12-3 MEM2052-00-195-00-A-CMD IO           
+R80-2 22 Ohm 1%-2 Passive      
+R85-2 10 kOhm 1%-2 Passive      
+U12-3 SDCIT2/32GB-CMD IO           
+U23-4 4 channel 0.5 pF ESD-4 Passive      
+)
+(
+SD_CK_U1
+R79-1 22 Ohm 1%-1 Passive      
+U1-80 STM32U585VIT6Q-PC12 Passive      
+)
+(
+SD_CK_CARD
+J12-5 MEM2052-00-195-00-A-CLK Output       
+R79-2 22 Ohm 1%-2 Passive      
+U12-5 SDCIT2/32GB-CLK Input        
+U23-5 4 channel 0.5 pF ESD-5 Passive      
+)
+(
+REV_STRAP1
+TP_EOL-11 TEST_PADS-REV1 Passive      
+U1-96 STM32U585VIT6Q-PB9 Passive      
+)
+(
+REV_STRAP0
+TP_EOL-10 TEST_PADS-REV0 Passive      
+U1-95 STM32U585VIT6Q-PB8 Passive      
+)
+(
+Q3_BASE
+Q3-1 MMBT3904,215-B Input        
+R46-2 10 kOhm 1%-2 Passive      
+R47-1 100 kOhm 1%-1 Passive      
+)
+(
+Q2_BASE
+Q2-1 MMBT3904,215-B Input        
+R26-2 4.7 kOhm 1%-2 Passive      
+R27-1 47 kOhm 1%-1 Passive      
+)
+(
+Q1_BASE
+Q1-1 MMBT3904,215-B Input        
+R24-2 4.7 kOhm 1%-2 Passive      
+R25-1 47 kOhm 1%-1 Passive      
+)
+(
+PWR_GOOD
+J_PWR-7 43045-1202-PWR_GOOD Passive      
+TP_EOL-7 TEST_PADS-PWR_GOOD Passive      
+U1-81 STM32U585VIT6Q-PD0 Passive      
+)
+(
+PWR_FAULT
+R103-2 0 Ohm-2 Passive      
+U1-82 STM32U585VIT6Q-PD1 Passive      
+)
+(
+PDM_DATA4_1V8
+J_MIC4-4 504050-0691-PDM_DATA4 Passive      
+U7-6 SN74AXC8T245PWR-A4 Input        
+U22-2 4 channel 0.5 pF ESD-2 Passive      
+)
+(
+PDM_DATA4
+U1-3 STM32U585VIT6Q-PE4 Passive      
+U7-18 SN74AXC8T245PWR-B4 Output       
+)
+(
+PDM_DATA3_1V8
+J_MIC3-4 504050-0691-PDM_DATA3 Passive      
+U7-5 SN74AXC8T245PWR-A3 Input        
+U21-2 4 channel 0.5 pF ESD-2 Passive      
+)
+(
+PDM_DATA3
+U1-35 STM32U585VIT6Q-PE7 Passive      
+U7-19 SN74AXC8T245PWR-B3 Output       
+)
+(
+PDM_DATA2_1V8
+J_MIC2-4 504050-0691-PDM_DATA2 Passive      
+U7-4 SN74AXC8T245PWR-A2 Input        
+U20-2 4 channel 0.5 pF ESD-2 Passive      
+)
+(
+PDM_DATA2
+U1-87 STM32U585VIT6Q-PD6 Passive      
+U7-20 SN74AXC8T245PWR-B2 Output       
+)
+(
+PDM_DATA1_1V8
+J_MIC1-4 504050-0691-PDM_DATA1 Passive      
+U7-3 SN74AXC8T245PWR-A1 Input        
+U19-2 4 channel 0.5 pF ESD-2 Passive      
+)
+(
+PDM_DATA1
+U1-33 STM32U585VIT6Q-PB1 Passive      
+U7-21 SN74AXC8T245PWR-B1 Output       
+)
+(
+PDM_CLK_1V8_U7
+R17-1 22 Ohm 1%-1 Passive      
+U7-7 SN74AXC8T245PWR-A5 Output       
+)
+(
+PDM_CLK_1V8_FANOUT
+J_MIC1-3 504050-0691-PDM_CLK Passive      
+J_MIC2-3 504050-0691-PDM_CLK Passive      
+J_MIC3-3 504050-0691-PDM_CLK Passive      
+J_MIC4-3 504050-0691-PDM_CLK Passive      
+R17-2 22 Ohm 1%-2 Passive      
+U19-1 4 channel 0.5 pF ESD-1 Passive      
+U20-1 4 channel 0.5 pF ESD-1 Passive      
+U21-1 4 channel 0.5 pF ESD-1 Passive      
+U22-1 4 channel 0.5 pF ESD-1 Passive      
+)
+(
+PDM_CLK
+U1-37 STM32U585VIT6Q-PE9 Passive      
+U7-17 SN74AXC8T245PWR-B5 Input        
+)
+(
+NRST
+C18-1 100 nF 25 V X7R-1 Passive      
+R1-2 10 kOhm 1%-2 Passive      
+TP_MCU_SWD-4 TEST_PADS-NRST Passive      
+U1-14 STM32U585VIT6Q-NRST Passive      
+)
+(
+NRF_SWDIO
+TP_BLE_SWD-2 TEST_PADS-SWDIO Passive      
+U11-51 MDBT50Q-P1MV2-SWDIO IO           
+)
+(
+NRF_SWCLK
+TP_BLE_SWD-3 TEST_PADS-SWDCLK Passive      
+U11-53 MDBT50Q-P1MV2-SWDCLK Input        
+)
+(
+NRF_RESET_N
+R78-2 10 kOhm 1%-2 Passive      
+U6-4 Single non-inverting open-drain buffer-4 Passive      
+U11-40 MDBT50Q-P1MV2-P0.18/nRESET Input        
+)
+(
+NOR_NCS_U2
+R7-2 10 kOhm 1%-2 Passive      
+U1-39 STM32U585VIT6Q-PE11 Passive      
+U2-7 W25Q512JVFIQ-/CS Input        
+)
+(
+NOR_IO3_U2
+R12-2 22 Ohm 1%-2 Passive      
+U2-1 W25Q512JVFIQ-/HOLD or /RESET (IO3) IO           
+)
+(
+NOR_IO3_U1
+R12-1 22 Ohm 1%-1 Passive      
+U1-43 STM32U585VIT6Q-PE15 Passive      
+)
+(
+NOR_IO2_U2
+R11-2 22 Ohm 1%-2 Passive      
+U2-9 W25Q512JVFIQ-/WP (IO2) IO           
+)
+(
+NOR_IO2_U1
+R11-1 22 Ohm 1%-1 Passive      
+U1-42 STM32U585VIT6Q-PE14 Passive      
+)
+(
+NOR_IO1_U2
+R10-2 22 Ohm 1%-2 Passive      
+U2-8 W25Q512JVFIQ-DO (IO1) IO           
+)
+(
+NOR_IO1_U1
+R10-1 22 Ohm 1%-1 Passive      
+U1-41 STM32U585VIT6Q-PE13 Passive      
+)
+(
+NOR_IO0_U2
+R9-2 22 Ohm 1%-2 Passive      
+U2-15 W25Q512JVFIQ-DI (IO0) IO           
+)
+(
+NOR_IO0_U1
+R9-1 22 Ohm 1%-1 Passive      
+U1-40 STM32U585VIT6Q-PE12 Passive      
+)
+(
+NOR_CLK_U2
+R8-2 22 Ohm 1%-2 Passive      
+U2-16 W25Q512JVFIQ-CLK Input        
+)
+(
+NOR_CLK_U1
+R8-1 22 Ohm 1%-1 Passive      
+U1-38 STM32U585VIT6Q-PE10 Passive      
+)
+(
+MIC_WAKE_OR_1V8
+U17-8 SN74LVC32APWR-3Y Output       
+U18-3 SN74AXC1T45DRLR-A Input        
+)
+(
+MIC_WAKE34_OR_1V8
+U17-6 SN74LVC32APWR-2Y Output       
+U17-10 SN74LVC32APWR-3B Input        
+)
+(
+MIC_WAKE12_OR_1V8
+U17-3 SN74LVC32APWR-1Y Output       
+U17-9 SN74LVC32APWR-3A Input        
+)
+(
+MIC_WAKE4
+J_MIC4-5 504050-0691-MIC_WAKE4 Passive      
+R22-1 100 kOhm 1%-1 Passive      
+U17-5 SN74LVC32APWR-2B Input        
+U22-4 4 channel 0.5 pF ESD-4 Passive      
+)
+(
+MIC_WAKE3
+J_MIC3-5 504050-0691-MIC_WAKE3 Passive      
+R21-1 100 kOhm 1%-1 Passive      
+U17-4 SN74LVC32APWR-2A Input        
+U21-4 4 channel 0.5 pF ESD-4 Passive      
+)
+(
+MIC_WAKE2
+J_MIC2-5 504050-0691-MIC_WAKE2 Passive      
+R20-1 100 kOhm 1%-1 Passive      
+U17-2 SN74LVC32APWR-1B Input        
+U20-4 4 channel 0.5 pF ESD-4 Passive      
+)
+(
+MIC_WAKE1
+J_MIC1-5 504050-0691-MIC_WAKE1 Passive      
+R19-1 100 kOhm 1%-1 Passive      
+U17-1 SN74LVC32APWR-1A Input        
+U19-4 4 channel 0.5 pF ESD-4 Passive      
+)
+(
+MIC_WAKE
+R23-1 100 kOhm 1%-1 Passive      
+U1-67 STM32U585VIT6Q-PA8 Passive      
+U18-4 SN74AXC1T45DRLR-B Output       
+)
+(
+LSE_IN
+U1-8 STM32U585VIT6Q-PC14-OSC32_IN (PC14) Passive      
+X1-2 32.768 kHz full-swing LVCMOS-2 Passive      
+)
+(
+LORA_TXEN
+R63-1 100 kOhm 1%-1 Passive      
+U1-54 STM32U585VIT6Q-PB15 Passive      
+U10-7 E22-900M22S-TXEN Input        
+)
+(
+LORA_SCK_U10
+R70-2 22 Ohm 1%-2 Passive      
+U10-18 E22-900M22S-SCK Input        
+)
+(
+LORA_SCK_U1
+R70-1 22 Ohm 1%-1 Passive      
+U1-29 STM32U585VIT6Q-PA5 Passive      
+)
+(
+LORA_RXEN
+R64-1 100 kOhm 1%-1 Passive      
+U1-55 STM32U585VIT6Q-PD8 Passive      
+U10-6 E22-900M22S-RXEN Input        
+)
+(
+LORA_RF_MODULE
+C69-1 10 pF 50 V C0G-1 Passive      
+R73-1 0 Ohm-1 Passive      
+U10-21 E22-900M22S-ANT IO           
+)
+(
+LORA_RF_ANT
+C70-1 10 pF 50 V C0G-1 Passive      
+D5-1 5 V bidirectional 0.2 pF RF ESD-1 Passive      
+J10-1 U.FL-R-SMT-1(60)-SIGNAL IO           
+R73-2 0 Ohm-2 Passive      
+)
+(
+LORA_RESET_N
+C68-1 100 nF 25 V X7R-1 Passive      
+R67-2 10 kOhm 1%-2 Passive      
+U1-57 STM32U585VIT6Q-PD10 Passive      
+U10-15 E22-900M22S-NRST Input        
+)
+(
+LORA_NSS_U10
+R68-2 10 kOhm 1%-2 Passive      
+R69-2 22 Ohm 1%-2 Passive      
+U10-19 E22-900M22S-NSS Input        
+)
+(
+LORA_NSS_U1
+R69-1 22 Ohm 1%-1 Passive      
+U1-28 STM32U585VIT6Q-PA4 Passive      
+)
+(
+LORA_MOSI_U10
+R71-2 22 Ohm 1%-2 Passive      
+U10-17 E22-900M22S-MOSI Input        
+)
+(
+LORA_MOSI_U1
+R71-1 22 Ohm 1%-1 Passive      
+U1-31 STM32U585VIT6Q-PA7 Passive      
+)
+(
+LORA_MISO_U10
+R72-1 22 Ohm 1%-1 Passive      
+U10-16 E22-900M22S-MISO Output       
+)
+(
+LORA_MISO_U1
+R72-2 22 Ohm 1%-2 Passive      
+U1-30 STM32U585VIT6Q-PA6 Passive      
+)
+(
+LORA_DIO1
+R65-1 100 kOhm 1%-1 Passive      
+U1-17 STM32U585VIT6Q-PC2 Passive      
+U10-13 E22-900M22S-DIO1 Output       
+)
+(
+LORA_BUSY
+R66-1 100 kOhm 1%-1 Passive      
+U1-56 STM32U585VIT6Q-PD9 Passive      
+U10-14 E22-900M22S-BUSY Output       
+)
+(
+I2C2_SDA_U1
+R16-1 22 Ohm 1%-1 Passive      
+U1-53 STM32U585VIT6Q-PB14 Passive      
+)
+(
+I2C2_SDA_BUS
+J_PWR-12 43045-1202-I2C2_SDA IO           
+R14-2 2.2 kOhm 1%-2 Passive      
+R16-2 22 Ohm 1%-2 Passive      
+TP_EOL-13 TEST_PADS-I2C_SDA Passive      
+U3-4 LIS2DW12TR-SDA/SDI/SDO IO           
+U4-6 STTS22HTR-SDA IO           
+)
+(
+I2C2_SCL_U1
+R15-1 22 Ohm 1%-1 Passive      
+U1-52 STM32U585VIT6Q-PB13 Passive      
+)
+(
+I2C2_SCL_BUS
+J_PWR-11 43045-1202-I2C2_SCL IO           
+R13-2 2.2 kOhm 1%-2 Passive      
+R15-2 22 Ohm 1%-2 Passive      
+TP_EOL-12 TEST_PADS-I2C_SCL Passive      
+U3-1 LIS2DW12TR-SCL/SPC Input        
+U4-1 STTS22HTR-SCL Input        
+)
+(
+HW_REV1
+R5-1 100 kOhm 1%-1 Passive      
+R6-2 100 kOhm 1%-2 Passive      
+)
+(
+HW_REV0
+R3-1 100 kOhm 1%-1 Passive      
+R4-2 100 kOhm 1%-2 Passive      
+)
+(
+GNSS_TX_U9
+R57-2 22 Ohm 1%-2 Passive      
+U9-3 MAX-M10S-00B-RXD Input        
+)
+(
+GNSS_TX_U1
+R57-1 22 Ohm 1%-1 Passive      
+U1-24 STM32U585VIT6Q-PA2 Passive      
+)
+(
+GNSS_RX_U9
+R56-1 22 Ohm 1%-1 Passive      
+U9-2 MAX-M10S-00B-TXD Output       
+)
+(
+GNSS_RX_U1
+R56-2 22 Ohm 1%-2 Passive      
+U1-25 STM32U585VIT6Q-PA3 Passive      
+)
+(
+GNSS_RF_FILTERED
+FL1-A 1582.4 MHz wideband GNSS SAW-A Passive      
+U9-11 MAX-M10S-00B-RF_IN Input        
+)
+(
+GNSS_RF_DC_BLOCK
+C64-2 47 pF 25 V C0G-2 Passive      
+FL1-C 1582.4 MHz wideband GNSS SAW-C Passive      
+)
+(
+GNSS_RF_ANT_BIASED
+C64-1 47 pF 25 V C0G-1 Passive      
+D4-1 5.5 V unidirectional 0.5 pF RF ESD-1 Passive      
+J9-1 U.FL-R-SMT-1(60)-SIGNAL IO           
+L2-2 27 nH 5%-2 Passive      
+)
+(
+GNSS_PPS_U9
+R58-1 22 Ohm 1%-1 Passive      
+U9-4 MAX-M10S-00B-TIMEPULSE Output       
+)
+(
+GNSS_PPS_U1
+R58-2 22 Ohm 1%-2 Passive      
+U1-22 STM32U585VIT6Q-PA0 Passive      
+)
+(
+GNSS_ANT_SWITCHED
+Q4-3 Complementary N and P channel 20 V-3 Passive      
+R59-1 560 Ohm 5% 0.1 W-1 Passive      
+R62-1 10 Ohm 5% 0.25 W-1 Passive      
+)
+(
+GNSS_ANT_SHORT_N
+C63-1 10 nF 16 V X7R-1 Passive      
+L2-1 27 nH 5%-1 Passive      
+R62-2 10 Ohm 5% 0.25 W-2 Passive      
+U5-2 Single rail-to-rail low-power op amp-2 Passive      
+U9-17 MAX-M10S-00B-SCL Input        
+)
+(
+GNSS_ANT_OFF_N
+Q4-2 Complementary N and P channel 20 V-2 Passive      
+U9-13 MAX-M10S-00B-LNA_EN Output       
+)
+(
+GNSS_ANT_GATE
+Q4-5 Complementary N and P channel 20 V-5 Passive      
+Q4-6 Complementary N and P channel 20 V-6 Passive      
+R61-2 100 kOhm 5% 0.1 W-2 Passive      
+)
+(
+GNSS_ANT_DIV
+R59-2 560 Ohm 5% 0.1 W-2 Passive      
+R60-1 100 kOhm 5% 0.1 W-1 Passive      
+U5-1 Single rail-to-rail low-power op amp-1 Passive      
+)
+(
+GNSS_ANT_DETECT
+U5-6 Single rail-to-rail low-power op amp-6 Passive      
+U9-16 MAX-M10S-00B-SDA Input        
+)
+(
+GNSS_ANT_BIAS_RAW
+C65-1 100 nF 25 V X7R-1 Passive      
+Q4-4 Complementary N and P channel 20 V-4 Passive      
+R61-1 100 kOhm 5% 0.1 W-1 Passive      
+U5-3 Single rail-to-rail low-power op amp-3 Passive      
+U5-4 Single rail-to-rail low-power op amp-4 Passive      
+U9-14 MAX-M10S-00B-VCC_RF Output       
+)
+(
+GND_MODEM
+C33-2 100 nF 25 V X7R-2 Passive      
+C34-2 100 nF 25 V X7R-2 Passive      
+C35-2 100 nF 25 V X7R-2 Passive      
+C36-2 100 uF 6.3 V 15 mOhm polymer-2 Passive      
+C37-2 220 nF 25 V X7R-2 Passive      
+C38-2 47 nF 25 V X7R-2 Passive      
+C39-2 150 pF 50 V C0G-2 Passive      
+C40-2 100 pF 50 V C0G-2 Passive      
+C41-2 68 pF 50 V C0G-2 Passive      
+C42-2 33 pF 50 V C0G-2 Passive      
+C43-2 10 pF 50 V C0G-2 Passive      
+C44-2 100 uF 6.3 V 15 mOhm polymer-2 Passive      
+C45-2 100 nF 25 V X7R-2 Passive      
+C46-2 33 pF 50 V C0G-2 Passive      
+C47-2 10 pF 50 V C0G-2 Passive      
+C48-2 10 nF 25 V X7R-2 Passive      
+C49-2 100 nF 25 V X7R-2 Passive      
+C50-2 100 nF 25 V X7R-2 Passive      
+C51-2 100 nF 25 V X7R-2 Passive      
+C52-2 10 nF 25 V X7R-2 Passive      
+C53-2 10 nF 25 V X7R-2 Passive      
+C54-2 33 pF 50 V C0G-2 Passive      
+C55-2 33 pF 50 V C0G-2 Passive      
+C56-2 33 pF 50 V C0G-2 Passive      
+C57-2 33 pF 50 V C0G-2 Passive      
+C58-2 33 pF 50 V C0G-2 Passive      
+C59-2 33 pF 50 V C0G-2 Passive      
+C79-2 10 pF 50 V C0G-2 Passive      
+C80-2 10 pF 50 V C0G-2 Passive      
+D1-2 5 V unidirectional 150 W TVS-2 Passive      
+D2-2 5 V unidirectional 150 W TVS-2 Passive      
+D3-2 5 V bidirectional 0.2 pF RF ESD-2 Passive      
+D10-2 5.5 V 0.5 pF ESD-2 Passive      
+J6-4 2336582-1-C5_GND Passive      
+J6-SHIELD 2336582-1-SHELL Passive      
+J7-4 2336582-1-C5_GND Passive      
+J7-SHIELD 2336582-1-SHELL Passive      
+J8-SHIELD U.FL-R-SMT-1(60)-SHELL Passive      
+J_PWR-2 43045-1202-GND_MODEM Passive      
+Q1-2 MMBT3904,215-E Passive      
+Q2-2 MMBT3904,215-E Passive      
+Q3-2 MMBT3904,215-E Passive      
+R25-2 47 kOhm 1%-2 Passive      
+R27-2 47 kOhm 1%-2 Passive      
+R29-2 100 kOhm 1%-2 Passive      
+R34-2 100 kOhm 1%-2 Passive      
+R35-2 100 kOhm 1%-2 Passive      
+R45-2 100 kOhm 1%-2 Passive      
+R47-2 100 kOhm 1%-2 Passive      
+TP_CELL_DBG-5 TEST_PADS-GND Passive      
+TP_CELL_USB-4 TEST_PADS-GND Passive      
+U8-3 BG95-M3-GND Passive      
+U8-31 BG95-M3-GND Passive      
+U8-47 BG95-M3-USIM_GND Passive      
+U8-48 BG95-M3-GND Passive      
+U8-50 BG95-M3-GND Passive      
+U8-54 BG95-M3-GND Passive      
+U8-55 BG95-M3-GND Passive      
+U8-58 BG95-M3-GND Passive      
+U8-59 BG95-M3-GND Passive      
+U8-61 BG95-M3-GND Passive      
+U8-62 BG95-M3-GND Passive      
+U8-67 BG95-M3-GND Passive      
+U8-68 BG95-M3-GND Passive      
+U8-69 BG95-M3-GND Passive      
+U8-70 BG95-M3-GND Passive      
+U8-71 BG95-M3-GND Passive      
+U8-72 BG95-M3-GND Passive      
+U8-73 BG95-M3-GND Passive      
+U8-74 BG95-M3-GND Passive      
+U8-79 BG95-M3-GND Passive      
+U8-80 BG95-M3-GND Passive      
+U8-81 BG95-M3-GND Passive      
+U8-82 BG95-M3-GND Passive      
+U8-89 BG95-M3-GND Passive      
+U8-90 BG95-M3-GND Passive      
+U8-91 BG95-M3-GND Passive      
+U8-100 BG95-M3-GND Passive      
+U8-101 BG95-M3-GND Passive      
+U8-102 BG95-M3-GND Passive      
+U13-5 TS3A27518EPWR-GND Passive      
+U14-2 ESDALC6V1-5P6-GND Passive      
+U15-2 ESDALC6V1-5P6-GND Passive      
+U16-6 SN74AXC8T245PWR-A4 Input        
+U16-11 SN74AXC8T245PWR-DIR2 Input        
+U16-12 SN74AXC8T245PWR-GND Passive      
+U16-13 SN74AXC8T245PWR-GND Passive      
+U16-14 SN74AXC8T245PWR-B8 Input        
+U16-15 SN74AXC8T245PWR-B7 Input        
+U16-22 SN74AXC8T245PWR-OE Input        
+U26-3 2 channel 0.7 pF USB ESD-3 Passive      
+U27-3 4 channel 0.5 pF ESD-3 Passive      
+U27-8 4 channel 0.5 pF ESD-8 Passive      
+)
+(
+GND_MIC
+C20-2 10 uF 10 V X5R-2 Passive      
+C30-2 100 nF 25 V X7R-2 Passive      
+J_MIC1-2 504050-0691-GND Passive      
+J_MIC2-2 504050-0691-GND Passive      
+J_MIC3-2 504050-0691-GND Passive      
+J_MIC4-2 504050-0691-GND Passive      
+J_PWR-6 43045-1202-GND_MIC Passive      
+R19-2 100 kOhm 1%-2 Passive      
+R20-2 100 kOhm 1%-2 Passive      
+R21-2 100 kOhm 1%-2 Passive      
+R22-2 100 kOhm 1%-2 Passive      
+U17-7 SN74LVC32APWR-GND Passive      
+U17-12 SN74LVC32APWR-4A Input        
+U17-13 SN74LVC32APWR-4B Input        
+U19-3 4 channel 0.5 pF ESD-3 Passive      
+U19-8 4 channel 0.5 pF ESD-8 Passive      
+U20-3 4 channel 0.5 pF ESD-3 Passive      
+U20-8 4 channel 0.5 pF ESD-8 Passive      
+U21-3 4 channel 0.5 pF ESD-3 Passive      
+U21-8 4 channel 0.5 pF ESD-8 Passive      
+U22-3 4 channel 0.5 pF ESD-3 Passive      
+U22-8 4 channel 0.5 pF ESD-8 Passive      
+)
+(
+GND_DIGITAL
+C1-2 100 nF 25 V X7R-2 Passive      
+C2-2 100 nF 25 V X7R-2 Passive      
+C3-2 100 nF 25 V X7R-2 Passive      
+C4-2 100 nF 25 V X7R-2 Passive      
+C5-2 100 nF 25 V X7R-2 Passive      
+C6-2 10 uF 10 V X5R-2 Passive      
+C7-2 100 nF 25 V X7R-2 Passive      
+C8-2 100 nF 25 V X7R-2 Passive      
+C9-2 1 uF 16 V X5R-2 Passive      
+C10-2 100 nF 25 V X7R-2 Passive      
+C11-2 1 uF 16 V X5R-2 Passive      
+C12-2 100 nF 25 V X7R-2 Passive      
+C13-2 10 uF 10 V X5R-2 Passive      
+C14-2 2.2 uF 10 V X5R-2 Passive      
+C15-2 2.2 uF 10 V X5R-2 Passive      
+C16-2 100 nF 25 V X7R-2 Passive      
+C17-2 100 nF 25 V X7R-2 Passive      
+C18-2 100 nF 25 V X7R-2 Passive      
+C19-2 22 uF 10 V X5R-2 Passive      
+C21-2 100 nF 25 V X7R-2 Passive      
+C22-2 1 uF 16 V X5R-2 Passive      
+C23-2 100 nF 25 V X7R-2 Passive      
+C24-2 10 uF 10 V X5R-2 Passive      
+C25-2 100 nF 25 V X7R-2 Passive      
+C26-2 100 nF 25 V X7R-2 Passive      
+C27-2 100 nF 25 V X7R-2 Passive      
+C28-2 100 nF 25 V X7R-2 Passive      
+C29-2 100 nF 25 V X7R-2 Passive      
+C31-2 100 nF 25 V X7R-2 Passive      
+C32-2 100 nF 25 V X7R-2 Passive      
+C60-2 100 nF 25 V X7R-2 Passive      
+C61-2 10 uF 10 V X5R-2 Passive      
+C62-2 100 nF 25 V X7R-2 Passive      
+C63-2 10 nF 16 V X7R-2 Passive      
+C65-2 100 nF 25 V X7R-2 Passive      
+C66-2 100 nF 25 V X7R-2 Passive      
+C67-2 10 uF 10 V X5R-2 Passive      
+C68-2 100 nF 25 V X7R-2 Passive      
+C69-2 10 pF 50 V C0G-2 Passive      
+C70-2 10 pF 50 V C0G-2 Passive      
+C71-2 100 nF 25 V X7R-2 Passive      
+C72-2 10 uF 10 V X5R-2 Passive      
+C73-2 100 nF 25 V X7R-2 Passive      
+C74-2 100 nF 25 V X7R-2 Passive      
+C75-2 10 uF 10 V X5R-2 Passive      
+C76-2 10 nF 25 V X7R-2 Passive      
+C77-2 4.7 nF 100 V X7R-2 Passive      
+C78-2 10 nF 25 V X7R-2 Passive      
+D4-2 5.5 V unidirectional 0.5 pF RF ESD-2 Passive      
+D5-2 5 V bidirectional 0.2 pF RF ESD-2 Passive      
+D6-2 5.5 V 0.5 pF ESD-2 Passive      
+D7-2 5.5 V 0.5 pF ESD-2 Passive      
+D8-2 5.5 V 0.5 pF ESD-2 Passive      
+D9-2 5.5 V 0.5 pF ESD-2 Passive      
+D11-2 5.5 V 0.5 pF ESD-2 Passive      
+FL1-B 1582.4 MHz wideband GNSS SAW-B Passive      
+FL1-D 1582.4 MHz wideband GNSS SAW-D Passive      
+FL1-E 1582.4 MHz wideband GNSS SAW-E Passive      
+J9-SHIELD U.FL-R-SMT-1(60)-SHELL Passive      
+J10-SHIELD U.FL-R-SMT-1(60)-SHELL Passive      
+J11-A1 USB4105-GF-A-120-GND Passive      
+J11-A12 USB4105-GF-A-120-GND Passive      
+J11-B1 USB4105-GF-A-120-GND Passive      
+J11-B12 USB4105-GF-A-120-GND Passive      
+J12-6 MEM2052-00-195-00-A-VSS Passive      
+J12-SHIELD MEM2052-00-195-00-A-SHELL Passive      
+J13-2 504050-0291-RETURN Passive      
+J_PWR-4 43045-1202-GND_DIGITAL Passive      
+Q4-1 Complementary N and P channel 20 V-1 Passive      
+R2-2 100 kOhm 1%-2 Passive      
+R3-2 100 kOhm 1%-2 Passive      
+R5-2 100 kOhm 1%-2 Passive      
+R23-2 100 kOhm 1%-2 Passive      
+R60-2 100 kOhm 5% 0.1 W-2 Passive      
+R63-2 100 kOhm 1%-2 Passive      
+R64-2 100 kOhm 1%-2 Passive      
+R65-2 100 kOhm 1%-2 Passive      
+R66-2 100 kOhm 1%-2 Passive      
+R77-2 100 kOhm 1%-2 Passive      
+R93-2 5.1 kOhm 1%-2 Passive      
+R94-2 5.1 kOhm 1%-2 Passive      
+R96-2 100 kOhm 1%-2 Passive      
+R97-2 1 MOhm 1%-2 Passive      
+R98-2 0 Ohm-2 Passive      
+TP_BLE_SWD-4 TEST_PADS-GND Passive      
+TP_EOL-1 TEST_PADS-GND Passive      
+TP_MCU_SWD-5 TEST_PADS-GND Passive      
+U1-10 STM32U585VIT6Q-VSS Passive      
+U1-19 STM32U585VIT6Q-VSSA Passive      
+U1-26 STM32U585VIT6Q-VSS Passive      
+U1-48 STM32U585VIT6Q-VSSSMPS Passive      
+U1-50 STM32U585VIT6Q-VSS Passive      
+U1-74 STM32U585VIT6Q-VSS Passive      
+U1-99 STM32U585VIT6Q-VSS Passive      
+U2-10 W25Q512JVFIQ-GND Passive      
+U3-3 LIS2DW12TR-SDO/SA0 Input        
+U3-6 LIS2DW12TR-GND Passive      
+U3-7 LIS2DW12TR-RES Input        
+U3-8 LIS2DW12TR-GND Passive      
+U4-4 STTS22HTR-Addr Input        
+U4-5 STTS22HTR-GND Passive      
+U5-5 Single rail-to-rail low-power op amp-5 Passive      
+U5-EP Single rail-to-rail low-power op amp-EP Passive      
+U6-3 Single non-inverting open-drain buffer-3 Passive      
+U7-11 SN74AXC8T245PWR-DIR2 Input        
+U7-12 SN74AXC8T245PWR-GND Passive      
+U7-13 SN74AXC8T245PWR-GND Passive      
+U7-14 SN74AXC8T245PWR-B8 Input        
+U7-15 SN74AXC8T245PWR-B7 Input        
+U7-22 SN74AXC8T245PWR-OE Input        
+U9-1 MAX-M10S-00B-GND Passive      
+U9-10 MAX-M10S-00B-GND Passive      
+U9-12 MAX-M10S-00B-GND Passive      
+U10-1 E22-900M22S-GND Passive      
+U10-2 E22-900M22S-GND Passive      
+U10-3 E22-900M22S-GND Passive      
+U10-4 E22-900M22S-GND Passive      
+U10-5 E22-900M22S-GND Passive      
+U10-10 E22-900M22S-GND Passive      
+U10-11 E22-900M22S-GND Passive      
+U10-12 E22-900M22S-GND Passive      
+U10-20 E22-900M22S-GND Passive      
+U10-22 E22-900M22S-GND Passive      
+U11-1 MDBT50Q-P1MV2-GND Passive      
+U11-2 MDBT50Q-P1MV2-GND Passive      
+U11-15 MDBT50Q-P1MV2-GND Passive      
+U11-33 MDBT50Q-P1MV2-GND Passive      
+U11-55 MDBT50Q-P1MV2-GND Passive      
+U12-6 SDCIT2/32GB-VSS Passive      
+U18-2 SN74AXC1T45DRLR-GND Passive      
+U23-3 4 channel 0.5 pF ESD-3 Passive      
+U23-8 4 channel 0.5 pF ESD-8 Passive      
+U24-3 4 channel 0.5 pF ESD-3 Passive      
+U24-8 4 channel 0.5 pF ESD-8 Passive      
+U25-3 2 channel 0.7 pF USB ESD-3 Passive      
+X1-1 32.768 kHz full-swing LVCMOS-1 Passive      
+X1-4 32.768 kHz full-swing LVCMOS-4 Passive      
+)
+(
+FAULT
+J_PWR-8 43045-1202-FAULT Passive      
+R103-1 0 Ohm-1 Passive      
+TP_EOL-8 TEST_PADS-FAULT Passive      
+)
+(
+EN_MODEM
+J_PWR-9 43045-1202-EN_MODEM Passive      
+U1-85 STM32U585VIT6Q-PD4 Passive      
+)
+(
+EN_AUX
+J_PWR-10 43045-1202-EN_AUX Passive      
+U1-86 STM32U585VIT6Q-PD5 Passive      
+)
+(
+CELL_USIM_VDD_1V8
+U8-43 BG95-M3-USIM_VDD Output       
+U13-4 TS3A27518EPWR-COM1 IO           
+U13-9 TS3A27518EPWR-COM4 IO           
+U13-12 TS3A27518EPWR-COM6 IO           
+)
+(
+CELL_USIM_RST_1V8
+U8-44 BG95-M3-USIM_RST Output       
+U13-6 TS3A27518EPWR-COM2 IO           
+)
+(
+CELL_USIM_DATA_1V8
+U8-45 BG95-M3-USIM_DATA IO           
+U13-10 TS3A27518EPWR-COM5 IO           
+)
+(
+CELL_USIM_CLK_1V8
+U8-46 BG95-M3-USIM_CLK Output       
+U13-7 TS3A27518EPWR-COM3 IO           
+)
+(
+CELL_USB_VBUS
+D10-1 5.5 V 0.5 pF ESD-1 Passive      
+TP_CELL_USB-1 TEST_PADS-HOST_VBUS Passive      
+U8-8 BG95-M3-USB_VBUS Input        
+)
+(
+CELL_USB_DP_U8
+R39-1 0 Ohm-1 Passive      
+U8-9 BG95-M3-USB_DP IO           
+)
+(
+CELL_USB_DP_TP
+R39-2 0 Ohm-2 Passive      
+TP_CELL_USB-2 TEST_PADS-USB_DP Passive      
+U26-1 2 channel 0.7 pF USB ESD-1 Passive      
+)
+(
+CELL_USB_DM_U8
+R40-1 0 Ohm-1 Passive      
+U8-10 BG95-M3-USB_DM IO           
+)
+(
+CELL_USB_DM_TP
+R40-2 0 Ohm-2 Passive      
+TP_CELL_USB-3 TEST_PADS-USB_DM Passive      
+U26-2 2 channel 0.7 pF USB ESD-2 Passive      
+)
+(
+CELL_USB_BOOT_TP
+R38-1 1 kOhm 1%-1 Passive      
+TP_CELL_DBG-4 TEST_PADS-USB_BOOT Passive      
+U27-5 4 channel 0.5 pF ESD-5 Passive      
+)
+(
+CELL_USB_BOOT_1V8
+R35-1 100 kOhm 1%-1 Passive      
+R38-2 1 kOhm 1%-2 Passive      
+U8-75 BG95-M3-USB_BOOT Input        
+)
+(
+CELL_TX_U16
+R28-2 10 kOhm 1%-2 Passive      
+U1-92 STM32U585VIT6Q-PB6 Passive      
+U16-17 SN74AXC8T245PWR-B5 Input        
+)
+(
+CELL_STATUS_U16
+R34-1 100 kOhm 1%-1 Passive      
+U1-60 STM32U585VIT6Q-PD13 Passive      
+U16-20 SN74AXC8T245PWR-B2 Output       
+)
+(
+CELL_RX_U16
+R32-2 100 kOhm 1%-2 Passive      
+U1-93 STM32U585VIT6Q-PB7 Passive      
+U16-21 SN74AXC8T245PWR-B1 Output       
+)
+(
+CELL_RI_U16
+R33-2 100 kOhm 1%-2 Passive      
+U1-62 STM32U585VIT6Q-PD15 Passive      
+U16-19 SN74AXC8T245PWR-B3 Output       
+)
+(
+CELL_RF_ANT
+C80-1 10 pF 50 V C0G-1 Passive      
+D3-1 5 V bidirectional 0.2 pF RF ESD-1 Passive      
+J8-1 U.FL-R-SMT-1(60)-SIGNAL IO           
+R43-2 0 Ohm-2 Passive      
+)
+(
+CELL_RF
+C79-1 10 pF 50 V C0G-1 Passive      
+R43-1 0 Ohm-1 Passive      
+U8-60 BG95-M3-ANT_MAIN IO           
+)
+(
+CELL_RESET_N_CMD
+R26-1 4.7 kOhm 1%-1 Passive      
+U1-59 STM32U585VIT6Q-PD12 Passive      
+)
+(
+CELL_PWRKEY_CMD
+R24-1 4.7 kOhm 1%-1 Passive      
+U1-58 STM32U585VIT6Q-PD11 Passive      
+)
+(
+CELL_DTR_U16
+R29-1 100 kOhm 1%-1 Passive      
+U1-61 STM32U585VIT6Q-PD14 Passive      
+U16-16 SN74AXC8T245PWR-B6 Input        
+)
+(
+CELL_DBG_VREF_TP
+R41-2 1 kOhm 1%-2 Passive      
+U27-4 4 channel 0.5 pF ESD-4 Passive      
+)
+(
+CELL_DBG_TXD_U8
+R36-1 22 Ohm 1%-1 Passive      
+U8-23 BG95-M3-DBG_TXD Output       
+)
+(
+CELL_DBG_TXD_TP
+R36-2 22 Ohm 1%-2 Passive      
+TP_CELL_DBG-2 TEST_PADS-DUT_TX Passive      
+U27-1 4 channel 0.5 pF ESD-1 Passive      
+)
+(
+CELL_DBG_RXD_U8
+R37-2 22 Ohm 1%-2 Passive      
+U8-22 BG95-M3-DBG_RXD Input        
+)
+(
+CELL_DBG_RXD_TP
+R37-1 22 Ohm 1%-1 Passive      
+TP_CELL_DBG-3 TEST_PADS-DUT_RX Passive      
+U27-2 4 channel 0.5 pF ESD-2 Passive      
+)
+(
+BOOT0
+R2-1 100 kOhm 1%-1 Passive      
+TP_EOL-9 TEST_PADS-BOOT0 Passive      
+U1-94 STM32U585VIT6Q-PH3-BOOT0 Passive      
+)
+(
+BLE_TX_U11
+R75-2 22 Ohm 1%-2 Passive      
+U11-24 MDBT50Q-P1MV2-P0.08 Input        
+)
+(
+BLE_TX_U1
+R75-1 22 Ohm 1%-1 Passive      
+U1-44 STM32U585VIT6Q-PB10 Passive      
+)
+(
+BLE_RX_U11
+R74-1 22 Ohm 1%-1 Passive      
+U11-22 MDBT50Q-P1MV2-P0.06 Output       
+)
+(
+BLE_RX_U1
+R74-2 22 Ohm 1%-2 Passive      
+U1-45 STM32U585VIT6Q-PB11 Passive      
+)
+(
+BLE_EN
+R77-1 100 kOhm 1%-1 Passive      
+U1-5 STM32U585VIT6Q-PE6 Passive      
+U6-2 Single non-inverting open-drain buffer-2 Passive      
+)
+(
+BLE_DFU_REQ
+R76-2 10 kOhm 1%-2 Passive      
+U1-34 STM32U585VIT6Q-PB2 Passive      
+U11-39 MDBT50Q-P1MV2-P0.15 Input        
+)
+(
+ACCEL_INT
+U1-63 STM32U585VIT6Q-PC6 Passive      
+U3-12 LIS2DW12TR-INT1 Output       
+)
+(
+AAD_CFG_1V8_U7
+R18-1 22 Ohm 1%-1 Passive      
+U7-8 SN74AXC8T245PWR-A6 Output       
+)
+(
+AAD_CFG_1V8_FANOUT
+J_MIC1-6 504050-0691-AAD_CFG Passive      
+J_MIC2-6 504050-0691-AAD_CFG Passive      
+J_MIC3-6 504050-0691-AAD_CFG Passive      
+J_MIC4-6 504050-0691-AAD_CFG Passive      
+R18-2 22 Ohm 1%-2 Passive      
+U19-5 4 channel 0.5 pF ESD-5 Passive      
+U20-5 4 channel 0.5 pF ESD-5 Passive      
+U21-5 4 channel 0.5 pF ESD-5 Passive      
+U22-5 4 channel 0.5 pF ESD-5 Passive      
+)
+(
+AAD_CFG
+U1-77 STM32U585VIT6Q-PA15 (JTDI) Passive      
+U7-16 SN74AXC8T245PWR-B6 Input        
+)
+(
+3V8_MODEM_RF
+C44-1 100 uF 6.3 V 15 mOhm polymer-1 Passive      
+C45-1 100 nF 25 V X7R-1 Passive      
+C46-1 33 pF 50 V C0G-1 Passive      
+C47-1 10 pF 50 V C0G-1 Passive      
+D2-1 5 V unidirectional 150 W TVS-1 Passive      
+R42-2 0 Ohm-2 Passive      
+U8-52 BG95-M3-VBAT_RF Passive      
+U8-53 BG95-M3-VBAT_RF Passive      
+)
+(
+3V8_MODEM_BB
+C36-1 100 uF 6.3 V 15 mOhm polymer-1 Passive      
+C37-1 220 nF 25 V X7R-1 Passive      
+C38-1 47 nF 25 V X7R-1 Passive      
+C39-1 150 pF 50 V C0G-1 Passive      
+C40-1 100 pF 50 V C0G-1 Passive      
+C41-1 68 pF 50 V C0G-1 Passive      
+C42-1 33 pF 50 V C0G-1 Passive      
+C43-1 10 pF 50 V C0G-1 Passive      
+D1-1 5 V unidirectional 150 W TVS-1 Passive      
+FB1-2 600 Ohm at 100 MHz-2 Passive      
+U8-32 BG95-M3-VBAT_BB Passive      
+U8-33 BG95-M3-VBAT_BB Passive      
+)
+(
+3V8_MODEM
+FB1-1 600 Ohm at 100 MHz-1 Passive      
+J_PWR-1 43045-1202-3V8_MODEM Passive      
+R42-1 0 Ohm-1 Passive      
+TP_EOL-3 TEST_PADS-VSENSE_3V8 Passive      
+)
+(
+3V3_DIGITAL
+C1-1 100 nF 25 V X7R-1 Passive      
+C2-1 100 nF 25 V X7R-1 Passive      
+C3-1 100 nF 25 V X7R-1 Passive      
+C4-1 100 nF 25 V X7R-1 Passive      
+C5-1 100 nF 25 V X7R-1 Passive      
+C6-1 10 uF 10 V X5R-1 Passive      
+C7-1 100 nF 25 V X7R-1 Passive      
+C8-1 100 nF 25 V X7R-1 Passive      
+C9-1 1 uF 16 V X5R-1 Passive      
+C12-1 100 nF 25 V X7R-1 Passive      
+C13-1 10 uF 10 V X5R-1 Passive      
+C19-1 22 uF 10 V X5R-1 Passive      
+C21-1 100 nF 25 V X7R-1 Passive      
+C22-1 1 uF 16 V X5R-1 Passive      
+C23-1 100 nF 25 V X7R-1 Passive      
+C24-1 10 uF 10 V X5R-1 Passive      
+C25-1 100 nF 25 V X7R-1 Passive      
+C26-1 100 nF 25 V X7R-1 Passive      
+C28-1 100 nF 25 V X7R-1 Passive      
+C29-1 100 nF 25 V X7R-1 Passive      
+C32-1 100 nF 25 V X7R-1 Passive      
+C34-1 100 nF 25 V X7R-1 Passive      
+C35-1 100 nF 25 V X7R-1 Passive      
+C49-1 100 nF 25 V X7R-1 Passive      
+C60-1 100 nF 25 V X7R-1 Passive      
+C61-1 10 uF 10 V X5R-1 Passive      
+C62-1 100 nF 25 V X7R-1 Passive      
+C66-1 100 nF 25 V X7R-1 Passive      
+C67-1 10 uF 10 V X5R-1 Passive      
+C71-1 100 nF 25 V X7R-1 Passive      
+C72-1 10 uF 10 V X5R-1 Passive      
+C73-1 100 nF 25 V X7R-1 Passive      
+C74-1 100 nF 25 V X7R-1 Passive      
+C75-1 10 uF 10 V X5R-1 Passive      
+D11-1 5.5 V 0.5 pF ESD-1 Passive      
+J12-4 MEM2052-00-195-00-A-VDD Passive      
+J_PWR-3 43045-1202-3V3_DIGITAL Passive      
+R1-1 10 kOhm 1%-1 Passive      
+R4-1 100 kOhm 1%-1 Passive      
+R6-1 100 kOhm 1%-1 Passive      
+R7-1 10 kOhm 1%-1 Passive      
+R13-1 2.2 kOhm 1%-1 Passive      
+R14-1 2.2 kOhm 1%-1 Passive      
+R28-1 10 kOhm 1%-1 Passive      
+R32-1 100 kOhm 1%-1 Passive      
+R33-1 100 kOhm 1%-1 Passive      
+R44-1 47 kOhm 1%-1 Passive      
+R48-1 10 kOhm 1%-1 Passive      
+R49-1 10 kOhm 1%-1 Passive      
+R67-1 10 kOhm 1%-1 Passive      
+R68-1 10 kOhm 1%-1 Passive      
+R76-1 10 kOhm 1%-1 Passive      
+R78-1 10 kOhm 1%-1 Passive      
+R85-1 10 kOhm 1%-1 Passive      
+R86-1 10 kOhm 1%-1 Passive      
+R87-1 10 kOhm 1%-1 Passive      
+R88-1 10 kOhm 1%-1 Passive      
+R89-1 10 kOhm 1%-1 Passive      
+R90-1 10 kOhm 1%-1 Passive      
+R99-1 10 kOhm 1%-1 Passive      
+TP_BLE_SWD-1 TEST_PADS-VTREF Passive      
+TP_EOL-2 TEST_PADS-VTREF_3V3 Passive      
+TP_MCU_SWD-1 TEST_PADS-VTREF Passive      
+U1-6 STM32U585VIT6Q-VBAT Passive      
+U1-11 STM32U585VIT6Q-VDD Passive      
+U1-20 STM32U585VIT6Q-VREF+ Passive      
+U1-21 STM32U585VIT6Q-VDDA Passive      
+U1-27 STM32U585VIT6Q-VDD Passive      
+U1-47 STM32U585VIT6Q-VDDSMPS Passive      
+U1-51 STM32U585VIT6Q-VDD Passive      
+U1-73 STM32U585VIT6Q-VDDUSB Passive      
+U1-75 STM32U585VIT6Q-VDD Passive      
+U1-100 STM32U585VIT6Q-VDD Passive      
+U2-2 W25Q512JVFIQ-VCC Passive      
+U2-3 W25Q512JVFIQ-/RESET Input        
+U3-2 LIS2DW12TR-CS Input        
+U3-9 LIS2DW12TR-VDD Passive      
+U3-10 LIS2DW12TR-VDD_IO Passive      
+U4-3 STTS22HTR-VDD Passive      
+U6-5 Single non-inverting open-drain buffer-5 Passive      
+U7-23 SN74AXC8T245PWR-VCCB Passive      
+U7-24 SN74AXC8T245PWR-VCCB Passive      
+U9-7 MAX-M10S-00B-V_IO Passive      
+U9-8 MAX-M10S-00B-VCC Passive      
+U10-9 E22-900M22S-VCC Passive      
+U11-28 MDBT50Q-P1MV2-VDD Passive      
+U11-30 MDBT50Q-P1MV2-VDDH Passive      
+U12-4 SDCIT2/32GB-VDD Passive      
+U13-8 TS3A27518EPWR-VCC Passive      
+U16-23 SN74AXC8T245PWR-VCCB Passive      
+U16-24 SN74AXC8T245PWR-VCCB Passive      
+U18-6 SN74AXC1T45DRLR-VCCB Passive      
+X1-3 32.768 kHz full-swing LVCMOS-3 Passive      
+)
+(
+1V8_MIC
+C20-1 10 uF 10 V X5R-1 Passive      
+C27-1 100 nF 25 V X7R-1 Passive      
+C30-1 100 nF 25 V X7R-1 Passive      
+C31-1 100 nF 25 V X7R-1 Passive      
+J_MIC1-1 504050-0691-1V8_MIC Passive      
+J_MIC2-1 504050-0691-1V8_MIC Passive      
+J_MIC3-1 504050-0691-1V8_MIC Passive      
+J_MIC4-1 504050-0691-1V8_MIC Passive      
+J_PWR-5 43045-1202-1V8_MIC Passive      
+TP_EOL-4 TEST_PADS-VSENSE_1V8 Passive      
+U7-1 SN74AXC8T245PWR-VCCA Passive      
+U7-2 SN74AXC8T245PWR-DIR1 Input        
+U17-14 SN74LVC32APWR-VCC Passive      
+U18-1 SN74AXC1T45DRLR-VCCA Passive      
+U18-5 SN74AXC1T45DRLR-DIR Input        
+)

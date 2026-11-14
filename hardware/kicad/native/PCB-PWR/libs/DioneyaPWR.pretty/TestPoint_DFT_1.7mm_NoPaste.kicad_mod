@@ -10,5 +10,5 @@
   (fp_circle (center 0 0) (end 1.15 0)
     (stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd"))
   (pad "1" smd circle (at 0 0) (size 1.70 1.70)
-    (layers "F.Cu" "F.Mask") (solder_mask_margin 0.20))
+    (layers "F.Cu" "F.Mask") (solder_mask_margin 0.10))
 )

@@ -1,0 +1,15 @@
+{
+  "PCB-MIC": {
+    "source_edge_count": 4,
+    "imported_edge_count": 4,
+    "matching_line_and_arc_geometry": 4,
+    "source_missing": 0,
+    "imported_extra": 0,
+    "coordinate_resolution_mm": 0.001,
+    "missing_examples": [],
+    "extra_examples": [],
+    "scope_limitations": [
+      "mechanical layers, holes, keepouts, and filled copper not checked"
+    ]
+  }
+}

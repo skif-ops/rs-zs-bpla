@@ -1,0 +1,16 @@
+{
+  "schema": "dioneya-evt-pre-20-altium-release-record-v1",
+  "date": "2026-10-16",
+  "release_status": "EVT_BUILD_RELEASED_CUSTOMER_CHECKOUT_REQUIRED",
+  "primary_archive": "EVT_PRE_20_ПРОИЗВОДСТВЕННЫЙ_КОМПЛЕКТ_20261016.zip",
+  "primary_sha256": "AC9497EBFED6E5BA314CF338B18B3FB500B043B087FD61B75CCEDF037A558AB9",
+  "kicad_reference_archive": "EVT_PRE_20_KICAD_ИСХОДНИКИ_АРХИВ_20261016.zip",
+  "kicad_reference_sha256": "A99F20112E3A4810F50AAFC452D51AE43454EACE3DE15198C7BA3871D9173B88",
+  "pcb_main_layers": 8,
+  "pcb_pwr_layers": 4,
+  "pcb_mic_layers": 2,
+  "altium_payload_validation": "PASS",
+  "customer_checkout_required": true,
+  "first_article_hold_required": true,
+  "serial_release": false
+}

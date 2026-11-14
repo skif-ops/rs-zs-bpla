@@ -1,0 +1,134 @@
+{
+  "schema": "dioneya-external-response-bundle-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "status": "SUPERSEDED_BY_EVT_ENGINEERING_BASELINE_EXTERNAL_REPLIES_NOT_REQUIRED",
+  "selected_station_quantity": 20,
+  "primary_procurement_track": "FULL_PCBA",
+  "bare_pcb_track": "ALTERNATIVE_QUOTATION_ONLY_DO_NOT_COMBINE_WITH_FULL_PCBA",
+  "commercial_procurement_owner": "CUSTOMER",
+  "commercial_quote_or_availability_required_by_engineering": false,
+  "job_specific_technical_manufacturing_responses_required": false,
+  "hardware_design_release": false,
+  "purchase_release": false,
+  "manufacturing_release": false,
+  "common_files": [
+    "manufacturing/EVT_PRE_20_EXTERNAL_RESPONSE_BUNDLE_REV_A.md",
+    "manufacturing/EVT_PRE_20_EXTERNAL_RESPONSE_BUNDLE_REV_A.json",
+    "manufacturing/EVT_LOT_SELECTION_REV_A.md",
+    "manufacturing/EVT_LOT_SELECTION_REV_A.csv",
+    "hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md",
+    "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
+    "hardware/EVT_PRE_20_BOM_POLICY_REV_A.md",
+    "hardware/CHINA_PROCUREMENT_RFQ.csv",
+    "hardware/reviews/FABRICATOR_PUBLIC_CAPABILITY_SCREEN_REV_A.md",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md",
+    "hardware/HARNESS_EVT_LENGTH_BASIS_REV_A.csv",
+    "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv"
+  ],
+  "groups": [
+    {
+      "id": "PCB-MAIN-FAB",
+      "recipient_role": "TWO_INDEPENDENT_PCB_FABRICATORS",
+      "response_register": "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv",
+      "files": [
+        "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md",
+        "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json",
+        "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv",
+        "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md",
+        "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json",
+        "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md",
+        "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",
+        "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
+        "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+        "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+      ]
+    },
+    {
+      "id": "PCB-MAIN-ASSEMBLER",
+      "recipient_role": "SELECTED_FULL_PCBA_ASSEMBLER_CANDIDATE",
+      "response_register": "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv",
+      "files": [
+        "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md",
+        "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json",
+        "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv",
+        "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+      ]
+    },
+    {
+      "id": "PCB-PWR-DIM003",
+      "recipient_role": "PROJECT_MECHANICAL_AND_ENCLOSURE_AUTHORITY",
+      "response_register": "hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv",
+      "files": [
+        "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md",
+        "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
+        "hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv",
+        "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md",
+        "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
+        "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+      ]
+    },
+    {
+      "id": "PCB-PWR-FAB",
+      "recipient_role": "TWO_INDEPENDENT_PCB_FABRICATORS",
+      "response_register": "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
+      "files": [
+        "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md",
+        "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json",
+        "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md",
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+        "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+        "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md",
+        "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
+        "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+      ]
+    },
+    {
+      "id": "PCB-MIC-DFM",
+      "recipient_role": "PCB_MIC_FABRICATOR_AND_ASSEMBLER",
+      "response_register": "hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv",
+      "files": [
+        "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
+        "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
+        "hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv",
+        "hardware/reviews/PCB_MIC_REVIEW_B_CHECKLIST_REV_A.md",
+        "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
+        "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch",
+        "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_dru",
+        "hardware/kicad/native/PCB-MIC/fabrication_metadata.json"
+      ]
+    },
+    {
+      "id": "HARNESS-SUPPLIER",
+      "recipient_role": "SELECTED_HARNESS_SUPPLIER_CANDIDATE",
+      "response_register": "hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv",
+      "files": [
+        "hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_REQUEST_REV_A.md",
+        "hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_REQUEST_REV_A.json",
+        "hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv",
+        "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md",
+        "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
+        "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+        "hardware/CONNECTOR_FREEZE_REV_A.csv"
+      ]
+    }
+  ],
+  "excluded_prefixes": [
+    "firmware/",
+    "server/",
+    "android/",
+    "artifacts/",
+    "logs/",
+    "outputs/"
+  ],
+  "release_rules": [
+    "This historical packet is superseded; no factory e-mail or signed response is required for EVT.",
+    "Customer order checkout must match the engineering baseline and have no unresolved parser or DFM error.",
+    "PCB-MAIN and PCB-PWR remain unrouted and require DRC, CAM and Review B before order upload.",
+    "Physical first-article and EVT tests remain mandatory.",
+    "Series transfer requires renewed supplier, tooling, DFM and process qualification."
+  ],
+  "engineering_baseline": "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+  "external_response_wait_gates_closed": true
+}

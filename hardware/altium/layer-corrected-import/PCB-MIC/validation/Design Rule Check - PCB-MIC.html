@@ -1,0 +1,617 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<style type="text/css">
+		h1, h2, h3, h4, h5, h6 {
+			font-family : segoe ui;
+			color : black;
+			background-color : #EDE7D9;
+			padding: 0.3em;
+		}
+
+		h1 {
+			font-size: 1.2em;
+		}		
+
+		h2 {
+			font-size: 1.2em;
+		}
+
+		body {
+			font-family : segoe ui;
+		}
+
+		td, th {
+			padding: 0.5em;
+			text-align : left;
+			width: 10em;
+		}
+		th {
+			background-color : #EEEEEE;
+
+		}
+		th.column1, td.column1 {
+			text-align: left;
+			width : auto;
+		}
+		table {
+			width : 100%;
+			font-size: 0.9em;
+		}
+
+		.DRC_summary_header {
+			padding-bottom : 0.1em;
+			border : 0px solid black;
+			width: 100%;
+			align: left;
+		}
+
+		.DRC_summary_header_col1,
+		.DRC_summary_header_col2, 
+		.DRC_summary_header_col3 {
+			color : black;
+			font-size:100%;
+			padding : 0em;
+			padding-top : 0.2em;
+			padding-bottom 0.2em;
+			border : 0px solid black;
+			vertical-align: top;
+			text-align: left;
+		}
+
+		.DRC_summary_header_col1 {
+			font-weight: bold;
+			width: 9em;
+		}
+
+		.DRC_summary_header_col2 {
+			width: 0.1em;
+		
+		}
+
+		.DRC_summary_header_col3 {
+			width : auto;
+		}
+
+		.header_holder {
+		    Width = 100%;
+		    border = 0px solid green;
+		    padding = 0;
+		}
+
+
+		.front_matter, .front_matter_column1, .front_matter_column2, .front_matter_column3
+		{
+			left : 0;
+			top : 0;
+			padding: 0em;
+			padding-top : 0.1em;
+			border : 0px solid black;
+			width : 100%;
+			vertical-align: top;
+			text-align: left;
+		}
+
+		.front_matter_column1 {
+			width : 8em;
+			font-weight: bold;
+		}
+
+		.front_matter_column2 {
+			width: 0.1em;
+		}
+
+		.front_matter_column3 {
+			width : auto;
+		}
+
+		.total_column1, .total_column {
+			font-weight : bold;
+		}
+		.total_column1 {
+			text-align : left;
+		}
+		.warning, .error {
+			color : red;
+			font-weight : bold;
+		}
+		tr.onmouseout_odd {
+			background-color : #white;
+		}
+		tr.onmouseout_even { 
+			background-color : #FAFAFA;
+		}
+		tr.onmouseover_odd, tr.onmouseover_even { 
+			background-color : #EEEEEE;
+		} 
+		a:link, a:visited, .q a:link,.q a:active,.q {
+			color: #21489e; 
+		}
+		a:link.callback, a:visited.callback { 
+			color: #21489e;
+		}
+		a:link.customize, a:visited.customize {
+			color: #C0C0C0;
+			position: absolute; 
+			right: 10px;
+		}	
+		p.contents_level1 {
+			font-weight : bold;
+			font-size : 110%;
+			margin : 0.5em;
+		}
+		p.contents_level2 {
+			position : relative;
+			left : 20px;
+			margin : 0.5em;
+		}
+	</style><script type="text/javascript">
+		function coordToMils(coord) {
+			var number = coord / 10000;
+			
+			if (number != number.toFixed(3))
+				number = number.toFixed(3);
+
+			return number + 'mil'
+		}
+
+		function coordToMM(coord) {
+			var number = 0.0254 * coord / 10000;
+			
+			if (number != number.toFixed(4))
+				number = number.toFixed(4);
+			
+			return number + 'mm'
+		}
+	
+		function convertCoord(coordNode, units) {
+			for (var i = 0; i < coordNode.childNodes.length; i++) {
+				coordNode.removeChild(coordNode.childNodes[i]);
+			}
+
+			var coord = coordNode.getAttribute('value');
+			if (coord != null) {
+				if (units == 'mm') {
+					textNode = document.createTextNode(coordToMM(coord));
+					coordNode.appendChild(textNode);
+				} else if (units == 'mil') {
+					textNode = document.createTextNode(coordToMils(coord));		
+					coordNode.appendChild(textNode);	
+				}
+			}
+		}
+	
+		function convertUnits(unitNode, units) {
+			for (var i = 0; i < unitNode.childNodes.length; i++) {
+				unitNode.removeChild(unitNode.childNodes[i]);		
+			}
+		
+			textNode = document.createTextNode(units); 
+			unitNode.appendChild(textNode);
+		}
+	
+		function changeUnits(radio_input, units) {
+			if (radio_input.checked) {
+			
+				var elements = document.getElementsByName('coordinate');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertCoord(elements[i], units);
+					}
+				}
+	
+				var elements = document.getElementsByName('units');
+				if (elements) {
+					for (var i = 0; i < elements.length; i++) {
+						convertUnits(elements[i], units);
+					}
+				}
+			}
+		}
+	</script><title>Design Rule Verification Report</title>
+</head>
+<body onload=""><img ALT="Altium" src="
+			file://C:\Users\Public\Documents\Altium\AD26\Templates\AD_logo.png
+		"><h1>Design Rule Verification Report</h1>
+<table class="header_holder">
+<td class="column1">
+<table class="front_matter">
+<tr class="front_matter">
+<td class="front_matter_column1">Date:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">14.10.2026</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Time:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">16:13:49</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Elapsed Time:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3">00:00:02</td>
+</tr>
+<tr class="front_matter">
+<td class="front_matter_column1">Filename:</td>
+<td class="front_matter_column2"></td>
+<td class="front_matter_column3"><a href="file:///F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc" class="file"><acronym title="F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc">F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc</acronym></a></td>
+</tr>
+</table>
+</td>
+<td class="column2">
+<table class="DRC_summary_header">
+<tr>
+<td class="DRC_summary_header_col1">Warnings:</td>
+<td class="DRC_summary_header_col2"></td>
+<td class="DRC_summary_header_col3">0</td></tr>
+<tr>
+<td class="DRC_summary_header_col1">Rule Violations:</td>
+<td class="DRC_summary_header_col2"></td>
+<td class="DRC_summary_header_col3" style="color : red">66</td></tr>
+<tr>
+<td class="DRC_summary_header_col1">PCB Health Issues:</td>
+<td class="DRC_summary_header_col2"></td>
+<td class="DRC_summary_header_col3" style="color : red">2</td></tr>
+</table>
+</td>
+</table><a name="IDJXWQH0PYAKV1PLD3BCOXUGCOMEQ05VUS4AY3X1E2GGP1PJT14DXD"><h2>Summary</h2></a><table>
+<tr>
+<th class="column1">Warnings</th>
+<th class="column2">Count</th>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">0</td>
+</tr>
+</table><br><table>
+<tr>
+<th class="column1">Rule Violations</th>
+<th class="column2">Count</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDIIWCRNEW3I0XPEM5HYS5UFE2OQNURE5W1MXDPIYDPR1P4CDR1BC">Clearance Constraint (Gap=0.2mm) (InNetClass('Default')),(All)</a></td>
+<td class="column2">34</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDMWXLFU5CYEPLBEQP1JD2IIF1XCU41JCIIZBPIXIYDBUKD2SE5I5I">Short-Circuit Constraint (Allowed=No) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDRZ2XYSUOWZ3JNZH4ML5FHWGWKDFPQ0AQXVL3VYNOM0QD5I4IUCZE">Un-Routed Net Constraint ( (All) )</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDFXJRBIGVNGKTEXHGEAACZYEDUOAJS2JPSDAODVDEJ512BUIY3SCO">Modified Polygon (Allow modified: No), (Allow shelved: No)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDWYA43X0WM5LXDQXNL3F0VZTKCCLSAPRCPYBJXDBCUUPN2BLYMZDP">Width Constraint (Min=0.254mm) (Max=10mm) (Preferred=0.2mm) (All)</a></td>
+<td class="column2">13</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDQM5XKS01BNASLNWVFT1U5Q3T4JX0SJZYKGKHQDOZSNZAXVFNQZ1E">Routing Topology Rule(Topology=Shortest) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDKPG0X5PGJ1U1N3P3VIY42FQKOPEYGM3UMMSVFEFGOVHYIK3WVFPG">Routing Layers(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#ID3KMSZZ2IMRMCIJJENHSNW5DMXMU3IJPPL0LXXMEQGOXDTYUPXLOC">Routing Via (MinHoleWidth=0.711mm) (MaxHoleWidth=0.711mm) (PreferredHoleWidth=0.711mm) (MinWidth=1.27mm) (MaxWidth=1.27mm) (PreferedWidth=1.27mm) (All)</a></td>
+<td class="column2">5</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDRHCDMDKBFKWZMYOY02TDFEMOCGU5MVMSSCHXX1J0KW5EPUS3LADC">Differential Pairs Uncoupled Length using the Gap Constraints (Min=0.254mm) (Max=0.254mm) (Prefered=0.254mm)  and Width Constraints (Min=0.381mm) (Max=0.381mm) (Prefered=0.381mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#ID0IFTBP31O1CROYZ1G3O0UC5ANFQ3FFJU22EPIPJC3PQ3L31AYXPD">Power Plane Connect Rule(Relief Connect )(Expansion=0.508mm) (Conductor Width=0.254mm) (Air Gap=0.254mm) (Entries=4) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#ID331E3LEACDFFPM01ANJ4IFO3KDMFPLIAWDLYJ2LNRAGYVZUBKE0O">Fabrication Testpoint Style (Under Component=Yes) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDJVMNM4RSCIDKG0ZUKPVK3PIBQIGFP1I0WBGC1XP1NX2H0FUJLALH">Fabrication Testpoint Usage (Valid =One Required, Allow multiple per net=No) (All)</a></td>
+<td class="column2">7</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDDDB0VMNVZ3GTN4G2P3USKBHELHYZGJRZ3F2JOUIOPSVTM5LMJCIG">Assembly Testpoint Style (Under Component=Yes) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDPB0S0EZYUOSDGDPRQLXUAH0FYDAVIG2F4Z45VIKFPNQRHGD4RSKM">Assembly Testpoint Usage (Valid =One Required, Allow multiple per net=No) (All)</a></td>
+<td class="column2">7</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDRZZNQZ4EY0RSJKR0BTXMNWJDTOPAHTM2IQQRLLB2T1LBP4HNTORB">Hole Size Constraint (Min=0.025mm) (Max=2.54mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#ID41SKETNY5NCHHXGJF40R0PHLAORDC3AOSDZKN0D0WGCLTNAUXJN">Pads and Vias to follow the Drill pairs settings</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#ID4Y3USTF0DEGUFWBLWHIS0JDZOHCUIMNWABPRNKUWZW4R3S31NEN">Hole To Hole Clearance (Gap=0.254mm) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDJOM3GNQLDZMFM3NJKIRM1JHRXIJ1GTHDS4YRGADVZBYFIN5OYAIP">Minimum Solder Mask Sliver (Gap=0mm) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#ID1MXBYZTXXLM2DHUSPQOGZNLNXOXHCIXCWYOEJBGD5ZMTS1YAK34M">Silk To Solder Mask (Clearance=0mm) (IsPad),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDWCO52LRK0JZ0L1EVTBWOIDZSWDK4AP3BDBOCAPFY3QCSB4OGN">Silk to Silk (Clearance=0mm) (All),(All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDCWYQSHDCIO3LKOSK1QNFMVFDBGWT0YMIFXVXQQCH42PJ3WKN0MZG">Net Antennae (Tolerance=0mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDCNZNV5PKTBJVBC3NDGL24TOU2K0FOFYKM3N32KKZEOOVZRJA10JG">Component Clearance Constraint ( Horizontal Gap = 0.254mm, Vertical Gap = 0.254mm ) (All),(All) </a></td>
+<td class="column2">0</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#IDJ5NCQFRRIPMXF2EJRKIHVUCTYHRJEVUFRZPYNFMOBUXU4XZM21AL">Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (All)</a></td>
+<td class="column2">0</td>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">66</td>
+</tr>
+</table><br><table>
+<tr>
+<th class="column1">PCB Health Issues</th>
+<th class="column2">Count</th>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="#IDOMADURSCQUVVETNJU1FUPQMQDBPKAMWXSQREJ2J3QL1P0PDODTJC">Invalid PCB Design Rules</a></td>
+<td class="column2">1</td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="#ID5DZ3VSEXPVZ1JU2R3POHKNBBGBK3YON5FSY4ZKDQNYESFTME1QGO">Micro-Segments (Board)</a></td>
+<td class="column2">1</td>
+</tr>
+<tr>
+<td style="font-weight : bold; text-align : right" class="column1">Total</td>
+<td style="font-weight : bold" class="column2">2</td>
+</tr>
+</table><br><a name="IDR25F4WOC50AJO32TQL4PC5CJWDIW3AJ3G5C15JG3UW3Q0OCV3GQB"><h2>Rule Violations</h2></a><a name="IDIIWCRNEW3I0XPEM5HYS5UFE2OQNURE5W1MXDPIYDPR1P4CDR1BC"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Clearance Constraint (Gap=0.2mm) (InNetClass('Default')),(All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=449.916mil|Location2.X=459.04mil|Location1.Y=206.068mil|Location2.Y=215.192mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=449.916mil|Location2.X=459.04mil|Location1.Y=206.068mil|Location2.Y=215.192mil|Absolute=True">Clearance Constraint: (0.113mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.337mm,5.35mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=450.512mil|Location2.X=459.636mil|Location1.Y=202.972mil|Location2.Y=212.096mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=450.512mil|Location2.X=459.636mil|Location1.Y=202.972mil|Location2.Y=212.096mil|Absolute=True">Clearance Constraint: (0.096mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.35mm,5.221mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=450.512mil|Location2.X=459.636mil|Location1.Y=209.163mil|Location2.Y=218.287mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=450.512mil|Location2.X=459.636mil|Location1.Y=209.163mil|Location2.Y=218.287mil|Absolute=True">Clearance Constraint: (0.096mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.35mm,5.479mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=452.198mil|Location2.X=461.322mil|Location1.Y=197.082mil|Location2.Y=206.619mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=452.198mil|Location2.X=461.322mil|Location1.Y=197.082mil|Location2.Y=206.619mil|Absolute=True">Clearance Constraint: (0.108mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.388mm,5.096mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=452.198mil|Location2.X=461.322mil|Location1.Y=214.641mil|Location2.Y=224.226mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=452.198mil|Location2.X=461.322mil|Location1.Y=214.641mil|Location2.Y=224.226mil|Absolute=True">Clearance Constraint: (0.108mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.388mm,5.604mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.757mil|Location2.X=463.881mil|Location1.Y=192.77mil|Location2.Y=201.894mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.757mil|Location2.X=463.881mil|Location1.Y=192.77mil|Location2.Y=201.894mil|Absolute=True">Clearance Constraint: (0.149mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.449mm,4.982mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.757mil|Location2.X=463.881mil|Location1.Y=219.366mil|Location2.Y=228.49mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.757mil|Location2.X=463.881mil|Location1.Y=219.366mil|Location2.Y=228.49mil|Absolute=True">Clearance Constraint: (0.149mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.449mm,5.718mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.103mil|Location2.X=463.227mil|Location1.Y=192.292mil|Location2.Y=201.416mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.103mil|Location2.X=463.227mil|Location1.Y=192.292mil|Location2.Y=201.416mil|Absolute=True">Clearance Constraint: (0.19mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.532mm,4.882mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.103mil|Location2.X=463.227mil|Location1.Y=219.843mil|Location2.Y=228.967mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.103mil|Location2.X=463.227mil|Location1.Y=219.843mil|Location2.Y=228.967mil|Absolute=True">Clearance Constraint: (0.19mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.532mm,5.818mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.581mil|Location2.X=463.705mil|Location1.Y=192.946mil|Location2.Y=202.07mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.581mil|Location2.X=463.705mil|Location1.Y=192.946mil|Location2.Y=202.07mil|Absolute=True">Clearance Constraint: (0.149mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.632mm,4.799mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.581mil|Location2.X=463.705mil|Location1.Y=219.19mil|Location2.Y=228.314mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=454.581mil|Location2.X=463.705mil|Location1.Y=219.19mil|Location2.Y=228.314mil|Absolute=True">Clearance Constraint: (0.149mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.632mm,5.901mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=459.306mil|Location2.X=468.89mil|Location1.Y=190.387mil|Location2.Y=199.511mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=459.306mil|Location2.X=468.89mil|Location1.Y=190.387mil|Location2.Y=199.511mil|Absolute=True">Clearance Constraint: (0.108mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.746mm,4.738mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=459.306mil|Location2.X=468.842mil|Location1.Y=221.749mil|Location2.Y=230.873mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=459.306mil|Location2.X=468.842mil|Location1.Y=221.749mil|Location2.Y=230.873mil|Absolute=True">Clearance Constraint: (0.108mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.746mm,5.962mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=464.783mil|Location2.X=473.907mil|Location1.Y=188.701mil|Location2.Y=197.825mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=464.783mil|Location2.X=473.907mil|Location1.Y=188.701mil|Location2.Y=197.825mil|Absolute=True">Clearance Constraint: (0.096mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.871mm,4.7mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=464.783mil|Location2.X=473.907mil|Location1.Y=223.435mil|Location2.Y=232.559mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=464.783mil|Location2.X=473.907mil|Location1.Y=223.435mil|Location2.Y=232.559mil|Absolute=True">Clearance Constraint: (0.096mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(11.871mm,6mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=470.974mil|Location2.X=480.099mil|Location1.Y=188.701mil|Location2.Y=197.825mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=470.974mil|Location2.X=480.099mil|Location1.Y=188.701mil|Location2.Y=197.825mil|Absolute=True">Clearance Constraint: (0.096mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.129mm,4.7mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=470.974mil|Location2.X=480.099mil|Location1.Y=223.435mil|Location2.Y=232.559mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=470.974mil|Location2.X=480.099mil|Location1.Y=223.435mil|Location2.Y=232.559mil|Absolute=True">Clearance Constraint: (0.096mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.129mm,6mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=476.452mil|Location2.X=485.989mil|Location1.Y=190.387mil|Location2.Y=199.511mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=476.452mil|Location2.X=485.989mil|Location1.Y=190.387mil|Location2.Y=199.511mil|Absolute=True">Clearance Constraint: (0.108mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.254mm,4.738mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=476.452mil|Location2.X=486.037mil|Location1.Y=221.749mil|Location2.Y=230.873mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=476.452mil|Location2.X=486.037mil|Location1.Y=221.749mil|Location2.Y=230.873mil|Absolute=True">Clearance Constraint: (0.108mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.254mm,5.962mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.177mil|Location2.X=490.301mil|Location1.Y=192.946mil|Location2.Y=202.07mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.177mil|Location2.X=490.301mil|Location1.Y=192.946mil|Location2.Y=202.07mil|Absolute=True">Clearance Constraint: (0.149mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.368mm,4.799mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.177mil|Location2.X=490.301mil|Location1.Y=219.19mil|Location2.Y=228.314mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.177mil|Location2.X=490.301mil|Location1.Y=219.19mil|Location2.Y=228.314mil|Absolute=True">Clearance Constraint: (0.149mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.368mm,5.901mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.654mil|Location2.X=490.778mil|Location1.Y=192.292mil|Location2.Y=201.416mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.654mil|Location2.X=490.778mil|Location1.Y=192.292mil|Location2.Y=201.416mil|Absolute=True">Clearance Constraint: (0.19mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.468mm,4.882mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.654mil|Location2.X=490.778mil|Location1.Y=219.843mil|Location2.Y=228.967mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.654mil|Location2.X=490.778mil|Location1.Y=219.843mil|Location2.Y=228.967mil|Absolute=True">Clearance Constraint: (0.19mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.468mm,5.818mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.001mil|Location2.X=490.125mil|Location1.Y=192.77mil|Location2.Y=201.894mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.001mil|Location2.X=490.125mil|Location1.Y=192.77mil|Location2.Y=201.894mil|Absolute=True">Clearance Constraint: (0.149mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.551mm,4.982mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.001mil|Location2.X=490.125mil|Location1.Y=219.366mil|Location2.Y=228.49mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=481.001mil|Location2.X=490.125mil|Location1.Y=219.366mil|Location2.Y=228.49mil|Absolute=True">Clearance Constraint: (0.149mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.551mm,5.718mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=483.56mil|Location2.X=492.684mil|Location1.Y=197.495mil|Location2.Y=207.079mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=483.56mil|Location2.X=492.684mil|Location1.Y=197.495mil|Location2.Y=207.079mil|Absolute=True">Clearance Constraint: (0.108mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.612mm,5.096mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=483.56mil|Location2.X=492.684mil|Location1.Y=214.228mil|Location2.Y=223.765mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=483.56mil|Location2.X=492.684mil|Location1.Y=214.228mil|Location2.Y=223.765mil|Absolute=True">Clearance Constraint: (0.108mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.612mm,5.604mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=485.246mil|Location2.X=494.37mil|Location1.Y=202.972mil|Location2.Y=212.096mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=485.246mil|Location2.X=494.37mil|Location1.Y=202.972mil|Location2.Y=212.096mil|Absolute=True">Clearance Constraint: (0.096mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.65mm,5.221mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=485.246mil|Location2.X=494.37mil|Location1.Y=209.163mil|Location2.Y=218.287mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=485.246mil|Location2.X=494.37mil|Location1.Y=209.163mil|Location2.Y=218.287mil|Absolute=True">Clearance Constraint: (0.096mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.65mm,5.479mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=485.841mil|Location2.X=494.966mil|Location1.Y=206.068mil|Location2.Y=215.192mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=485.841mil|Location2.X=494.966mil|Location1.Y=206.068mil|Location2.Y=215.192mil|Absolute=True">Clearance Constraint: (0.112mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12.662mm,5.35mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=467.879mil|Location2.X=477.003mil|Location1.Y=188.105mil|Location2.Y=197.229mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=467.879mil|Location2.X=477.003mil|Location1.Y=188.105mil|Location2.Y=197.229mil|Absolute=True">Clearance Constraint: (0.113mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12mm,4.687mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=467.879mil|Location2.X=477.003mil|Location1.Y=224.03mil|Location2.Y=233.155mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=467.879mil|Location2.X=477.003mil|Location1.Y=224.03mil|Location2.Y=233.155mil|Absolute=True">Clearance Constraint: (0.112mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Pad MK1-3(12mm,6.013mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=459.156mil|Location2.X=468.845mil|Location1.Y=223.513mil|Location2.Y=232.637mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=459.156mil|Location2.X=468.845mil|Location1.Y=223.513mil|Location2.Y=232.637mil|Absolute=True">Clearance Constraint: (0.191mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Track (11.37mm,6.6mm)(11.7mm,5.95mm) on F.Cu </acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=486.58mil|Location2.X=495.704mil|Location1.Y=206.068mil|Location2.Y=215.192mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=486.58mil|Location2.X=495.704mil|Location1.Y=206.068mil|Location2.Y=215.192mil|Absolute=True">Clearance Constraint: (0.15mm &lt; 0.2mm) Between Hole of Pad MK1-Un1(12mm,5.35mm) on Multi-Layer And Track (12.7mm,5.35mm)(15mm,5.35mm) on F.Cu </acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDWYA43X0WM5LXDQXNL3F0VZTKCCLSAPRCPYBJXDBCUUPN2BLYMZDP"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Width Constraint (Min=0.254mm) (Max=10mm) (Preferred=0.2mm) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=435.253mil|Location2.X=450.463mil|Location1.Y=513.264mil|Location2.Y=527.835mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=435.253mil|Location2.X=450.463mil|Location1.Y=513.264mil|Location2.Y=527.835mil|Absolute=True">Width Constraint: Track (11.25mm,11.96mm)(11.25mm,14.41mm) on F.Cu Actual Width = 0.22mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=435.253mil|Location2.X=450.463mil|Location1.Y=377.831mil|Location2.Y=392.401mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=435.253mil|Location2.X=450.463mil|Location1.Y=377.831mil|Location2.Y=392.401mil|Absolute=True">Width Constraint: Track (11.25mm,8.55mm)(11.25mm,10.94mm) on F.Cu Actual Width = 0.22mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=438.529mil|Location2.X=453.739mil|Location1.Y=305.678mil|Location2.Y=320.201mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=438.529mil|Location2.X=453.739mil|Location1.Y=305.678mil|Location2.Y=320.201mil|Absolute=True">Width Constraint: Track (11.25mm,8.55mm)(11.37mm,7.42mm) on F.Cu Actual Width = 0.22mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=449.484mil|Location2.X=463.737mil|Location1.Y=240.223mil|Location2.Y=251.697mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=449.484mil|Location2.X=463.737mil|Location1.Y=240.223mil|Location2.Y=251.697mil|Absolute=True">Width Constraint: Track (11.37mm,6.6mm)(11.7mm,5.95mm) on F.Cu Actual Width = 0.16mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=581.374mil|Location2.X=602.415mil|Location1.Y=254.012mil|Location2.Y=265.673mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=581.374mil|Location2.X=602.415mil|Location1.Y=254.012mil|Location2.Y=265.673mil|Absolute=True">Width Constraint: Track (12.63mm,6.6mm)(17.2mm,6.6mm) on F.Cu Actual Width = 0.22mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=520.744mil|Location2.X=539.266mil|Location1.Y=532.778mil|Location2.Y=545.398mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=520.744mil|Location2.X=539.266mil|Location1.Y=532.778mil|Location2.Y=545.398mil|Absolute=True">Width Constraint: Track (12.75mm,14.41mm)(14mm,13mm) on F.Cu Actual Width = 0.22mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=507.592mil|Location2.X=521.442mil|Location1.Y=119.169mil|Location2.Y=132.556mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=507.592mil|Location2.X=521.442mil|Location1.Y=119.169mil|Location2.Y=132.556mil|Absolute=True">Width Constraint: Track (13.07mm,1.75mm)(13.07mm,4.58mm) on F.Cu Actual Width = 0.2mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=608.343mil|Location2.X=629.383mil|Location1.Y=505.98mil|Location2.Y=517.642mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=608.343mil|Location2.X=629.383mil|Location1.Y=505.98mil|Location2.Y=517.642mil|Absolute=True">Width Constraint: Track (14mm,13mm)(17.2mm,13mm) on F.Cu Actual Width = 0.22mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=669.505mil|Location2.X=684.715mil|Location1.Y=379.996mil|Location2.Y=394.567mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=669.505mil|Location2.X=684.715mil|Location1.Y=379.996mil|Location2.Y=394.567mil|Absolute=True">Width Constraint: Track (17.2mm,6.6mm)(17.2mm,13mm) on F.Cu Actual Width = 0.22mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=414.248mil|Location2.X=433.535mil|Location1.Y=63.461mil|Location2.Y=74.335mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=414.248mil|Location2.X=433.535mil|Location1.Y=63.461mil|Location2.Y=74.335mil|Absolute=True">Width Constraint: Track (8.25mm,1.75mm)(13.07mm,1.75mm) on F.Cu Actual Width = 0.2mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=317.828mil|Location2.X=331.678mil|Location1.Y=312.673mil|Location2.Y=326.06mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=317.828mil|Location2.X=331.678mil|Location1.Y=312.673mil|Location2.Y=326.06mil|Absolute=True">Width Constraint: Track (8.25mm,1.75mm)(8.25mm,14.41mm) on F.Cu Actual Width = 0.2mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=401.65mil|Location2.X=420.937mil|Location1.Y=174.878mil|Location2.Y=185.752mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=401.65mil|Location2.X=420.937mil|Location1.Y=174.878mil|Location2.Y=185.752mil|Absolute=True">Width Constraint: Track (9.75mm,4.58mm)(10.93mm,4.58mm) on F.Cu Actual Width = 0.2mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=376.883mil|Location2.X=390.733mil|Location1.Y=368.382mil|Location2.Y=381.769mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=376.883mil|Location2.X=390.733mil|Location1.Y=368.382mil|Location2.Y=381.769mil|Absolute=True">Width Constraint: Track (9.75mm,4.58mm)(9.75mm,14.41mm) on F.Cu Actual Width = 0.2mm, Target Width = 0.254mm</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="ID3KMSZZ2IMRMCIJJENHSNW5DMXMU3IJPPL0LXXMEQGOXDTYUPXLOC"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Routing Via (MinHoleWidth=0.711mm) (MaxHoleWidth=0.711mm) (PreferredHoleWidth=0.711mm) (MinWidth=1.27mm) (MaxWidth=1.27mm) (PreferedWidth=1.27mm) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=508.295mil|Location2.X=542.886mil|Location1.Y=370.5mil|Location2.Y=405.091mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=508.295mil|Location2.X=542.886mil|Location1.Y=370.5mil|Location2.Y=405.091mil|Absolute=True">Routing Via Style: Via (13.35mm,9.85mm) from F.Cu to B.Cu Actual Size : 0.65mm Actual Hole Size : 0.3mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=553.571mil|Location2.X=588.161mil|Location1.Y=585.067mil|Location2.Y=619.658mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=553.571mil|Location2.X=588.161mil|Location1.Y=585.067mil|Location2.Y=619.658mil|Absolute=True">Routing Via Style: Via (14.5mm,15.3mm) from F.Cu to B.Cu Actual Size : 0.65mm Actual Hole Size : 0.3mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=583.098mil|Location2.X=617.689mil|Location1.Y=327.193mil|Location2.Y=361.784mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=583.098mil|Location2.X=617.689mil|Location1.Y=327.193mil|Location2.Y=361.784mil|Absolute=True">Routing Via Style: Via (15.25mm,8.75mm) from F.Cu to B.Cu Actual Size : 0.65mm Actual Hole Size : 0.3mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=573.256mil|Location2.X=607.846mil|Location1.Y=193.335mil|Location2.Y=227.925mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=573.256mil|Location2.X=607.846mil|Location1.Y=193.335mil|Location2.Y=227.925mil|Absolute=True">Routing Via Style: Via (15mm,5.35mm) from F.Cu to B.Cu Actual Size : 0.65mm Actual Hole Size : 0.3mm</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=714.988mil|Location2.X=749.579mil|Location1.Y=545.697mil|Location2.Y=580.287mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=714.988mil|Location2.X=749.579mil|Location1.Y=545.697mil|Location2.Y=580.287mil|Absolute=True">Routing Via Style: Via (18.6mm,14.3mm) from F.Cu to B.Cu Actual Size : 0.65mm Actual Hole Size : 0.3mm</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDJVMNM4RSCIDKG0ZUKPVK3PIBQIGFP1I0WBGC1XP1NX2H0FUJLALH"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Fabrication Testpoint Usage (Valid =One Required, Allow multiple per net=No) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=455.045mil|Location2.X=803.203mil|Location1.Y=260.35mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=455.045mil|Location2.X=803.203mil|Location1.Y=260.35mil|Location2.Y=608.508mil|Absolute=True">Fabrication Testpoint Usage: Net 1V8_MIC - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=144.209mil|Location2.X=689.256mil|Location1.Y=63.461mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=144.209mil|Location2.X=689.256mil|Location1.Y=63.461mil|Location2.Y=608.508mil|Absolute=True">Fabrication Testpoint Usage: Net AAD_CFG - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=241.61mil|Location2.X=736.067mil|Location1.Y=142.201mil|Location2.Y=636.657mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=241.61mil|Location2.X=736.067mil|Location1.Y=142.201mil|Location2.Y=636.657mil|Absolute=True">Fabrication Testpoint Usage: Net GND - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=176.335mil|Location2.X=631.933mil|Location1.Y=152.909mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=176.335mil|Location2.X=631.933mil|Location1.Y=152.909mil|Location2.Y=608.508mil|Absolute=True">Fabrication Testpoint Usage: Net MIC_WAKE - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=382.014mil|Location2.X=762.455mil|Location1.Y=228.067mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=382.014mil|Location2.X=762.455mil|Location1.Y=228.067mil|Location2.Y=608.508mil|Absolute=True">Fabrication Testpoint Usage: Net PDM_CLK - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=358.028mil|Location2.X=527.799mil|Location1.Y=438.736mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=358.028mil|Location2.X=527.799mil|Location1.Y=438.736mil|Location2.Y=608.508mil|Absolute=True">Fabrication Testpoint Usage: Net PDM_DATA - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=344.868mil|Location2.X=547.356mil|Location1.Y=260.35mil|Location2.Y=462.839mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=344.868mil|Location2.X=547.356mil|Location1.Y=260.35mil|Location2.Y=462.839mil|Absolute=True">Fabrication Testpoint Usage: Net PDM_DATA_MIC - Missing required testpoint</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="IDPB0S0EZYUOSDGDPRQLXUAH0FYDAVIG2F4Z45VIKFPNQRHGD4RSKM"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="rule">Assembly Testpoint Usage (Valid =One Required, Allow multiple per net=No) (All)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=455.045mil|Location2.X=803.203mil|Location1.Y=260.35mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=455.045mil|Location2.X=803.203mil|Location1.Y=260.35mil|Location2.Y=608.508mil|Absolute=True">Assembly Testpoint Usage: Net 1V8_MIC - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=144.209mil|Location2.X=689.256mil|Location1.Y=63.461mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=144.209mil|Location2.X=689.256mil|Location1.Y=63.461mil|Location2.Y=608.508mil|Absolute=True">Assembly Testpoint Usage: Net AAD_CFG - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=241.61mil|Location2.X=736.067mil|Location1.Y=142.201mil|Location2.Y=636.657mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=241.61mil|Location2.X=736.067mil|Location1.Y=142.201mil|Location2.Y=636.657mil|Absolute=True">Assembly Testpoint Usage: Net GND - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=176.335mil|Location2.X=631.933mil|Location1.Y=152.909mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=176.335mil|Location2.X=631.933mil|Location1.Y=152.909mil|Location2.Y=608.508mil|Absolute=True">Assembly Testpoint Usage: Net MIC_WAKE - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=382.014mil|Location2.X=762.455mil|Location1.Y=228.067mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=382.014mil|Location2.X=762.455mil|Location1.Y=228.067mil|Location2.Y=608.508mil|Absolute=True">Assembly Testpoint Usage: Net PDM_CLK - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_even" onmouseover="className = 'onmouseover_even'" onmouseout="className = 'onmouseout_even'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=358.028mil|Location2.X=527.799mil|Location1.Y=438.736mil|Location2.Y=608.508mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=358.028mil|Location2.X=527.799mil|Location1.Y=438.736mil|Location2.Y=608.508mil|Absolute=True">Assembly Testpoint Usage: Net PDM_DATA - Missing required testpoint</acronym></a><br></td>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=344.868mil|Location2.X=547.356mil|Location1.Y=260.35mil|Location2.Y=462.839mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=344.868mil|Location2.X=547.356mil|Location1.Y=260.35mil|Location2.Y=462.839mil|Absolute=True">Assembly Testpoint Usage: Net PDM_DATA_MIC - Missing required testpoint</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="ID2YLAU3GKPGXODSVCKJKHGRFPP43HBR55E1WVTJ1SVOGQNQ2DIOO"><h2>PCB Health Issues</h2></a><a name="IDOMADURSCQUVVETNJU1FUPQMQDBPKAMWXSQREJ2J3QL1P0PDODTJC"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="health">Invalid PCB Design Rules</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=99999mil|Location2.X=-99999mil|Location1.Y=99999mil|Location2.Y=-99999mil|Absolute=True" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=99999mil|Location2.X=-99999mil|Location1.Y=99999mil|Location2.Y=-99999mil|Absolute=True">Invalid PCB Design Rules: Width</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br><a name="ID5DZ3VSEXPVZ1JU2R3POHKNBBGBK3YON5FSY4ZKDQNYESFTME1QGO"><table>
+<tr>
+<th style="text-align : left" colspan="1" class="health">Micro-Segments (Board)</th>
+</tr>
+<tr class="onmouseout_odd" onmouseover="className = 'onmouseover_odd'" onmouseout="className = 'onmouseout_odd'">
+<td class="column1"><a href="dxpprocess://PCB:Zoom?document=F:\%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%8B\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mm|Location2.X=0mm|Location1.Y=0mm|Location2.Y=0mm" class="callback"><acronym title="dxpprocess://PCB:Zoom?document=F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\layer-corrected-import\PCB-MIC\PCB-MIC.PcbDoc;viewname=PCBEditor;Action=AREA_DYNAMICZOOM|Location1.X=0mm|Location2.X=0mm|Location1.Y=0mm|Location2.Y=0mm">Micro-Segment: Board region P1(0mm,0mm) P2(0mm,0mm)</acronym></a><br></td>
+</tr>
+</table></a><hr color="#EEEEEE"><a href="#top" style="font-size: 0.9em">Back to top</a><br><br></body>
+</html>

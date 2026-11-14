@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Independently audit PCB-MAIN Rev.A pre-route constraint coverage.
+"""Independently audit PCB-MAIN Rev.A routing-constraint coverage.
 
 This control proves that every native net has an explicit reviewed routing
-classification.  It deliberately also proves that the committed candidate is
-still unrouted, so a PASS cannot be interpreted as DRC, CAM or manufacturing
-release evidence.
+classification and that the authoritative board is the exact accepted bounded
+RF-P0 successor to the OctoSPI/R8 subgate.  A PASS does not claim
+completion of signal or power routing, Review B, CAM, or manufacturing release.
 """
 from __future__ import annotations
 
@@ -20,16 +20,95 @@ from typing import Any
 from kiutils.board import Board
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 sys.path.insert(0, str(ROOT / "tools"))
 from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E402
 
-DEFAULT_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+DEFAULT_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"  # current board (003 checked below)
 DEFAULT_AUTHORITY = ROOT / "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv"
+INNER_003 = _lineage.inner_reroute_003_applied()
 DEFAULT_STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+GROUND_CANDIDATE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"
+    / "PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
+)
+GROUND_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
+)
+SIGNAL_CANDIDATE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001"
+    / "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+)
+SIGNAL_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
+)
+OCTOSPI_CANDIDATE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002"
+    / "PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
+)
+OCTOSPI_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
+)
+RF_CANDIDATE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001"
+    / "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+)
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_REMEDIATION_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
+RF_RETURN_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPLICATION_REV_A.json"
+)
+GNSS_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+)
+USB_SOURCE_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"
+)
+USB_CELL_MODEM_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
+)
+USB_CELL_FIXTURE_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"
+)
 
-STATE = "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE"
+STATE = (
+    "PASS_CONSTRAINT_COVERAGE_ACCEPTED_RF_REMEDIATIONS_USB_MCU_SOURCE_"
+    "CELL_MODEM_AND_CELL_FIXTURE_APPLIED"
+)
 ROW_STATUS = "PRE_ROUTE_CONSTRAINT_CONTROLLED_ROUTING_NOT_COMPLETE"
-STACKUP_STATE = "OPEN_REQUIRED_BEFORE_NUMERIC_RF_USB_GEOMETRY"
+STACKUP_STATE = "EVT_JLC06161H_3313_ACCEPTED_CHECKOUT_DFM_REQUIRED"
+GROUND_CANDIDATE_SHA256 = (
+    "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
+)
+SIGNAL_CANDIDATE_SHA256 = (
+    "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
+)
+OCTOSPI_CANDIDATE_SHA256 = (
+    "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+)
+RF_CANDIDATE_SHA256 = (
+    "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+)
+RF_REMEDIATION_SHA256 = (
+    "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+)
+ACTIVE_BOARD_SHA256 = (
+    "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
+)
+USB_SOURCE_BOARD_SHA256 = (
+    "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+)
+USB_CELL_MODEM_BOARD_SHA256 = (
+    "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+)
 
 FIELDS = [
     "Net_Name",
@@ -258,9 +337,9 @@ def expected_geometry(net: str, route_class: str) -> str:
     if route_class == "RETURN_PLANE":
         return "PLANE_GEOMETRY_AND_VOID_REVIEW_B"
     if route_class == "RF_50OHM":
-        return "NO_NUMERIC_WIDTH_UNTIL_FACTORY_STACKUP"
+        return "WIDTH_0P1509MM_JLC06161H_3313_L1_OVER_L2"
     if route_class == "USB_90OHM_DIFF":
-        return "NO_NUMERIC_WIDTH_OR_GAP_UNTIL_FACTORY_STACKUP"
+        return "WIDTH_0P1537MM_GAP_0P2032MM_JLC06161H_3313_L1_OVER_L2"
     if net == "3V8_MODEM_BB":
         return "MIN_EQUIVALENT_WIDTH_0.60_MM_WIDEN_IF_LONG"
     if net == "3V8_MODEM_RF":
@@ -333,9 +412,9 @@ def validate_row(row: dict[str, str], route_class: str) -> None:
     require(row["Topology"] == TOPOLOGY[route_class], f"{net}: topology rule drift")
 
     impedance = (
-        "50_OHM_SINGLE_ENDED_FACTORY_STACKUP_PENDING"
+        "50_OHM_SINGLE_ENDED_EVT_STACKUP_ACCEPTED"
         if route_class == "RF_50OHM"
-        else "90_OHM_DIFFERENTIAL_FACTORY_STACKUP_PENDING"
+        else "90_OHM_DIFFERENTIAL_EVT_STACKUP_ACCEPTED"
         if route_class == "USB_90OHM_DIFF"
         else "NOT_CONTROLLED_IMPEDANCE"
     )
@@ -349,7 +428,7 @@ def validate_row(row: dict[str, str], route_class: str) -> None:
     length_group = expected_length_group(net)
     require(row["Length_Group"] == length_group, f"{net}: length-group rule drift")
     length_rule = (
-        "PAIR_SKEW_LIMIT_REQUIRES_FINAL_STACKUP_AND_SI_REVIEW"
+        "PAIR_SKEW_LIMIT_REQUIRES_SI_REVIEW"
         if pair_group
         else "GROUP_SKEW_BUDGET_REQUIRES_TIMING_AND_SI_REVIEW"
         if length_group
@@ -401,7 +480,7 @@ def expected_status_control(
     board_sha256: str,
     authority_sha256: str,
 ) -> dict[str, Any]:
-    return {
+    control = {
         "state": STATE,
         "board_sha256": board_sha256,
         "authority_sha256": authority_sha256,
@@ -411,12 +490,31 @@ def expected_status_control(
         "rf_50ohm_net_count": 7,
         "usb_90ohm_pair_count": 4,
         "cross_domain_review_net_count": 18,
-        "trace_items": 0,
-        "copper_zones": 0,
+        "trace_items": 1069 if INNER_003 else 1023,
+        "copper_zones": 10 if INNER_003 else 8,
+        "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "octospi_r8_eco_002_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "rf_p0_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "cellular_l2_return_subgate": "APPLIED_EXACT_ACCEPTED_ZONE",
+        "gnss_rf_placement_routeability_subgate": "APPLIED_EXACT_ACCEPTED_DELTA",
+        "combined_rf_remediation_gate": "PASS_COMMIT_BOUND_KICAD9_DRC_AND_FILLED_L2_REFERENCES",
+        "usb_source_termination_placement_subgate":
+        "APPLIED_EXACT_ACCEPTED_R91_R92_DELTA_COMMIT_BOUND_GATE_PASS",
+        "usb_mcu_source_routing_subgate":
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
+        "usb_cell_modem_routing_subgate":
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
+        "usb_cell_fixture_routing_subgate":
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,
     }
+    if INNER_003:
+        # accepted inner reroute 003: OCTOSPI/SDIO/EN_MODEM on F.Cu/B.Cu over GND_DIGITAL, In4 split, R9-R11 row
+        control["inner_reroute_003_subgate"] = "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS"
+    return control
 
 
 def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> dict[str, Any]:
@@ -424,6 +522,22 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
     authority_path = authority_path.resolve()
     require(board_path.is_file(), f"native board is missing: {board_path}")
     require(authority_path.is_file(), f"routing authority is missing: {authority_path}")
+    require(GROUND_CANDIDATE.is_file(),
+            f"accepted ground-domain candidate is missing: {GROUND_CANDIDATE}")
+    require(GROUND_APPLICATION.is_file(),
+            f"ground-domain application record is missing: {GROUND_APPLICATION}")
+    require(SIGNAL_CANDIDATE.is_file(),
+            f"accepted signal candidate is missing: {SIGNAL_CANDIDATE}")
+    require(SIGNAL_APPLICATION.is_file(),
+            f"signal application record is missing: {SIGNAL_APPLICATION}")
+    require(OCTOSPI_CANDIDATE.is_file(),
+            f"accepted OctoSPI candidate is missing: {OCTOSPI_CANDIDATE}")
+    require(OCTOSPI_APPLICATION.is_file(),
+            f"OctoSPI application record is missing: {OCTOSPI_APPLICATION}")
+    require(RF_CANDIDATE.is_file(),
+            f"accepted RF candidate is missing: {RF_CANDIDATE}")
+    require(RF_APPLICATION.is_file(),
+            f"RF application record is missing: {RF_APPLICATION}")
 
     with authority_path.open(encoding="utf-8", newline="") as stream:
         reader = csv.DictReader(stream)
@@ -498,10 +612,170 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items == 0 and copper_zones == 0,
-            "pre-route authority must be revised when routed copper or zones appear")
-
     board_digest = sha256(board_path)
+    if INNER_003:
+        # the 003 application audit proves the 003 delta; the earlier sub-gates below are checked on its predecessor
+        inner = json.loads(_lineage.INNER_003_APPLICATION.read_text(encoding="utf-8"))
+        require(trace_items == 1069 and copper_zones == 10
+                and board_digest == _lineage.INNER_003_BOARD_SHA256
+                and inner.get("applied", {}).get("predecessor_board_sha256") == ACTIVE_BOARD_SHA256
+                and inner.get("routing_complete") is False and inner.get("manufacturing_release") is False,
+                "authoritative board is not the accepted inner reroute 003 successor")
+    else:
+        require(trace_items == 1023 and copper_zones == 8,
+                "authoritative board does not contain the accepted RF remediations")
+        require(board_digest == ACTIVE_BOARD_SHA256,
+                "authoritative board SHA-256 differs from the accepted USB placement successor")
+    require(sha256(GROUND_CANDIDATE) == GROUND_CANDIDATE_SHA256,
+            "accepted ground-domain candidate hash drift")
+    require(sha256(SIGNAL_CANDIDATE) == SIGNAL_CANDIDATE_SHA256 and
+            sha256(OCTOSPI_CANDIDATE) == OCTOSPI_CANDIDATE_SHA256 and
+            sha256(RF_CANDIDATE) == RF_CANDIDATE_SHA256 and
+            sha256(RF_REMEDIATION_COMPOSED) == RF_REMEDIATION_SHA256,
+            "accepted routing predecessor identity drift")
+    application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+    require(application.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE"
+            and application.get("status") ==
+            "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES"
+            and application.get("reviewed_candidate_board_sha256") ==
+            GROUND_CANDIDATE_SHA256,
+            "ground-domain application decision or candidate binding differs")
+    require(application.get("applied") == {
+                "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+                "board_sha256": GROUND_CANDIDATE_SHA256,
+                "exact_candidate_byte_identity": True,
+                "track_segments": 319,
+                "track_length_mm": 226.515879672367,
+                "vias": 254,
+                "copper_zones": 3,
+                "mounting_rule_areas": 4,
+                "committed_zone_fill_state":
+                "UNFILLED_CI_AND_REVIEW_TOOLS_MUST_REFILL_BEFORE_DRC",
+                "native_connectivity_baseline_to_candidate": [718, 464],
+                "new_comparative_drc_error_counts": {},
+            }, "ground-domain application geometry or release boundary differs")
+    signal_application = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
+    require(signal_application.get("decision") ==
+            "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
+            signal_application.get("status") ==
+            "APPLIED_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+            signal_application.get("reviewed_candidate_board_sha256") ==
+            SIGNAL_CANDIDATE_SHA256 and
+            signal_application.get("applied", {}).get("board_sha256") ==
+            SIGNAL_CANDIDATE_SHA256 and
+            signal_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            signal_application.get("review_b_complete") is False and
+            signal_application.get("cam_or_manufacturing_release") is False,
+            "signal application decision, geometry, or release boundary differs")
+    octospi_application = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
+    require(octospi_application.get("decision") ==
+            "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
+            octospi_application.get("status") ==
+            "APPLIED_ACCEPTED_OCTOSPI_R8_ECO_002_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+            octospi_application.get("historical_baseline", {}).get("board_sha256") ==
+            SIGNAL_CANDIDATE_SHA256 and
+            octospi_application.get("reviewed_candidate_board_sha256") ==
+            OCTOSPI_CANDIDATE_SHA256 and
+            octospi_application.get("applied", {}).get("board_sha256") ==
+            OCTOSPI_CANDIDATE_SHA256 and
+            octospi_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            octospi_application.get("routing_complete") is False and
+            octospi_application.get("review_b_complete") is False and
+            octospi_application.get("cam_or_manufacturing_release") is False,
+            "OctoSPI application decision, geometry, or release boundary differs")
+    rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    require(rf_application.get("decision") == "ACCEPT_RF_P0_ROUTING_SUBGATE" and
+            rf_application.get("status") ==
+            "APPLIED_ACCEPTED_RF_P0_ROUTING_SUBGATE_REMAINING_ROUTING_AND_REVIEWS_OPEN" and
+            rf_application.get("historical_baseline", {}).get("board_sha256") ==
+            OCTOSPI_CANDIDATE_SHA256 and
+            rf_application.get("reviewed_candidate_board_sha256") ==
+            RF_CANDIDATE_SHA256 and
+            rf_application.get("applied", {}).get("board_sha256") ==
+            RF_CANDIDATE_SHA256 and
+            rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            rf_application.get("routing_complete") is False and
+            rf_application.get("review_b_complete") is False and
+            rf_application.get("cam_or_manufacturing_release") is False,
+            "RF application decision, geometry, or release boundary differs")
+    rf_return_application = json.loads(
+        RF_RETURN_APPLICATION.read_text(encoding="utf-8")
+    )
+    gnss_application = json.loads(GNSS_APPLICATION.read_text(encoding="utf-8"))
+    usb_source_application = json.loads(
+        USB_SOURCE_APPLICATION.read_text(encoding="utf-8")
+    )
+    usb_cell_modem_application = json.loads(
+        USB_CELL_MODEM_APPLICATION.read_text(encoding="utf-8")
+    )
+    usb_cell_fixture_application = json.loads(
+        USB_CELL_FIXTURE_APPLICATION.read_text(encoding="utf-8")
+    )
+    require(
+        rf_return_application.get("decision") ==
+        "ACCEPT_CELLULAR_L2_RETURN_PLANE_SUBGATE"
+        and rf_return_application.get("applied_intermediate", {}).get(
+            "exact_candidate_byte_identity"
+        ) is True
+        and gnss_application.get("decision") ==
+        "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+        and gnss_application.get("applied", {}).get("board_sha256") ==
+        RF_REMEDIATION_SHA256
+        and gnss_application.get("applied", {}).get(
+            "exact_composed_board_byte_identity"
+        ) is True
+        and gnss_application.get("routing_complete") is False
+        and gnss_application.get("review_b_complete") is False
+        and gnss_application.get("cam_or_manufacturing_release") is False,
+        "RF remediation application decision, composition, or boundary differs",
+    )
+    require(
+        usb_source_application.get("decision") ==
+        "ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE"
+        and usb_source_application.get("applied", {}).get("board_sha256") ==
+        USB_SOURCE_BOARD_SHA256
+        and usb_source_application.get("applied", {}).get(
+            "exact_candidate_byte_identity"
+        ) is True
+        and usb_source_application.get("review_b_complete") is False
+        and usb_source_application.get("manufacturing_release") is False,
+        "USB MCU source-routing application boundary differs",
+    )
+    require(
+        usb_cell_modem_application.get("decision") ==
+        "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+        and usb_cell_modem_application.get("predecessor", {}).get(
+            "board_sha256"
+        ) == USB_SOURCE_BOARD_SHA256
+        and usb_cell_modem_application.get("applied", {}).get("board_sha256") ==
+        USB_CELL_MODEM_BOARD_SHA256
+        and usb_cell_modem_application.get("applied", {}).get(
+            "exact_candidate_byte_identity"
+        ) is True
+        and usb_cell_modem_application.get("review_b_complete") is False
+        and usb_cell_modem_application.get("manufacturing_release") is False,
+        "USB cellular-modem routing application boundary differs",
+    )
+    require(
+        usb_cell_fixture_application.get("decision") ==
+        "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+        and usb_cell_fixture_application.get("predecessor", {}).get(
+            "board_sha256"
+        ) == usb_cell_modem_application.get("applied", {}).get("board_sha256")
+        and usb_cell_fixture_application.get("applied", {}).get("board_sha256") ==
+        ACTIVE_BOARD_SHA256
+        and usb_cell_fixture_application.get("applied", {}).get(
+            "exact_candidate_byte_identity"
+        ) is True
+        and usb_cell_fixture_application.get("status") ==
+        "APPLIED_EXACT_ACCEPTED_USB_CELL_FIXTURE_ROUTING_COMMIT_BOUND_KICAD9_GATE_PASS"
+        and usb_cell_fixture_application.get("machine_gate", {}).get("status") ==
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+        and usb_cell_fixture_application.get("review_b_complete") is False
+        and usb_cell_fixture_application.get("manufacturing_release") is False,
+        "USB cellular-fixture routing application boundary differs",
+    )
+
     authority_digest = sha256(authority_path)
     control = expected_status_control(board_digest, authority_digest)
     if status_path is not None:
@@ -515,7 +789,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "routing_authority_generator": "tools/generate_pcb_main_routing_authority_rev_a.py",
             "routing_authority_audit": "tools/audit_pcb_main_routing_authority_rev_a.py",
             "routing_constraint_status": (
-                "PASS_ALL_186_NETS_CLASSIFIED_FACTORY_STACKUP_AND_ROUTING_PENDING"
+                "PASS_ALL_186_NETS_CLASSIFIED_EVT_STACKUP_ACCEPTED_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING"
             ),
         }
         require(all(evidence.get(key) == value
@@ -552,6 +827,15 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "microphone_digital": sorted(CROSS_MIC_DIGITAL),
         },
         "factory_stackup_status": STACKUP_STATE,
+        "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "octospi_r8_eco_002_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "rf_p0_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "cellular_l2_return_subgate": "APPLIED_EXACT_ACCEPTED_ZONE",
+        "gnss_rf_placement_routeability_subgate": "APPLIED_EXACT_ACCEPTED_DELTA",
+        "combined_rf_remediation_gate": "PASS_COMMIT_BOUND_KICAD9_DRC_AND_FILLED_L2_REFERENCES",
+        "usb_cell_fixture_routing_subgate":
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "routing_complete": False,
         "manufacturing_release": False,
     }
@@ -579,7 +863,10 @@ def main() -> int:
     print("PCB-MAIN routing authority audit: PASS")
     print(
         "nets=186 classes=15 rf_50ohm=7 usb_pairs=4 "
-        "trace_items=0 copper_zones=0 routing_complete=false"
+        "trace_items=1023 copper_zones=8 ground_subgate=applied "
+        "signal_hard_nets_subgate=applied octospi_r8_eco_002_subgate=applied "
+        "rf_p0_subgate=applied rf_remediations=applied "
+        "routing_complete=false"
     )
     return 0
 

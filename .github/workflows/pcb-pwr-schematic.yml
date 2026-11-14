@@ -3,7 +3,7 @@ name: PCB-PWR Schematic Gate
 on:
   workflow_dispatch:
   push:
-    branches: [main, develop, evt-pre-20, "integration/**"]
+    branches: [evt-pre-20]
     paths:
       - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
@@ -16,19 +16,32 @@ on:
       - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md"
       - "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md"
+      - "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
       - "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md"
       - "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json"
       - "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md"
       - "hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv"
+      - "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json"
+      - "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.md"
       - "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json"
       - "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md"
       - "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv"
+      - "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
+      - "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md"
       - "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json"
       - "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md"
       - "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv"
+      - "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json"
+      - "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md"
+      - "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json"
+      - "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md"
+      - "hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md"
       - "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md"
+      - "hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.json"
+      - "hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
+      - "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step"
       - "hardware/POWER_DESIGN_CALC_REV_A.md"
       - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/kicad/sheets/01_POWER.csv"
@@ -55,39 +68,40 @@ on:
       - "tools/generate_pcb_pwr_layout_candidate_rev_a.py"
       - "tools/generate_pcb_pwr_routing_authority_rev_a.py"
       - "tools/audit_pcb_pwr_routing_authority_rev_a.py"
+      - "tools/generate_pcb_pwr_evt_route_rules_rev_a.py"
+      - "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
       - "tools/audit_pcb_pwr_dim_003_request_rev_a.py"
+      - "tools/generate_pcb_pwr_evt_mechanical_step_rev_a.py"
       - "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py"
       - "tools/audit_pcb_pwr_input_protection_rev_a.py"
-      - ".github/workflows/pcb-pwr-schematic.yml"
-  pull_request:
-    branches: [main, develop, evt-pre-20]
-    paths:
-      - "hardware/PCB_PWR_*.csv"
-      - "hardware/PCB_PWR_*.md"
-      - "hardware/POWER_*.json"
-      - "hardware/POWER_*.csv"
-      - "hardware/POWER_*.md"
-      - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
-      - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
-      - "hardware/reviews/PCB_PWR_*"
-      - "hardware/kicad/sheets/01_POWER.csv"
-      - "hardware/kicad/native/PCB-PWR/**"
-      - "mechanics/common/OPEN_DIMENSIONS.csv"
-      - "tools/*pcb_pwr*_rev_a.py"
+      - "tools/audit_pcb_pwr_input_protection_sources_rev_a.py"
+      - "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py"
       - ".github/workflows/pcb-pwr-schematic.yml"
 
 jobs:
   pwr-schematic:
     name: PCB-PWR Rev.A native schematic ERC
     runs-on: ubuntu-latest
+    container:
+      # Official KiCad CI image: https://www.kicad.org/download/docker/
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+
+      - name: Trust container checkout for commit-bound audits
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Install audit parser dependency
-        run: python -m pip install --disable-pip-version-check 'kiutils==1.4.8'
+        run: |
+          apt-get -o APT::Update::Error-Mode=any update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            python3-pip python-is-python3
+          python3 -m pip install --break-system-packages --disable-pip-version-check \
+            'kiutils==1.4.8'
 
       - name: Review-A authorities and DFT freeze
         run: |
@@ -97,6 +111,10 @@ jobs:
             --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
           python tools/audit_pcb_pwr_capture_authority_rev_a.py
           python tools/audit_pcb_pwr_dft_authority_rev_a.py
+          python tools/audit_pcb_pwr_input_protection_sources_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/input_protection_primary_source_audit.json
+          python tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/input_protection_procurement_identity_audit.json
           python tools/audit_pcb_pwr_input_protection_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/input_protection_qualification_audit.json
           python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
@@ -108,27 +126,26 @@ jobs:
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
 
-      - name: Install KiCad 9
-        shell: bash
+      - name: Verify official KiCad 9.0.9 container toolchain
         run: |
           set -euo pipefail
-          retry() {
-            local max=3
-            local attempt=1
-            while true; do
-              if "$@"; then return 0; fi
-              if [ "$attempt" -ge "$max" ]; then return 1; fi
-              echo "transient package/repository failure; retry $attempt/$max: $*" >&2
-              sleep $((attempt * 15))
-              attempt=$((attempt + 1))
-            done
-          }
-          retry sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
-          retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
-          retry sudo apt-get update
-          retry sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
-          kicad-cli version
+          kicad_version="$(kicad-cli version)"
+          echo "KiCad CLI version: $kicad_version"
+          case "$kicad_version" in
+            9.0.9*) ;;
+            *)
+              echo "Pinned KiCad 9.0.9 required; refusing installed version: $kicad_version" >&2
+              exit 1
+              ;;
+          esac
+          test -s /usr/share/kicad/symbols/Connector_Generic.kicad_sym
+          test -s /usr/share/kicad/symbols/Device.kicad_sym
+          /usr/bin/python3 - <<'PY'
+          import pcbnew
+          version = pcbnew.GetBuildVersion()
+          assert version.startswith("9.0.9"), version
+          print("PCBNEW_PYTHON_AVAILABLE", version)
+          PY
 
       - name: Materialize complete PCB-PWR native schematic
         run: |
@@ -162,6 +179,9 @@ jobs:
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
+          python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
+          python tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/evt_routing_basis_audit.json
           python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/dim_003_request_audit.json
           python tools/audit_pcb_pwr_stackup_copper_request_rev_a.py \
@@ -186,6 +206,7 @@ jobs:
               "Vishay_WSK2512_4T_T1.19mm": 4,
               "Coilcraft_XAL7030_472": 2,
               "TestPoint_DFT_1.7mm_NoPaste": 1,
+              "MountingHole_M3_3.4_EVT": 1,
           }
           for name, pad_count in expected.items():
               footprint = pcbnew.FootprintLoad(root, name)
@@ -245,15 +266,28 @@ jobs:
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json
+            hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.md
+            mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md
+            hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md
+            hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv
+            hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json
+            hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md
             hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
             hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md
+            hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.json
+            hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.md
           if-no-files-found: error

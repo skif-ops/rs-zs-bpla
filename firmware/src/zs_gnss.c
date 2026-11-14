@@ -84,12 +84,15 @@ bool zs_gnss_parse_line(zs_gnss_nmea_t *g, const char *line) {
     g->satellites = (uint8_t)atoi(values[7]);
     g->hdop_x100 = (uint16_t)lround(strtod(values[8], NULL) * 100.0);
     g->valid_fix = fix > 0;
+    g->gga_quality = (uint8_t)(fix > 0 && fix < 256 ? fix : 0);
     if (g->valid_fix) {
       g->position.lat_e7 = coord_e7(values[2], values[3][0]);
       g->position.lon_e7 = coord_e7(values[4], values[5][0]);
-      g->position.alt_dm = (int32_t)lround(strtod(values[9], NULL) * 10.0);
-      g->position.altitude_source = 1;
+      g->position.alt_dm = (int32_t)lround(strtod(values[9], NULL) * 10.0);   /* GGA field 9: altitude above MSL */
+      g->position.altitude_source = 0;   /* GNSS MSL (ICD station map key 4: 0 GNSS MSL, 1 configured MSL, 2 unknown) */
+      g->position.position_source = ZS_POSITION_SOURCE_GNSS_LIVE;
     }
+    g->gga_count++;
     return true;
   }
 

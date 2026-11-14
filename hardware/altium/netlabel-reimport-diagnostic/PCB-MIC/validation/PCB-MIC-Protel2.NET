@@ -1,0 +1,215 @@
+PROTEL NETLIST 2.0
+[
+DESIGNATOR
+C1
+FOOTPRINT
+C_0402_1005Metric
+PARTTYPE
+100nF X7R
+DESCRIPTION
+
+Comment
+100nF X7R
+Component Kind
+Standard
+Description
+
+Footprint
+Capacitor_SMD:C_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+C
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+100nF X7R
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+J1
+FOOTPRINT
+Molex_5040500691
+PARTTYPE
+5040500691
+DESCRIPTION
+
+Comment
+5040500691
+Component Kind
+Standard
+Description
+
+Footprint
+Dioneya:Molex_5040500691
+Ibis Model
+
+Library Name
+Dioneya
+Library Reference
+5040500691
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+5040500691
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+MK1
+FOOTPRINT
+T5838_RevA
+PARTTYPE
+MMICT5838-00-012
+DESCRIPTION
+
+Comment
+MMICT5838-00-012
+Component Kind
+Standard
+Description
+
+Footprint
+Dioneya:T5838_RevA
+Ibis Model
+
+Library Name
+Dioneya
+Library Reference
+MMICT5838-00-012
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+MMICT5838-00-012
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+[
+DESIGNATOR
+R1
+FOOTPRINT
+R_0402_1005Metric
+PARTTYPE
+0R EVT_SI_TUNE
+DESCRIPTION
+
+Comment
+0R EVT_SI_TUNE
+Component Kind
+Standard
+Description
+
+Footprint
+Resistor_SMD:R_0402_1005Metric
+Ibis Model
+
+Library Name
+Device
+Library Reference
+R
+PCB3D
+
+Pin Info
+
+Signal Integrity
+
+Simulation
+
+Value
+0R EVT_SI_TUNE
+
+*
+
+*
+
+*
+
+*
+
+*
+]
+(
+PDM_DATA_MIC
+MK1-1 MMICT5838-00-012-DATA Passive      
+R1-2 0R EVT_SI_TUNE-2 Passive      
+)
+(
+PDM_DATA
+J1-4 5040500691-4 Passive      
+R1-1 0R EVT_SI_TUNE-1 Passive      
+)
+(
+PDM_CLK
+J1-3 5040500691-3 Passive      
+MK1-6 MMICT5838-00-012-CLK Passive      
+)
+(
+MIC_WAKE
+J1-5 5040500691-5 Passive      
+MK1-4 MMICT5838-00-012-WAKE Passive      
+)
+(
+GND
+C1-2 100nF X7R-2 Passive      
+J1-2 5040500691-2 Passive      
+MK1-2 MMICT5838-00-012-SELECT Passive      
+MK1-3 MMICT5838-00-012-GND Passive      
+)
+(
+AAD_CFG
+J1-6 5040500691-6 Passive      
+MK1-5 MMICT5838-00-012-THSEL Passive      
+)
+(
+1V8_MIC
+C1-1 100nF X7R-1 Passive      
+J1-1 5040500691-1 Passive      
+MK1-7 MMICT5838-00-012-VDD Passive      
+)

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "target": "STM32U585VIT6Q",
+  "linker_script": "STM32U585VITXQ_APP_BANK.ld",
+  "checked_by": "firmware/tools/check_memory_budget.py (ci/firmware.sh)",
+  "regions": {
+    "RAM123": {
+      "min_free_bytes": 40960,
+      "reason": "40 KiB kept for the bench heap/stack high-water marks and bring-up fixes; 2026-10-02 free 72,544 B (90.8 % used)"
+    },
+    "FLASH": {
+      "min_free_bytes": 262144,
+      "reason": "256 KiB of the 1016 KiB application bank kept for growth before the A/B partition review; 2026-10-02 free 783,376 B"
+    },
+    "SRAM4": {
+      "min_free_bytes": 0,
+      "reason": "16 KiB retained SRAM, unused (the .retained section); any use must fit"
+    }
+  }
+}

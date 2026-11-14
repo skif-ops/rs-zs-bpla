@@ -60,6 +60,19 @@ def main() -> int:
     require(
         unguarded_station_decorators == {
             "@router.post('/stations/{station_id}/audio-request')",
+            # operator reads of audio assembled from the MQTT upload (addendum B); no station ingress
+            "@router.get('/stations/{station_id}/events/{event_id}/audio')",
+            "@router.get('/stations/{station_id}/events/{event_id}/audio/{segment}.wav')",
+            # operator queues a command key rotation (addendum E); goes to the station over MQTT only
+            "@router.post('/stations/{station_id}/command-key-rotation')",
+            # operator queues a firmware update (addendum F); the image goes to the station over MQTT only
+            "@router.post('/stations/{station_id}/firmware-update')",
+            # operator queues a network configuration change (addendum G); goes to the station over MQTT only
+            "@router.post('/stations/{station_id}/network-config')",
+            # operator queues a classifier model package (addendum I); the package goes to the station over MQTT only
+            "@router.post('/stations/{station_id}/model-update')",
+            # operator takes a station out of a firmware rollout (docs/SERVER_OTA_ROLLOUT_2026-10-03.md); no station ingress
+            "@router.post('/firmware/rollouts/{rollout_id}/stations/{station_id}/skip')",
         },
         f"station transport route bypasses guarded router: {unguarded_station_decorators}",
     )

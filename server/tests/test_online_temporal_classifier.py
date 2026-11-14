@@ -98,3 +98,23 @@ def test_checked_in_v07_model_matches_active_four_to_eight_window_policy():
     assert model is not None
     assert set(model["horizons"]) == {"4.0", "6.0", "8.0"}
     assert model["timing"]["evidence_window_range"] == [4, 8]
+
+
+def test_temporal_training_merges_views_from_one_source_group(tmp_path):
+    rows = []
+    for source in ("view-a.wav", "view-b.wav", "view-c.wav"):
+        source_rows = _rows("Лютый", source, "training_provisional", 1.0)
+        for row in source_rows:
+            row["meta_source_group"] = "same-flight"
+        rows += source_rows
+    rows += _rows("Лютый", "independent.wav", "training_provisional", 1.2)
+    rows += _rows("FP-1", "fp1-a.wav", "training_provisional_weak", 3.0)
+    rows += _rows("FP-1", "fp1-b.wav", "training_provisional_weak", 3.2)
+
+    model = OnlineTemporalTypeClassifier(model_path=tmp_path / "temporal.json").train(
+        pd.DataFrame(rows)
+    )
+
+    assert model["horizons"]["4.0"]["classes"]["Лютый"]["sources"] == 2
+    grouped = model["horizons"]["4.0"]["source_centroids"]["Лютый::same-flight"]
+    assert grouped["source_files"] == ["view-a.wav", "view-b.wav", "view-c.wav"]

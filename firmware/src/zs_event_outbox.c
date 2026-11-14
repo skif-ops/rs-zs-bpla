@@ -344,6 +344,14 @@ zs_event_outbox_result_t zs_event_outbox_enqueue_detection(
 zs_event_outbox_result_t zs_event_outbox_peek(
     const zs_event_outbox_io_t *io,
     zs_event_outbox_item_t *item) {
+  return zs_event_outbox_peek_filtered(io, item, NULL, NULL);
+}
+
+zs_event_outbox_result_t zs_event_outbox_peek_filtered(
+    const zs_event_outbox_io_t *io,
+    zs_event_outbox_item_t *item,
+    bool (*skip)(void *ctx, const zs_event_outbox_item_t *candidate),
+    void *ctx) {
   decoded_slot_t decoded;
   bool found = false;
   slot_state_t state;
@@ -354,6 +362,7 @@ zs_event_outbox_result_t zs_event_outbox_peek(
     if (state == SLOT_IO_ERROR || state == SLOT_CORRUPT)
       return slot_error(state);
     if (state != SLOT_VALID || decoded.delivered) continue;
+    if (skip && skip(ctx, &decoded.item)) continue;
     if (!found || decoded.item.priority > item->priority ||
         (decoded.item.priority == item->priority &&
          generation_newer(item->storage_generation,
@@ -366,6 +375,23 @@ zs_event_outbox_result_t zs_event_outbox_peek(
     }
   }
   return found ? ZS_EVENT_OUTBOX_OK : ZS_EVENT_OUTBOX_EMPTY;
+}
+
+zs_event_outbox_result_t zs_event_outbox_pending_count(
+    const zs_event_outbox_io_t *io,
+    uint16_t *pending) {
+  decoded_slot_t decoded;
+  slot_state_t state;
+  uint16_t count = 0u;
+  if (!io_valid(io) || !pending) return ZS_EVENT_OUTBOX_INVALID_ARGUMENT;
+  *pending = 0u;
+  for (uint16_t slot = 0u; slot < io->slot_count; ++slot) {
+    state = read_slot(io, slot, &decoded);
+    if (state == SLOT_IO_ERROR || state == SLOT_CORRUPT) return slot_error(state);
+    if (state == SLOT_VALID && !decoded.delivered) count++;
+  }
+  *pending = count;
+  return ZS_EVENT_OUTBOX_OK;
 }
 
 zs_event_outbox_result_t zs_event_outbox_lookup(

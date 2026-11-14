@@ -1,0 +1,58 @@
+{
+  "schema_version": "dioneya.pcb-main-usb-cell-modem-routing-001-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-USB-CELL-MODEM-ROUTING-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-20",
+  "decision": "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE",
+  "decision_input": "ответ подтверждаю. далее идем по наиболее целесообразным решениям решения одобряю нужно максимально быстро завершать работу по проекту. дополнительные запросы только в крайнем случае",
+  "decision_normalization": "The user approved continuing with the most rational engineering decisions and requested no additional question except in an extreme case; after the green machine gate this bounded decision is normalized to ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE.",
+  "reviewed_github_commit_sha": "88292432cee87cec4e209ed2d0e4d142071af2cb",
+  "reviewed_tree_sha": "3eeb19625385ffe70417bfe9641e676860cb49a9",
+  "review_mapping": "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "89fab19ab200749c9f293e50539ad8b9aa6cda7ae1b384d935d86c90d6483e63",
+  "reviewed_proposal_record_sha256": "9a5be47727c48c623a35fe9e1407f36fe3783c1e8588322ee652a049fb5f3fa0",
+  "reviewed_candidate_board_sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",
+  "reviewed_generator_sha256": "d8e87528f7c105ae5da909f2d6467171f676d80bf1f25dc2f01c97446fab993b",
+  "reviewed_audit_sha256": "b48c76a8cbc5c782511e6b915d834b3d239d22b22e8074c36a05a27c7d843546",
+  "approved_scope": {
+    "routed_nets": ["CELL_USB_DP_U8", "CELL_USB_DM_U8"],
+    "endpoints": {
+      "CELL_USB_DP_U8": ["U8.9", "R39.1"],
+      "CELL_USB_DM_U8": ["U8.10", "R40.1"]
+    },
+    "added_segments": 6,
+    "added_signal_vias": 0,
+    "trace_width_mm": 0.1537,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "pair_length_mismatch_mm": 0.0,
+    "changed_existing_copper": false
+  },
+  "machine_gate": {
+    "proposal_commit_sha": "5c73ffe5b9eae3f623f7336c705f939a2a5af2fd",
+    "ci_run_id": 35536788206,
+    "ci_run_number": 564,
+    "ci_conclusion": "success",
+    "pcb_native_run_id": 35536788193,
+    "pcb_native_run_number": 291,
+    "pcb_native_conclusion": "success",
+    "artifact_id": 10613537447,
+    "artifact_digest": "sha256:fa9f1ab6357ad4ad2e356194e05ae999a6a8358641082a860228e0e4cfe04e90",
+    "base_violations": 232,
+    "candidate_violations": 232,
+    "base_unconnected": 427,
+    "candidate_unconnected": 425,
+    "new_errors": 0
+  },
+  "authorization": {
+    "apply_exact_hash_bound_usb_cell_modem_routing_delta": true,
+    "preserve_all_unlisted_footprints_nets_copper_zones_keepouts_and_outline": true,
+    "continue_routing_engineering_after_green_application_gate": true,
+    "main_connector_usb_segment_complete": false,
+    "cellular_fixture_usb_segment_complete": false,
+    "final_fabricator_stackup_accepted": false,
+    "production_impedance_tolerance_accepted": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}

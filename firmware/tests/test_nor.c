@@ -270,6 +270,38 @@ static void test_w25q512_probe_fail_closed(mock_nor_t *mock,
   mock->status = 0u;
 }
 
+/* Bus lock: every command goes out under the lock, taken per page program, per erase block and per read, and
+   released on every path (including a failing command). */
+static int lock_depth;
+static unsigned lock_count, unlocked_commands;
+static int fail_commands_after = -1;
+static void t_lock(void *ctx) { (void)ctx; assert(lock_depth == 0); lock_depth++; lock_count++; }
+static void t_unlock(void *ctx) { (void)ctx; assert(lock_depth == 1); lock_depth--; }
+static int checked_command(void *ctx, uint8_t opcode, uint32_t address, uint8_t address_bytes,
+                           const uint8_t *tx, size_t tx_len, uint8_t *rx, size_t rx_len) {
+  if (lock_depth != 1) unlocked_commands++;
+  if (fail_commands_after == 0) return -1;
+  if (fail_commands_after > 0) fail_commands_after--;
+  return mock_command(ctx, opcode, address, address_bytes, tx, tx_len, rx, rx_len);
+}
+static void test_bus_lock(zs_nor_t *base) {
+  zs_nor_t nor = *base;
+  uint8_t buf[600];
+  nor.port.command = checked_command;
+  zs_nor_set_lock(&nor, t_lock, t_unlock, NULL);
+  memset(buf, 0x5a, sizeof(buf));
+  lock_count = 0u; assert(zs_nor_erase(&nor, 0x10000u, 8192u) && lock_count == 2u);             /* per block */
+  lock_count = 0u; assert(zs_nor_program(&nor, 0x1000au, buf, sizeof(buf)) && lock_count == 3u); /* 246 + 256 + 98 */
+  lock_count = 0u; assert(zs_nor_read(&nor, 0x1000au, buf, sizeof(buf)) && lock_count == 1u);
+  assert(buf[0] == 0x5a && buf[599] == 0x5a);
+  fail_commands_after = 1;                                                                        /* dies mid-operation */
+  assert(!zs_nor_program(&nor, 0x12000u, buf, 16u) && lock_depth == 0);
+  fail_commands_after = -1;
+  assert(unlocked_commands == 0u && lock_depth == 0);
+  zs_nor_set_lock(&nor, t_lock, NULL, NULL);                                                     /* half a lock = none */
+  lock_count = 0u; assert(zs_nor_read(&nor, 0x1000au, buf, 4u) && lock_count == 0u);
+}
+
 int main(void) {
   mock_nor_t mock = {0};
   mock.size = MOCK_BYTES;
@@ -286,6 +318,7 @@ int main(void) {
   test_bounds(&nor);
   test_w25q512_probe_and_quad_restore(&mock, &nor);
   test_w25q512_probe_fail_closed(&mock, &nor);
+  test_bus_lock(&nor);
 
   free(mock.mem);
   puts("zs_nor_tests: OK");

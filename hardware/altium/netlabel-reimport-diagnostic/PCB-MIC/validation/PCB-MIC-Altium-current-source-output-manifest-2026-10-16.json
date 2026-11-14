@@ -1,0 +1,223 @@
+{
+  "schema": "dioneya-altium-current-source-output-manifest-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MIC",
+  "generated_local": "2026-10-16T00:38:05+03:00",
+  "altium_version": "26.10.1 Trial",
+  "status": "CURRENT_SOURCE_OUTPUTS_GENERATED_DRC_PASS_REVIEW_BINDING_OPEN",
+  "manufacturing_authorized": false,
+  "source_binding": [
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/PCB-MIC.PrjPcb",
+      "bytes": 35240,
+      "last_write_local": "2026-10-16T00:37:58",
+      "sha256": "99C726A2D8513287A1A679AFB75DAE9552A8B1C4D6BE56AFB3497FA3249EB94C"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/PCB-MIC.PcbDoc",
+      "bytes": 976896,
+      "last_write_local": "2026-10-15T15:15:08",
+      "sha256": "CDBF994E1D2B6B59E83BE48C7D5D0B525D889B1509148C2DA42C2E7522C423C0"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/EVT-PRE-20_PCB-MIC.OutJob",
+      "bytes": 15255,
+      "last_write_local": "2026-10-16T00:45:25",
+      "sha256": "9089C119380A5D26D87584B17FC25177F541968AB0FE7A01A590B46A3550187F"
+    }
+  ],
+  "validation": {
+    "project_compile": {
+      "success": true,
+      "errors": 0,
+      "observed_local": "2026-10-16T00:29:37+03:00"
+    },
+    "pcb_drc": {
+      "warnings": 0,
+      "rule_violations": 0,
+      "report": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/DRC/PCB-MIC.html",
+      "report_sha256": "4E895F0DA6182146865A7EE1218D473915EDCC40C1088EA2858D05A7E3A80AB7"
+    },
+    "required_output_subset_present": {
+      "gerber_top": true,
+      "gerber_bottom": true,
+      "profile": true,
+      "plated_drill": true,
+      "pick_place": true,
+      "step": true,
+      "drc": true
+    },
+    "all_required_output_subset_present": true,
+    "pcb_saved_before_all_listed_cam_outputs": true
+  },
+  "outputs": [
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/Design Rule Check - PCB-MIC.drc",
+      "bytes": 1953,
+      "last_write_local": "2026-10-16T00:31:46",
+      "sha256": "70DE0EBD8FDB60E66F3492F5D28DDAF24681E8FF3B9E9F84B5F9770616EADB6D"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/Design Rule Check - PCB-MIC.html",
+      "bytes": 11657,
+      "last_write_local": "2026-10-16T00:31:46",
+      "sha256": "F24A25E41DAAFAA86DDFF785B8214BA6AB7EF7CE07EE72AFADCD335CE825A8AE"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/DRC/PCB-MIC.html",
+      "bytes": 12954,
+      "last_write_local": "2026-10-16T00:38:05",
+      "sha256": "4E895F0DA6182146865A7EE1218D473915EDCC40C1088EA2858D05A7E3A80AB7"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/ExportSTEP/PCB-MIC.step",
+      "bytes": 10812,
+      "last_write_local": "2026-10-16T00:38:05",
+      "sha256": "9C448592C7C9BF7A3AE28A322AF18F3A5803951464193F27B6419778C69DD9AA"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC-macro.APR_LIB",
+      "bytes": 0,
+      "last_write_local": "2026-10-16T00:38:03",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC.apr",
+      "bytes": 0,
+      "last_write_local": "2026-10-16T00:38:03",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC.EXTREP",
+      "bytes": 594,
+      "last_write_local": "2026-10-16T00:38:03",
+      "sha256": "7E72044FC4F7EB5BFE46E1C4A27246EFD79FD6DD112977768EF85F89C23BB0EB"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC.REP",
+      "bytes": 108,
+      "last_write_local": "2026-10-16T00:38:03",
+      "sha256": "4257F16FB22BD407FD2D277B85503FFED4709AC2D39E12770E78FFF74BD186B2"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Copper_Signal_Bot.gbr",
+      "bytes": 1088,
+      "last_write_local": "2026-10-15T15:15:22",
+      "sha256": "5FC9022A55CB49A4F20C72A7F8CCFFC82BF76027C52561D4D50C2589596B5C2C"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Copper_Signal_Top.gbr",
+      "bytes": 8342,
+      "last_write_local": "2026-10-15T15:15:22",
+      "sha256": "87BE39295F323848816F13E105C03DDB4A0575E17943819ED44086BEE9AB79A2"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Legend_Bot.gbr",
+      "bytes": 341,
+      "last_write_local": "2026-10-15T15:15:22",
+      "sha256": "78CD09353BC136AB1127E5DAA654DD701A7EE573C31F4AC88396637563A47AE7"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Legend_Top.gbr",
+      "bytes": 10904,
+      "last_write_local": "2026-10-15T15:15:22",
+      "sha256": "AF87B62F6B14A7124A64CFFC1C344B6E451ECC6E929EBCE757BF2926B500BCA3"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_NPTH_Drill.gbr",
+      "bytes": 351,
+      "last_write_local": "2026-10-15T15:15:24",
+      "sha256": "A37657520C9361201C4B33D148E8A3FB488C366F9F5D3CC9B2ACF33FA65CB9BC"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Paste_Bot.gbr",
+      "bytes": 338,
+      "last_write_local": "2026-10-15T15:15:24",
+      "sha256": "26E23F2092D66205BC455924926AF2D082BC27020B639FA270E128092A90C21C"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Paste_Top.gbr",
+      "bytes": 1901,
+      "last_write_local": "2026-10-15T15:15:24",
+      "sha256": "2AB017022B7EA9FCA10D6F620877AFB712F959D7FE6D8C59723FEF08F688D6EA"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Profile.gbr",
+      "bytes": 450,
+      "last_write_local": "2026-10-15T15:15:24",
+      "sha256": "7B2BC7565388CAD95CF76787DC0FEC6860B62EA61DCE59F55ECAE8AAA3137603"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_PTH_Drill.gbr",
+      "bytes": 699,
+      "last_write_local": "2026-10-15T15:15:24",
+      "sha256": "1C31AC404E9D64951FF3220A65C035FB74AF7CD5DDE53DDFFB87BF0904D219FE"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Soldermask_Bot.gbr",
+      "bytes": 497,
+      "last_write_local": "2026-10-15T15:15:23",
+      "sha256": "33CAFA461BAE7DF76749E2956F9D69CCA742495F21C266BF12E220988503783A"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/GerberX2/PCB-MIC_Soldermask_Top.gbr",
+      "bytes": 7286,
+      "last_write_local": "2026-10-15T15:15:23",
+      "sha256": "A5ADF9837C9585571247C543E4FFF9AB62A72CB521B4A82F9F9F1E85A8293EA6"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/NC Drill/PCB-MIC.DRR",
+      "bytes": 1288,
+      "last_write_local": "2026-10-16T00:38:03",
+      "sha256": "43A577E175F0A498D0FAD1FABAD7A0256F8F379B0EF9F42FF15BD5B26B234E86"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/NC Drill/PCB-MIC.LDP",
+      "bytes": 217,
+      "last_write_local": "2026-10-16T00:38:03",
+      "sha256": "C7B6979C5D7DDD8028519A16BE70D736C70E98AC7132182599C9540F0863F268"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/NC Drill/PCB-MIC.TXT",
+      "bytes": 255,
+      "last_write_local": "2026-10-16T00:38:03",
+      "sha256": "2A0913CB65461075869EF78CD7C1D0F26E8FA262725D50CE3E193C065B6014A5"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/Pick Place/Pick Place for PCB-MIC.txt",
+      "bytes": 2888,
+      "last_write_local": "2026-10-16T00:38:04",
+      "sha256": "EF3184DCB719CEBE5B945E79B2791E61F34A0EC9894D1B7D2A072836F6E3F017"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/Status Report.Txt",
+      "bytes": 247,
+      "last_write_local": "2026-10-16T00:38:05",
+      "sha256": "BD3BB936EB3AEA5AF1C52DBD8C8541D2C8AE4DBCB0E65BF190D999AC8D12699D"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/Test Points/Fabrication Testpoint Report for PCB-MIC.csv",
+      "bytes": 60,
+      "last_write_local": "2026-10-16T00:38:03",
+      "sha256": "AABFEEBDFA3FFBFF546E005FA8E77DD819C6BB88E61002020CDC3BB4B030A1B7"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/Test Points/Fabrication Testpoint Report for PCB-MIC.ipc",
+      "bytes": 4746,
+      "last_write_local": "2026-10-16T00:38:04",
+      "sha256": "A4E14632DBED794905EDA484A6A986F142290E65457C82BAC5AF2AABB7A8033E"
+    },
+    {
+      "path": "hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/Project Outputs for PCB-MIC/Test Points/Fabrication Testpoint Report for PCB-MIC.REP",
+      "bytes": 350,
+      "last_write_local": "2026-10-16T00:38:04",
+      "sha256": "CF1F0647AACA708F8C4D193B49A7C67C54325BE81346389481EF849A773F1F40"
+    }
+  ],
+  "limits": [
+    "Independent Review A and Review B are not yet bound to this source hash.",
+    "The Altium OutJob did not emit a BOM, assembly drawing PDF or a standalone IPC-D-356 netlist.",
+    "The complete EVT candidate therefore keeps the controlled KiCad BOM, assembly documentation and IPC-D-356 alongside these Altium outputs.",
+    "Physical acoustic, membrane/cavity, panel and first-article checks remain open."
+  ]
+}

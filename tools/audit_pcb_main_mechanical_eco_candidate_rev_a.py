@@ -47,6 +47,7 @@ DEFAULT_REVIEW_COMMIT_MAPPING = (
     ROOT / "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json"
 )
 DEFAULT_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json"
+ECO002_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json"
 NUMERIC_TOLERANCE = 1e-6
 REVIEWED_COMMIT = "61cbe796de2f87560342a44b063ff6283a8ce1e8"
 REVIEWED_CANDIDATE_SHA256 = "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1"
@@ -837,6 +838,63 @@ def main() -> int:
     require(candidate_path.is_file(), f"candidate not found: {candidate_path}")
     require(approval_path.is_file(), f"approval not found: {approval_path}")
     require(mapping_path.is_file(), f"review commit mapping not found: {mapping_path}")
+    if ECO002_APPLICATION.is_file():
+        # ECO-001 remains immutable historical evidence after ECO-002 supersedes
+        # its live placement geometry.  Revalidate the exact signed chain here;
+        # current geometry is independently controlled by the ECO-002 audit.
+        require(sha256(candidate_path) == REVIEWED_CANDIDATE_SHA256,
+                "historical mechanical ECO-001 candidate SHA-256 drift")
+        approval = validate_approval(approval_path, candidate_path)
+        mapping, reviewed_candidate = validate_review_commit_mapping(
+            mapping_path, approval
+        )
+        require(reviewed_candidate == candidate_path.read_bytes(),
+                "historical mechanical ECO-001 reviewed candidate bytes drift")
+        application = json.loads(application_path.read_text(encoding="utf-8"))
+        require(application.get("proposal_id") == "PCB-MAIN-MECH-ECO-001" and
+                application.get("decision") == "ACCEPT_LIMITED_MECHANICAL_ECO" and
+                application.get("status") == "APPLIED_FULL_REPACK_REQUIRED" and
+                application.get("review_b_complete") is False and
+                application.get("manufacturing_release") is False,
+                "historical mechanical ECO-001 application chain drift")
+        eco_002 = json.loads(ECO002_APPLICATION.read_text(encoding="utf-8"))
+        require(eco_002.get("proposal_id") == "PCB-MAIN-MECH-ECO-002" and
+                eco_002.get("status") ==
+                "APPLIED_STRICT_2D_CLEARANCE_PASS_ROUTING_AND_3D_REVIEW_PENDING" and
+                eco_002.get("routing_authorized") is False and
+                eco_002.get("review_b_complete") is False and
+                eco_002.get("manufacturing_release") is False,
+                "PCB-MAIN ECO-002 supersession boundary drift")
+        report = {
+            "schema_version": "dioneya.pcb-main-mechanical-eco-audit.v1",
+            "proposal_id": "PCB-MAIN-MECH-ECO-001",
+            "status": "PASS_HISTORICAL_SIGNED_CHAIN_SUPERSEDED_BY_ECO_002",
+            "candidate_file": str(candidate_path.relative_to(ROOT)),
+            "candidate_sha256": REVIEWED_CANDIDATE_SHA256,
+            "approval": {
+                "reviewer": approval["reviewer"],
+                "date": approval["date"],
+                "decision": approval["decision"],
+                "scope": approval["scope"],
+            },
+            "review_commit_mapping": {
+                "github_equivalent_commit_sha":
+                    mapping["github_equivalent_commit_sha"],
+                "reviewed_tree_sha": mapping["reviewed_tree_sha"],
+                "candidate_blob_sha": mapping["candidate_blob_sha"],
+                "equivalence": mapping["equivalence"],
+            },
+            "successor": "PCB-MAIN-MECH-ECO-002",
+            "manufacturing_release": False,
+        }
+        if args.output:
+            output = args.output.resolve()
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+                              encoding="utf-8")
+        print("PCB-MAIN mechanical ECO-001 audit: PASS_HISTORICAL_SIGNED_CHAIN_SUPERSEDED_BY_ECO_002")
+        print("successor=PCB-MAIN-MECH-ECO-002 manufacturing_release=false")
+        return 0
     report = audit(candidate_path, approval_path, mapping_path, application_path)
     if args.output:
         output = args.output.resolve()

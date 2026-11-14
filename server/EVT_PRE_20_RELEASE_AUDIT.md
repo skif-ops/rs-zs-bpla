@@ -1,5 +1,7 @@
 # «Мухоед» - аудит исходной версии для EVT-PRE-20
 
+> Это исторический аудит состояния на 08.09.2026. Его запреты и открытые пункты не следует читать как текущий статус. Актуальные сведения находятся в [`RELEASE_NOTES.md`](RELEASE_NOTES.md) и [`docs/release-notes/DEPLOYMENT_STATUS.md`](../docs/release-notes/DEPLOYMENT_STATUS.md).
+
 Дата: 2026-09-08
 Статус: `SOURCE_BASELINE_IDENTIFIED / RELEASE_GATE_OPEN`
 
@@ -49,8 +51,20 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
    byte-exact lock и проходит отдельные QG-1/QG-2.
 4. Нет подтверждённого clean deployment и backup/restore на Windows 11 и Ubuntu 24.04.
-5. Нет load/reconnect/dedup теста для 20 реальных станций.
-6. Нет OTA repository, canary rollout, pause и rollback audit.
+5. ЧАСТИЧНО: load/reconnect/dedup проверен на хосте с 41 синтетической станцией по пути
+   реального моста (`tools/load_field.py`, `tests/test_load_field.py`,
+   docs/SERVER_LOAD_FIELD_2026-10-03.md): сутки пилота со всеми сбоями связи
+   (154 634 сообщения, 305 сообщений/с, 170× реального времени) — всё сохранено ровно
+   один раз, повторы с тем же receipt, ни одного неподтверждённого сообщения,
+   читатели без блокировок; найдено и закрыто зависание моста после 20 ошибок
+   обработки (`StallGuard`). Открыто: тот же прогон с реальными станциями через
+   Mosquitto с TLS на целевом сервере.
+6. ЧАСТИЧНО: хранилище выпусков и обновление станции по команде (аддендум F); раскатка
+   выпуска на группу станций — canary-волна, не больше N станций в полёте, автопауза по
+   отказу или откату станции, resume/cancel/skip, возврат возвратным выпуском (станция не
+   принимает версию не новее), журнал каждого шага и журнал действий учётных записей
+   (`station/rollout.py`, `docs/SERVER_OTA_ROLLOUT_2026-10-03.md`, `tests/test_rollout.py`).
+   Открыто: раскатка на двойниках поля с настоящими сессиями и страница в веб-интерфейсе.
 7. ЧАСТИЧНО: portable event outbox атомарно сохраняет schema-4 CBOR, metadata,
    SHA-256, приоритет и retry bitmap и проходит fault-injection. Серверная схема
    application receipt и portable firmware parser проверяют точный payload hash,
@@ -78,9 +92,31 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 Частично закрыто после baseline: station HTTP ingress, command polling/ACK и
 audio upload теперь fail-closed и доступны только при точном стендовом opt-in
 `ZS_STATION_HTTP_INSECURE_BENCH=1`. Production telemetry должна поступать через
-MQTT mTLS. Пункт 1 остаётся открытым до завершения auth/authz операторского
-REST/WebSocket UI и deployment-проверок; это изменение не разрешает публикацию
-FastAPI напрямую в интернет.
+MQTT mTLS.
+
+Auth/authz операторского REST/WebSocket UI реализованы (`station/operator_auth.py`):
+всё приложение, кроме `/static`, `/login`, `/api/v1/health` и станционных стендовых
+маршрутов, требует оператора; без учётных записей сервер отказывает во всём
+(fail-closed); роли `viewer`/`operator`/`engineer`/`admin`/`service` как наборы прав,
+у каждого изменяющего маршрута объявлено право (необъявленный отклоняется), аудио событий
+только с правом `audio.listen`, команды станциям только у `engineer`, администратор
+безопасности управляет учётными записями и ключом команд, но не командует станциями;
+второй фактор TOTP (RFC 6238) для `engineer` и `admin`; scrypt-пароли, API-токены
+хранятся как SHA-256 и ограничены своими правами (по умолчанию `read`); HMAC-cookie сессии,
+хранимой на сервере (выход, 30 мин бездействия, 12 ч, смена пароля, отключение и удаление
+учётной записи завершают её); журнал аудита со сцепкой хешей (входы, неудачи, выходы, все
+изменяющие запросы, изменения учётных записей); проверка учётной записи и версии пароля
+на каждом запросе; same-origin
+проверка изменяющих запросов по cookie; блокировка входа (5 неудач на имя с одного адреса,
+20 с адреса, 15 мин; адрес клиента из `X-Forwarded-For` только за доверенным прокси). Отключение —
+только точным стендовым `ZS_OPERATOR_AUTH_INSECURE_BENCH=1` в dev/Windows-bench compose.
+Проверки: `server/tests/test_operator_auth.py`, `tools/validate_operator_auth.py` (QG-1),
+`tools/audit_operator_auth_technical.py` (QG-2). Пункт 1 остаётся открытым до
+deployment-проверок на целевом сервере (HTTPS reverse proxy с передачей `Host`,
+созданные учётные записи и второй фактор инженеров и администраторов, отсутствие
+bench-флагов); видимость станций и участков по учётной записи (`set-scope`, `/api/v1/access`) применяется во всех
+API данных, потоках и выходном API тревог (`station/access_scope.py`); это изменение не разрешает
+публикацию FastAPI напрямую в интернет.
 
 Частично закрыт пункт 2: production bridge публикует только подписанные команды,
 не считает broker QoS ACK прикладным подтверждением и безопасно отключает
@@ -111,5 +147,10 @@ pending events, а server/portable-firmware application receipt подтверж
 - secret scan;
 - clean deploy Windows 11 и Ubuntu 24.04;
 - broker mTLS/ACL и API auth tests;
-- 20-station soak не менее 24 часов;
-- backup/restore и журнал отката OTA.
+- 20-station soak не менее 24 часов (на хосте: сутки поля из 41 синтетической
+  станции пройдены, `tools/load_field.py --hours 24 --check`; с реальными станциями —
+  после партии EVT);
+- backup/restore (сценарии `deploy/scripts/backup_*` и `restore_*` с согласованной
+  копией, проверкой целостности и сохранением заменённого есть и проверены тестами;
+  прогон на целевых Windows 11 и Ubuntu 24.04 — открыт) и журнал отката OTA (журнал
+  раскаток `rollout_journal` с откатами станций и возвратами, `docs/SERVER_OTA_ROLLOUT_2026-10-03.md`).

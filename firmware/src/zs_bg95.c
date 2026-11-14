@@ -5,7 +5,28 @@
 #include <string.h>
 
 #define BG95_COMMAND_TIMEOUT_MS 120000u
+#define BG95_AT_SYNC_TIMEOUT_MS 30000u   /* PWRKEY release -> first "OK": the module boots for seconds and swallows early ATs */
 #define BG95_NO_PROFILE 0xffu
+
+#define BG95_MIN_NETWORK_EPOCH_US INT64_C(1735689600000000)   /* 2025-01-01: earlier = the modem's RTC default */
+
+static int64_t days_from_civil(int y, unsigned m, unsigned d) {   /* H. Hinnant's algorithm, proleptic Gregorian */
+  const int yy = y - (m <= 2u);
+  const int era = (yy >= 0 ? yy : yy - 399) / 400;
+  const unsigned yoe = (unsigned)(yy - era * 400);
+  const unsigned doy = (153u * (m + (m > 2u ? (unsigned)-3 : 9u)) + 2u) / 5u + d - 1u;
+  const unsigned doe = yoe * 365u + yoe / 4u - yoe / 100u + doy;
+  return (int64_t)era * 146097 + (int64_t)doe - 719468;
+}
+
+/* +QLTS: "yyyy/MM/dd,hh:mm:ss+-zz,dst" of AT+QLTS=1: the time is GMT, the zone field is informative. */
+static bool parse_qlts(const char *line, int64_t *epoch_us) {
+  int y, mo, d, h, mi, s;
+  if (strncmp(line, "+QLTS: \"", 8u) != 0 || sscanf(line + 8, "%4d/%2d/%2d,%2d:%2d:%2d", &y, &mo, &d, &h, &mi, &s) != 6) return false;
+  if (y < 2000 || mo < 1 || mo > 12 || d < 1 || d > 31 || h < 0 || h > 23 || mi < 0 || mi > 59 || s < 0 || s > 60) return false;
+  *epoch_us = (days_from_civil(y, (unsigned)mo, (unsigned)d) * 86400 + h * 3600 + mi * 60 + s) * INT64_C(1000000);
+  return true;
+}
 
 static bool copy_checked(char *dst, size_t size, const char *src) {
   size_t n;
@@ -241,6 +262,7 @@ static bool parse_pdp_settings(zs_bg95_t *m, const char *line) {
   return true;
 }
 
+
 void zs_bg95_init(zs_bg95_t *m, const zs_hal_port_t *io,
                   unsigned uart, unsigned pwrkey, const char *apn) {
   if (!m) return;
@@ -363,6 +385,12 @@ static int registration_status(const char *line) {
   return sscanf(p + 1, " %d", &first) == 1 ? first : -1;
 }
 
+static void start_tls(zs_bg95_t *m, uint32_t now_ms) {
+  m->state = ZS_BG95_TLS_CONFIGURING;
+  m->tls_step = 0u;
+  if (!send_tls_step(m, now_ms)) fail_transport(m);
+}
+
 static void on_ok(zs_bg95_t *m, uint32_t now_ms) {
   char command[224];
   int n;
@@ -423,10 +451,12 @@ static void on_ok(zs_bg95_t *m, uint32_t now_ms) {
       if (!m->network_settings.valid) {
         fail_transport(m);
       } else {
-        m->state = ZS_BG95_TLS_CONFIGURING;
-        m->tls_step = 0u;
-        if (!send_tls_step(m, now_ms)) fail_transport(m);
+        m->state = ZS_BG95_TIME_QUERY;
+        if (!send_timed_cmd(m, "AT+QLTS=1", now_ms)) fail_transport(m);
       }
+      break;
+    case ZS_BG95_TIME_QUERY:
+      start_tls(m, now_ms);
       break;
     case ZS_BG95_TLS_CONFIGURING:
       ++m->tls_step;
@@ -495,6 +525,15 @@ void zs_bg95_on_line(zs_bg95_t *m, const char *line, uint32_t now_ms) {
   }
   if (m->state == ZS_BG95_APN_DISCOVERING && strstr(line, "+CGNAPN:")) {
     parse_network_apn(m, line);
+    return;
+  }
+  if (m->state == ZS_BG95_TIME_QUERY && strncmp(line, "+QLTS:", 6u) == 0) {
+    int64_t t;
+    if (parse_qlts(line, &t) && t >= BG95_MIN_NETWORK_EPOCH_US) {
+      m->network_time_us = t;
+      m->network_time_at_ms = now_ms;
+      m->network_time_valid = true;
+    }
     return;
   }
   if (m->state == ZS_BG95_PDP_SETTINGS_QUERY && strstr(line, "+CGCONTRDP:")) {
@@ -568,6 +607,9 @@ void zs_bg95_on_line(zs_bg95_t *m, const char *line, uint32_t now_ms) {
         m->state == ZS_BG95_OPERATOR_QUERY ||
         m->state == ZS_BG95_APN_DISCOVERING) {
       on_discovery_error(m, now_ms);
+    } else if (m->state == ZS_BG95_TIME_QUERY) {
+      m->command_pending = false;                     /* no network time on this cell: carry on without it */
+      start_tls(m, now_ms);
     } else if (m->state == ZS_BG95_AT_SYNC || m->state == ZS_BG95_REGISTERING) {
       m->command_pending = false;
       if (++m->retries > 3u) m->state = ZS_BG95_ERROR;
@@ -621,9 +663,13 @@ void zs_bg95_tick(zs_bg95_t *m, uint32_t now_ms) {
     if (m->io.gpio_write) m->io.gpio_write(m->io.ctx, m->pwrkey_gpio, false);
     m->state = ZS_BG95_AT_SYNC;
     m->retry_at_ms = now_ms;
+    m->deadline_ms = now_ms + BG95_AT_SYNC_TIMEOUT_MS;   /* one deadline for the whole sync, not per probe */
   }
-  if (m->state == ZS_BG95_AT_SYNC && !m->command_pending && now_ms >= m->retry_at_ms) {
-    if (!send_timed_cmd(m, "AT", now_ms)) fail_transport(m);
+  /* AT sync probes every second whether or not the previous one was answered: the BG95 boots for several
+     seconds after PWRKEY and drops what arrives before its UART is up, so a "pending" first AT must not block
+     the retries (with the 120 s command timeout that used to cost a full power cycle per bring-up). */
+  if (m->state == ZS_BG95_AT_SYNC && now_ms >= m->retry_at_ms) {
+    if (!send_cmd(m, "AT")) fail_transport(m);
     m->retry_at_ms = now_ms + 1000u;
   }
   if (m->state == ZS_BG95_REGISTERING && !m->command_pending && now_ms >= m->retry_at_ms) {
@@ -701,8 +747,15 @@ const char *zs_bg95_state_name(zs_bg95_state_t state) {
     "OFF", "POWERING", "AT_SYNC", "SIM_CHECK", "SIM_ICCID_QUERY",
     "SIM_IMSI_QUERY", "OPERATOR_QUERY", "APN_DISCOVERING", "CONFIGURE",
     "REGISTERING", "READY", "PDP_ACTIVATING", "PDP_SETTINGS_QUERY",
-    "TLS_CONFIGURING", "MQTT_OPENING", "MQTT_CONNECTING", "ONLINE",
+    "TIME_QUERY", "TLS_CONFIGURING", "MQTT_OPENING", "MQTT_CONNECTING", "ONLINE",
     "POWERING_OFF", "ERROR"
   };
   return state <= ZS_BG95_ERROR ? names[state] : "?";
+}
+
+bool zs_bg95_network_time(const zs_bg95_t *m, int64_t *epoch_us, uint32_t *at_ms) {
+  if (!m || !m->network_time_valid || !epoch_us || !at_ms) return false;
+  *epoch_us = m->network_time_us;
+  *at_ms = m->network_time_at_ms;
+  return true;
 }

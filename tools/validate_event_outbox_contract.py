@@ -229,28 +229,28 @@ def main() -> int:
         "target status overclaims or omits shared NOR binding evidence",
     )
     require(
-        "event_outbox_storage_binding: PORTABLE_SHARED_THREE_CONSUMER_BINDING_PASS_EXACT_SLOT_COUNTS_OCTOSPI_ENDURANCE_BLOCKER"
+        "event_outbox_storage_binding: TARGET_SHARED_THREE_CONSUMER_BINDING_BUILD_PASS_ENDURANCE_VALIDATION_PENDING"
         in target,
-        "target outbox storage binding status is not bounded",
+        "target outbox storage binding status drift",
     )
     require(
-        "event_outbox_nor_partition: PORTABLE_ARCHIVE_COMMAND_OUTBOX_NONOVERLAP_QG1_QG2_PASS_EXACT_SLOT_COUNTS_AND_TARGET_BINDING_BLOCKER"
+        "event_outbox_nor_partition: TARGET_ARCHIVE_COMMAND_OUTBOX_NONOVERLAP_16_COMMAND_256_OUTBOX_BUILD_PASS"
         in target,
-        "target outbox NOR partition blocker is not explicit",
+        "target outbox NOR partition status drift",
     )
-    require("event_outbox_slot_count: MISSING_BLOCKER" in target,
-            "target outbox slot-count blocker is not explicit")
-    require("command_journal_slot_count: MISSING_BLOCKER" in target,
-            "target command-journal slot-count blocker is not explicit")
+    require("event_outbox_slot_count: LOCKED_256_BUILD_PASS" in target,
+            "target outbox slot-count status drift")
+    require("command_journal_slot_count: LOCKED_16_BUILD_PASS" in target,
+            "target command-journal slot-count status drift")
     require(
         "nor_boot_probe: PORTABLE_W25Q512JV_EXACT_JEDEC_SFDP_CAPACITY_QE_RESTORE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_PENDING"
         in target,
         "target status overclaims or omits exact NOR boot probe",
     )
     require(
-        "nor_octospi_binding: PORTABLE_W25Q512JV_PROBE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_BLOCKER"
+        "nor_octospi_binding: TARGET_W25Q512JV_OSPI_BUILD_PASS_SAMPLE_VALIDATION_PENDING"
         in target,
-        "target NOR OCTOSPI/sample blocker is not explicit",
+        "target NOR OCTOSPI/sample status drift",
     )
 
     print("Event store-and-forward outbox QG-1: PASS")

@@ -1,0 +1,43 @@
+{
+  "schema_version": "dioneya.pcb-main-mech-eco-002-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-MECH-ECO-002",
+  "reviewer": "Скиф",
+  "date": "2026-09-18",
+  "reviewed_candidate": "hardware/reviews/PCB_MAIN_MECH_ECO_002_CANDIDATE.md",
+  "reviewed_candidate_sha256": "5164195ebf6a9a66b6a30197abfcb314655bfe059d0aea5f3782a744069780ff",
+  "reviewed_authority_sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9",
+  "reviewed_board_sha256": "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e",
+  "reviewed_placement_repack_sha256": "dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1",
+  "reviewed_local_commit_sha": "16ee36b9432508b539736a8ee78890ad99ce0788",
+  "github_equivalent_commit_sha": "b3ab796bcdee727798a121d114605e7ba84d683a",
+  "reviewed_tree_sha": "b5c2892d795389eb07a216139dc50f725a13e849",
+  "decision": "ACCEPT_LIMITED_MECHANICAL_ECO",
+  "scope": "LIMITED_MECH_007_MECH_012_TRANSLATION_ONLY",
+  "approved_change_records": [
+    "MECH-007",
+    "MECH-012"
+  ],
+  "approved_geometry": {
+    "MECH-007": {
+      "refdes": "J_PWR",
+      "from": [0.0, 15.0, 90.0],
+      "to": [0.0, 22.0, 90.0]
+    },
+    "MECH-012": {
+      "refdes": "J6",
+      "from": [18.0, 2.5, 180.0],
+      "to": [21.0, 2.5, 180.0]
+    }
+  },
+  "retained_baseline": {
+    "H1": [8.0, 5.0],
+    "source": "PCB-MAIN-MECH-ECO-001",
+    "part_of_eco_002": false
+  },
+  "approval_statement": "Утверждаю PCB-MAIN-MECH-ECO-002 по указанным SHA-256. Решение ACCEPT_LIMITED_MECHANICAL_ECO. Разрешаю оформить подпись, commit и push в evt-pre-20",
+  "implementation_authorized": true,
+  "routing_authorized": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

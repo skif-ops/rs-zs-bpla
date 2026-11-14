@@ -1,5 +1,7 @@
 # Мухоед EVT-PRE-20 source baseline 0.1
 
+> Историческая запись исходного baseline. Текущий выпуск и фактическое развёртывание фиксируются в [`RELEASE_NOTES.md`](RELEASE_NOTES.md) и [`docs/release-notes/DEPLOYMENT_STATUS.md`](../docs/release-notes/DEPLOYMENT_STATUS.md).
+
 Статус: `CI PASS / NOT DEPLOYED`
 
 - Сохранена фактическая база Мухоед 1.2.0, interface release 1.4.

@@ -1,0 +1,3 @@
+Layer Pairs Export File for PCB: F:\2AC9~1\Codex\rs-zs-bpla-evt-pre-20\hardware\altium\netlabel-reimport-diagnostic\PCB-MAIN\PCB-MAIN.PcbDoc
+LayersSetName=Top_Bot_Thru_Holes|DrillFile=pcb-main-roundholes.txt|DrillLayers=gtl,g1,g2,g3,g4,gbl
+LayersSetName=Top_Bot_Slot_Holes|DrillFile=pcb-main-slotholes.txt|DrillLayers=gtl,g1,g2,g3,g4,gbl

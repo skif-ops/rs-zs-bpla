@@ -1,0 +1,98 @@
+{
+  "schema": "pcb-main-usb-cell-fixture-routing-001-candidate.rev-a",
+  "candidate_id": "PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001",
+  "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS",
+  "reviewed_source_commit": "69642979f8b93e20d122d8e717c0d606ecbc8384",
+  "base_board_sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",
+  "candidate_board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
+  "scope": {
+    "routed_pair_group": "USB_CELL_FIXTURE_SEGMENT",
+    "routed_nets": [
+      "CELL_USB_DP_TP",
+      "CELL_USB_DM_TP"
+    ],
+    "endpoints": {
+      "CELL_USB_DP_TP": ["R39.2", "U26.1", "TP_CELL_USB.2"],
+      "CELL_USB_DM_TP": ["R40.2", "U26.2", "TP_CELL_USB.3"]
+    },
+    "added_segments": 27,
+    "added_signal_vias": 2,
+    "changed_footprints": [],
+    "changed_zones": [],
+    "changed_existing_copper": []
+  },
+  "engineering_geometry": {
+    "basis": "JLC06161H-3313_PUBLIC_ENGINEERING_CANDIDATE",
+    "layers": ["F.Cu", "B.Cu"],
+    "long_trunk_reference": "GND_MODEM_In4.Cu",
+    "trace_width_mm": 0.1537,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "minimum_conservative_obstacle_edge_gap_mm": 0.23625,
+    "via_size_mm": 0.5,
+    "via_drill_mm": 0.3,
+    "CELL_USB_DP_TP_primary_length_mm": 76.293814073931,
+    "CELL_USB_DM_TP_primary_length_mm": 76.293814073931,
+    "primary_pair_length_mismatch_mm": 0.0,
+    "CELL_USB_DP_TP_esd_stub_length_mm": 1.007782218537,
+    "CELL_USB_DM_TP_esd_stub_length_mm": 1.007782218537,
+    "esd_stub_length_mismatch_mm": 0.0,
+    "nearest_return_via_mm": {
+      "CELL_USB_DP_TP": 1.04432992871,
+      "CELL_USB_DM_TP": 0.865975306344
+    }
+  },
+  "machine_gate": {
+    "static_regeneration": "PASS",
+    "independent_static_audit": "PASS",
+    "commit_bound_ci": {
+      "status": "PASS",
+      "commit": "11af5c9df9ac8e4fd68ba78dbbd5c067bd3fe23f",
+      "run_number": 568,
+      "run_id": 35540146804
+    },
+    "commit_bound_kicad9_comparative_drc": {
+      "status": "PASS_NO_NEW_ERRORS_EXACT_FOUR_CONNECTION_REDUCTION",
+      "commit": "11af5c9df9ac8e4fd68ba78dbbd5c067bd3fe23f",
+      "run_number": 295,
+      "run_id": 35540146802,
+      "artifact_name": "evt-pre-20-kicad-native-gate",
+      "artifact_id": 10614043819,
+      "artifact_digest": "sha256:0a2bd9269a99a517716182f84fa280f3807c1f56045731a6a2253f4f434b7680",
+      "base_violations": 232,
+      "candidate_violations": 232,
+      "base_unconnected": 425,
+      "candidate_unconnected": 421,
+      "new_errors": 0,
+      "unconnected_reduction": 4
+    },
+    "application_commit_bound_gate": {
+      "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+      "application_commit": "8acd65791c5d68ff758fa8d3a43298825e6f688f",
+      "gate_source_commit": "c48217af5a6f74064491fb2aaa184548bd0ffbfb",
+      "gate_source_tree": "c2b7771853b40b673691e9e52cfe40b75867918c",
+      "ci_run_number": 570,
+      "ci_run_id": 35541888985,
+      "pcb_native_run_number": 297,
+      "pcb_native_run_id": 35541888979,
+      "artifact_id": 10615386189,
+      "artifact_digest": "sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd",
+      "base_violations": 232,
+      "active_violations": 232,
+      "base_unconnected": 425,
+      "active_unconnected": 421,
+      "new_errors": 0
+    }
+  },
+  "acceptance_basis": "USER_AUTHORIZED_MOST_RATIONAL_DECISIONS_AND_REQUESTED_NO_ADDITIONAL_QUERY_EXCEPT_EXTREME_CASE",
+  "human_acceptance": "ACCEPTED",
+  "required_acceptance_token_after_green_gate": "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE",
+  "authoritative_board_modified": true,
+  "remaining_usb_routing_after_application": [
+    "USB_MAIN_CONNECTOR_SEGMENT"
+  ],
+  "final_job_stackup_accepted": false,
+  "production_impedance_tolerance_accepted": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false,
+  "manufacturing_release": false
+}

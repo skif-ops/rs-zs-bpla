@@ -14,21 +14,24 @@ if str(ROOT) not in sys.path:
 
 from ml.acoustic_family import AcousticFamily, family_for_label
 from ml.family_classifier import AcousticFamilyClassifier
+from ml.source_identity import SOURCE_ID_COLUMN, with_source_identity
 
 
 def main() -> int:
-    frame = pd.read_csv(ROOT / "dataset" / "features.csv")
+    frame = with_source_identity(pd.read_csv(ROOT / "dataset" / "features.csv"))
     frame["expected_family"] = frame["label"].map(lambda x: family_for_label(str(x)).value)
     frame = frame[frame["expected_family"] != AcousticFamily.UNKNOWN.value].copy()
     rows = []
     with tempfile.TemporaryDirectory() as td:
-        for source_file, holdout in frame.groupby("source_file", sort=False):
+        for source_id, holdout in frame.groupby(SOURCE_ID_COLUMN, sort=False):
             expected = str(holdout["expected_family"].iloc[0])
-            train = frame[frame["source_file"].astype(str) != str(source_file)].copy()
+            train = frame[frame[SOURCE_ID_COLUMN].astype(str) != str(source_id)].copy()
+            source_files = sorted(set(holdout["source_file"].astype(str)))
             remaining = set(train["expected_family"].astype(str))
             if expected not in remaining:
                 rows.append({
-                    "source_file": str(source_file), "label": str(holdout["label"].iloc[0]),
+                    "source_group": str(source_id), "source_files": "|".join(source_files),
+                    "label": str(holdout["label"].iloc[0]),
                     "expected_family": expected, "predicted_family": "NOT_EVALUABLE",
                     "confidence": 0.0, "margin": 0.0, "correct": None,
                 })
@@ -38,7 +41,8 @@ def main() -> int:
             is_air = expected in {AcousticFamily.PROP_PISTON.value, AcousticFamily.ROTOR_ELECTRIC.value, AcousticFamily.TURBINE_JET.value}
             pred = clf.predict_rows(holdout, model, air_target_confirmed=is_air)
             rows.append({
-                "source_file": str(source_file), "label": str(holdout["label"].iloc[0]),
+                "source_group": str(source_id), "source_files": "|".join(source_files),
+                "label": str(holdout["label"].iloc[0]),
                 "expected_family": expected,
                 "predicted_family": pred.best_family if pred else "NONE",
                 "confidence": round(float(pred.confidence if pred else 0.0), 6),

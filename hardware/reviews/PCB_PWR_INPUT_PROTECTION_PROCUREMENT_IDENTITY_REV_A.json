@@ -1,0 +1,263 @@
+{
+  "schema_version": 2,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "retrieved_utc_date": "2026-09-17",
+  "status": "PASS_DOCUMENTARY_PROCUREMENT_IDENTITY_NO_RECEIVING_HOLD",
+  "decision": {
+    "standalone_engineering_sample_purchase_required": false,
+    "qualification_batch_may_be_ordered_without_identity_samples": true,
+    "prepurchase_documentary_identity_complete": true,
+    "mandatory_receiving_quarantine_required": false,
+    "mandatory_receiving_photography_required": false,
+    "mandatory_body_sampling_required": false,
+    "certificate_of_conformance_required": false,
+    "electrical_qualification_complete": false
+  },
+  "exact_orderables": [
+    "0451008.MRL",
+    "SMBJ18A",
+    "43045-0213",
+    "43030-0038"
+  ],
+  "targets": {
+    "0451008.MRL": {
+      "manufacturer": "Littelfuse",
+      "function": "F1 PCB input fuse",
+      "official_identity_source": "https://www.littelfuse.com/assetdocs/fuse-451-and-453-datasheet?assetguid=533cd5cc-956c-4243-867f-6ab5a62f6ba1",
+      "official_product_page": "https://www.littelfuse.com/products/fuses-overcurrent-protection/fuses/surface-mount-fuses/nano-2-fuses/451/0451008",
+      "documentary_identity": {
+        "series": "451 Nano2",
+        "nominal_current_a": 8.0,
+        "voltage_rating_vdc": 125,
+        "nominal_cold_resistance_ohm": 0.0077,
+        "nominal_melting_i2t_a2s": 20.23,
+        "body_marking_reference": "Littelfuse F brand mark plus 8A ampere marking; exact suffix is an ordering-code attribute, not a required body legend",
+        "factory_packaging": "1000 pieces on 12 mm tape and reel",
+        "ordering_code_binding": "0451 + 008. + M + R + L"
+      },
+      "supplier_catalog_records": [
+        {
+          "supplier": "DigiKey",
+          "url": "https://www.digikey.com/en/products/detail/littelfuse-inc/0451008-MRL/700831",
+          "claims_used": [
+            "Exact manufacturer part number 0451008.MRL",
+            "Littelfuse manufacturer binding",
+            "Tape-and-reel, cut-tape and Digi-Reel order options"
+          ]
+        }
+      ],
+      "purchase_order_identity_rule": "Littelfuse 0451008.MRL only; no adjacent 451-series rating or ordering-suffix substitution"
+    },
+    "SMBJ18A": {
+      "manufacturer": "Littelfuse",
+      "function": "D1 transient clamp",
+      "official_identity_source": "https://www.littelfuse.com/assetdocs/tvs-diodes-smbj-series-datasheet?assetguid=ba555e99-a12d-4f72-a0b6-86b06c67171e",
+      "official_product_page": "https://www.littelfuse.com/products/overvoltage-protection/tvs-diodes/surface-mount/smbj/smbj18a",
+      "documentary_identity": {
+        "package": "SMB DO-214AA",
+        "reverse_standoff_v": 18.0,
+        "breakdown_voltage_v": "20.0..22.1",
+        "maximum_clamp_v": 29.2,
+        "peak_pulse_power_w_10_1000us": 600,
+        "body_marking_reference": "LT device code, YMXXX trace format and cathode band; BT identifies rejected SMBJ18CA",
+        "factory_packaging": "3000 pieces on 12 mm tape on 13 inch reel"
+      },
+      "supplier_catalog_records": [
+        {
+          "supplier": "Mouser",
+          "url": "https://www.mouser.com/ProductDetail/Littelfuse/SMBJ18A?qs=zHiv0nsVGmq6qhYJ9exSJA%3D%3D",
+          "claims_used": [
+            "Exact manufacturer part number SMBJ18A",
+            "Littelfuse manufacturer binding",
+            "Reel, cut-tape and MouseReel order options"
+          ]
+        }
+      ],
+      "purchase_order_identity_rule": "Littelfuse SMBJ18A unidirectional device only; SMBJ18CA and other voltage codes are prohibited substitutions"
+    },
+    "43045-0213": {
+      "manufacturer": "Molex",
+      "function": "J1 two-circuit vertical PCB header",
+      "official_product_page": "https://www.molex.com/en-us/products/part-detail/430450213",
+      "official_product_image": {
+        "url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/manual/en-us/images/430/43045/0430450213_hires.jpg?wid=480&hei=327",
+        "sha256": "d0fdbe0b053d81cc0001bc228c8a30ef07962d9f3b6902f4518d1d037419d49c",
+        "scope": "Exact manufacturer product image used as documentary geometry reference only"
+      },
+      "documentary_identity": {
+        "circuits": 2,
+        "orientation": "Vertical",
+        "color": "Black",
+        "maximum_current_per_contact_a": 8.5,
+        "official_packaging_type": "Tray",
+        "upc": "800754370066"
+      },
+      "supplier_catalog_records": [
+        {
+          "supplier": "DigiKey",
+          "url": "https://www.digikey.com/en/products/detail/molex/0430450213/1635000",
+          "claims_used": [
+            "Exact numeric manufacturer part number 0430450213",
+            "Molex manufacturer binding",
+            "Tray packaging and small-quantity ordering"
+          ]
+        }
+      ],
+      "purchase_order_identity_rule": "Molex 43045-0213 only; supplier numeric style 0430450213 is accepted as the same exact Molex orderable"
+    },
+    "43030-0038": {
+      "manufacturer": "Molex",
+      "function": "18 AWG female crimp terminal",
+      "official_product_page": "https://www.molex.com/en-us/products/part-detail/430300038",
+      "official_product_image": {
+        "url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/manual/en-us/images/430/43030/0430300038_hires.jpg?wid=480&hei=327",
+        "sha256": "3964a86c3efa3975f59f4ed95a92d85532617434f98f59f4ed95eff79cb32",
+        "scope": "Exact manufacturer product image used as documentary geometry reference only"
+      },
+      "official_packaging_drawing": {
+        "document_number": "PK-43030-001-001",
+        "revision": "B1",
+        "release_date": "2022-10-07",
+        "url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/automated/en-us/packagingdesigndrawing/430/43030/PK-43030-001-001.pdf",
+        "sha256": "2f60beee920157c12547322ae81cfcf13d62e084180fb67c3b0d9d1df38efb86",
+        "claims": {
+          "quantity_pieces_per_reel": 12000,
+          "reel_flange_diameter_in": 24,
+          "product_label_location_shown": true,
+          "reels_per_carton": 7
+        }
+      },
+      "documentary_identity": {
+        "wire_awg": 18,
+        "wire_cross_section_mm2": 0.75,
+        "maximum_current_per_contact_a": 8.5,
+        "official_packaging_type": "Reel",
+        "upc": "889056413237"
+      },
+      "supplier_catalog_records": [
+        {
+          "supplier": "DigiKey",
+          "url": "https://www.digikey.com/en/products/detail/molex/0430300038/6098601",
+          "claims_used": [
+            "Exact numeric manufacturer part number 0430300038",
+            "Molex manufacturer binding",
+            "Tape-and-reel and cut-tape order options"
+          ]
+        },
+        {
+          "supplier": "Mouser",
+          "url": "https://www.mouser.com/ProductDetail/Molex/43030-0038",
+          "claims_used": [
+            "Exact manufacturer part number 43030-0038",
+            "Molex manufacturer binding",
+            "Factory pack and small-quantity order options"
+          ]
+        }
+      ],
+      "purchase_order_identity_rule": "Molex 43030-0038 only; supplier numeric style 0430300038 is accepted as the same exact Molex orderable"
+    }
+  },
+  "nonbinding_supplier_availability_snapshot": {
+    "observed_utc_date": "2026-09-17",
+    "purpose": "Two-week EVT-20 sourcing triage; not a frozen qualification fact or delivery guarantee",
+    "records": [
+      {
+        "mpn": "0451008.MRL",
+        "supplier": "DigiKey",
+        "evt_20_quantity_with_spares": 30,
+        "displayed_in_stock": 14150,
+        "manufacturer_standard_lead_time_weeks": 23,
+        "supplier_page": "https://www.digikey.com/en/products/detail/littelfuse-inc/0451008-MRL/700831"
+      },
+      {
+        "mpn": "SMBJ18A",
+        "supplier": "Mouser",
+        "evt_20_quantity_with_spares": 25,
+        "displayed_in_stock": 12758,
+        "manufacturer_standard_lead_time_weeks": null,
+        "supplier_page": "https://www.mouser.com/ProductDetail/Littelfuse/SMBJ18A?qs=zHiv0nsVGmq6qhYJ9exSJA%3D%3D"
+      },
+      {
+        "mpn": "43045-0213",
+        "supplier": "DigiKey",
+        "evt_20_quantity_with_spares": 25,
+        "displayed_in_stock": 4507,
+        "manufacturer_standard_lead_time_weeks": 17,
+        "supplier_page": "https://www.digikey.com/en/products/detail/molex/0430450213/1635000"
+      },
+      {
+        "mpn": "43030-0038",
+        "supplier": "DigiKey",
+        "evt_20_quantity_with_spares": 252,
+        "displayed_in_stock": 670806,
+        "manufacturer_standard_lead_time_weeks": 8,
+        "supplier_page": "https://www.digikey.com/en/products/detail/molex/0430300038/6098601"
+      }
+    ],
+    "displayed_stock_covers_controlled_evt_20_quantities": true,
+    "two_week_delivery_guaranteed": false,
+    "cart_or_quote_destination_delivery_confirmation_required_at_order": true
+  },
+  "documentary_procurement_gate": {
+    "status": "PASS",
+    "authority_order": [
+      "Official manufacturer product page and current data sheet or drawing",
+      "Exact manufacturer part number in the controlled BOM and purchase order",
+      "Supplier catalogue record binding seller order entry to manufacturer and exact MPN"
+    ],
+    "purchase_order_rule": [
+      "State manufacturer and exact MPN for every line",
+      "Prohibit substitutions and mixed manufacturer equivalents",
+      "Buy new unused material through the manufacturer or an established component distributor",
+      "Retain the supplier product URL or quotation line that maps the seller order entry to the exact MPN"
+    ],
+    "volatile_commercial_fields_confirm_at_order": [
+      "Orderable status",
+      "Available quantity",
+      "Price",
+      "Ship date and delivery date to destination",
+      "Packaging option when ordering less than the factory pack"
+    ],
+    "not_required_for_gate": [
+      "A separate engineering sample order",
+      "Future shipment date or lot code",
+      "Certificate of conformance",
+      "Incoming package or body photographs",
+      "A minimum incoming body sample count"
+    ]
+  },
+  "non_blocking_receipt_reconciliation": {
+    "status": "NOT_A_QUALIFICATION_OR_RELEASE_GATE",
+    "quarantine_required": false,
+    "mandatory_photographs_required": false,
+    "minimum_body_sample_count": 0,
+    "certificate_of_conformance_required": false,
+    "actions_using_existing_commercial_data": [
+      "Reconcile delivered quantity and supplier line against the purchase order or packing slip",
+      "Escalate an obvious MPN, quantity or transit-damage discrepancy through normal procurement nonconformance handling",
+      "Proceed directly to kitting when no discrepancy is reported"
+    ],
+    "new_receiving_evidence_package_required": false
+  },
+  "qualification_binding": {
+    "matrix_row": "PWR-IPQ-002",
+    "matrix_status": "PASS",
+    "documentary_gate_complete": true,
+    "physical_lot_identity_gate_required": false,
+    "functional_confirmation_routes": [
+      "PWR-IPQ-005 through PWR-IPQ-020",
+      "Assembly inspection and AOI",
+      "PCB-PWR electrical end-of-line test",
+      "EVT thermal, inrush, fault and transient tests"
+    ]
+  },
+  "release_boundary": {
+    "identity_control_allows_sample_only_purchase_to_be_omitted": true,
+    "exact_parts_may_be_bought_with_the_controlled_evt_test_batch_when_other_procurement_gates_allow": true,
+    "identity_control_allows_direct_evt_kitting_without_receiving_hold": true,
+    "physical_qualification_complete": false,
+    "pcba_procurement_authorized": false,
+    "manufacturing_release": false
+  }
+}

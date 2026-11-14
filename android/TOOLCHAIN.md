@@ -6,7 +6,8 @@
 |---|---|
 | Android Gradle Plugin | 9.4.0 |
 | Gradle | 9.6.0 |
-| JDK | 17 |
+| Build JVM | OpenJDK 21 |
+| Java source and target | 17 |
 | compileSdk / targetSdk | 36 |
 | minSdk | 28 (Android 9) |
 | SDK Build Tools | 36.0.0 |

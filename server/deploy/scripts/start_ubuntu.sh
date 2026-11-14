@@ -5,7 +5,7 @@ deploy_dir="$(cd "$script_dir/.." && pwd)"
 cd "$deploy_dir"
 mkdir -p ../data ../output
 test -f .env
-test -f tls/ca.crt
+for f in ca-chain.pem crl.pem server.crt.pem server.key.pem bridge.crt.pem bridge.key.pem; do test -f "tls/$f"; done   # what compose.ubuntu.yml mounts
 test -f tls/command-signing.key
 test "$(stat -c '%a' tls/command-signing.key)" = "600"
 docker compose --env-file .env -f compose.ubuntu.yml build --pull

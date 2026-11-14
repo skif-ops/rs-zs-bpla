@@ -238,7 +238,9 @@ Required AAD tests before release:
 
 - `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv` is the machine authority for `MAIN-AUTH-011` and contains 70 exact geometry records.
 - The Rev.A PCB outline is 110 x 75 mm with R3 corners, nominal 1.60 mm thickness and four D3.20 mm M3-clearance NPTHs at `(5,5)`, `(105,5)`, `(105,70)` and `(5,70)` mm.
-- The EVT target remains six layers. Trace widths for 50 Ohm cellular, GNSS and RU868 paths are calculated only from the selected fabricator stackup; this authority does not guess them.
+- The EVT target remains six layers. The selected public `JLC06161H-3313`
+  construction controls 50 Ohm cellular/GNSS/RU868 width at `0.1509 mm` on L1
+  over L2; checkout DFM and final RF/SI review remain mandatory.
 - J6/J7/J11/J12 use the south service edge; J_PWR exits west, J13 east, and the four microphone harnesses use controlled west/north/east pull corridors.
 - U8/J8, U9/J9, U10/J10 and U11 occupy separate cellular, GNSS, RU868 and BLE zones. The U11 antenna end is flush to the east edge with a 3.8 x 10.5 mm all-layer board keepout and a larger enclosure exclusion.
 - The GNSS upper-view mechanical exclusion prohibits solar, metal and cable bundles above its reserved route. Final active antenna and coax geometry remain separate system inputs.

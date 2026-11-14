@@ -1,0 +1,263 @@
+{
+  "configuration": "EVT-PRE-20 Rev.A",
+  "board": "PCB-MAIN",
+  "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
+  "generator": "tools/generate_pcb_main_schematic_rev_a.py",
+  "generator_sha256": "1c2bb6dad226c4609a17747e9212bda6ec51f962cda22b19b5061a067513a9bf",
+  "hierarchy_materializer": "tools/materialize_pcb_main_hierarchy_rev_a.py",
+  "hierarchy_materializer_sha256": "0c04a3d07878ac613679175504fb1bc9e66303ed4d2190436655792ba0c5122b",
+  "hierarchy_connectivity_reader": "tools/pcb_main_schematic_hierarchy.py",
+  "hierarchy_connectivity_reader_sha256": "3d02a528b55239292ef760e5df7b3b619111da099f27eca5dc1964723cb5421f",
+  "inputs": [
+    {
+      "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "e766dedaee8ba2ba664b9392770ab59f5f96464af60121fb6ff8310d3bd0ef0b"
+    },
+    {
+      "path": "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "481d38fcd9b946a222542521bdb90de84ae85b651b2250cd46494c79b47a167b"
+    },
+    {
+      "path": "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "ff84acbcc8ecc104cbc6691d5a2eaed652adfab082c510518bd0ab487da68267"
+    },
+    {
+      "path": "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "3431c903eb9a1138e9976a0d95479c4269e2c0d25d72c98bbe5dc6e7785c6579"
+    },
+    {
+      "path": "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "5709e9d3ae8af4f77865891e5db8104d3f66e597f38194af0f95280d234fc814"
+    },
+    {
+      "path": "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "72b0604e6010d98761857a9aaacd86d21a0935bd01a9365050a3392db3d4cd6e"
+    },
+    {
+      "path": "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "efb075342ac159d3c96a8d84cbd464d592156c6f3ad53e57875efcc5c7dd5d2a"
+    },
+    {
+      "path": "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "9dc9bc2f57d722bd4cb6ae9f6de251cffe22c883c68dc9f25ee55a2eb577dbe3"
+    },
+    {
+      "path": "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "b94cd4723efeffbdea7f1c6ba82f977da9c83c556967316630461af6048eaf12"
+    },
+    {
+      "path": "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
+      "sha256": "0b2abb5e967526590b02f069992579a2606d05d485f8ce3917472a3dbfbcd2b6"
+    },
+    {
+      "path": "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+      "sha256": "421b833fa809b099b310302fd942c2678d98f27da33a41d6e7b25176dfbab17d"
+    },
+    {
+      "path": "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
+      "sha256": "e0373e83d3d82316044295ad50aa7ced8a309dbb1fad92a3374691cd39ad169c"
+    },
+    {
+      "path": "hardware/CONNECTOR_FREEZE_REV_A.csv",
+      "sha256": "6e1d5c066cd312542724dd400660a99e92ad85465556c017825893e62c3bf0d7"
+    },
+    {
+      "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
+      "sha256": "1d8f81d09a93a9e1910faa7ee24130e634e46600c4033daef9ca3bdea2fd30ab"
+    },
+    {
+      "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+      "sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9"
+    },
+    {
+      "path": "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv",
+      "sha256": "7925cbdf1e8665384971c71923e2d946d1f6735ab4e9bfe67e5b5d12807b6f92"
+    },
+    {
+      "path": "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv",
+      "sha256": "6a118b05bf08d1f1ac58bed00ed3d55fae40ba325cd177605673376073e7a3ad"
+    },
+    {
+      "path": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
+      "sha256": "e1fa9f08d8e055c57240b0cdef11a404f367926a5bbe29909ca13994a2c2f09b"
+    },
+    {
+      "path": "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
+      "sha256": "0de5b056e0c50c4196fdb763a4805b3860f9cca9f7a089096398c10b1d596bbc"
+    }
+  ],
+  "component_count": 248,
+  "fitted_count": 233,
+  "dnp_count": 15,
+  "pin_count": 1074,
+  "schematic_sha256": "810a3aa16d88e4179cf84a7bfbfd9c29d1a5d95066a75a6e2517f4d1d30a0918",
+  "hierarchy_sources": [
+    {
+      "path": "PCB-MAIN.kicad_sch",
+      "sha256": "810a3aa16d88e4179cf84a7bfbfd9c29d1a5d95066a75a6e2517f4d1d30a0918"
+    },
+    {
+      "path": "PCB-MAIN_01_POWER.kicad_sch",
+      "sha256": "4c163f8c88b42a4ffd35e4b6cb27acd32753c1fa2004acb194084997c8de51c0"
+    },
+    {
+      "path": "PCB-MAIN_02_MCU.kicad_sch",
+      "sha256": "e2f13a507e66a9658d65dc628897db0eb824d46216fcefe7f7f8e8b153d8e405"
+    },
+    {
+      "path": "PCB-MAIN_03_AUDIO.kicad_sch",
+      "sha256": "e359b46850186940efd914460eaefa8e6f292d0cddaae91ad92ae1f99d5c2516"
+    },
+    {
+      "path": "PCB-MAIN_04_GNSS.kicad_sch",
+      "sha256": "0741780507d2c4b5907d8ab0b00807eb2b1ecb2becf899e6246d3a4787b1e38c"
+    },
+    {
+      "path": "PCB-MAIN_05_CELLULAR.kicad_sch",
+      "sha256": "b944b2ae8eed85e9436577e62beac1e0fdd6a6831dcc292f2e2bf37058bdecd4"
+    },
+    {
+      "path": "PCB-MAIN_06_LORA.kicad_sch",
+      "sha256": "733c2996581794b49eb7061019c9136c53476750a251e0499e37a849a05db155"
+    },
+    {
+      "path": "PCB-MAIN_07_BLE.kicad_sch",
+      "sha256": "af66b777d65d86645893dd1966b6980045a2c444b9d06e6979bc676cfb72f7fd"
+    },
+    {
+      "path": "PCB-MAIN_08_STORAGE_SENSORS.kicad_sch",
+      "sha256": "24a76c439aa3f7ad22b3f2b761d8458b852b190ea62169647ab0d150a00260aa"
+    },
+    {
+      "path": "PCB-MAIN_09_CONNECTORS_TEST.kicad_sch",
+      "sha256": "fe24ad6ccc93310acd2bede9d9f5839bfa825a857bef9e9319ec1b6ef3ec658d"
+    }
+  ],
+  "hierarchy_pages": 10,
+  "hierarchy_functional_child_sheets": 9,
+  "project_sha256": "236a25b84abc40de5cb67464d9ee46cceaa247384d4710c84c93990a98961897",
+  "symbol_library_sha256": "565d255cb6d45209be3b68fe5be51c5d897e66b5e4aba40c6c3197b30060eb56",
+  "symbol_library_table_sha256": "06b7072dc084b7bfabb1ae955f30bf4972df14ac56d471186bef75949aeb8f63",
+  "footprint_library_table_sha256": "1c47fb4609ed49f15a299ed2eb80d6538bdbc0082ec7471c483750a35cedefa3",
+  "controlled_footprints": [
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/KEMET_T52X_D_7343-31_DensityB.kicad_mod",
+      "sha256": "a5ee0ff5fdfd9b7ce2197f35333062d0023fcccd6320431719b5c84f946c39d7"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Hirose_U.FL-R-SMT-1.kicad_mod",
+      "sha256": "3a5029441591fb1ea9974d5450449593fb8f374d88dd749d9dce0e5d28ff32ae"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/ST_STM32U585_LQFP100_1L.kicad_mod",
+      "sha256": "fad5eff80bb5889c3f3443fd4b800b83a58f5639527ac8b863cf8e1d5b53865f"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_PW0014A_TSSOP14.kicad_mod",
+      "sha256": "c7ac553b05eda1a2d9999dc2e8f73c2c2de2e96f1bea62d58a3426c8b811ca7c"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_PW0024A_TSSOP24.kicad_mod",
+      "sha256": "b16e058a945d70e228291e0d1d0de09a714e3059b74a99925893b8ccc004d16f"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_DRL0006A_SOT6.kicad_mod",
+      "sha256": "58309ce43d3c4812b7ab925f0245d1d8ca9080c7bde0fa4e959b891054deaa5e"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_DBV0005A_SOT23-5.kicad_mod",
+      "sha256": "3417ce9959d5ec4c01c77ca85f372fdaa8caab0343b2875aa841c041110589fc"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_DYA0002A_SOD523.kicad_mod",
+      "sha256": "05734890d74ced4990348df184cd922826415c54c9a919e069b507fffe793b5c"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_DQA0010A_USON10.kicad_mod",
+      "sha256": "3c47b238566ba213cd0acb75a95c6c2d938b3669d26a75fd73fcd16dd30eab16"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/ST_LIS2DW12_LGA-12L.kicad_mod",
+      "sha256": "71613d02186e56ce03941c394acbea3404e705758c56bee149b452e70d701be8"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Raytac_MDBT50Q-P1MV2.kicad_mod",
+      "sha256": "f19787598f9c1d2e892b3d3850804f5e56ba25dde8daccbba842bab4854bca44"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/PESD5V0C1BSF_SOD962-2.kicad_mod",
+      "sha256": "eee737e3ea2c4b9af01d0d022f2a7bf5a66c0a080513965dc11ccfc078d3a112"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Nexperia_PESD5V0S1UL_SOD882.kicad_mod",
+      "sha256": "f790403b5af284ff7fdecc0033bc2f96097849d26dbb576e2354b25eb731e567"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Nexperia_MMBT3904_SOT23.kicad_mod",
+      "sha256": "09e16af7131d59096cb68c093daadf650d453e022697a5d638fcab151493da6d"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/ST_ESDALC6V1-5P6_SOT666.kicad_mod",
+      "sha256": "473a3f69b1daf6751a860187ed50d44f738bbc3f626f0edd6fe0f445fdd49ed2"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Vishay_Si1016X_SC-89.kicad_mod",
+      "sha256": "3256048c59e1758c1e36d1c545681406241c8f2f283997033a9ceabf20743e0c"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/STTS22H_UDFN-6L.kicad_mod",
+      "sha256": "e06136e5f2ebd67798141ff1ef99db94d895d139d20b3c98a671e34bbbfa277f"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/LT6000_DCB-7.kicad_mod",
+      "sha256": "6284c99e8302bd671a8eb20d1e732ed009c708e85892703b54c51b839532e497"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/SiT1552_JE_CSP-4.kicad_mod",
+      "sha256": "f89d41dc8b07610954dff6672c3566eb27c37fe08c90b22b5e6c00c0961d34df"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/u-blox_MAX-M10S_LCC-18.kicad_mod",
+      "sha256": "9c38091a434fb82f84dac437901e0d544c8b2be6e5aa4ee0cfced36c6aa95d87"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Ebyte_E22-M22S_Castellated-22.kicad_mod",
+      "sha256": "e701867e072a198f83a737d541de6424eff3c309688a0cbbad7d68150309c6e7"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Abracon_ABSES5AF_1109-5.kicad_mod",
+      "sha256": "23c81edc4a45c68fcea775040f042dc2101888c80a00e1a37e5a04b56f7ccc90"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TE_2336582-1_NanoSIM.kicad_mod",
+      "sha256": "8457cd97b6a147c3a8f2a3968f407aa6fe8af41063b6f4ff6a0275817ac9e8e3"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Quectel_BG95-M3_LGA-102.kicad_mod",
+      "sha256": "48780a92b91648b3cafe42922aef9853e85db8bd5e4763e3975a02968f0ff179"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/GCT_MEM2052-00-195-00-A.kicad_mod",
+      "sha256": "7f3368cfb98d68922679433b2c9e96ef129b8976b1fa233df531d60ac049f4bb"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Molex_504050-0291_PicoLock-2.kicad_mod",
+      "sha256": "c0143595ccb60dfca65b822bfb94248ab2b37fb98059d20daf9141034457ac56"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Molex_43045-1202_MicroFit-12_RA.kicad_mod",
+      "sha256": "b495c6001746670a5d37afbb3de9fcf49392fc18e0a72528feccc44b8d276cdb"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",
+      "sha256": "78a67dda268e971a3463c41a8fb8170c3c59a1d3af145c65ed6b7212d1d8af83"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_DRT0003A_IPC_Candidate.kicad_mod",
+      "sha256": "b82af2a8e0eb455b430115ea8d9f2c4aeae30cc71de92823573d4f2d092bc6b9"
+    }
+  ],
+  "review_a": "SIGNED_PIN_NET_PASS_RETAINED_BY_EXACT_HIERARCHY_EQUIVALENCE",
+  "hierarchy_review": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+  "review_b": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_REMAINING_ROUTING_PENDING"
+}

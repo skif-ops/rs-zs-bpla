@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Independently audit the unrouted PCB-PWR Rev.A placement candidate."""
+"""Independently audit the unrouted PCB-PWR Rev.A EVT placement candidate."""
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -19,10 +20,52 @@ STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 OPEN_DIMENSIONS = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
 
 EXPECTED_ZONE_COUNTS = Counter({
-    "INPUT_PROTECTION": 7, "CURRENT_SENSE": 5, "BUCK_3V8": 15,
-    "BUCK_3V3": 12, "AUX_1V8": 4, "CONTROL_INTERFACE": 4,
+    "INPUT_PROTECTION": 7, "CURRENT_SENSE": 5, "BUCK_3V8": 16,
+    "BUCK_3V3": 13, "AUX_1V8": 4, "CONTROL_INTERFACE": 4,
     "GROUND_JOIN": 3, "DFT_EDGE": 10,
 })
+EXPECTED_MOUNTS = {
+    "H1": (5.0, 5.0),
+    "H2": (82.0, 5.0),
+    "H3": (68.0, 55.0),
+    "H4": (5.0, 55.0),
+}
+ECO_002_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+HOT_LOOP_006_SHA256 = "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
+SHUNT_BULK_007_SHA256 = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
+C13_C12_008_SHA256 = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+OUTPUT_BULK_010_SHA256 = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+J2_PLACEMENT_ECO_003_SHA256 = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
+AUTOROUTE_011_SHA256 = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ECO_005_SHA256 = "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610"  # exact committed ECO-005 board (Review B R1 remediation)
+ECO_006_SHA256 = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"  # exact committed ECO-006 board (Review B R2 DFM: TP mask 0.1 mm, legend 1.0/0.15 mm; copper unchanged)
+# ECO-005 (Review B R1 finding 6): NT2 turned 180 deg so its GND_DIGITAL pad faces J2.4;
+# only this pose changes (hardware/reviews/PCB_PWR_ECO_005_REV_A.md).
+ECO_005_POSES = {"NT2": (75.6, 48.52, 180.0)}
+# Exact accepted ECO-003 poses; the placement authority CSV and the DIM-003
+# record stay byte-identical because historical packets bind their SHA-256.
+J2_PLACEMENT_ECO_003_POSES = {
+    "J2": (81.08, 40.0, 270.0),
+    "U5": (74.4, 46.0, 0.0),
+    "C7": (74.4, 50.0, 0.0),
+    "C8": (74.9, 54.0, 0.0),
+    "NT1": (75.6, 40.12, 0.0),
+    "NT2": (75.6, 48.52, 0.0),
+    "NT3": (75.6, 52.0, 0.0),
+    "R13": (74.6, 56.5, 0.0),
+    "R14": (74.6, 58.0, 0.0),
+}
+ECO_002_POSES = {
+    "U3": (55.0, 14.0, 90.0),
+    "U4": (55.0, 42.0, 90.0),
+    "C4": (57.8, 14.03, 270.0),
+    "C6": (57.8, 42.03, 270.0),
+    "C20": (52.35, 14.0, 90.0),
+    "C21": (52.35, 42.0, 90.0),
+    "L1": (62.5, 14.0, 180.0),
+    "L2": (62.5, 42.0, 180.0),
+}
 
 
 def require(ok: bool, message: str) -> None:
@@ -75,11 +118,11 @@ def close(actual: float, expected: float, message: str, tolerance: float = 0.002
 
 def main() -> int:
     placements = read_csv(PLACEMENT)
-    require(len(placements) == 60, "placement authority must contain exactly 60 rows")
+    require(len(placements) == 62, "placement authority must contain exactly 62 rows")
     require(all(all(value.strip() for value in row.values()) for row in placements),
             "placement authority contains a blank field")
     by_ref = {row["RefDes"]: row for row in placements}
-    require(len(by_ref) == 60, "duplicate placement RefDes")
+    require(len(by_ref) == 62, "duplicate placement RefDes")
     require(all(row["Side"] == "TOP" and row["Placement_Status"].startswith("PROVISIONAL_")
                 for row in placements), "placement state must stay provisional and top-side")
     require(Counter(row["Functional_Zone"] for row in placements) == EXPECTED_ZONE_COUNTS,
@@ -103,27 +146,40 @@ def main() -> int:
             "value": prop(instance, "Value"), "footprint": prop(instance, "Footprint"),
             "population": "DNP" if instance.dnp else "FITTED", "pins": pins,
         }
-    require(len(expected) == 60 and set(expected) == set(by_ref),
+    require(len(expected) == 62 and set(expected) == set(by_ref),
             "native schematic and placement physical sets differ")
     require(all(item["footprint"] for item in expected.values()),
             "native schematic still has a blank physical footprint")
 
     board = Board.from_file(str(PCB), encoding="utf-8")
+    board_sha256 = hashlib.sha256(PCB.read_bytes()).hexdigest()
     copper = [layer.name for layer in board.layers if layer.name.endswith(".Cu")]
     require(copper == ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"],
-            f"unexpected provisional copper stack: {copper}")
-    close(float(board.general.thickness), 1.6, "provisional board thickness")
+            f"unexpected controlled copper-layer count: {copper}")
+    close(float(board.general.thickness), 1.6, "EVT board thickness")
     footprints = {ref_of(item): item for item in board.footprints}
-    require(len(footprints) == len(board.footprints) == 60, "board must contain 60 unique references")
-    require(set(footprints) == set(expected), "board and schematic reference sets differ")
+    require(len(footprints) == len(board.footprints) == 66,
+            "board must contain 62 electrical and four mounting references")
+    require(set(footprints) == set(expected) | set(EXPECTED_MOUNTS),
+            "board electrical/mounting reference set differs")
 
     for ref, wanted in expected.items():
         footprint = footprints[ref]
         row = by_ref[ref]
-        close(float(footprint.position.X), float(row["X_mm"]), f"{ref} X")
-        close(float(footprint.position.Y), float(row["Y_mm"]), f"{ref} Y")
+        wanted_pose = (
+            ECO_005_POSES[ref]
+            if board_sha256 in {ECO_005_SHA256, ECO_006_SHA256} and ref in ECO_005_POSES
+            else J2_PLACEMENT_ECO_003_POSES[ref]
+            if board_sha256 in {J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256} and ref in J2_PLACEMENT_ECO_003_POSES
+            else ECO_002_POSES[ref]
+            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256} and ref in ECO_002_POSES
+            else (float(row["X_mm"]), float(row["Y_mm"]),
+                  float(row["Rotation_deg"]) % 360.0)
+        )
+        close(float(footprint.position.X), wanted_pose[0], f"{ref} X")
+        close(float(footprint.position.Y), wanted_pose[1], f"{ref} Y")
         close(float(footprint.position.angle or 0.0) % 360.0,
-              float(row["Rotation_deg"]) % 360.0, f"{ref} rotation", 0.01)
+              wanted_pose[2], f"{ref} rotation", 0.01)
         require(footprint.layer == "F.Cu", f"{ref}: provisional placement must remain top-side")
         require(footprint.libId == wanted["footprint"],
                 f"{ref}: footprint binding differs from native schematic")
@@ -138,8 +194,8 @@ def main() -> int:
             f"authority={row['Source_Authority']}",
         ))
         require(footprint.description == description, f"{ref}: placement metadata drift")
-        require(footprint.tags == "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN",
-                f"{ref}: provisional interlock tags drift")
+        require(footprint.tags == "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE",
+                f"{ref}: EVT mechanical/release tags drift")
         excluded = population in {"DNP", "PCB_FEATURE"}
         require(footprint.attributes.excludeFromPosFiles is excluded and
                 footprint.attributes.excludeFromBom is excluded,
@@ -154,11 +210,33 @@ def main() -> int:
             actual = {pad.net.name if pad.net is not None else "NC" for pad in pads[number]}
             require(actual == {net}, f"{ref}.{number}: board net {sorted(actual)} != {net}")
 
+    for ref, expected_xy in EXPECTED_MOUNTS.items():
+        footprint = footprints[ref]
+        close(float(footprint.position.X), expected_xy[0], f"{ref} X")
+        close(float(footprint.position.Y), expected_xy[1], f"{ref} Y")
+        require(footprint.libId == "DioneyaPWR:MountingHole_M3_3.4_EVT",
+                f"{ref}: mounting footprint binding differs")
+        require(footprint.attributes.boardOnly and
+                footprint.attributes.excludeFromPosFiles and
+                footprint.attributes.excludeFromBom,
+                f"{ref}: board-only/BOM/PnP attributes differ")
+        require(len(footprint.pads) == 1, f"{ref}: expected one mounting pad")
+        pad = footprint.pads[0]
+        require(pad.type == "np_thru_hole" and pad.shape == "circle" and
+                abs(float(pad.size.X) - 3.4) <= 0.001 and
+                abs(float(pad.size.Y) - 3.4) <= 0.001 and
+                pad.drill is not None and
+                abs(float(pad.drill.diameter) - 3.4) <= 0.001 and
+                abs(float(pad.clearance) - 2.3) <= 0.001,
+                f"{ref}: NPTH drill or D8 copper exclusion differs")
+
     expected_nets = {net for item in expected.values() for net in item["pins"].values() if net != "NC"}
     board_nets = {net.name for net in board.nets if net.number != 0}
     require(board_nets == expected_nets, "board net set differs from native schematic")
-    require(len(board.traceItems) == 0 and len(board.zones) == 0,
-            "provisional placement candidate contains routing or copper zones")
+    require((len(board.traceItems), len(board.zones)) in
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)}
+            or board_sha256 in {AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256},  # exact committed autoroute 011 board
+            "PCB-PWR contains copper beyond the accepted autoroute 011 successor")
 
     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
     require(len(edges) == 4, "provisional outline must contain four line segments")
@@ -172,32 +250,34 @@ def main() -> int:
             "input/harness edge-anchor intent drift")
     require((float(by_ref["U3"]["X_mm"]), float(by_ref["U3"]["Y_mm"]),
              float(by_ref["L1"]["X_mm"]), float(by_ref["L1"]["Y_mm"])) ==
-            (55.0, 14.0, 62.0, 14.0), "3V8 power-stage anchor drift")
+            (55.0, 14.0, 60.75, 14.0), "3V8 power-stage anchor drift")
     require((float(by_ref["U4"]["X_mm"]), float(by_ref["U4"]["Y_mm"]),
              float(by_ref["L2"]["X_mm"]), float(by_ref["L2"]["Y_mm"])) ==
-            (55.0, 42.0, 62.0, 42.0), "3V3 power-stage anchor drift")
+            (55.0, 42.0, 60.75, 42.0), "3V3 power-stage anchor drift")
     for index in range(1, 11):
         row = by_ref[f"TP{index}"]
         close(float(row["X_mm"]), 25.0 + (index - 1) * 2.54, f"TP{index} pitch")
         close(float(row["Y_mm"]), 56.0, f"TP{index} row")
 
     dim_rows = {row["ID"]: row for row in read_csv(OPEN_DIMENSIONS)}
-    require(dim_rows["DIM-003"]["Status"] == "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED"
+    require(dim_rows["DIM-003"]["Status"] ==
+            "CLOSED_EVT_ENGINEERING_18_OF_18_ACCEPTED_SERIAL_REVALIDATION_REQUIRED"
             and dim_rows["DIM-003"]["Owner"] == "EE_ME",
-            "DIM-003 must remain at the controlled 0/18 EE_ME request state")
+            "DIM-003 EVT acceptance state differs")
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     layout = status["native_layout"]
     require(status["manufacturing_release"] is False and
-            layout["status"] == "PROVISIONAL_FITTED_2D_CLEARANCE_PASS_DIM_003_OPEN" and
+            layout["status"] == "EVT_FITTED_2D_AND_MOUNTING_CLEARANCE_PASS_DIM_003_ACCEPTED" and
             layout["layer_count_authority"] == "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv" and
-            layout["layer_count_status"] == "FROZEN_REV_A_FINAL_STACKUP_OPEN" and
-            layout["routing_present"] is False and layout["copper_zones_present"] is False and
-            layout["cam_export_authorized"] is False and layout["mounting_holes"] == 0,
+            layout["layer_count_status"] == "FROZEN_REV_A_EVT_STACKUP_ACCEPTED" and
+            layout["routing_present"] is True and layout["copper_zones_present"] is True and
+            layout["cam_export_authorized"] is False and layout["mounting_holes"] == 4 and
+            layout["mounting_status"] == "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
             "PCB-PWR capture-status interlock drift")
 
-    print("PCB-PWR provisional placement-candidate independent audit PASS")
-    print("60 footprints; exact schematic nets; 90x60 four-layer canvas; routing/zones/holes absent")
-    print("DIM-003 request ready with 0/18 accepted; DRC/CAM/Review B/manufacturing remain prohibited")
+    print("PCB-PWR EVT placement-candidate independent audit PASS")
+    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; accepted 3V8 output bulk 010 successor")
+    print("DIM-003 18/18 EVT accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 
 

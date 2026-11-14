@@ -259,7 +259,32 @@ static void test_retry_limit_station_and_argument_guards(void) {
          ZS_MQTT_EVENT_INVALID_ARGUMENT);
 }
 
+/* A published event waits ZS_MQTT_EVENT_RECEIPT_WAIT_MS for the server receipt before it is offered again;
+   a heartbeat publication (not from the outbox) does not disturb the hold. */
+static void test_receipt_hold_delays_republish(void) {
+  fixture_t fixture;
+  zs_event_outbox_io_t io;
+  zs_mqtt_event_transport_t transport;
+  zs_mqtt_event_message_t publication;
+  enqueue_vector(&fixture, &io, ZS_EVENT_RECEIPT_VECTOR_STATION_ID);
+  transport = make_transport(&io);
+  zs_mqtt_event_transport_set_time(&transport, 1000u);
+  assert(zs_mqtt_event_transport_prepare(&transport, &publication) == ZS_MQTT_EVENT_PUBLICATION_READY);
+  zs_mqtt_event_transport_note_published(&transport);                 /* broker ack at t = 1 s */
+  zs_mqtt_event_transport_set_time(&transport, 1000u + ZS_MQTT_EVENT_RECEIPT_WAIT_MS - 1u);
+  assert(zs_mqtt_event_transport_prepare(&transport, &publication) == ZS_MQTT_EVENT_EMPTY);   /* held */
+  zs_mqtt_event_transport_set_time(&transport, 1000u + ZS_MQTT_EVENT_RECEIPT_WAIT_MS);
+  assert(zs_mqtt_event_transport_prepare(&transport, &publication) == ZS_MQTT_EVENT_PUBLICATION_READY);   /* no receipt: republish */
+  assert(transport.publication_item.retry_count == 1u);                /* the count before this (second) attempt */
+  /* a hold without a broker ack (publish failed) does not exist: the item is offered again at once */
+  transport = make_transport(&io);
+  zs_mqtt_event_transport_set_time(&transport, 5000u);
+  assert(zs_mqtt_event_transport_prepare(&transport, &publication) == ZS_MQTT_EVENT_PUBLICATION_READY);
+  assert(zs_mqtt_event_transport_prepare(&transport, &publication) == ZS_MQTT_EVENT_PUBLICATION_READY);
+}
+
 int main(void) {
+  test_receipt_hold_delays_republish();
   test_retry_then_exact_receipt_lifecycle();
   test_queued_receipt_applies_after_transport_restart();
   test_receipt_rejection_and_attempt_storage_failure();

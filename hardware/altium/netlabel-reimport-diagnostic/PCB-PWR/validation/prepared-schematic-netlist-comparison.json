@@ -1,0 +1,27 @@
+{
+  "source": "hardware\\altium\\netlabel-reimport-diagnostic\\PCB-PWR\\validation\\PCB-PWR-KiCad-prepared.xml",
+  "altium": "hardware\\altium\\netlabel-reimport-diagnostic\\PCB-PWR\\validation\\PCB-PWR-Protel2.NET",
+  "source_net_count": 32,
+  "altium_net_count": 31,
+  "source_physical_net_count": 31,
+  "altium_physical_net_count": 31,
+  "source_physical_pin_count": 160,
+  "altium_physical_pin_count": 160,
+  "omitted_kicad_unconnected_singletons": [
+    "U5-4"
+  ],
+  "source_virtual_nodes": [],
+  "altium_virtual_nodes": [
+    "3V3_DIGITAL: #FLG03-1",
+    "GND_PWR: #FLG02-1",
+    "VBAT_SYS: #FLG01-1"
+  ],
+  "physical_pin_universe_equal": true,
+  "physical_net_partitions_equal": true,
+  "physical_net_names_equal": true,
+  "missing_physical_pins": [],
+  "extra_physical_pins": [],
+  "missing_groups": [],
+  "extra_groups": [],
+  "name_mismatches": []
+}

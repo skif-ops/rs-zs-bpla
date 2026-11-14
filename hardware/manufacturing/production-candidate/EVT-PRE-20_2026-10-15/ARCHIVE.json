@@ -1,0 +1,9 @@
+{
+  "release_directory": "F:\\Проекты\\Codex\\release-packages\\EVT-PRE-20_FULL_PRODUCTION_CANDIDATE_2026-10-15",
+  "archive": "F:\\Проекты\\Codex\\release-packages\\EVT-PRE-20_FULL_PRODUCTION_CANDIDATE_2026-10-15.zip",
+  "archive_bytes": 21106455,
+  "archive_sha256": "2FE5A516EAD16640FC3497D51C20CBBB0B825DF061010AA32B22BC1D8A3480D8",
+  "file_count": 854,
+  "content_commit": "80dd64000d66d9eb9994174210eb55aee0d3d3be",
+  "main_pcb_sha256": "BFA1355CFE70B9794507C58FFD22923FBAEB3234DECDDB595796E8C0441141CF"
+}

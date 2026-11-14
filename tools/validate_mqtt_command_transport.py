@@ -143,24 +143,40 @@ def main() -> int:
         else:
             require(current is not None, "ACL rule appears before a user")
             sections[current].add(line)
+    # Pilot identity (protocols/MQTT_TLS_ICD_v0_1_ADDENDUM_A_PILOT_IDENTITY.md): certificate CN = serial,
+    # DIO-EVT-001..020 -> tenant pilot1 (station_id = number), 021..040 -> pilot2, B01 -> bench/901.
+    pilot_units = {f"DIO-EVT-{i:03d}": ("pilot1" if i <= 20 else "pilot2", i) for i in range(1, 41)}
+    pilot_units["DIO-EVT-B01"] = ("bench", 901)
+    tenants = ("bench", "pilot1", "pilot2")
+    # The bridge also publishes the output API dioneya.alert/1 over MQTT (protocols/DIONEYA_ALERT_API_v1.md, 4.4);
+    # a registered consumer of it (`pki.cli consumer-cert`) reads nothing but the alert topics of pilot tenants.
+    alert_topics = {f"dioneya/alert/v1/{tenant}" for tenant in tenants}
     require(sections.get("bridge") == {
-        "topic read zs/v1/evt/+/up",
-        "topic read zs/v1/evt/+/status",
-        "topic write zs/v1/evt/+/down",
-        "topic read zs/v1/evt/+/ack",
-        "topic write zs/v1/evt/+/receipt",
-    }, "bridge ACL has missing or excessive rights")
-    for station_id in range(1, 21):
-        user = f"station{station_id:02d}"
-        require(sections.get(user) == {
-            f"topic write zs/v1/evt/{station_id}/up",
-            f"topic write zs/v1/evt/{station_id}/status",
-            f"topic read zs/v1/evt/{station_id}/down",
-            f"topic write zs/v1/evt/{station_id}/ack",
-            f"topic read zs/v1/evt/{station_id}/receipt",
-        }, f"station {station_id} ACL has missing or excessive rights")
-    require(set(sections) == {"bridge"} | {f"station{i:02d}" for i in range(1, 21)},
-            "unexpected MQTT ACL identity")
+        f"topic {op} zs/v1/{tenant}/+/{suffix}"
+        for tenant in tenants
+        for op, suffix in (("read", "up"), ("read", "status"), ("write", "down"), ("read", "ack"), ("write", "receipt"),
+                               ("read", "audio"),                       # audio: addendum B
+                               ("read", "fwreq"), ("write", "fw"),      # firmware update: addendum F
+                               ("read", "bearing"))                     # bearing stream: addendum H
+    } | {f"topic write {topic}" for topic in alert_topics},             # output API dioneya.alert/1 (4.4)
+    "bridge ACL has missing or excessive rights")
+    for serial, (tenant, station_id) in pilot_units.items():
+        require(sections.get(serial) == {
+            f"topic write zs/v1/{tenant}/{station_id}/up",
+            f"topic write zs/v1/{tenant}/{station_id}/status",
+            f"topic read zs/v1/{tenant}/{station_id}/down",
+            f"topic write zs/v1/{tenant}/{station_id}/ack",
+            f"topic read zs/v1/{tenant}/{station_id}/receipt",
+            f"topic write zs/v1/{tenant}/{station_id}/audio",
+            f"topic write zs/v1/{tenant}/{station_id}/fwreq",     # addendum F: chunk requests up,
+            f"topic read zs/v1/{tenant}/{station_id}/fw",         # firmware chunks down
+            f"topic write zs/v1/{tenant}/{station_id}/bearing",   # addendum H: bearing stream up
+        }, f"station {serial} ACL has missing or excessive rights")
+    for consumer in set(sections) - {"bridge"} - set(pilot_units):
+        require(not consumer.startswith("DIO-EVT-") and sections[consumer] and
+                all(rule.startswith("topic read ") and rule.removeprefix("topic read ") in alert_topics
+                    for rule in sections[consumer]),
+                f"unexpected MQTT ACL identity or rights: {consumer}")
 
     for token in (
         "ZS_COMMAND_MAX_BYTES 2048u",
@@ -473,29 +489,29 @@ def main() -> int:
         in target_status and
         "command_bg95_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_FIXED_LENGTH_ACK_SESSION_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING"
         in target_status and
-        "command_mqtt_binding: PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        "command_mqtt_binding: TARGET_BG95_SESSION_FRAMED_SERIALIZED_BUILD_PASS_HARDWARE_MODEM_VALIDATION_PENDING"
         in target_status and
-        "command_mqtt_subscription_ack_binding: PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        "command_mqtt_subscription_ack_binding: TARGET_BG95_DOWN_ACK_BINDING_BUILD_PASS_HARDWARE_VALIDATION_PENDING"
         in target_status,
-        "target BG95 command blockers are not bounded",
+        "target BG95 command binding status drift",
     )
     require(
         "command_result_journal: PORTABLE_ATOMIC_QG1_QG2_PASS_NOR_ERASE_ISOLATED_SHARED_NONOVERLAP_BOUND_TARGET_SLOT_COUNT_ENDURANCE_PENDING"
         in target_status and
         "command_journal_nor_adapter: PORTABLE_ERASE_ISOLATED_SHARED_ARCHIVE_COMMAND_OUTBOX_NONOVERLAP_QG1_QG2_PASS_TARGET_SLOT_COUNT_ENDURANCE_PENDING"
         in target_status and
-        "command_journal_flash_binding: PORTABLE_NOR_ERASE_ISOLATED_SHARED_NONOVERLAP_QG1_QG2_PASS_TARGET_SLOT_COUNT_OCTOSPI_ENDURANCE_BLOCKER"
+        "command_journal_flash_binding: TARGET_NOR_ERASE_ISOLATED_BINDING_BUILD_PASS_ENDURANCE_VALIDATION_PENDING"
         in target_status,
-        "target command journal storage blocker is not bounded",
+        "target command journal storage status drift",
     )
-    require("command_journal_slot_count: MISSING_BLOCKER" in target_status,
-            "target command journal slot-count blocker is not explicit")
+    require("command_journal_slot_count: LOCKED_16_BUILD_PASS" in target_status,
+            "target command journal slot-count status drift")
     require(
         "nor_boot_probe: PORTABLE_W25Q512JV_EXACT_JEDEC_SFDP_CAPACITY_QE_RESTORE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_PENDING"
         in target_status and
-        "nor_octospi_binding: PORTABLE_W25Q512JV_PROBE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_BLOCKER"
+        "nor_octospi_binding: TARGET_W25Q512JV_OSPI_BUILD_PASS_SAMPLE_VALIDATION_PENDING"
         in target_status,
-        "target exact NOR boot-probe blocker is not bounded",
+        "target exact NOR boot-probe status drift",
     )
 
     require("PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING" in icd,

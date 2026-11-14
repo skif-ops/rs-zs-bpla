@@ -1,0 +1,43 @@
+{
+  "schema_version": "dioneya.pcb-main-signal-hard-nets-routing-application.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-SIGNAL-HARD-NETS-001",
+  "approval": "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.json",
+  "application_date": "2026-09-19",
+  "reviewed_proposal_commit_sha": "4f3e5b18a49ebe2d11a33fcb833e57e18c56e34d",
+  "approval_commit_sha": "9a6a5c0f86b2a6cbf597e9d0dcba57c394c42033",
+  "approval_sha256": "098396c6335d1854226dd0f237d2736ec29a32ae9f8921342926ab50628876d3",
+  "reviewed_candidate_board_sha256": "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3",
+  "decision": "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE",
+  "scope": "EXACT_EIGHT_NET_NINE_FRAGMENT_SIGNAL_ROUTING_ONLY",
+  "historical_baseline": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb",
+    "board_sha256": "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e",
+    "track_segments": 319,
+    "vias": 254,
+    "copper_zones": 3,
+    "mounting_rule_areas": 4,
+    "filled_connectivity": 464
+  },
+  "applied": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3",
+    "exact_candidate_byte_identity": true,
+    "track_segments": 421,
+    "track_length_mm": 488.344829807376,
+    "vias": 263,
+    "copper_zones": 3,
+    "mounting_rule_areas": 4,
+    "committed_zone_fill_state": "UNFILLED_CI_AND_REVIEW_TOOLS_MUST_REFILL_BEFORE_DRC",
+    "native_filled_connectivity_baseline_to_candidate": [464, 454],
+    "new_comparative_drc_error_counts": {}
+  },
+  "status": "APPLIED_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE_ROUTING_ENGINEERING_CONTINUES",
+  "remaining_signal_and_power_routing_continuation_authorized": true,
+  "routing_complete": false,
+  "return_path_review_complete": false,
+  "si_review_complete": false,
+  "pi_review_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}

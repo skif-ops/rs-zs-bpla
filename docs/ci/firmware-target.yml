@@ -1,0 +1,30 @@
+name: firmware-target
+on:
+  workflow_dispatch:
+  push:
+    paths: ["firmware/**"]
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi cmake
+      - name: host tests
+        run: |
+          cmake -S firmware -B build-host -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-host --parallel
+          ctest --test-dir build-host --output-on-failure
+      - name: target build (STM32U585, FreeRTOS + HAL at pinned commits)
+        run: |
+          cmake -S firmware/targets/evt_pre_20/app -B build-target \
+            -DCMAKE_TOOLCHAIN_FILE=$PWD/firmware/targets/evt_pre_20/app/cmake/arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-target --parallel
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dioneya_evt_pre_20-firmware
+          path: |
+            build-target/dioneya_evt_pre_20.elf
+            build-target/dioneya_evt_pre_20.bin
+            build-target/dioneya_evt_pre_20.hex
+            build-target/dioneya_evt_pre_20.map
+          retention-days: 30

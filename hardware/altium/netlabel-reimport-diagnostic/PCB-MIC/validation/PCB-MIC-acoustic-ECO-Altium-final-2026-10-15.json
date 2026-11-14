@@ -1,0 +1,81 @@
+{
+  "file": "F:\\2AC9~1\\Codex\\tools\\eda-agent-runtime\\workspace\\PCB-MIC.acoustic-eco-test.PcbDoc",
+  "sha256_before_final_save": "D1369539C01C5AEFF3A1F3D71EA17C5D0B82D47EE52B22BA668F8C6B9C00BEC8",
+  "sha256_after_final_save": "5694BA909348205998DAA8E907407898A46A35665A23B05F51CD2E193DCD3A7E",
+  "pad_fragments_moved": 32,
+  "pad_radius_delta_mm": 0.01,
+  "pad_radius_after_mil_min": 26.476262060682384,
+  "pad_radius_after_mil_max": 26.47652881995307,
+  "ordinary_gnd_track_hole_clearance_mm": [
+    0.20000020000019417,
+    0.2020012598533331
+  ],
+  "tracks_after": [
+    {
+      "X1": "501.9685",
+      "Y1": "210.6299",
+      "X2": "590.5512",
+      "Y2": "210.6299",
+      "Width": "11.811",
+      "Layer": "TopLayer",
+      "Net.Name": "GND"
+    },
+    {
+      "X1": "447.6378",
+      "Y1": "259.8425",
+      "X2": "460.4331",
+      "Y2": "234.6457",
+      "Width": "6.2992",
+      "Layer": "TopLayer",
+      "Net.Name": "GND"
+    }
+  ],
+  "clearance_rule_priority_order": [
+    {
+      "name": "MK1_Internal_Acoustic_ClearanceInComponent('MK1')MK1_Internal_Acoustic_ClearanceInComponent('MK1')InComponent('MK1')MK1_Internal_Acoustic_Clearance",
+      "rule_kind": 0,
+      "enabled": true,
+      "priority": 1,
+      "scope_1": "IsPad && (Name = 'MK1-3')",
+      "scope_2": "IsPad && (Name = 'MK1-Un1')",
+      "comment": "EVT-PRE-20: 0.10 mm only between MK1 pad 3 manufacturer land and the 0.8 mm acoustic NPTH",
+      "descriptor": "Clearance Constraint (Gap=0.1mm) (IsPad && (Name = 'MK1-3')),(IsPad && (Name = 'MK1-Un1'))",
+      "gap_mm": 0.0999998
+    },
+    {
+      "name": "MK1_Manufacturer_Copper_0p125mm",
+      "rule_kind": 0,
+      "enabled": true,
+      "priority": 2,
+      "scope_1": "IsPad && (Name = 'MK1-3')",
+      "scope_2": "IsPad && InComponent('MK1') && (Name <> 'MK1-3') && (Name <> 'MK1-Un1')",
+      "comment": "EVT-PRE-20: 0.125 mm between MK1 pad 3 manufacturer ground land and ordinary MK1 pads; acoustic NPTH excluded",
+      "descriptor": "Clearance Constraint (Gap=0.125mm) (IsPad && (Name = 'MK1-3')),(IsPad && InComponent('MK1') && (Name <> 'MK1-3') && (Name <> 'MK1-Un1'))",
+      "gap_mm": 0.12500102
+    },
+    {
+      "name": "Clearence 0,2_NetClass",
+      "rule_kind": 0,
+      "enabled": true,
+      "priority": 3,
+      "scope_1": "InNetClass('Default')",
+      "scope_2": "All",
+      "comment": "",
+      "descriptor": "Clearance Constraint (Gap=0.2mm) (InNetClass('Default')),(All)",
+      "gap_mm": 0.1999996
+    }
+  ],
+  "save_result": {
+    "file_path": "F:\\\u001f@>5:BK\\Codex\\tools\\eda-agent-runtime\\workspace\\PCB-MIC.acoustic-eco-test.PcbDoc",
+    "saved": true,
+    "was_modified": true,
+    "reason": ""
+  },
+  "active_after_save": {
+    "file_name": "PCB-MIC.acoustic-eco-test.PcbDoc",
+    "file_path": "F:\\\u001f@>5:BK\\Codex\\tools\\eda-agent-runtime\\workspace\\PCB-MIC.acoustic-eco-test.PcbDoc",
+    "document_kind": "PCB",
+    "modified": false
+  },
+  "next_required_check": "fresh modal Altium batch DRC"
+}

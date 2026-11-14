@@ -1,0 +1,1376 @@
+{
+ "schema": "dioneya-pcb-pwr-current-evidence-v1",
+ "board": "hardware/kicad/candidates/PCB-PWR-ECO-005/PCB-PWR_ECO_005_CANDIDATE_REV_A.kicad_pcb",
+ "board_sha256": "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610",
+ "basis": {
+  "outer_copper_um": 35,
+  "rho_20c": 1.724e-08,
+  "temperature_factor_70c": 1.197,
+  "via_70c_mohm_in_network": 1.75093,
+  "cell_mm": 0.05,
+  "narrow_screen": "IPC-2221 external, delta-T 10 C (2.03 mm -> 4.0 A: project screen)",
+  "manufacturing_release": false
+ },
+ "cases": [
+  {
+   "id": "input_fused",
+   "net": "VBAT_FUSED",
+   "from": "F1.2",
+   "to": "Q1.1+Q1.2+Q1.3",
+   "current_a": 5.0,
+   "basis": "5 A qualification/protection envelope (POWER_DESIGN_CALC_REV_A.md section 1)",
+   "vias_in_window": 2,
+   "r_mohm_70c": 4.013,
+   "du_mv_70c": 20.06,
+   "p_mw_70c": 100.33
+  },
+  {
+   "id": "input_protected",
+   "net": "VBAT_PROTECTED",
+   "from": "Q1.5+Q1.6+Q1.7+Q1.8",
+   "to": "RSH1.1",
+   "current_a": 5.0,
+   "basis": "5 A envelope; path includes the Q1 -> RSH1 via groups of finding 1",
+   "vias_in_window": 15,
+   "r_mohm_70c": 1.677,
+   "du_mv_70c": 8.38,
+   "p_mw_70c": 41.93,
+   "r_mohm_70c_min_wall_thick_board": 1.797,
+   "du_mv_70c_min_wall_thick_board": 8.98
+  },
+  {
+   "id": "vin_3v8",
+   "net": "VBAT_SYS",
+   "from": "RSH1.2",
+   "to": "U3.1",
+   "current_a": 1.788,
+   "basis": "U3 DC input at 4 A out, 10.0 V in, 85 % efficiency",
+   "vias_in_window": 2,
+   "r_mohm_70c": 5.896,
+   "du_mv_70c": 10.54,
+   "p_mw_70c": 18.85
+  },
+  {
+   "id": "vin_3v3",
+   "net": "VBAT_SYS",
+   "from": "RSH1.2",
+   "to": "U4.1",
+   "current_a": 1.553,
+   "basis": "U4 DC input at 4 A out (rail rating), 10.0 V in, 85 % efficiency",
+   "vias_in_window": 2,
+   "r_mohm_70c": 3.654,
+   "du_mv_70c": 5.67,
+   "p_mw_70c": 8.81
+  },
+  {
+   "id": "sw_3v8",
+   "net": "SW_3V8",
+   "from": "U3.3",
+   "to": "L1.1",
+   "current_a": 4.75,
+   "basis": "4 A + half the 1.50 A p-p ripple at 14.6 V (POWER_DESIGN_CALC_REV_A.md)",
+   "vias_in_window": 0,
+   "r_mohm_70c": 1.1,
+   "du_mv_70c": 5.23,
+   "p_mw_70c": 24.82
+  },
+  {
+   "id": "sw_3v3",
+   "net": "SW_3V3",
+   "from": "U4.3",
+   "to": "L2.1",
+   "current_a": 4.68,
+   "basis": "4 A + half the 1.36 A p-p ripple at 14.6 V (POWER_DESIGN_CALC_REV_A.md)",
+   "vias_in_window": 0,
+   "r_mohm_70c": 1.1,
+   "du_mv_70c": 5.15,
+   "p_mw_70c": 24.09
+  },
+  {
+   "id": "out_3v8",
+   "net": "3V8_MODEM",
+   "from": "L1.2",
+   "to": "J2.1",
+   "current_a": 3.3,
+   "basis": "BG95-M3 0.6 A VBAT_BB + 2.7 A VBAT_RF peaks (PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md)",
+   "vias_in_window": 1,
+   "r_mohm_70c": 7.022,
+   "du_mv_70c": 23.17,
+   "p_mw_70c": 76.47
+  },
+  {
+   "id": "out_3v3",
+   "net": "3V3_DIGITAL",
+   "from": "L2.2",
+   "to": "J2.3",
+   "current_a": 1.0,
+   "basis": "3V3_DIGITAL budget envelope (budget_3v3)",
+   "vias_in_window": 7,
+   "r_mohm_70c": 10.142,
+   "du_mv_70c": 10.14,
+   "p_mw_70c": 10.14
+  },
+  {
+   "id": "ldo_in",
+   "net": "3V3_DIGITAL",
+   "from": "L2.2",
+   "to": "U5.1",
+   "current_a": 0.3,
+   "basis": "TPS7A20 rating",
+   "vias_in_window": 7,
+   "r_mohm_70c": 4.933,
+   "du_mv_70c": 1.48,
+   "p_mw_70c": 0.44
+  },
+  {
+   "id": "out_1v8",
+   "net": "1V8_MIC",
+   "from": "U5.5",
+   "to": "J2.5",
+   "current_a": 0.3,
+   "basis": "TPS7A20 rating",
+   "vias_in_window": 5,
+   "r_mohm_70c": 13.656,
+   "du_mv_70c": 4.1,
+   "p_mw_70c": 1.23
+  },
+  {
+   "id": "ret_modem",
+   "net": "GND_MODEM",
+   "from": "J2.2",
+   "to": "NT1.1",
+   "current_a": 3.3,
+   "basis": "return of out_3v8",
+   "vias_in_window": 3,
+   "r_mohm_70c": 4.59,
+   "du_mv_70c": 15.15,
+   "p_mw_70c": 49.99
+  },
+  {
+   "id": "ret_digital",
+   "net": "GND_DIGITAL",
+   "from": "J2.4",
+   "to": "NT2.1",
+   "current_a": 1.0,
+   "basis": "return of out_3v3",
+   "vias_in_window": 0,
+   "r_mohm_70c": 2.118,
+   "du_mv_70c": 2.12,
+   "p_mw_70c": 2.12
+  },
+  {
+   "id": "ret_mic",
+   "net": "GND_MIC",
+   "from": "J2.6",
+   "to": "NT3.1",
+   "current_a": 0.3,
+   "basis": "return of out_1v8",
+   "vias_in_window": 2,
+   "r_mohm_70c": 11.08,
+   "du_mv_70c": 3.32,
+   "p_mw_70c": 1.0
+  }
+ ],
+ "narrow": [
+  {
+   "layers": [
+    "B.Cu",
+    "F.Cu"
+   ],
+   "segments": 9,
+   "length_mm": 3.614,
+   "min_width_mm": 0.25,
+   "pads": [
+    "U1.3",
+    "U1.6"
+   ],
+   "probe": {
+    "layer": "B.Cu",
+    "at_mm": [
+     19.35,
+     30.1
+    ],
+    "segment_width_mm": 0.25,
+    "segment_length_mm": 0.7
+   },
+   "cases": [
+    {
+     "case": "input_fused",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "VBAT_FUSED",
+   "worst_case": "input_fused",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 8.523,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.875,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 8,
+   "length_mm": 1.673,
+   "min_width_mm": 0.25,
+   "pads": [
+    "U1.3"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     17.5,
+     30.0
+    ],
+    "segment_width_mm": 0.25,
+    "segment_length_mm": 0.707
+   },
+   "cases": [
+    {
+     "case": "input_fused",
+     "share": 0.1001,
+     "current_a": 0.5005
+    }
+   ],
+   "net": "VBAT_FUSED",
+   "worst_case": "input_fused",
+   "i_branch_a": 0.5005,
+   "r_branch_mohm_70c": 3.946,
+   "du_mv": 1.975,
+   "p_mw": 0.988,
+   "ipc2221_10c_a": 0.875,
+   "bar_delta_t_c": 0.0606,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 2,
+   "length_mm": 0.381,
+   "min_width_mm": 0.5608,
+   "pads": [
+    "C1.2"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     20.615,
+     26.135
+    ],
+    "segment_width_mm": 0.5608,
+    "segment_length_mm": 0.381
+   },
+   "cases": [
+    {
+     "case": "input_fused",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "VBAT_FUSED",
+   "worst_case": "input_fused",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 0.401,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 1.572,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 0.052,
+   "min_width_mm": 0.6006,
+   "pads": [
+    "U1.6"
+   ],
+   "note": "longest segment < 0.1 mm: pad neck/zero-length joint inside wider copper",
+   "cases": [
+    {
+     "case": "input_fused",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "VBAT_FUSED",
+   "worst_case": "input_fused",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 0.051,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 1.653,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 0.9,
+   "min_width_mm": 0.8,
+   "pads": [],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     33.45,
+     28.3
+    ],
+    "segment_width_mm": 0.8,
+    "segment_length_mm": 0.9
+   },
+   "cases": [
+    {
+     "case": "input_protected",
+     "share": 0.0319,
+     "current_a": 0.1595
+    }
+   ],
+   "net": "VBAT_PROTECTED",
+   "worst_case": "input_protected",
+   "i_branch_a": 0.1595,
+   "r_branch_mohm_70c": 0.663,
+   "du_mv": 0.106,
+   "p_mw": 0.017,
+   "ipc2221_10c_a": 2.034,
+   "bar_delta_t_c": 0.0002,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 0.242,
+   "min_width_mm": 0.6006,
+   "pads": [
+    "U1.4"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     21.386,
+     31.036
+    ],
+    "segment_width_mm": 0.6006,
+    "segment_length_mm": 0.242
+   },
+   "cases": [
+    {
+     "case": "input_protected",
+     "share": 0.0007,
+     "current_a": 0.0035
+    }
+   ],
+   "net": "VBAT_PROTECTED",
+   "worst_case": "input_protected",
+   "i_branch_a": 0.0035,
+   "r_branch_mohm_70c": 0.238,
+   "du_mv": 0.001,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 1.653,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 0.171,
+   "min_width_mm": 0.6006,
+   "pads": [
+    "U1.4"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     21.643,
+     31.207
+    ],
+    "segment_width_mm": 0.6006,
+    "segment_length_mm": 0.171
+   },
+   "cases": [
+    {
+     "case": "input_protected",
+     "share": 0.0031,
+     "current_a": 0.0155
+    }
+   ],
+   "net": "VBAT_PROTECTED",
+   "worst_case": "input_protected",
+   "i_branch_a": 0.0155,
+   "r_branch_mohm_70c": 0.168,
+   "du_mv": 0.003,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 1.653,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "B.Cu",
+    "F.Cu"
+   ],
+   "segments": 2,
+   "length_mm": 7.514,
+   "min_width_mm": 0.2,
+   "pads": [
+    "U2.8"
+   ],
+   "probe": {
+    "layer": "B.Cu",
+    "at_mm": [
+     45.65,
+     25.75
+    ],
+    "segment_width_mm": 0.25,
+    "segment_length_mm": 6.414
+   },
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "share": 0.0,
+     "current_a": 0.0
+    },
+    {
+     "case": "vin_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "VBAT_SYS",
+   "worst_case": "vin_3v8",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 22.152,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.745,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 2,
+   "length_mm": 2.226,
+   "min_width_mm": 0.25,
+   "pads": [
+    "C21.1",
+    "U4.1",
+    "U4.9"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     53.125,
+     42.763
+    ],
+    "segment_width_mm": 0.5,
+    "segment_length_mm": 1.55
+   },
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "share": 0.0,
+     "current_a": 0.0
+    },
+    {
+     "case": "vin_3v3",
+     "share": 0.2075,
+     "current_a": 0.3222
+    }
+   ],
+   "net": "VBAT_SYS",
+   "worst_case": "vin_3v3",
+   "i_branch_a": 0.3222,
+   "r_branch_mohm_70c": 5.25,
+   "du_mv": 1.692,
+   "p_mw": 0.545,
+   "ipc2221_10c_a": 0.875,
+   "bar_delta_t_c": 0.0444,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 1.55,
+   "min_width_mm": 0.5,
+   "pads": [
+    "C20.1",
+    "U3.1"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     53.125,
+     14.762
+    ],
+    "segment_width_mm": 0.5,
+    "segment_length_mm": 1.55
+   },
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "share": 0.3021,
+     "current_a": 0.5402
+    },
+    {
+     "case": "vin_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "VBAT_SYS",
+   "worst_case": "vin_3v8",
+   "i_branch_a": 0.5402,
+   "r_branch_mohm_70c": 1.828,
+   "du_mv": 0.987,
+   "p_mw": 0.533,
+   "ipc2221_10c_a": 1.447,
+   "bar_delta_t_c": 0.0151,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 0.247,
+   "min_width_mm": 0.2506,
+   "pads": [
+    "U3.1"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     53.985,
+     14.812
+    ],
+    "segment_width_mm": 0.2506,
+    "segment_length_mm": 0.247
+   },
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "share": 0.005,
+     "current_a": 0.0089
+    },
+    {
+     "case": "vin_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "VBAT_SYS",
+   "worst_case": "vin_3v8",
+   "i_branch_a": 0.0089,
+   "r_branch_mohm_70c": 0.581,
+   "du_mv": 0.005,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.877,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 0.074,
+   "min_width_mm": 0.3456,
+   "pads": [
+    "U4.1"
+   ],
+   "note": "longest segment < 0.1 mm: pad neck/zero-length joint inside wider copper",
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "share": 0.0,
+     "current_a": 0.0
+    },
+    {
+     "case": "vin_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "VBAT_SYS",
+   "worst_case": "vin_3v8",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 0.126,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 1.107,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 29,
+   "length_mm": 1.211,
+   "min_width_mm": 0.2506,
+   "pads": [
+    "U3.3"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     56.418,
+     15.319
+    ],
+    "segment_width_mm": 0.2506,
+    "segment_length_mm": 0.939
+   },
+   "cases": [
+    {
+     "case": "sw_3v8",
+     "share": 0.2379,
+     "current_a": 1.13
+    }
+   ],
+   "net": "SW_3V8",
+   "worst_case": "sw_3v8",
+   "i_branch_a": 1.13,
+   "r_branch_mohm_70c": 2.849,
+   "du_mv": 3.22,
+   "p_mw": 3.638,
+   "ipc2221_10c_a": 0.877,
+   "bar_delta_t_c": 0.161,
+   "status": "PASS_SHORT_CONDUCTION"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 26,
+   "length_mm": 1.21,
+   "min_width_mm": 0.2506,
+   "pads": [
+    "U4.3"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     56.418,
+     43.319
+    ],
+    "segment_width_mm": 0.2506,
+    "segment_length_mm": 0.939
+   },
+   "cases": [
+    {
+     "case": "sw_3v3",
+     "share": 0.2379,
+     "current_a": 1.1134
+    }
+   ],
+   "net": "SW_3V3",
+   "worst_case": "sw_3v3",
+   "i_branch_a": 1.1134,
+   "r_branch_mohm_70c": 2.847,
+   "du_mv": 3.17,
+   "p_mw": 3.529,
+   "ipc2221_10c_a": 0.877,
+   "bar_delta_t_c": 0.156,
+   "status": "PASS_SHORT_CONDUCTION"
+  },
+  {
+   "layers": [
+    "B.Cu"
+   ],
+   "segments": 2,
+   "length_mm": 10.833,
+   "min_width_mm": 0.3,
+   "pads": [
+    "J2.1"
+   ],
+   "probe": {
+    "layer": "B.Cu",
+    "at_mm": [
+     75.232,
+     41.474
+    ],
+    "segment_width_mm": 0.3,
+    "segment_length_mm": 8.749
+   },
+   "cases": [
+    {
+     "case": "out_3v8",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "3V8_MODEM",
+   "worst_case": "out_3v8",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 21.291,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.999,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 8,
+   "length_mm": 8.497,
+   "min_width_mm": 0.25,
+   "pads": [
+    "R1.1"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     58.85,
+     17.95
+    ],
+    "segment_width_mm": 0.25,
+    "segment_length_mm": 3.0
+   },
+   "cases": [
+    {
+     "case": "out_3v8",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "3V8_MODEM",
+   "worst_case": "out_3v8",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 20.04,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.875,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 2.6,
+   "min_width_mm": 0.5,
+   "pads": [
+    "C16.1"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     72.525,
+     18.3
+    ],
+    "segment_width_mm": 0.5,
+    "segment_length_mm": 2.6
+   },
+   "cases": [
+    {
+     "case": "out_3v8",
+     "share": 0.0074,
+     "current_a": 0.0244
+    }
+   ],
+   "net": "3V8_MODEM",
+   "worst_case": "out_3v8",
+   "i_branch_a": 0.0244,
+   "r_branch_mohm_70c": 3.066,
+   "du_mv": 0.075,
+   "p_mw": 0.002,
+   "ipc2221_10c_a": 1.447,
+   "bar_delta_t_c": 0.0001,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 2.6,
+   "min_width_mm": 0.5,
+   "pads": [
+    "C14.1"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     72.525,
+     8.7
+    ],
+    "segment_width_mm": 0.5,
+    "segment_length_mm": 2.6
+   },
+   "cases": [
+    {
+     "case": "out_3v8",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "3V8_MODEM",
+   "worst_case": "out_3v8",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 3.066,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 1.447,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "B.Cu",
+    "F.Cu"
+   ],
+   "segments": 10,
+   "length_mm": 36.64,
+   "min_width_mm": 0.2,
+   "pads": [
+    "C2.1",
+    "C5.1",
+    "R15.2",
+    "U2.6"
+   ],
+   "probe": {
+    "layer": "B.Cu",
+    "at_mm": [
+     54.605,
+     24.0
+    ],
+    "segment_width_mm": 0.25,
+    "segment_length_mm": 13.81
+   },
+   "cases": [
+    {
+     "case": "out_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    },
+    {
+     "case": "ldo_in",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "3V3_DIGITAL",
+   "worst_case": "out_3v3",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 108.016,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.745,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "B.Cu",
+    "F.Cu"
+   ],
+   "segments": 3,
+   "length_mm": 11.731,
+   "min_width_mm": 0.2,
+   "pads": [
+    "R10.1",
+    "U4.6"
+   ],
+   "probe": {
+    "layer": "B.Cu",
+    "at_mm": [
+     56.538,
+     43.55
+    ],
+    "segment_width_mm": 0.2,
+    "segment_length_mm": 8.906
+   },
+   "cases": [
+    {
+     "case": "out_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    },
+    {
+     "case": "ldo_in",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "3V3_DIGITAL",
+   "worst_case": "out_3v3",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 34.583,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.745,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 4,
+   "length_mm": 8.746,
+   "min_width_mm": 0.25,
+   "pads": [
+    "C7.1",
+    "R13.1",
+    "R14.1"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     73.2,
+     53.65
+    ],
+    "segment_width_mm": 0.25,
+    "segment_length_mm": 5.7
+   },
+   "cases": [
+    {
+     "case": "out_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    },
+    {
+     "case": "ldo_in",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "3V3_DIGITAL",
+   "worst_case": "out_3v3",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 20.627,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.875,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 20,
+   "length_mm": 8.37,
+   "min_width_mm": 0.25,
+   "pads": [],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     64.85,
+     48.6
+    ],
+    "segment_width_mm": 0.25,
+    "segment_length_mm": 1.7
+   },
+   "cases": [
+    {
+     "case": "out_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    },
+    {
+     "case": "ldo_in",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "3V3_DIGITAL",
+   "worst_case": "out_3v3",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 19.74,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 0.875,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 4,
+   "length_mm": 5.428,
+   "min_width_mm": 0.25,
+   "pads": [
+    "C17.1",
+    "C5.1"
+   ],
+   "probe": {
+    "layer": "F.Cu",
+    "at_mm": [
+     71.85,
+     36.95
+    ],
+    "segment_width_mm": 0.25,
+    "segment_length_mm": 1.98
+   },
+   "cases": [
+    {
+     "case": "out_3v3",
+     "share": 0.1415,
+     "current_a": 0.1415
+    },
+    {
+     "case": "ldo_in",
+     "share": 0.1416,
+     "current_a": 0.0425
+    }
+   ],
+   "net": "3V3_DIGITAL",
+   "worst_case": "out_3v3",
+   "i_branch_a": 0.1415,
+   "r_branch_mohm_70c": 12.802,
+   "du_mv": 1.811,
+   "p_mw": 0.256,
+   "ipc2221_10c_a": 0.875,
+   "bar_delta_t_c": 0.051,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "F.Cu"
+   ],
+   "segments": 1,
+   "length_mm": 0.052,
+   "min_width_mm": 0.6006,
+   "pads": [
+    "U5.1"
+   ],
+   "note": "longest segment < 0.1 mm: pad neck/zero-length joint inside wider copper",
+   "cases": [
+    {
+     "case": "out_3v3",
+     "share": 0.0,
+     "current_a": 0.0
+    },
+    {
+     "case": "ldo_in",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "3V3_DIGITAL",
+   "worst_case": "out_3v3",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 0.051,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 1.653,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "B.Cu",
+    "F.Cu"
+   ],
+   "segments": 25,
+   "length_mm": 75.513,
+   "min_width_mm": 0.5,
+   "pads": [
+    "C8.1",
+    "J2.5",
+    "TP7.1",
+    "U5.5"
+   ],
+   "probe": {
+    "layer": "B.Cu",
+    "at_mm": [
+     48.633,
+     40.975
+    ],
+    "segment_width_mm": 0.5,
+    "segment_length_mm": 12.485
+   },
+   "cases": [
+    {
+     "case": "out_1v8",
+     "share": 0.0,
+     "current_a": 0.0
+    }
+   ],
+   "net": "1V8_MIC",
+   "worst_case": "out_1v8",
+   "i_branch_a": 0.0,
+   "r_branch_mohm_70c": 89.046,
+   "du_mv": 0.0,
+   "p_mw": 0.0,
+   "ipc2221_10c_a": 1.447,
+   "bar_delta_t_c": 0.0,
+   "status": "PASS"
+  },
+  {
+   "layers": [
+    "B.Cu",
+    "F.Cu"
+   ],
+   "segments": 7,
+   "length_mm": 11.248,
+   "min_width_mm": 0.5,
+   "pads": [
+    "J2.6",
+    "NT3.1"
+   ],
+   "probe": {
+    "layer": "B.Cu",
+    "at_mm": [
+     76.066,
+     54.702
+    ],
+    "segment_width_mm": 0.5,
+    "segment_length_mm": 4.296
+   },
+   "cases": [
+    {
+     "case": "ret_mic",
+     "share": 1.0,
+     "current_a": 0.3
+    }
+   ],
+   "net": "GND_MIC",
+   "worst_case": "ret_mic",
+   "i_branch_a": 0.3,
+   "r_branch_mohm_70c": 13.264,
+   "du_mv": 3.979,
+   "p_mw": 1.194,
+   "ipc2221_10c_a": 1.447,
+   "bar_delta_t_c": 0.2459,
+   "status": "PASS"
+  }
+ ],
+ "hot_loop": [
+  {
+   "regulator": "U4",
+   "stub_pads": [
+    "C21.1",
+    "U4.1",
+    "U4.9"
+   ],
+   "stub_width_mm": 0.5,
+   "stub_length_mm": 1.55,
+   "i_dc_a": 0.3222,
+   "i_ac_rms_bound_a": 1.881,
+   "i_rms_bound_a": 1.908,
+   "r_stub_mohm_70c": 1.828,
+   "p_mw_bound": 6.66,
+   "ipc2221_10c_a": 1.447,
+   "bar_delta_t_c": 0.189,
+   "status": "PASS_SHORT_CONDUCTION"
+  },
+  {
+   "regulator": "U3",
+   "stub_pads": [
+    "C20.1",
+    "U3.1"
+   ],
+   "stub_width_mm": 0.5,
+   "stub_length_mm": 1.55,
+   "i_dc_a": 0.5402,
+   "i_ac_rms_bound_a": 1.942,
+   "i_rms_bound_a": 2.015,
+   "r_stub_mohm_70c": 1.828,
+   "p_mw_bound": 7.42,
+   "ipc2221_10c_a": 1.447,
+   "bar_delta_t_c": 0.211,
+   "status": "PASS_SHORT_CONDUCTION"
+  }
+ ],
+ "via_group": [
+  {
+   "case": "nominal",
+   "wall_um": 20.0,
+   "length_mm": 1.6,
+   "r_via_mohm_70c": 1.7517,
+   "r_7plus7_mohm_70c": 0.5005,
+   "du_mv_5a": 2.5,
+   "p_mw_5a": 12.51
+  },
+  {
+   "case": "min_wall",
+   "wall_um": 18.0,
+   "length_mm": 1.6,
+   "r_via_mohm_70c": 1.9463,
+   "r_7plus7_mohm_70c": 0.5561,
+   "du_mv_5a": 2.78,
+   "p_mw_5a": 13.9
+  },
+  {
+   "case": "min_wall_thick_board",
+   "wall_um": 18.0,
+   "length_mm": 1.76,
+   "r_via_mohm_70c": 2.1409,
+   "r_7plus7_mohm_70c": 0.6117,
+   "du_mv_5a": 3.06,
+   "p_mw_5a": 15.29
+  }
+ ],
+ "nt_bridge": [
+  {
+   "tie": "NT1",
+   "current_a": 3.3,
+   "length_case": "pad_edge_to_edge",
+   "r_mohm_70c": 0.59,
+   "du_mv": 1.95,
+   "p_mw": 6.42,
+   "bar_model_delta_t_c": 0.059
+  },
+  {
+   "tie": "NT1",
+   "current_a": 3.3,
+   "length_case": "pad_centre_to_centre",
+   "r_mohm_70c": 1.179,
+   "du_mv": 3.89,
+   "p_mw": 12.84,
+   "bar_model_delta_t_c": 0.235
+  },
+  {
+   "tie": "NT2",
+   "current_a": 1.0,
+   "length_case": "pad_edge_to_edge",
+   "r_mohm_70c": 0.59,
+   "du_mv": 0.59,
+   "p_mw": 0.59,
+   "bar_model_delta_t_c": 0.005
+  },
+  {
+   "tie": "NT2",
+   "current_a": 1.0,
+   "length_case": "pad_centre_to_centre",
+   "r_mohm_70c": 1.179,
+   "du_mv": 1.18,
+   "p_mw": 1.18,
+   "bar_model_delta_t_c": 0.022
+  },
+  {
+   "tie": "NT3",
+   "current_a": 0.3,
+   "length_case": "pad_edge_to_edge",
+   "r_mohm_70c": 0.59,
+   "du_mv": 0.18,
+   "p_mw": 0.05,
+   "bar_model_delta_t_c": 0.0
+  },
+  {
+   "tie": "NT3",
+   "current_a": 0.3,
+   "length_case": "pad_centre_to_centre",
+   "r_mohm_70c": 1.179,
+   "du_mv": 0.35,
+   "p_mw": 0.11,
+   "bar_model_delta_t_c": 0.002
+  }
+ ],
+ "budget_3v3": {
+  "rows": [
+   {
+    "ref": "U1",
+    "part": "STM32U585VIT6Q",
+    "i_peak_ma": 50,
+    "i_cont_ma": 30,
+    "duration": "continuous",
+    "source": "allowance above the 160 MHz run mode; measure"
+   },
+   {
+    "ref": "U10",
+    "part": "E22-900M22S",
+    "i_peak_ma": 120,
+    "i_cont_ma": 7,
+    "duration": "TX burst = LoRa time on air (up to ~2 s at SF12), duty-cycle limited",
+    "source": "Ebyte E22-900M(M)22S specification: TX 119 mA instantaneous, RX 6.8 mA"
+   },
+   {
+    "ref": "U9",
+    "part": "MAX-M10S-00B",
+    "i_peak_ma": 100,
+    "i_cont_ma": 30,
+    "duration": "start-up inrush (ms)",
+    "source": "EVT_PRE_20_POWER_ARCHITECTURE.md: 100 mA start-up"
+   },
+   {
+    "ref": "U11",
+    "part": "MDBT50Q-P1MV2",
+    "i_peak_ma": 25,
+    "i_cont_ma": 10,
+    "duration": "BLE TX events",
+    "source": "allowance; measure"
+   },
+   {
+    "ref": "U12",
+    "part": "SDCIT2/32GB",
+    "i_peak_ma": 200,
+    "i_cont_ma": 100,
+    "duration": "write bursts; continuous logging allowance",
+    "source": "SD high-speed-mode card limit (3.3 V signalling, no UHS); vendor gives no figure; measure"
+   },
+   {
+    "ref": "U2",
+    "part": "W25Q512JVFIQ",
+    "i_peak_ma": 25,
+    "i_cont_ma": 5,
+    "duration": "program/erase",
+    "source": "allowance; measure"
+   },
+   {
+    "ref": "misc",
+    "part": "sensors, translators, SIM mux, pull-ups",
+    "i_peak_ma": 10,
+    "i_cont_ma": 10,
+    "duration": "continuous",
+    "source": "allowance"
+   },
+   {
+    "ref": "U5 (PCB-PWR)",
+    "part": "TPS7A2018 -> 1V8_MIC (4x T5838, U7/U18 VCCA)",
+    "i_peak_ma": 300,
+    "i_cont_ma": 10,
+    "duration": "LDO rating as the peak envelope",
+    "source": "TPS7A20 300 mA rating; realistic load a few mA"
+   }
+  ],
+  "sum_peak_ma": 830,
+  "sum_cont_ma": 202,
+  "envelope_peak_a": 1.0,
+  "envelope_cont_a": 0.35,
+  "r_forward_plus_return_mohm_70c": 12.26,
+  "du_peak_mv": 12.26,
+  "du_cont_mv": 4.29,
+  "note": "regulation point is U4 (fixed 3.3 V, FB at the output); the J2 drop is uncompensated"
+ },
+ "returns_base_011": [
+  {
+   "id": "ret_modem",
+   "r_mohm_70c": 5.948,
+   "du_mv_70c": 19.63
+  },
+  {
+   "id": "ret_digital",
+   "r_mohm_70c": 3.659,
+   "du_mv_70c": 3.66
+  },
+  {
+   "id": "ret_mic",
+   "r_mohm_70c": 12.006,
+   "du_mv_70c": 3.6
+  }
+ ],
+ "narrow_review": []
+}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Мухоед - журнал тревог{% endblock %}
+{% block main_class %} container-wide{% endblock %}
+{% block content %}
+{% set permissions = request.state.operator.permissions if request.state.operator else [] %}
+<section class="journal-heading">
+  <div>
+    <p class="ops-eyebrow">Учёт и разбор событий</p>
+    <h1>Журнал тревог</h1>
+    <p>Одна строка соответствует одному эпизоду тревоги. Телеметрия, пеленги и треки сохраняются независимо от решения оператора.</p>
+  </div>
+  <div class="journal-heading-actions"><span id="journal-updated">Загрузка...</span><button class="btn btn-outline-primary btn-sm" id="journal-refresh" type="button">Обновить</button></div>
+</section>
+
+<div class="ops-error" id="journal-error" role="alert" hidden></div>
+<section class="journal-summary" aria-label="Сводка журнала">
+  <button type="button" class="journal-stat" data-quick=""><span>Загружено</span><strong id="journal-total">0</strong></button>
+  <button type="button" class="journal-stat journal-stat-pending" data-quick="pending"><span>Ожидают решения</span><strong id="journal-pending">0</strong></button>
+  <button type="button" class="journal-stat journal-stat-confirmed" data-quick="confirmed_target"><span>Подтверждены</span><strong id="journal-confirmed">0</strong></button>
+  <button type="button" class="journal-stat journal-stat-false" data-quick="false_alarm"><span>Ложные</span><strong id="journal-false">0</strong></button>
+  <button type="button" class="journal-stat journal-stat-technical" data-quick="technical_event"><span>Технические</span><strong id="journal-technical">0</strong></button>
+</section>
+
+<section id="journal" class="journal" data-can-confirm="{{ 'true' if 'alert.confirm' in permissions else 'false' }}">
+  <div class="journal-toolbar">
+    <label>Участок<select id="journal-tenant" class="form-control"><option value="">Все доступные</option></select></label>
+    <label>Решение<select id="journal-decision" class="form-control">
+      <option value="">Все</option><option value="pending">Ожидает решения</option><option value="confirmed_target">Цель подтверждена</option>
+      <option value="false_alarm">Ложная тревога</option><option value="technical_event">Техническое событие</option>
+    </select></label>
+    <label>Уровень<select id="journal-level" class="form-control"><option value="">Все</option><option value="alert">Тревога</option><option value="warning">Уточнение координат</option></select></label>
+    <label class="journal-search">Поиск<input id="journal-search" class="form-control" type="search" placeholder="ID, станция, оператор, комментарий"></label>
+    <button class="btn btn-outline-secondary btn-sm" id="journal-reset" type="button">Сбросить</button>
+  </div>
+
+  <p class="journal-permission-note" id="journal-permission-note" {% if 'alert.confirm' in permissions %}hidden{% endif %}>
+    Доступен просмотр. Для записи решения требуется роль оператора или инженера.
+  </p>
+  <div class="journal-table-wrap">
+    <table class="journal-table">
+      <thead><tr><th>Начало</th><th>Участок</th><th>Уровень</th><th>Тип цели</th><th>Станции</th><th>Треки</th><th>Решение</th><th>Оператор</th></tr></thead>
+      <tbody id="journal-body"><tr><td colspan="8" class="journal-empty">Загрузка журнала...</td></tr></tbody>
+    </table>
+  </div>
+  <button class="btn btn-outline-primary journal-more" id="journal-more" type="button" hidden>Показать более ранние</button>
+</section>
+<script src="/static/js/journal.js?v={{ build.commit or build.version }}"></script>
+{% endblock %}

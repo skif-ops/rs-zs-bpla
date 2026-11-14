@@ -12,11 +12,15 @@ import time
 
 import paho.mqtt.client as mqtt
 
+from station.audio_ingest import AUDIO_COMMAND, ingest_audio_chunk
+from station.bearing_codec import decode_bearing_batch
 from station.cbor_codec import decode_cbor, decode_detection_obj, decode_heartbeat_obj
-from station.command_codec import CommandSigner, decode_command_ack, encode_signed_command
+from station.command_codec import CommandKeyring, CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
+from station.firmware_codec import ReleaseRepository, serve_request
+from station.model_codec import ModelRepository
 from station.router import service, store
-from station.schemas import HeartbeatMessage
+from station.schemas import DetectionMessage, HeartbeatMessage, StationCommand
 
 
 TENANT_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,31}")
@@ -36,7 +40,7 @@ def station_id_from_topic(topic: str, tenant: str) -> tuple[int, str]:
         or parts[0] != "zs"
         or parts[1] != "v1"
         or parts[2] != tenant
-        or parts[4] not in {"up", "status", "ack"}
+        or parts[4] not in {"up", "status", "ack", "audio", "fwreq", "bearing"}
     ):
         raise ValueError(f"unexpected topic: {topic}")
     try:
@@ -62,6 +66,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Unencrypted PKCS#8 Ed25519 PEM; downstream is disabled when omitted.",
     )
     parser.add_argument(
+        "--command-next-signing-key",
+        default=os.getenv("ZS_COMMAND_NEXT_SIGNING_KEY"),
+        help="Key rotation (ICD addendum E): the next Ed25519 PEM; stations that trust it (heartbeat or an "
+             "acknowledged CMD_ROTATE_COMMAND_KEY) are signed for with it, the others with --command-signing-key.",
+    )
+    parser.add_argument(
         "--command-poll-seconds",
         type=float,
         default=float(os.getenv("ZS_COMMAND_POLL_SECONDS", "1")),
@@ -70,6 +80,30 @@ def build_parser() -> argparse.ArgumentParser:
         "--command-retry-seconds",
         type=float,
         default=float(os.getenv("ZS_COMMAND_RETRY_SECONDS", "30")),
+    )
+    parser.add_argument(
+        "--auto-audio",
+        choices=("off", "pre", "post", "both"),
+        default=os.getenv("ZS_AUTO_AUDIO", "both"),
+        help="Ask a station for the audio of a new detection (addendum B); off disables it.",
+    )
+    parser.add_argument(
+        "--auto-audio-gap-seconds",
+        type=float,
+        default=float(os.getenv("ZS_AUTO_AUDIO_GAP_SECONDS", "120")),
+        help="At most one automatic audio request per station in this interval (one per detection episode).",
+    )
+    parser.add_argument(
+        "--firmware-dir",
+        default=os.getenv("ZS_FIRMWARE_DIR", str(Path(__file__).resolve().parents[1] / "data" / "firmware")),
+        help="Release repository of signed station firmware (addendum F, python -m pki.cli fw-sign), shared with "
+             "the operator API; the bridge answers fwreq from it.",
+    )
+    parser.add_argument(
+        "--model-dir",
+        default=os.getenv("ZS_MODEL_DIR", str(Path(__file__).resolve().parents[1] / "data" / "models")),
+        help="Repository of signed station model packages (addendum I, python -m pki.cli model-sign), shared with "
+             "the operator API; fwreq of a model update (manifest target 3) are answered from it.",
     )
     parser.add_argument(
         "--insecure-bench",
@@ -126,7 +160,30 @@ def process_message(
     event_store=store,
     fusion_service=service,
 ) -> str:
+    status = _process_message(topic, payload, tenant, tls_enabled, event_store=event_store, fusion_service=fusion_service)
+    # the station's tenant (what a tenant-limited operator account may see, station/access_scope.py): the topic's,
+    # which the broker ACL lets only this station's credential publish on
+    event_store.note_station_tenant(station_id_from_topic(topic, tenant)[0], tenant)
+    return status
+
+
+def _process_message(
+    topic: str,
+    payload: bytes,
+    tenant: str,
+    tls_enabled: bool,
+    *,
+    event_store,
+    fusion_service,
+) -> str:
     topic_station_id, kind = station_id_from_topic(topic, tenant)
+    if kind == "audio":
+        return ingest_audio_chunk(payload, topic_station_id, event_store=event_store)
+    if kind == "bearing":                       # addendum H: the live bearings of a tracking window
+        batch = decode_bearing_batch(payload)
+        if batch.station_id != topic_station_id:
+            raise ValueError("station_id mismatch between topic and bearing batch")
+        return "stored" if fusion_service.ingest_bearings(batch) else "duplicate"
     if kind == "ack":
         ack = decode_command_ack(payload)
         if ack.station_id != topic_station_id:
@@ -166,6 +223,34 @@ def process_message(
     return "duplicate" if ingress == "duplicate" else "stored"
 
 
+# Station time trust values that make an audio request pointless (the station answers REJECTED / detail 3).
+UNTRUSTED_EVENT_TIME = {"GNSS_TIME_SUSPECT", "UNSYNCED"}
+
+
+def request_event_audio(
+    detection: DetectionMessage,
+    *,
+    segment: str,
+    min_gap_us: int,
+    now_us: int,
+    event_store=store,
+) -> StationCommand | None:
+    """Auto-request (addendum B): the station emits a detection only at confirmed presence, first on the rising edge
+    and then as periodic updates, so one request per station per ``min_gap_us`` covers an episode.  The station holds
+    the audio in its NOR ring (~42 min of recorded sound) and knows the last 16 events of its boot."""
+
+    if segment == "off" or detection.gnss.time_trust in UNTRUSTED_EVENT_TIME:
+        return None
+    last = event_store.last_command_us(detection.station_id, AUDIO_COMMAND)
+    if last is not None and now_us - last < min_gap_us:
+        return None
+    # the event time goes along: the station serves it even after a reboot has emptied its own event table
+    return event_store.create_command(
+        detection.station_id, AUDIO_COMMAND,
+        {"event_id": detection.event_id, "segment": segment, "event_time_us": detection.event_time_us},
+    )
+
+
 def build_event_receipt(topic: str, payload: bytes, tenant: str) -> tuple[str, bytes]:
     topic_station_id, kind = station_id_from_topic(topic, tenant)
     if kind != "up":
@@ -188,7 +273,7 @@ def build_event_receipt(topic: str, payload: bytes, tenant: str) -> tuple[str, b
 def publish_due_commands(
     client,
     tenant: str,
-    signer: CommandSigner | None,
+    signer: CommandSigner | CommandKeyring | None,
     *,
     now_us: int,
     retry_after_us: int,
@@ -203,7 +288,8 @@ def publish_due_commands(
     published = failed = 0
     for command in event_store.due_commands(now_us, retry_after_us, limit):
         try:
-            payload = encode_signed_command(command, signer)
+            chosen = signer.signer_for(command.station_id, event_store) if isinstance(signer, CommandKeyring) else signer
+            payload = encode_signed_command(command, chosen)
             info = client.publish(
                 f"zs/v1/{tenant}/{command.station_id}/down",
                 payload,
@@ -226,6 +312,52 @@ def publish_due_commands(
     return published, failed
 
 
+def answer_firmware_request(
+    client,
+    topic: str,
+    payload: bytes,
+    tenant: str,
+    *,
+    event_store=store,
+    firmware_repository: ReleaseRepository | None = None,
+    now_us: int | None = None,
+    model_repository: ReleaseRepository | None = None,
+) -> str:
+    """Addendum F: one chunk for a fwreq, published at QoS 0 on the station's fw topic (a lost chunk is requested
+    again by the station); a request the store or the repository does not cover is dropped silently."""
+
+    topic_station_id, kind = station_id_from_topic(topic, tenant)
+    if kind != "fwreq":
+        raise ValueError("firmware answers only fwreq")
+    answer = serve_request(payload, topic_station_id, event_store=event_store, repository=firmware_repository,
+                           now_us=int(time.time() * 1_000_000) if now_us is None else now_us,
+                           model_repository=model_repository)
+    if answer is None:
+        return "fw_ignored"
+    info = client.publish(f"zs/v1/{tenant}/{topic_station_id}/fw", answer[1], qos=0, retain=False)
+    if info.rc != mqtt.MQTT_ERR_SUCCESS:
+        raise RuntimeError("firmware chunk publish failed")
+    return "fw_served"
+
+
+# A message handle_message could not process stays in flight unacknowledged (the broker redelivers it to the next
+# session only), and Mosquitto delivers at most max_inflight_messages (20 by default) QoS 1 messages to a client ahead
+# of its acknowledgements: after that many processing errors the bridge would receive nothing more and still look
+# alive.  StallGuard counts them; at the limit the bridge exits (code 3) and the container restarts it (compose:
+# restart unless-stopped) with a fresh session, while the stations repeat their detections until the application
+# receipt (docs/SERVER_LOAD_FIELD_2026-10-03.md, §4).
+UNACKED_LIMIT = 10
+
+
+class StallGuard:
+    def __init__(self, limit: int = UNACKED_LIMIT):
+        self.limit = limit
+        self.unacked = 0
+
+    def stalled(self) -> bool:
+        return self.unacked >= self.limit
+
+
 def handle_message(
     client,
     message,
@@ -234,21 +366,31 @@ def handle_message(
     *,
     event_store=store,
     fusion_service=service,
+    on_new_detection=None,
+    firmware_repository: ReleaseRepository | None = None,
+    model_repository: ReleaseRepository | None = None,
+    guard: StallGuard | None = None,
 ) -> bool:
-    """Process then MQTT-ACK; discard invalid input but retry transient failures."""
+    """Process then MQTT-ACK; discard invalid input but retry transient failures.  ``on_new_detection`` runs for a
+    newly stored detection after its receipt went out (the audio auto-request); its failure never blocks the ACK.
+    ``guard`` counts the messages left unacknowledged by processing errors."""
 
     try:
         if type(message.qos) is not int or message.qos != 1 or getattr(message, "retain", False):
             raise ValueError("station MQTT delivery must be QoS 1 and non-retained")
-        process_message(
-            message.topic,
-            message.payload,
-            tenant,
-            tls_enabled,
-            event_store=event_store,
-            fusion_service=fusion_service,
-        )
         _, kind = station_id_from_topic(message.topic, tenant)
+        if kind == "fwreq":                     # addendum F: answered with a chunk (or dropped), then acknowledged
+            status = answer_firmware_request(client, message.topic, message.payload, tenant, event_store=event_store,
+                                             firmware_repository=firmware_repository, model_repository=model_repository)
+        else:
+            status = process_message(
+                message.topic,
+                message.payload,
+                tenant,
+                tls_enabled,
+                event_store=event_store,
+                fusion_service=fusion_service,
+            )
         if kind == "up":
             receipt_topic, receipt_payload = build_event_receipt(
                 message.topic, message.payload, tenant
@@ -261,6 +403,11 @@ def handle_message(
             )
             if info.rc != mqtt.MQTT_ERR_SUCCESS:
                 raise RuntimeError("event application receipt publish failed")
+            if status == "stored" and on_new_detection is not None:
+                try:
+                    on_new_detection(decode_detection_obj(decode_cbor(message.payload)))
+                except Exception as exc:  # noqa: BLE001 - optional follow-up, the event itself is stored
+                    print(f"MQTT follow-up error: {type(exc).__name__}", file=sys.stderr)
     except ValueError as exc:
         print(f"MQTT decode error: {exc}", file=sys.stderr)
         if message.qos:
@@ -268,6 +415,8 @@ def handle_message(
         return False
     except Exception as exc:
         print(f"MQTT processing error: {type(exc).__name__}", file=sys.stderr)
+        if guard is not None:
+            guard.unacked += 1
         return False
     if message.qos:
         client.ack(message.mid, message.qos)
@@ -280,16 +429,26 @@ def main(argv: list[str] | None = None) -> None:
     validate_tenant(args.tenant)
     if args.command_poll_seconds <= 0 or args.command_retry_seconds <= 0:
         raise ValueError("command poll and retry intervals must be positive")
+    if args.auto_audio_gap_seconds < 0:
+        raise ValueError("auto audio gap must not be negative")
     signer = (
         CommandSigner.from_pem_file(args.command_signing_key)
         if args.command_signing_key
         else None
     )
+    if args.command_next_signing_key:
+        if signer is None:
+            raise ValueError("--command-next-signing-key needs --command-signing-key")
+        signer = CommandKeyring(signer, CommandSigner.from_pem_file(args.command_next_signing_key))
+        print(f"command key rotation: current {signer.primary.key_id.hex()}, next {signer.next.key_id.hex()} "
+              f"(public key {signer.next.public_key_hex})", file=sys.stderr)
     if signer is None:
         print(
             "MQTT command downstream disabled: signing key not configured",
             file=sys.stderr,
         )
+
+    service.alerts.tenant = args.tenant          # dioneya.alert/1 messages of this bridge belong to its tenant
 
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.manual_ack_set(True)
@@ -304,10 +463,34 @@ def main(argv: list[str] | None = None) -> None:
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/up", qos=1)
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/status", qos=1)
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/ack", qos=1)
+        client_obj.subscribe(f"zs/v1/{args.tenant}/+/audio", qos=1)
+        client_obj.subscribe(f"zs/v1/{args.tenant}/+/fwreq", qos=1)
+        client_obj.subscribe(f"zs/v1/{args.tenant}/+/bearing", qos=1)
+
+    auto_audio = args.auto_audio if signer is not None else "off"      # a request needs the command downstream
+    firmware_repository = ReleaseRepository(args.firmware_dir) if args.firmware_dir else None
+    if firmware_repository is not None:
+        print(f"firmware releases: {firmware_repository.versions() or 'none yet'} in {args.firmware_dir}", file=sys.stderr)
+    model_repository = ModelRepository(args.model_dir) if args.model_dir else None
+    if model_repository is not None:
+        print(f"model packages: {model_repository.versions() or 'none yet'} in {args.model_dir}", file=sys.stderr)
+
+    def on_new_detection(detection: DetectionMessage) -> None:
+        command = request_event_audio(
+            detection,
+            segment=auto_audio,
+            min_gap_us=int(args.auto_audio_gap_seconds * 1_000_000),
+            now_us=int(time.time() * 1_000_000),
+        )
+        if command is not None:
+            print(f"MQTT audio request {command.command_id} for station {detection.station_id}", file=sys.stderr)
+
+    guard = StallGuard()
 
     def on_message(client_obj, userdata, message):
         del userdata
-        handle_message(client_obj, message, args.tenant, tls_enabled)
+        handle_message(client_obj, message, args.tenant, tls_enabled, on_new_detection=on_new_detection,
+                       firmware_repository=firmware_repository, model_repository=model_repository, guard=guard)
 
     client.on_connect = on_connect
     client.on_message = on_message
@@ -315,6 +498,10 @@ def main(argv: list[str] | None = None) -> None:
     client.loop_start()
     try:
         while True:
+            if guard.stalled():
+                print(f"MQTT bridge: {guard.unacked} messages left unacknowledged after processing errors; "
+                      "exiting for a restart with a fresh session", file=sys.stderr)
+                raise SystemExit(3)
             if client.is_connected():
                 published, failed = publish_due_commands(
                     client,
@@ -328,6 +515,10 @@ def main(argv: list[str] | None = None) -> None:
                         f"MQTT command publish batch: {published} queued, {failed} failed",
                         file=sys.stderr,
                     )
+            try:
+                service.alerts.sweep()           # dioneya.alert/1: tracks and the alert that went quiet end
+            except Exception as exc:              # the output API never stops the bridge
+                print(f"dioneya.alert/1 sweep failed: {exc}", file=sys.stderr)
             time.sleep(args.command_poll_seconds)
     except KeyboardInterrupt:
         pass

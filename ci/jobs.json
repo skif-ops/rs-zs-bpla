@@ -1,0 +1,60 @@
+{
+  "include": [
+    {
+      "name": "firmware-host-and-target",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/firmware.sh",
+      "artifacts": "build-target/dioneya_evt_pre_20.*"
+    },
+    {
+      "name": "station-twin-field",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/twin_field.sh",
+      "artifacts": ""
+    },
+    {
+      "name": "server-pki",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/server_pki.sh",
+      "artifacts": ""
+    },
+    {
+      "name": "pki-windows-x64",
+      "runner": "windows-latest",
+      "shell": "pwsh",
+      "script": "ci/pki_windows.ps1",
+      "artifacts": "server/dist/*"
+    },
+    {
+      "name": "pki-windows-arm64",
+      "runner": "windows-11-arm",
+      "shell": "pwsh",
+      "script": "ci/pki_windows.ps1",
+      "artifacts": "server/dist/*"
+    },
+    {
+      "name": "evt-build-release-audit",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/evt_build_release.sh",
+      "artifacts": "artifacts/evt_pre_20_evt_build_release_audit.json"
+    },
+    {
+      "name": "pcb-pwr-j2-placement-eco-003-drc",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/pcb_pwr_eco_003_drc.sh",
+      "artifacts": "artifacts/kicad-native/PCB-PWR/j2-placement-eco-003/*"
+    },
+    {
+      "name": "pcb-pwr-eco-004-drc",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/pcb_pwr_eco_004_drc.sh",
+      "artifacts": "artifacts/kicad-native/PCB-PWR/eco-004-u3-u4-land-rule/*"
+    }
+  ]
+}

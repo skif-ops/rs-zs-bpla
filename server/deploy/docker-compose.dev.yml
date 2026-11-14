@@ -15,6 +15,7 @@ services:
       ZS_MQTT_PORT: "1883"
       ZS_TENANT: default
       ZS_STATION_HTTP_INSECURE_BENCH: "1"
+      ZS_OPERATOR_AUTH_INSECURE_BENCH: "1"          # isolated bench only: no operator login
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -29,6 +30,16 @@ services:
     command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "1883", "--insecure-bench"]
     environment:
       ZS_TENANT: default
+    volumes:
+      - ../data:/app/data
+    depends_on:
+      - mqtt
+      - server
+  mqtt_alerts:                                  # the output API dioneya.alert/1 over MQTT (DIONEYA_ALERT_API_v1.md, 4.4)
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "1883", "--insecure-bench"]
     volumes:
       - ../data:/app/data
     depends_on:

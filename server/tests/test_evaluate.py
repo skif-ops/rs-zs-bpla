@@ -67,6 +67,30 @@ def test_evaluate_refuses_window_leakage_when_class_has_one_source(tmp_path):
     assert "оконный k-fold" in result.message.lower()
 
 
+def test_evaluate_holds_grouped_files_out_together(tmp_path):
+    rows = []
+    for label, base in (("A", 0.0), ("B", 5.0)):
+        for source_group in range(2):
+            for view in range(2):
+                for window_index in range(3):
+                    row = {column: 0.0 for column in FEATURE_COLUMNS}
+                    row.update(
+                        {
+                            "label": label,
+                            "source_file": f"/{label}/flight{source_group}-view{view}.wav",
+                            "meta_source_group": f"{label}-flight-{source_group}",
+                            "start_seconds": window_index * 0.5,
+                            "rms": base,
+                        }
+                    )
+                    rows.append(row)
+
+    result = _manager(tmp_path, pd.DataFrame(rows)).evaluate()
+
+    assert result.method == "leave_one_file_out"
+    assert result.folds == 4
+
+
 def test_provisional_class_is_excluded_from_validation_metrics(tmp_path):
     rows=[]
     for label in ["A", "B"]:

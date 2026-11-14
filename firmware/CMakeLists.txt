@@ -7,6 +7,13 @@ add_subdirectory(targets/evt_pre_20)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
+add_compile_definitions(_USE_MATH_DEFINES _CRT_SECURE_NO_WARNINGS)
+if(MSVC)
+  add_compile_options("/FI${CMAKE_CURRENT_SOURCE_DIR}/include/zs_compiler_compat.h")
+endif()
+if(WIN32)
+  add_library(m INTERFACE)
+endif()
 
 add_library(zs_core
   src/zs_sha256.c
@@ -45,17 +52,63 @@ add_library(zs_core
   src/zs_nor_storage_layout.c
   src/zs_adpcm.c
   src/zs_prehistory.c
+  src/zs_audio_recorder.c
+  src/zs_audio_upload.c
   src/zs_spatial.c
+  src/zs_bearing.c
+  src/zs_comb_bearing.c
+  src/zs_doa_sep.c
+  src/zs_bearing_batch.c
+  src/zs_track_window.c
   src/zs_position_trust.c
+  src/zs_station_position.c
   src/zs_installation_store.c
   src/zs_installation_commissioning.c
+  src/zs_station_config.c
+  src/zs_bg95_provision.c
+  src/zs_power_modes.c
+  src/zs_pdm_capture.c
+  src/zs_pps_sync.c
+  src/zs_selftest.c
+  src/zs_fft_mixed.c
+  src/zs_dsp_mcu.c
   src/zs_ina226.c
+  src/zs_cbor_read.c
+  src/zs_ble_framing.c
+  src/zs_ipc_link.c
+  src/zs_ble_bridge.c
+  src/zs_ipc_service.c
+  src/zs_nor_slot_store.c
+  src/zs_air_gate.c
+  src/zs_presence.c
+  src/zs_mcumgr_serial.c
+  src/zs_nor_image_store.c
+  src/zs_station_pipeline.c
+  src/zs_station_comms.c
+  src/zs_boot_counter.c
+  src/zs_station_secrets.c
+  src/zs_command_keys.c
+  src/zs_ed25519.c
+  src/zs_lora_frame.c
+  src/zs_lora_uplink.c
+  src/zs_lora_rf_profile.c
+  src/zs_audio_chunk.c
+  src/zs_task_watch.c
+  src/zs_command_clock.c
+  src/zs_station_params.c
+  src/zs_bg95_topic_subscription.c
+  src/zs_fw_update.c
+  src/zs_fw_boot.c
+  src/zs_model.c
+  src/zs_model_store.c
+  src/zs_net_trial.c
 )
 target_include_directories(zs_core PUBLIC include generated)
 target_link_libraries(zs_core m)
 
 add_library(evt_pre_20_dual_sim_gpio
   targets/evt_pre_20/src/evt_pre_20_dual_sim_gpio.c
+  targets/evt_pre_20/src/evt_pre_20_sim_orchestrator.c
 )
 target_link_libraries(evt_pre_20_dual_sim_gpio
   PUBLIC zs_core evt_pre_20_target_contract
@@ -111,24 +164,122 @@ add_executable(zs_nor_storage_layout_tests tests/test_nor_storage_layout.c)
 target_link_libraries(zs_nor_storage_layout_tests zs_core m)
 add_executable(zs_prehistory_tests tests/test_prehistory.c)
 target_link_libraries(zs_prehistory_tests zs_core m)
+add_executable(zs_audio_recorder_tests tests/test_audio_recorder.c)
+target_link_libraries(zs_audio_recorder_tests zs_core m)
+add_executable(zs_audio_upload_tests tests/test_audio_upload.c)
+target_link_libraries(zs_audio_upload_tests zs_core m)
+add_executable(zs_time_gap_tests tests/test_time_gap.c)
+target_link_libraries(zs_time_gap_tests zs_core m)
+add_executable(zs_time_spoof_tests tests/test_time_spoof.c)
+target_link_libraries(zs_time_spoof_tests zs_core m)
 add_executable(zs_spatial_tests tests/test_spatial.c)
 target_link_libraries(zs_spatial_tests zs_core m)
 add_executable(zs_protocol_size_tests tests/test_protocol_size.c)
 target_link_libraries(zs_protocol_size_tests zs_core m)
 add_executable(zs_position_trust_tests tests/test_position_trust.c)
 target_link_libraries(zs_position_trust_tests zs_core m)
+add_executable(zs_station_position_tests tests/test_station_position.c)
+target_link_libraries(zs_station_position_tests zs_core m)
 add_executable(zs_installation_store_tests tests/test_installation_store.c)
 target_link_libraries(zs_installation_store_tests zs_core m)
 add_executable(zs_installation_commissioning_tests tests/test_installation_commissioning.c)
 target_link_libraries(zs_installation_commissioning_tests zs_core m)
+add_executable(zs_station_config_tests tests/test_station_config.c)
+target_link_libraries(zs_station_config_tests zs_core m)
+add_executable(zs_bg95_provision_tests tests/test_bg95_provision.c)
+target_link_libraries(zs_bg95_provision_tests zs_core m)
+add_executable(zs_platform_tests tests/test_platform.c)
+target_link_libraries(zs_platform_tests zs_core m)
+add_executable(zs_fft_mixed_tests tests/test_fft_mixed.c)
+target_link_libraries(zs_fft_mixed_tests zs_core m)
+add_executable(zs_dsp_mcu_tests tests/test_dsp_mcu.c)
+target_link_libraries(zs_dsp_mcu_tests zs_core m)
 add_executable(zs_ina226_tests tests/test_ina226.c)
 target_link_libraries(zs_ina226_tests zs_core m)
+add_executable(zs_ble_bridge_tests tests/test_ble_bridge.c)
+target_link_libraries(zs_ble_bridge_tests zs_core m)
+add_executable(zs_nor_slot_store_tests tests/test_nor_slot_store.c)
+target_link_libraries(zs_nor_slot_store_tests zs_core m)
+add_executable(zs_air_gate_tests tests/test_air_gate.c)
+target_link_libraries(zs_air_gate_tests zs_core m)
+add_executable(zs_presence_tests tests/test_presence.c)
+target_link_libraries(zs_presence_tests zs_core m)
+add_executable(zs_mcumgr_serial_tests tests/test_mcumgr_serial.c)
+target_link_libraries(zs_mcumgr_serial_tests zs_core m)
+add_executable(zs_nor_image_store_tests tests/test_nor_image_store.c)
+target_link_libraries(zs_nor_image_store_tests zs_core m)
+add_executable(zs_station_pipeline_tests tests/test_station_pipeline.c)
+target_link_libraries(zs_station_pipeline_tests zs_core m)
+add_executable(zs_station_comms_tests tests/test_station_comms.c)
+target_link_libraries(zs_station_comms_tests zs_core m)
+add_executable(zs_boot_counter_tests tests/test_boot_counter.c)
+target_link_libraries(zs_boot_counter_tests zs_core m)
+add_executable(zs_station_secrets_tests tests/test_station_secrets.c)
+target_link_libraries(zs_station_secrets_tests zs_core m)
+add_executable(zs_command_keys_tests tests/test_command_keys.c)
+target_link_libraries(zs_command_keys_tests zs_core m)
+add_executable(zs_fw_update_tests tests/test_fw_update.c)
+target_link_libraries(zs_fw_update_tests zs_core m)
+add_executable(zs_model_tests tests/test_model.c)
+target_link_libraries(zs_model_tests zs_core m)
+add_executable(zs_fw_boot_tests tests/test_fw_boot.c)
+target_link_libraries(zs_fw_boot_tests zs_core m)
+add_executable(zs_net_trial_tests tests/test_net_trial.c)
+target_link_libraries(zs_net_trial_tests zs_core m)
+add_executable(zs_bearing_tests tests/test_bearing.c twin/array_render.c)
+target_include_directories(zs_bearing_tests PRIVATE twin)
+target_link_libraries(zs_bearing_tests zs_core m)
+add_executable(zs_pipeline_sources_tests tests/test_pipeline_sources.c twin/array_render.c)
+target_include_directories(zs_pipeline_sources_tests PRIVATE twin)
+target_link_libraries(zs_pipeline_sources_tests zs_core m)
+add_executable(zs_comb_bearing_tests tests/test_comb_bearing.c twin/array_render.c)
+target_include_directories(zs_comb_bearing_tests PRIVATE twin)
+target_link_libraries(zs_comb_bearing_tests zs_core m)
+add_executable(zs_doa_sep_tests tests/test_doa_sep.c twin/array_render.c)
+target_include_directories(zs_doa_sep_tests PRIVATE twin)
+target_link_libraries(zs_doa_sep_tests zs_core m)
+add_executable(zs_bearing_stream_tests tests/test_bearing_stream.c)
+target_link_libraries(zs_bearing_stream_tests zs_core m)
+add_executable(zs_ed25519_tests tests/test_ed25519.c)
+target_link_libraries(zs_ed25519_tests zs_core m)
+add_executable(zs_lora_frame_tests tests/test_lora_frame.c)
+target_link_libraries(zs_lora_frame_tests zs_core m)
+add_executable(zs_lora_uplink_tests tests/test_lora_uplink.c)
+target_link_libraries(zs_lora_uplink_tests zs_core m)
+add_executable(zs_lora_rf_profile_tests tests/test_lora_rf_profile.c)
+target_link_libraries(zs_lora_rf_profile_tests zs_core m)
+add_executable(zs_sx1262_packet_tests tests/test_sx1262_packet.c)
+target_link_libraries(zs_sx1262_packet_tests zs_core m)
+add_executable(zs_audio_chunk_tests tests/test_audio_chunk.c)
+target_link_libraries(zs_audio_chunk_tests zs_core m)
+add_executable(zs_task_watch_tests tests/test_task_watch.c)
+target_link_libraries(zs_task_watch_tests zs_core m)
+add_executable(zs_command_clock_tests tests/test_command_clock.c)
+target_link_libraries(zs_command_clock_tests zs_core m)
+add_executable(zs_command_set_tests tests/test_command_set.c)
+target_link_libraries(zs_command_set_tests zs_core m)
+add_executable(zs_station_params_tests tests/test_station_params.c)
+target_link_libraries(zs_station_params_tests zs_core m)
 add_executable(evt_pre_20_target_contract_tests tests/test_evt_pre_20_target_contract.c)
 target_link_libraries(evt_pre_20_target_contract_tests PRIVATE evt_pre_20_target_contract)
 add_executable(evt_pre_20_dual_sim_gpio_tests tests/test_evt_pre_20_dual_sim_gpio.c)
 target_link_libraries(evt_pre_20_dual_sim_gpio_tests
   PRIVATE evt_pre_20_dual_sim_gpio
 )
+add_executable(evt_pre_20_sim_orchestrator_tests tests/test_evt_pre_20_sim_orchestrator.c)
+target_link_libraries(evt_pre_20_sim_orchestrator_tests PRIVATE evt_pre_20_dual_sim_gpio)
+# the STM32 comms task compiled against a simulated clock, GPIO and a scripted BG95 (tests/host_sim)
+add_executable(app_comms_sim_tests tests/test_app_comms_sim.c targets/evt_pre_20/app/app_comms.c)
+target_include_directories(app_comms_sim_tests PRIVATE tests/host_sim targets/evt_pre_20/app)
+target_link_libraries(app_comms_sim_tests PRIVATE evt_pre_20_dual_sim_gpio)
+
+# station digital twin: portable stack + real comms task on the host against a scene, a scripted BG95 and the server twin
+if(UNIX)
+  add_executable(zs_station_twin twin/station_twin.c twin/scene.c twin/array_render.c targets/evt_pre_20/app/app_comms.c)
+  target_include_directories(zs_station_twin PRIVATE twin tests/host_sim targets/evt_pre_20/app)
+  target_link_libraries(zs_station_twin PRIVATE evt_pre_20_dual_sim_gpio m)
+  target_compile_options(zs_station_twin PRIVATE -UNDEBUG)
+endif()
 
 # Release configuration defines NDEBUG globally. Tests must keep assert() active,
 # otherwise validation expressions disappear and can hide both test failures and warnings.
@@ -158,14 +309,62 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_nor_event_outbox_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_nor_storage_layout_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_prehistory_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_audio_recorder_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_audio_upload_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_time_gap_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_time_spoof_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_spatial_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_protocol_size_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_position_trust_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_station_position_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_installation_store_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_installation_commissioning_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_station_config_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_bg95_provision_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_platform_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_fft_mixed_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_dsp_mcu_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ina226_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_ble_bridge_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_nor_slot_store_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_air_gate_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_presence_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_mcumgr_serial_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_nor_image_store_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_station_pipeline_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_station_comms_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_boot_counter_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_station_secrets_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_command_keys_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_fw_update_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_model_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_fw_boot_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_net_trial_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_bearing_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_bearing_stream_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_comb_bearing_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_doa_sep_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_pipeline_sources_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_ed25519_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_lora_frame_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_lora_uplink_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_sx1262_packet_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_audio_chunk_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_task_watch_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_command_clock_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_command_set_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_station_params_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_target_contract_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_dual_sim_gpio_tests PRIVATE -UNDEBUG)
+  target_compile_options(evt_pre_20_sim_orchestrator_tests PRIVATE -UNDEBUG)
+  target_compile_options(app_comms_sim_tests PRIVATE -UNDEBUG)
+elseif(MSVC)
+  get_property(zs_build_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+  foreach(zs_target IN LISTS zs_build_targets)
+    if(zs_target MATCHES "_tests$")
+      target_compile_options(${zs_target} PRIVATE /UNDEBUG)
+    endif()
+  endforeach()
 endif()
 
 enable_testing()
@@ -194,14 +393,67 @@ add_test(NAME nor_command_journal COMMAND zs_nor_command_journal_tests)
 add_test(NAME nor_event_outbox COMMAND zs_nor_event_outbox_tests)
 add_test(NAME nor_storage_layout COMMAND zs_nor_storage_layout_tests)
 add_test(NAME prehistory COMMAND zs_prehistory_tests)
+add_test(NAME audio_recorder COMMAND zs_audio_recorder_tests)
+add_test(NAME audio_upload COMMAND zs_audio_upload_tests)
+add_test(NAME time_gap COMMAND zs_time_gap_tests)
+add_test(NAME time_spoof COMMAND zs_time_spoof_tests)
 add_test(NAME spatial COMMAND zs_spatial_tests)
 add_test(NAME protocol_size COMMAND zs_protocol_size_tests)
 add_test(NAME position_trust COMMAND zs_position_trust_tests)
+add_test(NAME station_position COMMAND zs_station_position_tests)
 add_test(NAME installation_store COMMAND zs_installation_store_tests)
 add_test(NAME installation_commissioning COMMAND zs_installation_commissioning_tests)
+add_test(NAME station_config COMMAND zs_station_config_tests)
+add_test(NAME bg95_provision COMMAND zs_bg95_provision_tests)
+add_test(NAME platform COMMAND zs_platform_tests)
+add_test(NAME fft_mixed COMMAND zs_fft_mixed_tests)
+add_test(NAME dsp_mcu COMMAND zs_dsp_mcu_tests)
 add_test(NAME ina226 COMMAND zs_ina226_tests)
+add_test(NAME ble_bridge COMMAND zs_ble_bridge_tests)
+add_test(NAME nor_slot_store COMMAND zs_nor_slot_store_tests)
+add_test(NAME air_gate COMMAND zs_air_gate_tests)
+add_test(NAME presence COMMAND zs_presence_tests)
+add_test(NAME mcumgr_serial COMMAND zs_mcumgr_serial_tests)
+add_test(NAME nor_image_store COMMAND zs_nor_image_store_tests)
+add_test(NAME station_pipeline COMMAND zs_station_pipeline_tests)
+add_test(NAME station_comms COMMAND zs_station_comms_tests)
+add_test(NAME boot_counter COMMAND zs_boot_counter_tests)
+add_test(NAME station_secrets COMMAND zs_station_secrets_tests)
+add_test(NAME command_keys COMMAND zs_command_keys_tests)
+add_test(NAME fw_update COMMAND zs_fw_update_tests)
+add_test(NAME model COMMAND zs_model_tests)
+add_test(NAME fw_boot COMMAND zs_fw_boot_tests)
+add_test(NAME net_trial COMMAND zs_net_trial_tests)
+add_test(NAME bearing COMMAND zs_bearing_tests)
+add_test(NAME bearing_stream COMMAND zs_bearing_stream_tests)
+add_test(NAME comb_bearing COMMAND zs_comb_bearing_tests)
+add_test(NAME doa_sep COMMAND zs_doa_sep_tests)
+add_test(NAME pipeline_sources COMMAND zs_pipeline_sources_tests)
+add_test(NAME ed25519 COMMAND zs_ed25519_tests)
+add_test(NAME lora_frame COMMAND zs_lora_frame_tests)
+add_test(NAME lora_uplink COMMAND zs_lora_uplink_tests)
+add_test(NAME lora_rf_profile COMMAND zs_lora_rf_profile_tests)
+add_test(NAME sx1262_packet COMMAND zs_sx1262_packet_tests)
+add_test(NAME audio_chunk COMMAND zs_audio_chunk_tests)
+add_test(NAME task_watch COMMAND zs_task_watch_tests)
+add_test(NAME command_clock COMMAND zs_command_clock_tests)
+add_test(NAME command_set COMMAND zs_command_set_tests)
+add_test(NAME station_params COMMAND zs_station_params_tests)
 add_test(NAME evt_pre_20_target_contract COMMAND evt_pre_20_target_contract_tests)
 add_test(NAME evt_pre_20_dual_sim_gpio COMMAND evt_pre_20_dual_sim_gpio_tests)
+add_test(NAME evt_pre_20_sim_orchestrator COMMAND evt_pre_20_sim_orchestrator_tests)
+add_test(NAME app_comms_sim COMMAND app_comms_sim_tests)
+# station twin smoke: a drone fly-by must produce at least one detection event (no server: the comms side is
+# covered by app_comms_sim; the closed loop with server/twin/twin_server.py runs in the server CI job)
+if(TARGET zs_station_twin)
+  add_test(NAME station_twin_smoke COMMAND zs_station_twin --scene drone --seconds 70 --seed 3 --expect-events 1)
+  # closed loop with the Python server twin (needs server/requirements-protocol.lock.txt installed, as ci/firmware.sh does)
+  add_test(NAME station_twin_e2e COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_station_twin_e2e.py)
+  set_tests_properties(station_twin_e2e PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
+  # three twins in one field through the real server path (needs server/requirements.lock.txt, as ci/twin_field.sh does)
+  add_test(NAME station_twin_field COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_twin_field_e2e.py)
+  set_tests_properties(station_twin_field PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
+endif()
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)
@@ -210,5 +462,11 @@ target_link_libraries(zs_emit_heartbeat PRIVATE zs_core m)
 
 add_executable(zs_eval_golden tools/eval_golden.c)
 target_link_libraries(zs_eval_golden PRIVATE zs_core m)
+add_executable(zs_air_gate_eval tools/air_gate_eval.c)
+target_link_libraries(zs_air_gate_eval PRIVATE zs_core m)
+add_executable(zs_presence_eval tools/presence_eval.c)
+target_link_libraries(zs_presence_eval PRIVATE zs_core m)
+add_executable(zs_eval_golden_mcu tools/eval_golden_mcu.c)
+target_link_libraries(zs_eval_golden_mcu PRIVATE zs_core m)
 add_executable(zs_dump_spectrum tools/dump_spectrum.c)
 target_link_libraries(zs_dump_spectrum PRIVATE zs_core m)

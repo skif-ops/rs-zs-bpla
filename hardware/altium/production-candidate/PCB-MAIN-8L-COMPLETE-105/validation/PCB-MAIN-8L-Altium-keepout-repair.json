@@ -1,0 +1,209 @@
+{
+  "schema": "dioneya-main8l-keepout-repair-v1",
+  "status": "repaired_and_verified",
+  "pcb_path": "hardware/altium/production-candidate/PCB-MAIN-8L-COMPLETE-105/PCB-MAIN.PcbDoc",
+  "pcb_sha256": "BFA1355CFE70B9794507C58FFD22923FBAEB3234DECDDB595796E8C0441141CF",
+  "method": "Altium built-in PCB:ConvertToKeepout on nine selected rectangular regions",
+  "coordinate_transform": "x_altium = x_kicad + 3.685 mm; y_altium = 75.025 mm - y_kicad",
+  "rounding": "bounds expanded outwards to integer mils; maximum expansion below 0.0254 mm per edge",
+  "source_keepouts": [
+    {
+      "layers": [
+        "F.Cu"
+      ],
+      "source_bbox_mm": [
+        105.0,
+        32.95,
+        106.2,
+        34.55
+      ],
+      "altium_bbox_mm": [
+        108.685,
+        40.475,
+        109.885,
+        42.075
+      ],
+      "placed_mils": [
+        4278,
+        1593,
+        4327,
+        1657
+      ]
+    },
+    {
+      "layers": [
+        "F.Cu",
+        "In1.Cu",
+        "In2.Cu",
+        "In3.Cu",
+        "In4.Cu",
+        "In5.Cu",
+        "In6.Cu",
+        "B.Cu"
+      ],
+      "source_bbox_mm": [
+        106.2,
+        30.0,
+        110.0,
+        40.5
+      ],
+      "altium_bbox_mm": [
+        109.885,
+        34.525,
+        113.685,
+        45.025
+      ],
+      "placed_mils": [
+        4326,
+        1359,
+        4476,
+        1773
+      ]
+    }
+  ],
+  "baseline_keepout_count": 32,
+  "final_keepout_count": 41,
+  "final_layer_keepout_counts": {
+    "TopLayer": 6,
+    "MidLayer1": 5,
+    "MidLayer2": 5,
+    "MidLayer3": 5,
+    "MidLayer4": 5,
+    "MidLayer5": 5,
+    "MidLayer6": 5,
+    "BottomLayer": 5
+  },
+  "final_region_count": 123,
+  "free_nonkeepout_regions": {
+    "MultiLayer": 1
+  },
+  "save": {
+    "file_path": "F:\\2AC9~1\\Codex\\altium-main-8l-evaluation-2026-10-15\\altium-output-final\\PCB-MAIN\\PCB-MAIN.PcbDoc",
+    "saved": true,
+    "was_modified": true,
+    "reason": ""
+  },
+  "deselections": [
+    {
+      "layer": "TopLayer",
+      "result": {
+        "matched": 2,
+        "properties": {
+          "unknown_count": 0,
+          "unknown": [],
+          "failed_count": 0,
+          "failed": [],
+          "unreadable_count": 0,
+          "unreadable": []
+        },
+        "success": true
+      }
+    },
+    {
+      "layer": "MidLayer1",
+      "result": {
+        "matched": 1,
+        "properties": {
+          "unknown_count": 0,
+          "unknown": [],
+          "failed_count": 0,
+          "failed": [],
+          "unreadable_count": 0,
+          "unreadable": []
+        },
+        "success": true
+      }
+    },
+    {
+      "layer": "MidLayer2",
+      "result": {
+        "matched": 1,
+        "properties": {
+          "unknown_count": 0,
+          "unknown": [],
+          "failed_count": 0,
+          "failed": [],
+          "unreadable_count": 0,
+          "unreadable": []
+        },
+        "success": true
+      }
+    },
+    {
+      "layer": "MidLayer3",
+      "result": {
+        "matched": 1,
+        "properties": {
+          "unknown_count": 0,
+          "unknown": [],
+          "failed_count": 0,
+          "failed": [],
+          "unreadable_count": 0,
+          "unreadable": []
+        },
+        "success": true
+      }
+    },
+    {
+      "layer": "MidLayer4",
+      "result": {
+        "matched": 1,
+        "properties": {
+          "unknown_count": 0,
+          "unknown": [],
+          "failed_count": 0,
+          "failed": [],
+          "unreadable_count": 0,
+          "unreadable": []
+        },
+        "success": true
+      }
+    },
+    {
+      "layer": "MidLayer5",
+      "result": {
+        "matched": 1,
+        "properties": {
+          "unknown_count": 0,
+          "unknown": [],
+          "failed_count": 0,
+          "failed": [],
+          "unreadable_count": 0,
+          "unreadable": []
+        },
+        "success": true
+      }
+    },
+    {
+      "layer": "MidLayer6",
+      "result": {
+        "matched": 1,
+        "properties": {
+          "unknown_count": 0,
+          "unknown": [],
+          "failed_count": 0,
+          "failed": [],
+          "unreadable_count": 0,
+          "unreadable": []
+        },
+        "success": true
+      }
+    },
+    {
+      "layer": "BottomLayer",
+      "result": {
+        "matched": 1,
+        "properties": {
+          "unknown_count": 0,
+          "unknown": [],
+          "failed_count": 0,
+          "failed": [],
+          "unreadable_count": 0,
+          "unreadable": []
+        },
+        "success": true
+      }
+    }
+  ],
+  "final_saved_sha256": "BFA1355CFE70B9794507C58FFD22923FBAEB3234DECDDB595796E8C0441141CF"
+}

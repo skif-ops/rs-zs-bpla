@@ -1,0 +1,29 @@
+{
+  "schema": "dioneya-pcb-main-8l-adoption-audit-v1",
+  "configuration": "EVT-PRE-20 Rev.B",
+  "status": "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED",
+  "manufacturing_release": false,
+  "authority": "hardware\\PCB_LAYER_COUNT_AUTHORITY_REV_B.csv",
+  "controlled_counts": {
+    "PCB-MAIN": 8,
+    "PCB-PWR": 4,
+    "PCB-MIC": 2
+  },
+  "pcb_main": {
+    "source": "hardware\\kicad\\native\\PCB-MAIN\\PCB-MAIN.kicad_pcb",
+    "sha256": "47b1c8dd391aabd6339c878ac4baff4f8fdf4f82d6ab588c13f7437552ea1f77",
+    "layers": [
+      "F.Cu",
+      "In1.Cu",
+      "In2.Cu",
+      "In3.Cu",
+      "In4.Cu",
+      "In5.Cu",
+      "In6.Cu",
+      "B.Cu"
+    ],
+    "retired_6l_preserved": true,
+    "decision": "hardware\\PCB_MAIN_8L_ADOPTION_DECISION_REV_B.json"
+  },
+  "open_interlocks": "selected-stack DFM and dielectric confirmation; impedance review; POFV confirmation; Altium antenna warnings; Review B; EVT validation"
+}

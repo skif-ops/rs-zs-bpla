@@ -8,6 +8,7 @@ from station.schemas import (
     Classification,
     CellularTelemetry,
     DetectionMessage,
+    DetectorHealth,
     DoaEstimate,
     GnssStatus,
     HeartbeatMessage,
@@ -22,7 +23,10 @@ from station.schemas import (
 _MSG_DETECTION = 2
 _MSG_HEARTBEAT = 3
 _SUPPORTED_DETECTION_SCHEMAS = frozenset({1, 3, 4})
-_SUPPORTED_HEARTBEAT_SCHEMAS = frozenset({1})
+_FW_STATE = {0: "IDLE", 1: "DOWNLOADING", 2: "INSTALL_PENDING", 3: "TRIAL", 4: "ROLLED_BACK"}   # addendum F, key 19
+_NET_STATE = {0: "STABLE", 1: "ACCEPTED", 2: "TRIAL", 3: "ROLLED_BACK"}                        # addendum G, key 22
+_RESET_CAUSE = {1: "POWER", 2: "PIN", 3: "SOFTWARE", 4: "IWDG", 5: "WWDG", 6: "LOW_POWER", 7: "OPTION_BYTES"}
+_SUPPORTED_HEARTBEAT_SCHEMAS = frozenset({1, 2})   # 2 adds the optional detector map (key 13)
 _ROUTE = {0: "LTE", 1: "NB_IOT", 2: "2G", 3: "LORA", 4: "BLE", 5: "TEST"}
 _PROFILE = {0: "generic", 1: "piston", 2: "reactive"}
 _CLASS_LABEL = {
@@ -61,6 +65,7 @@ _TIME_TRUST = {
 _ALTITUDE_SOURCE = {0: "gnss_msl", 1: "configured_msl", 2: "unknown"}
 _POSITION_SOURCE = {0: "gnss_live", 1: "configured_install"}
 _APN_SOURCE = {1: "EXPLICIT", 2: "NETWORK", 3: "CATALOG"}
+_PRESENCE_LEVEL = {0: "NONE", 1: "SUSPECT", 2: "ENGINE_UNCONFIRMED", 3: "CONFIRMED"}   # firmware zs_presence_level_t
 
 
 class _CborReader:
@@ -128,6 +133,13 @@ def decode_cbor(raw: bytes):
 
 def _as_map(value: Any) -> dict:
     return value if isinstance(value, dict) else {}
+
+
+def _key_id_hex(value: object) -> str | None:
+    """Heartbeat detector keys 16/17 (ICD addendum E): a command key id as uint64, 0 = none."""
+    if type(value) is not int or not 0 <= value <= 0xFFFFFFFFFFFFFFFF:
+        raise ValueError("command key id must be a uint64")
+    return None if value == 0 else value.to_bytes(8, "big").hex()
 
 
 def _text_field(values: dict, key: int, name: str) -> str:
@@ -295,6 +307,7 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
     power = _as_map(obj.get(6))
     route = _as_map(obj.get(7))
     cellular = _as_map(obj.get(12))
+    detector = _as_map(obj.get(13)) if schema_ver >= 2 and 13 in obj else None
     if not cellular:
         raise ValueError("compact heartbeat requires cellular telemetry")
     if cellular.get(11) is not True:
@@ -364,6 +377,32 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
             access_technology=_integer_field(cellular, 9, "access technology"),
             apn_source=apn_source,
             settings_valid=True,
+        ),
+        detector=None if detector is None else DetectorHealth(
+            boot_id=_integer_field(detector, 0, "boot_id"),
+            uptime_s=int(detector.get(1, 0)),
+            windows=int(detector.get(2, 0)),
+            windows_dropped=int(detector.get(3, 0)),
+            confirmed_windows=int(detector.get(4, 0)),
+            suspect_windows=int(detector.get(5, 0)),
+            engine_windows=int(detector.get(6, 0)),
+            events_emitted=int(detector.get(7, 0)),
+            events_refused=int(detector.get(8, 0)),
+            outbox_pending=int(detector.get(9, 0)),
+            window_max_ms=int(detector.get(10, 0)),
+            presence_level=_PRESENCE_LEVEL.get(int(detector.get(11, 0)), "NONE"),
+            reset_cause=_RESET_CAUSE.get(int(detector.get(12, 0)), "UNKNOWN"),
+            watchdog_missed_tasks=int(detector.get(13, 0)),
+            params_version=int(detector.get(14, 0)),
+            selftest_failed_tests=int(detector.get(15, 0)),
+            command_key_id=_key_id_hex(detector.get(16, 0)),
+            command_next_key_id=_key_id_hex(detector.get(17, 0)),
+            fw_version=int(detector.get(18, 0)),
+            fw_state=_FW_STATE.get(int(detector.get(19, 0)), "IDLE"),
+            fw_other_version=int(detector.get(20, 0)),
+            net_config_version=int(detector.get(21, 0)),
+            net_state=_NET_STATE.get(int(detector.get(22, 0)), "STABLE"),
+            net_failed_version=int(detector.get(23, 0)),
         ),
     )
 

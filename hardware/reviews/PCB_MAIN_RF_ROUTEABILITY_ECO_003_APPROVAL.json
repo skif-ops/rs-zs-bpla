@@ -1,0 +1,57 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-routeability-eco-003-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-RF-ROUTEABILITY-ECO-003",
+  "reviewer": "Скиф",
+  "date": "2026-09-19",
+  "reviewed_proposal": "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.json",
+  "reviewed_proposal_sha256": "81c71958796e816fd28360562c1034a96c67d1c314bc645210ebc249065dc831",
+  "reviewed_proposal_record": "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.md",
+  "reviewed_proposal_record_sha256": "72904af934e7ee41050a660d47fd59916ed798a9ee1183c5df0b828e509303ae",
+  "reviewed_candidate_board": "hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb",
+  "reviewed_candidate_board_sha256": "3561f334476259f4e2aa6143a49dcc945da7eb1a292400449b60d204ac421c5d",
+  "reviewed_baseline_board_sha256": "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e",
+  "reviewed_local_commit_sha": "dc7921fa08714ae9ad997b9c54ce24491e9672da",
+  "github_equivalent_commit_sha": "23d4195c15a380f4e12337094be0d09d022be065",
+  "reviewed_tree_sha": "82467c29399fddec21458e169ed00c6d02a1e856",
+  "decision": "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO",
+  "scope": "FL1_D4_L2_PLACEMENT_DELTA_AND_RF_ROUTING_ENGINEERING_CONTINUATION_ONLY",
+  "approved_placement_delta": [
+    {
+      "refdes": "FL1",
+      "from": [61.0, 69.5, 0.0],
+      "to": [60.5, 68.0, 0.0]
+    },
+    {
+      "refdes": "D4",
+      "from": [61.0, 68.0, 0.0],
+      "to": [58.25, 70.0, 90.0]
+    },
+    {
+      "refdes": "L2",
+      "from": [59.25, 69.5, 0.0],
+      "to": [59.75, 70.25, 90.0]
+    }
+  ],
+  "reviewed_routeability_evidence": {
+    "routed_nets": 7,
+    "track_segments": 89,
+    "track_length_mm": 103.481866172679,
+    "signal_layer": "F.Cu",
+    "trace_width_mm": 0.1509,
+    "signal_vias": 0,
+    "copper_zones": 0,
+    "strict_2d_placement_clearance": "PASS",
+    "comparative_drc": "PASS_NO_NEW_ERROR",
+    "native_connectivity_reduction": 15
+  },
+  "approval_statement": "Подтверждаю ACCEPT_LIMITED_RF_ROUTEABILITY_ECO и разрешаю продолжать в evt-pre-20.",
+  "placement_implementation_authorized": true,
+  "routing_engineering_continuation_authorized": true,
+  "candidate_copper_final_authorized": false,
+  "routing_complete": false,
+  "return_path_review_complete": false,
+  "si_review_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

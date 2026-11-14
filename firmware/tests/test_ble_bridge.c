@@ -1,0 +1,508 @@
+/* Host tests: BLE framing (B.2), IPC link (C), and the Android-like client <-> nRF bridge <-> STM32 service loop. */
+#include "zs_ble_bridge.h"
+#include "zs_ble_framing.h"
+#include "zs_cbor.h"
+#include "zs_ipc_link.h"
+#include "zs_ipc_service.h"
+#include "zs_sha256.h"
+
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+
+/* ---- framing ---------------------------------------------------------------------------- */
+
+static void test_framing_vectors(void) {
+  uint8_t value[4096], frame[244], out[4096];
+  for (unsigned i = 0u; i < sizeof(value); i++) value[i] = (uint8_t)i;
+  /* 300 bytes at MTU 247: two frames of 244 (240 data) and 2 + 60 (Kotlin LongValueFramingTest.frameLayoutForMtu247) */
+  zs_ble_splitter_t s; zs_ble_reassembler_t r;
+  assert(zs_ble_splitter_init(&s, value, 300u));
+  assert(zs_ble_splitter_next(&s, 244u, frame, sizeof(frame)) == 244u);
+  assert(frame[0] == 0u && frame[1] == ZS_BLE_FRAME_FLAG_FIRST && frame[2] == 0x01u && frame[3] == 0x2cu && frame[4] == 0u);
+  zs_ble_reassembler_init(&r, out, sizeof(out));
+  assert(zs_ble_reassembler_feed(&r, frame, 244u) && !r.complete);
+  assert(zs_ble_splitter_next(&s, 244u, frame, sizeof(frame)) == 62u);
+  assert(frame[0] == 1u && frame[1] == ZS_BLE_FRAME_FLAG_LAST);
+  assert(zs_ble_reassembler_feed(&r, frame, 62u) && r.complete && r.filled == 300u && memcmp(out, value, 300u) == 0);
+  assert(zs_ble_splitter_next(&s, 244u, frame, sizeof(frame)) == 0u);
+  /* single frame, empty value, MTU 23 */
+  assert(zs_ble_splitter_init(&s, value, 0u));
+  assert(zs_ble_splitter_next(&s, 20u, frame, sizeof(frame)) == 4u && frame[1] == (ZS_BLE_FRAME_FLAG_FIRST | ZS_BLE_FRAME_FLAG_LAST));
+  zs_ble_reassembler_reset(&r);
+  assert(zs_ble_reassembler_feed(&r, frame, 4u) && r.complete && r.filled == 0u);
+  /* 4096 bytes at 16-byte payload: sequence wraps past 255 */
+  assert(zs_ble_splitter_init(&s, value, 4096u));
+  zs_ble_reassembler_reset(&r);
+  unsigned frames = 0u;
+  for (;;) { const size_t n = zs_ble_splitter_next(&s, 16u, frame, sizeof(frame)); if (!n) break; assert(zs_ble_reassembler_feed(&r, frame, n)); frames++; }
+  assert(frames > 256u && r.complete && memcmp(out, value, 4096u) == 0);
+  /* errors: seq gap, no FIRST after reset, truncated LAST, oversized announcement */
+  assert(zs_ble_splitter_init(&s, value, 700u));
+  uint8_t f0[244], f1[244], f2[244]; size_t n0 = zs_ble_splitter_next(&s, 244u, f0, 244u), n1 = zs_ble_splitter_next(&s, 244u, f1, 244u), n2 = zs_ble_splitter_next(&s, 244u, f2, 244u);
+  zs_ble_reassembler_reset(&r);
+  assert(zs_ble_reassembler_feed(&r, f0, n0) && !zs_ble_reassembler_feed(&r, f2, n2) && !zs_ble_reassembler_feed(&r, f1, n1));
+  assert(zs_ble_reassembler_feed(&r, f0, n0) && zs_ble_reassembler_feed(&r, f1, n1) && !zs_ble_reassembler_feed(&r, f2, n2 - 1u));
+  const uint8_t huge[5] = {0u, ZS_BLE_FRAME_FLAG_FIRST, 0x20u, 0x00u, 1u};
+  zs_ble_reassembler_reset(&r); assert(!zs_ble_reassembler_feed(&r, huge, 5u));
+  printf("framing ok\n");
+}
+
+/* ---- IPC link --------------------------------------------------------------------------- */
+
+static void test_ipc_link(void) {
+  uint8_t payload[600], wire[700], rxbuf[ZS_IPC_PAYLOAD_MAX + 4u];
+  zs_ipc_decoder_t d;
+  uint8_t type, seq; const uint8_t *p; size_t n;
+  assert(zs_ipc_crc16((const uint8_t *)"123456789", 9u) == 0x29B1u);
+  for (unsigned i = 0u; i < sizeof(payload); i++) payload[i] = (i % 7u == 0u) ? 0u : (i % 300u == 1u ? 0xffu : (uint8_t)i); /* zeros + long runs */
+  memset(&payload[300], 0x55, 300u); /* run longer than 254 without zeros */
+  zs_ipc_decoder_init(&d, rxbuf, sizeof(rxbuf));
+  const size_t w = zs_ipc_encode(ZS_IPC_READ_VALUE, 0x42u, payload, sizeof(payload), wire, sizeof(wire));
+  assert(w > sizeof(payload) + 4u && wire[w - 1u] == 0u);
+  for (size_t i = 0u; i < w - 1u; i++) assert(wire[i] != 0u);
+  bool got = false;
+  for (size_t i = 0u; i < w; i++) if (zs_ipc_decoder_feed(&d, wire[i], &type, &seq, &p, &n)) { got = true; assert(i == w - 1u); }
+  assert(got && type == ZS_IPC_READ_VALUE && seq == 0x42u && n == sizeof(payload) && memcmp(p, payload, n) == 0);
+  /* empty payload, then a corrupted frame (CRC) and resync on the next good one */
+  const size_t w0 = zs_ipc_encode(ZS_IPC_PING, 1u, NULL, 0u, wire, sizeof(wire));
+  got = false; for (size_t i = 0u; i < w0; i++) if (zs_ipc_decoder_feed(&d, wire[i], &type, &seq, &p, &n)) got = true;
+  assert(got && type == ZS_IPC_PING && n == 0u);
+  const uint8_t small[3] = {1, 2, 3};
+  const size_t w1 = zs_ipc_encode(ZS_IPC_NOTIFY, 2u, small, 3u, wire, sizeof(wire));
+  wire[2] ^= 0x10u; /* flip a payload bit */
+  got = false; for (size_t i = 0u; i < w1; i++) if (zs_ipc_decoder_feed(&d, wire[i], &type, &seq, &p, &n)) got = true;
+  assert(!got && d.crc_errors == 1u);
+  const size_t w2 = zs_ipc_encode(ZS_IPC_NOTIFY, 3u, small, 3u, wire, sizeof(wire));
+  got = false; for (size_t i = 0u; i < w2; i++) if (zs_ipc_decoder_feed(&d, wire[i], &type, &seq, &p, &n)) got = true;
+  assert(got && seq == 3u && n == 3u && p[2] == 3u);
+  /* garbage between frames is dropped as a framing error */
+  const uint8_t junk[4] = {0x05, 0x01, 0x02, 0x00};
+  got = false; for (size_t i = 0u; i < 4u; i++) if (zs_ipc_decoder_feed(&d, junk[i], &type, &seq, &p, &n)) got = true;
+  assert(!got && d.framing_errors == 1u);
+  printf("ipc link ok\n");
+}
+
+/* ---- end to end: client <-> bridge <-> service ------------------------------------------- */
+
+typedef struct { uint8_t slots[ZS_STATION_CONFIG_SLOT_COUNT][ZS_STATION_CONFIG_SLOT_BYTES]; } cfg_store_t;
+typedef struct { uint8_t slots[ZS_INSTALLATION_STORE_SLOT_COUNT][ZS_INSTALLATION_STORE_SLOT_BYTES]; } pos_store_t;
+
+static bool cfg_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { cfg_store_t *st = c; if (s >= 2u || o + n > ZS_STATION_CONFIG_SLOT_BYTES) return false; memcpy(d, &st->slots[s][o], n); return true; }
+static bool cfg_erase(void *c, uint8_t s) { cfg_store_t *st = c; if (s >= 2u) return false; memset(st->slots[s], 0xff, ZS_STATION_CONFIG_SLOT_BYTES); return true; }
+static bool cfg_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { cfg_store_t *st = c; if (s >= 2u || o + n > ZS_STATION_CONFIG_SLOT_BYTES) return false; for (size_t i = 0u; i < n; i++) { if ((st->slots[s][o + i] & d[i]) != d[i]) return false; st->slots[s][o + i] = d[i]; } return true; }
+static bool pos_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { pos_store_t *st = c; if (s >= 2u || o + n > ZS_INSTALLATION_STORE_SLOT_BYTES) return false; memcpy(d, &st->slots[s][o], n); return true; }
+static bool pos_erase(void *c, uint8_t s) { pos_store_t *st = c; if (s >= 2u) return false; memset(st->slots[s], 0xff, ZS_INSTALLATION_STORE_SLOT_BYTES); return true; }
+static bool pos_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { pos_store_t *st = c; if (s >= 2u || o + n > ZS_INSTALLATION_STORE_SLOT_BYTES) return false; for (size_t i = 0u; i < n; i++) { if ((st->slots[s][o + i] & d[i]) != d[i]) return false; st->slots[s][o + i] = d[i]; } return true; }
+static bool audit_append(void *c, const zs_commissioning_audit_event_t *e) { unsigned *count = c; (void)e; (*count)++; return true; }
+static zs_commissioning_audit_event_t last_audit;
+static bool audit_append_keep(void *c, const zs_commissioning_audit_event_t *e) { last_audit = *e; return audit_append(c, e); }
+
+typedef struct { uint8_t slots[2][ZS_STATION_SECRETS_SLOT_BYTES]; } sec_store_t;
+static bool sec_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { sec_store_t *st = c; if (s >= 2u || o + n > ZS_STATION_SECRETS_SLOT_BYTES) return false; memcpy(d, &st->slots[s][o], n); return true; }
+static bool sec_erase(void *c, uint8_t s) { sec_store_t *st = c; if (s >= 2u) return false; memset(st->slots[s], 0xff, ZS_STATION_SECRETS_SLOT_BYTES); return true; }
+static bool sec_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { sec_store_t *st = c; if (s >= 2u || o + n > ZS_STATION_SECRETS_SLOT_BYTES) return false; for (size_t i = 0u; i < n; i++) { if ((st->slots[s][o + i] & d[i]) != d[i]) return false; st->slots[s][o + i] = d[i]; } return true; }
+
+typedef struct {
+  zs_ble_bridge_t bridge;
+  zs_ipc_service_t service;
+  /* client side */
+  uint8_t notify_buf[ZS_BLE_VALUE_MAX];
+  zs_ble_reassembler_t notify_rx;
+  uint16_t notify_char;
+  unsigned notify_complete;
+  uint8_t last_notify[ZS_BLE_VALUE_MAX]; size_t last_notify_len;
+  uint8_t prev_notify[ZS_BLE_VALUE_MAX]; size_t prev_notify_len;    /* the notify before the last one (role challenge + status) */
+  uint8_t engineer_key[32]; uint32_t rnd_counter;
+  bool subscribed;
+  size_t att;
+  char local_name[32];
+  bool advertising; uint16_t adv_seconds;
+  uint8_t secret[16]; bool secret_set;
+  /* service side */
+  bool service_mode, secure; zs_commissioning_role_t role; uint32_t now;
+  cfg_store_t cfg; pos_store_t pos; unsigned audits;
+  sec_store_t sec; zs_station_secrets_io_t sec_io; zs_station_secrets_t applied; unsigned applied_count;
+  zs_selftest_registry_t selftest;
+  zs_ipc_identity_t identity;
+  zs_station_config_io_t cfg_io; zs_installation_store_io_t pos_io; zs_commissioning_audit_io_t audit_io;
+  zs_ble_bridge_port_t bport; zs_ipc_service_port_t sport;
+} world_t;
+
+/* UART: bytes from the nRF go straight into the STM32 decoder and vice versa. */
+static bool nrf_uart_send(void *ctx, const uint8_t *w, size_t n) { world_t *W = ctx; zs_ipc_service_on_uart_rx(&W->service, w, n); return true; }
+static bool stm_uart_send(void *ctx, const uint8_t *w, size_t n) { world_t *W = ctx; zs_ble_bridge_on_uart_rx(&W->bridge, w, n); return true; }
+static bool gatt_notify(void *ctx, uint16_t id, const uint8_t *f, size_t n) {
+  world_t *W = ctx;
+  if (!W->subscribed) return false;
+  if (W->notify_char != id) { zs_ble_reassembler_reset(&W->notify_rx); W->notify_char = id; }
+  assert(zs_ble_reassembler_feed(&W->notify_rx, f, n));
+  if (W->notify_rx.complete) {
+    W->notify_complete++;
+    memcpy(W->prev_notify, W->last_notify, W->last_notify_len); W->prev_notify_len = W->last_notify_len;
+    W->last_notify_len = W->notify_rx.filled; memcpy(W->last_notify, W->notify_buf, W->last_notify_len); zs_ble_reassembler_reset(&W->notify_rx);
+  }
+  return true;
+}
+static size_t att_payload(void *ctx) { return ((world_t *)ctx)->att; }
+static void advertise(void *ctx, bool on, uint16_t s) { world_t *W = ctx; W->advertising = on; W->adv_seconds = s; }
+static void set_name(void *ctx, const char *n) { strcpy(((world_t *)ctx)->local_name, n); }
+static void set_secret(void *ctx, const uint8_t s[16]) { world_t *W = ctx; memcpy(W->secret, s, 16u); W->secret_set = true; }
+static uint32_t now_ms(void *ctx) { return ((world_t *)ctx)->now; }
+static bool service_mode(void *ctx, uint32_t *started) { *started = 1000u; return ((world_t *)ctx)->service_mode; }
+static zs_commissioning_role_t peer_role(void *ctx) { return ((world_t *)ctx)->role; }
+static bool peer_secure(void *ctx) { return ((world_t *)ctx)->secure; }
+static bool rnd(void *ctx, uint8_t *out, size_t n) { world_t *W = ctx; for (size_t i = 0u; i < n; i++) out[i] = (uint8_t)(0x5au + i + W->rnd_counter); W->rnd_counter += 17u; return true; }
+/* The station applies a new secrets record: the engineer key pointer of the port follows it (as tasks.c does). */
+static void secrets_changed(void *ctx, const zs_station_secrets_t *rec) {
+  world_t *W = ctx;
+  W->applied = *rec; W->applied_count++;
+  if (rec->engineer_key_set) memcpy(W->engineer_key, rec->engineer_key, 32u);
+}
+static zs_selftest_code_t st_pass(void *ctx, uint32_t *d) { (void)ctx; *d = 3900u; return ZS_ST_PASS; }
+static zs_selftest_code_t st_fail(void *ctx, uint32_t *d) { (void)ctx; *d = 7u; return ZS_ST_FAIL; }
+
+static void world_init(world_t *W) {
+  memset(W, 0, sizeof(*W));
+  memset(W->cfg.slots, 0xff, sizeof(W->cfg.slots)); memset(W->pos.slots, 0xff, sizeof(W->pos.slots));
+  W->att = 244u; W->service_mode = true; W->secure = true; W->role = ZS_COMMISSIONING_ROLE_INSTALLER; W->now = 5000u; W->subscribed = true;
+  zs_ble_reassembler_init(&W->notify_rx, W->notify_buf, sizeof(W->notify_buf));
+  strcpy(W->identity.serial, "DIO-EVT-012"); strcpy(W->identity.hardware_revision, "Rev.A");
+  strcpy(W->identity.firmware_version, "0.1.0-b1"); strcpy(W->identity.bootloader_version, "0.1.0");
+  W->identity.station_id = 12u; W->identity.region = ZS_STATION_CONFIG_REGION_RU868;
+  W->cfg_io = (zs_station_config_io_t){&W->cfg, cfg_read, cfg_erase, cfg_write};
+  W->pos_io = (zs_installation_store_io_t){&W->pos, pos_read, pos_erase, pos_write};
+  W->audit_io = (zs_commissioning_audit_io_t){&W->audits, audit_append};
+  zs_selftest_init(&W->selftest);
+  zs_selftest_register(&W->selftest, ZS_ST_ID_POWER_INA226, "power", st_pass, NULL, true);
+  zs_selftest_register(&W->selftest, ZS_ST_ID_LORA_SPI, "lora_spi", st_fail, NULL, false);
+  W->bport = (zs_ble_bridge_port_t){W, nrf_uart_send, gatt_notify, att_payload, advertise, set_name, set_secret};
+  for (unsigned i = 0u; i < 32u; i++) W->engineer_key[i] = (uint8_t)(0xa0u + i);
+  memset(W->sec.slots, 0xff, sizeof(W->sec.slots));
+  W->sec_io = (zs_station_secrets_io_t){&W->sec, sec_read, sec_erase, sec_write};
+  W->sport = (zs_ipc_service_port_t){W, stm_uart_send, now_ms, service_mode, peer_role, peer_secure, &W->cfg_io, &W->pos_io, &W->audit_io, &W->selftest, &W->identity, W->engineer_key, rnd, &W->sec_io, secrets_changed, NULL, NULL};
+  zs_ble_bridge_init(&W->bridge, &W->bport);
+  assert(zs_ipc_service_init(&W->service, &W->sport));
+}
+
+/* Android-like client primitives over the bridge. */
+static bool client_read_long(world_t *W, uint16_t id, uint8_t *out, size_t cap, size_t *len) {
+  uint8_t frame[244]; zs_ble_reassembler_t r; size_t n;
+  zs_ble_reassembler_init(&r, out, cap);
+  for (unsigned i = 0u; i < 64u; i++) {
+    if (!zs_ble_bridge_on_gatt_read(&W->bridge, id, frame, sizeof(frame), &n)) return false;
+    if (!zs_ble_reassembler_feed(&r, frame, n)) return false;
+    if (r.complete) { *len = r.filled; return true; }
+  }
+  return false;
+}
+static uint8_t client_write_long(world_t *W, uint16_t id, const uint8_t *value, size_t len) {
+  zs_ble_splitter_t s; uint8_t frame[244];
+  const unsigned before = W->notify_complete;
+  assert(zs_ble_splitter_init(&s, value, len));
+  for (;;) { const size_t n = zs_ble_splitter_next(&s, W->att, frame, sizeof(frame)); if (!n) break; assert(zs_ble_bridge_on_gatt_write(&W->bridge, id, frame, n)); }
+  assert(W->notify_complete == before + 1u && W->notify_char == id); /* status notify arrived synchronously */
+  return W->last_notify_len == 1u ? W->last_notify[0] : 0xffu;
+}
+
+static size_t config_patch(uint8_t *buf, size_t cap, uint32_t version) {
+  zs_cbor_t c; uint8_t fp[32]; for (unsigned i = 0u; i < 32u; i++) fp[i] = (uint8_t)i;
+  zs_cbor_init(&c, buf, cap); zs_cbor_map(&c, 11u);
+  zs_cbor_uint(&c, 1u); zs_cbor_uint(&c, version);
+  zs_cbor_uint(&c, 2u); zs_cbor_text(&c, "muhoed.example.ru");
+  zs_cbor_uint(&c, 3u); zs_cbor_uint(&c, 8883u);
+  zs_cbor_uint(&c, 4u); zs_cbor_uint(&c, 443u);
+  zs_cbor_uint(&c, 5u); zs_cbor_text(&c, "dioneya-root");
+  zs_cbor_uint(&c, 6u); zs_cbor_bytes(&c, fp, 32u);
+  zs_cbor_uint(&c, 7u); zs_cbor_text(&c, "pilot1");
+  zs_cbor_uint(&c, 8u); zs_cbor_text(&c, "zs/v1");
+  zs_cbor_uint(&c, 9u); zs_cbor_uint(&c, 1u);
+  zs_cbor_uint(&c, 10u); zs_cbor_text(&c, "internet");
+  zs_cbor_uint(&c, 11u); zs_cbor_text(&c, "");
+  assert(!c.error); return c.len;
+}
+
+static size_t installation_request(uint8_t *buf, size_t cap, bool recommission, uint32_t version, int32_t lat) {
+  zs_cbor_t c; zs_cbor_init(&c, buf, cap); zs_cbor_map(&c, 14u);
+  zs_cbor_uint(&c, 1u); zs_cbor_uint(&c, recommission ? 1u : 0u);
+  zs_cbor_uint(&c, 2u); zs_cbor_int(&c, lat);
+  zs_cbor_uint(&c, 3u); zs_cbor_int(&c, 376173000);
+  zs_cbor_uint(&c, 4u); zs_cbor_int(&c, 1564);
+  zs_cbor_uint(&c, 5u); zs_cbor_uint(&c, 4u);
+  zs_cbor_uint(&c, 6u); zs_cbor_uint(&c, 3u);
+  zs_cbor_uint(&c, 7u); zs_cbor_uint(&c, version);
+  zs_cbor_uint(&c, 8u); zs_cbor_bool(&c, true);
+  zs_cbor_uint(&c, 9u); zs_cbor_uint(&c, UINT64_C(1800000000000000));
+  zs_cbor_uint(&c, 10u); zs_cbor_uint(&c, 25u);
+  zs_cbor_uint(&c, 11u); zs_cbor_uint(&c, 75u);
+  zs_cbor_uint(&c, 12u); zs_cbor_uint(&c, 250u);
+  zs_cbor_uint(&c, 13u); zs_cbor_uint(&c, 3u);
+  zs_cbor_uint(&c, 14u); zs_cbor_uint(&c, 10u);
+  assert(!c.error); return c.len;
+}
+
+static void test_end_to_end(void) {
+  static world_t W;
+  uint8_t out[4096], req[256], expect[256]; size_t n, m;
+  world_init(&W);
+  assert(strcmp(W.local_name, "DIO-EVT-012") == 0);                  /* IDENTITY_SET at init */
+  assert(zs_ipc_service_set_window(&W.service, true, 600u) && W.advertising && W.adv_seconds == 600u);
+  const uint8_t secret[16] = {0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x21, 0xde, 0xad, 0xbe, 0xef, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x21};
+  assert(zs_ipc_service_set_pairing_secret(&W.service, secret) && W.secret_set && memcmp(W.secret, secret, 16u) == 0);
+  assert(zs_ble_pairing_passkey(secret) == 20559u);                    /* B.7 vector shared with StationLabelTest ("020559") */
+  assert(zs_ipc_service_ping(&W.service) && W.service.pings_sent == 1u && W.service.pongs_seen == 1u && W.service.peer_protocol_version == ZS_IPC_PROTOCOL_VERSION);
+
+  /* connection: caches for identity + installation (empty) are pushed; config is absent on a fresh station */
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  assert(W.service.link_state == 2u);
+  assert(client_read_long(&W, ZS_CHAR_IDENTITY, out, sizeof(out), &n));
+  m = zs_ipc_encode_identity(&W.identity, expect, sizeof(expect));
+  assert(n == m && memcmp(out, expect, n) == 0 && out[0] == 0xa6u && out[1] == 0x01u && out[2] == 0x6bu);
+  assert(client_read_long(&W, ZS_CHAR_INSTALLATION_POSITION, out, sizeof(out), &n) && n == 1u && out[0] == 0xa0u);
+  assert(!client_read_long(&W, ZS_CHAR_CONFIG_READ, out, sizeof(out), &n));   /* nothing stored yet -> cache miss */
+  assert(!client_read_long(&W, ZS_CHAR_CONFIG_WRITE, out, sizeof(out), &n));  /* write-only characteristic */
+
+  /* config_write: service mode / authorization gates, then a real commit and read-back with the station hash */
+  n = config_patch(req, sizeof(req), 1u);
+  W.service_mode = false; assert(client_write_long(&W, ZS_CHAR_CONFIG_WRITE, req, n) == ZS_BLE_STATUS_NOT_IN_SERVICE_MODE);
+  W.service_mode = true; W.secure = false; assert(client_write_long(&W, ZS_CHAR_CONFIG_WRITE, req, n) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  W.secure = true;
+  assert(client_write_long(&W, ZS_CHAR_CONFIG_WRITE, req, n) == ZS_BLE_STATUS_OK);
+  assert(client_read_long(&W, ZS_CHAR_CONFIG_READ, out, sizeof(out), &n));
+  m = zs_station_config_encode_readback(&W.service.config, expect, sizeof(expect));
+  assert(n == m && memcmp(out, expect, n) == 0 && zs_station_config_hash_valid(&W.service.config) && W.service.config.version == 1u);
+  assert(strcmp(W.service.config.server_host, "muhoed.example.ru") == 0 && W.service.config.station_id == 12u);
+  n = config_patch(req, sizeof(req), 1u);
+  assert(client_write_long(&W, ZS_CHAR_CONFIG_WRITE, req, n) == ZS_BLE_STATUS_REJECTED_VERSION);
+  req[5] ^= 0x40u; /* corrupt the host text -> malformed / validation */
+  n = config_patch(req, sizeof(req), 2u); req[10] = 0x20u; /* replace a host byte with a space */
+  assert(client_write_long(&W, ZS_CHAR_CONFIG_WRITE, req, n) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  assert(W.service.config.version == 1u);
+
+  /* installation_position: INITIAL, then INITIAL again (locked), then RECOMMISSION v2 */
+  n = installation_request(req, sizeof(req), false, 1u, 557558000);
+  assert(client_write_long(&W, ZS_CHAR_INSTALLATION_POSITION, req, n) == ZS_BLE_STATUS_OK && W.audits == 2u);
+  assert(client_read_long(&W, ZS_CHAR_INSTALLATION_POSITION, out, sizeof(out), &n) && out[0] == 0xb0u);
+  zs_installation_record_t stored; uint8_t slot;
+  assert(zs_installation_store_load(&W.pos_io, &stored, &slot) == ZS_INSTALLATION_STORE_OK);
+  m = zs_ipc_encode_installation_readback(&stored, true, expect, sizeof(expect));
+  assert(n == m && memcmp(out, expect, n) == 0 && stored.version == 1u && stored.trust.installation.lat_e7 == 557558000 && zs_installation_record_hash_valid(&stored));
+  n = installation_request(req, sizeof(req), false, 2u, 557558100);
+  assert(client_write_long(&W, ZS_CHAR_INSTALLATION_POSITION, req, n) == ZS_BLE_STATUS_POSITION_LOCKED);
+  n = installation_request(req, sizeof(req), true, 2u, 557558100);
+  assert(client_write_long(&W, ZS_CHAR_INSTALLATION_POSITION, req, n) == ZS_BLE_STATUS_OK);
+  assert(zs_installation_store_load(&W.pos_io, &stored, &slot) == ZS_INSTALLATION_STORE_OK && stored.version == 2u && stored.trust.installation.lat_e7 == 557558100);
+  assert(client_read_long(&W, ZS_CHAR_INSTALLATION_POSITION, out, sizeof(out), &n) && n == zs_ipc_encode_installation_readback(&stored, true, expect, sizeof(expect)) && memcmp(out, expect, n) == 0);
+  n = installation_request(req, sizeof(req), true, 3u, 557558100); req[2] = 0x02u; /* operation value becomes unsupported */
+  assert(client_write_long(&W, ZS_CHAR_INSTALLATION_POSITION, req, n) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+
+  /* self-test: write 0x01, the report is notified as a framed CBOR map {1:[1,3900], 8:[2,7]} */
+  const uint8_t run = 0x01u;
+  assert(client_write_long(&W, ZS_CHAR_SELF_TEST, &run, 1u) == 0xffu); /* not a 1-byte status */
+  const uint8_t report[] = {0xa2, 0x01, 0x82, 0x01, 0x19, 0x0f, 0x3c, 0x08, 0x82, 0x02, 0x07};
+  assert(W.last_notify_len == sizeof(report) && memcmp(W.last_notify, report, sizeof(report)) == 0);
+
+  /* MTU 23 path: the same read-back is split into many small frames */
+  W.att = 20u;
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  assert(client_read_long(&W, ZS_CHAR_CONFIG_READ, out, sizeof(out), &n) && n == zs_station_config_encode_readback(&W.service.config, expect, sizeof(expect)) && memcmp(out, expect, n) == 0);
+  /* disconnect: writes in flight are dropped */
+  zs_ble_bridge_on_link(&W.bridge, 0u);
+  assert(W.service.link_state == 0u && W.bridge.write_char == 0u);
+  printf("end to end ok (writes ok=%u rejected=%u audits=%u)\n", W.service.writes_ok, W.service.writes_rejected, W.audits);
+}
+
+/* Like client_write_long but tolerates the value notify that precedes the status (role B.9, secrets v0.3). */
+static uint8_t write_with_notify(world_t *W, uint16_t id, const uint8_t *v, size_t n) {
+  zs_ble_splitter_t s; uint8_t frame[244];
+  assert(zs_ble_splitter_init(&s, v, n));
+  for (;;) { const size_t k = zs_ble_splitter_next(&s, W->att, frame, sizeof(frame)); if (!k) break; assert(zs_ble_bridge_on_gatt_write(&W->bridge, id, frame, k)); }
+  assert(W->notify_char == id && W->last_notify_len == 1u);
+  return W->last_notify[0];
+}
+/* B.9: installer by pairing, engineer by HMAC challenge; the policy change needs the engineer. */
+static uint8_t role_write(world_t *W, const uint8_t *v, size_t n) { return write_with_notify(W, ZS_CHAR_SESSION_ROLE, v, n); }
+static uint8_t secrets_write(world_t *W, const uint8_t *v, size_t n) { return write_with_notify(W, ZS_CHAR_STATION_SECRETS, v, n); }
+
+static void test_session_role(void) {
+  static world_t W;
+  uint8_t out[64], req[256], tag[ZS_ROLE_TAG_BYTES], resp[1u + ZS_ROLE_TAG_BYTES]; size_t n;
+  const uint8_t challenge = ZS_ROLE_OP_CHALLENGE;
+  world_init(&W);
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  assert(client_read_long(&W, ZS_CHAR_SESSION_ROLE, out, sizeof(out), &n) && n == 1u && out[0] == ZS_COMMISSIONING_ROLE_INSTALLER);
+  /* a policy that is not the locked default needs the engineer: rejected as installer */
+  n = installation_request(req, sizeof(req), false, 1u, 557558000); req[n - 11u] = 30u;    /* key 10 warning distance 25 -> 30 (0x18 0x1e) */
+  assert(client_write_long(&W, ZS_CHAR_INSTALLATION_POSITION, req, n) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  /* response without a challenge, then a challenge, then the right tag */
+  memset(resp, 0, sizeof(resp)); resp[0] = ZS_ROLE_OP_RESPONSE;
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);
+  assert(W.prev_notify_len == 1u + ZS_ROLE_NONCE_BYTES && W.prev_notify[0] == ZS_ROLE_OP_CHALLENGE);
+  zs_ipc_role_tag(W.engineer_key, W.identity.serial, W.prev_notify + 1, tag);
+  memcpy(resp + 1, tag, sizeof(tag));
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_OK && W.prev_notify_len == 2u && W.prev_notify[0] == ZS_ROLE_OP_RESULT && W.prev_notify[1] == ZS_COMMISSIONING_ROLE_ENGINEER);
+  assert(client_read_long(&W, ZS_CHAR_SESSION_ROLE, out, sizeof(out), &n) && n == 1u && out[0] == ZS_COMMISSIONING_ROLE_ENGINEER);
+  assert(zs_ipc_service_role(&W.service) == ZS_COMMISSIONING_ROLE_ENGINEER && W.service.role_elevations == 1u);
+  n = installation_request(req, sizeof(req), false, 1u, 557558000); req[n - 11u] = 30u;
+  assert(client_write_long(&W, ZS_CHAR_INSTALLATION_POSITION, req, n) == ZS_BLE_STATUS_OK);   /* the same non-default policy, now as engineer */
+  /* a nonce is single-use: replaying the same tag fails */
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  /* the role dies with the link; three wrong tags lock elevation for the link */
+  zs_ble_bridge_on_link(&W.bridge, 0u);
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  assert(zs_ipc_service_role(&W.service) == ZS_COMMISSIONING_ROLE_INSTALLER);
+  for (unsigned i = 0u; i < ZS_ROLE_MAX_FAILURES; i++) {
+    assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);
+    memset(resp + 1, (int)i, sizeof(tag));
+    assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  }
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_NOT_AUTHORIZED && W.service.role_failures == ZS_ROLE_MAX_FAILURES);
+  zs_ble_bridge_on_link(&W.bridge, 0u); zs_ble_bridge_on_link(&W.bridge, 2u);
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);                          /* a new link starts clean */
+  /* no key provisioned / not secure / not in service mode */
+  W.sport.engineer_key = NULL;
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  W.sport.engineer_key = W.engineer_key; W.secure = false;
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  W.secure = true; W.service_mode = false;
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_NOT_IN_SERVICE_MODE);
+  /* the tag is deterministic for the Android/PKI vector: key a0..bf, serial DIO-EVT-012, nonce 00..0f */
+  uint8_t nonce[16]; for (unsigned i = 0u; i < 16u; i++) nonce[i] = (uint8_t)i;
+  zs_ipc_role_tag(W.engineer_key, "DIO-EVT-012", nonce, tag);
+  printf("session role ok, vector tag ");
+  for (unsigned i = 0u; i < 16u; i++) printf("%02x", tag[i]);
+  printf("\n");
+}
+
+/* v0.3 station_secrets: first record by the installer on a blank station, later changes only by the engineer
+   (with the key the record itself carried), presence read never exposes values, clear wipes the record. */
+static void test_station_secrets(void) {
+  static world_t W;
+  uint8_t out[64], patch[128], tag[ZS_ROLE_TAG_BYTES], resp[1u + ZS_ROLE_TAG_BYTES]; size_t n;
+  const uint8_t challenge = ZS_ROLE_OP_CHALLENGE;
+  zs_cbor_t c;
+  uint8_t newkey[32];
+  world_init(&W);
+  W.audit_io.append = audit_append_keep;
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  for (unsigned i = 0u; i < 32u; i++) newkey[i] = (uint8_t)(0x10u + i);
+
+  /* blank station: presence map all false, version 0 */
+  assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u);
+  assert(out[0] == 0xa5u && out[2] == 0x00u && out[4] == 0xf4u && out[6] == 0xf4u && out[8] == 0xf4u && out[10] == 0xf4u);
+
+  /* installer provisions the engineer key and slot-1 ICCID (the key on the station differs from the port's until applied) */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 2u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ENGINEER); zs_cbor_bytes(&c, newkey, 32u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID1); zs_cbor_text(&c, "89701012345678901234");
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+  assert(W.applied_count == 1u && W.applied.engineer_key_set && strcmp(W.applied.iccid[0], "89701012345678901234") == 0 && W.applied.version == 1u);
+  /* the presence map was notified right before the status (the Android controller reads it from the notify) */
+  assert(W.prev_notify_len == 11u && W.prev_notify[0] == 0xa5u && W.prev_notify[2] == 0x01u && W.prev_notify[4] == 0xf5u && W.prev_notify[6] == 0xf5u && W.prev_notify[8] == 0xf4u);
+  assert(last_audit.phase == ZS_COMMISSIONING_AUDIT_COMMITTED && last_audit.operation == ZS_COMMISSIONING_OPERATION_SECRETS_WRITE && last_audit.role == ZS_COMMISSIONING_ROLE_INSTALLER && last_audit.version == 1u);
+  assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u && out[2] == 0x01u && out[4] == 0xf5u && out[6] == 0xf5u && out[8] == 0xf4u && out[10] == 0xf4u);
+  /* the value never travels back: the read-back holds no key bytes */
+  assert(memcmp(out, newkey, 8u) != 0);
+
+  /* a second write as installer is refused: the station is no longer blank */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID2); zs_cbor_text(&c, "89702012345678901234");
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  assert(last_audit.phase == ZS_COMMISSIONING_AUDIT_REJECTED && last_audit.result == ZS_COMMISSIONING_POLICY_ROLE_REQUIRED && W.service.secrets_rejections == 1u);
+
+  /* elevate with the key just provisioned, then the change goes through and merges with what is stored */
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);
+  zs_ipc_role_tag(newkey, W.identity.serial, W.prev_notify + 1, tag);
+  resp[0] = ZS_ROLE_OP_RESPONSE; memcpy(resp + 1, tag, sizeof(tag));
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_OK && zs_ipc_service_role(&W.service) == ZS_COMMISSIONING_ROLE_ENGINEER);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+  assert(W.applied.version == 2u && W.applied.engineer_key_set && W.applied.iccid[0][0] && strcmp(W.applied.iccid[1], "89702012345678901234") == 0);
+  assert(last_audit.role == ZS_COMMISSIONING_ROLE_ENGINEER && last_audit.version == 2u);
+
+  /* a remote rotation is in flight (MQTT ICD addendum E): the engineer's command key ends it (the recovery path) */
+  { zs_station_secrets_t rec; uint8_t k[32];
+    assert(zs_station_secrets_load(&W.sec_io, &rec, NULL) == ZS_STATION_SECRETS_OK);
+    rec.command_key_set = true; memset(rec.command_public_key, 0x31, 32u);
+    rec.command_next_key_set = true; memset(rec.command_next_key, 0x32, 32u);
+    assert(zs_station_secrets_commit(&W.sec_io, &rec) == ZS_STATION_SECRETS_OK && rec.version == 3u);
+    memset(k, 0x33, 32u);
+    zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_COMMAND); zs_cbor_bytes(&c, k, 32u);
+    assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+    assert(W.applied.command_key_set && W.applied.command_public_key[0] == 0x33u && !W.applied.command_next_key_set && W.applied.version == 4u);
+    assert(zs_station_secrets_load(&W.sec_io, &rec, NULL) == ZS_STATION_SECRETS_OK && !rec.command_next_key_set && strcmp(rec.iccid[1], "89702012345678901234") == 0); }
+
+  /* malformed: unknown key, wrong key length, bad ICCID, not a map */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, 9u); zs_cbor_uint(&c, 1u);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_ENGINEER); zs_cbor_bytes(&c, newkey, 16u);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID1); zs_cbor_text(&c, "12ab");
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  patch[0] = 0x01u;
+  assert(secrets_write(&W, patch, 1u) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  assert(W.applied.version == 4u);
+
+  /* clear as engineer: record gone, presence all false, the station drops the key */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_CLEAR); zs_cbor_bool(&c, true);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+  assert(!W.applied.engineer_key_set && W.applied.iccid[0][0] == 0 && last_audit.operation == ZS_COMMISSIONING_OPERATION_SECRETS_CLEAR);
+  assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u && out[2] == 0x00u && out[4] == 0xf4u);
+
+  /* policy gates: not secure, not in service mode, no store */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID1); zs_cbor_text(&c, "89701012345678901234");
+  W.secure = false;
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  W.secure = true; W.service_mode = false;
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_NOT_IN_SERVICE_MODE);
+  W.service_mode = true; W.sport.secrets_io = NULL;
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_STORAGE_ERROR);
+  assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u && out[4] == 0xf4u);
+  W.sport.secrets_io = &W.sec_io;
+  assert(W.service.secrets_writes == 4u);
+  printf("station secrets ok\n");
+}
+
+/* The EOL console writes identity + pairing before BLE exists.  That factory record must still permit the
+   installer's first operational-secrets write, and BLE decommissioning must preserve the factory fields. */
+static void test_factory_seed_then_ble_secrets(void) {
+  static world_t W;
+  zs_station_secrets_t seeded, back;
+  uint8_t patch[96], newkey[32], tag[ZS_ROLE_TAG_BYTES], resp[1u + ZS_ROLE_TAG_BYTES];
+  const uint8_t challenge = ZS_ROLE_OP_CHALLENGE;
+  zs_cbor_t c;
+  world_init(&W);
+  memset(&seeded, 0, sizeof(seeded));
+  seeded.factory_serial_set = true; strcpy(seeded.factory_serial, "DIO-EVT-012");
+  seeded.pairing_secret_set = true; memset(seeded.pairing_secret, 0x5a, sizeof(seeded.pairing_secret));
+  assert(zs_station_secrets_commit(&W.sec_io, &seeded) == ZS_STATION_SECRETS_OK && seeded.version == 1u);
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  for (unsigned i = 0u; i < sizeof(newkey); i++) newkey[i] = (uint8_t)(0x60u + i);
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ENGINEER); zs_cbor_bytes(&c, newkey, sizeof(newkey));
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);  /* installer, despite factory record */
+  assert(zs_station_secrets_load(&W.sec_io, &back, NULL) == ZS_STATION_SECRETS_OK && back.version == 2u);
+  assert(back.factory_serial_set && strcmp(back.factory_serial, "DIO-EVT-012") == 0 && back.pairing_secret_set && back.engineer_key_set);
+
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);
+  zs_ipc_role_tag(newkey, W.identity.serial, W.prev_notify + 1u, tag);
+  resp[0] = ZS_ROLE_OP_RESPONSE; memcpy(resp + 1u, tag, sizeof(tag));
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_OK);
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_CLEAR); zs_cbor_bool(&c, true);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+  assert(zs_station_secrets_load(&W.sec_io, &back, NULL) == ZS_STATION_SECRETS_OK);
+  assert(back.factory_serial_set && back.pairing_secret_set && !back.engineer_key_set && back.iccid[0][0] == 0);
+  printf("factory seed / first BLE secrets / preserved decommission ok\n");
+}
+
+int main(void) {
+  test_framing_vectors();
+  test_ipc_link();
+  test_end_to_end();
+  test_session_role();
+  test_station_secrets();
+  test_factory_seed_then_ble_secrets();
+  printf("ble bridge tests passed\n");
+  return 0;
+}

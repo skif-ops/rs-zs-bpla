@@ -1,6 +1,6 @@
 """Ingestion, correlation and tracking service."""
 from __future__ import annotations
-import math, time, uuid, asyncio
+import math, time, uuid, asyncio, logging
 from collections import defaultdict
 import numpy as np
 from station.schemas import DetectionMessage, SystemEvent, TargetEstimate
@@ -8,6 +8,10 @@ from station.store import EventStore
 from fusion.solver import solve_target
 from fusion.geodesy import EnuFrame
 from fusion.kalman import ConstantVelocityKalman3D
+from station.track_hypotheses import HypothesisTrackFusion
+from integration.alert_producer import AlertProducer
+
+log=logging.getLogger(__name__)
 
 class EventBus:
     def __init__(self): self._queues:set[asyncio.Queue]=set()
@@ -24,6 +28,12 @@ class EventBus:
 class StationFusionService:
     def __init__(self,store:EventStore,correlation_window_s:float=3.0):
         self.store=store; self.window_us=int(correlation_window_s*1e6); self.bus=EventBus(); self.track_filters={}; self.track_frames={}
+        self.tracks=HypothesisTrackFusion(store)
+        self.alerts=AlertProducer(store)            # output API dioneya.alert/1 (the bridge sets its tenant)
+    def _alert(self,handler,*args):
+        """The output API never stops ingestion: a failure is logged and the station data stay stored."""
+        try: handler(*args)
+        except Exception: log.exception('dioneya.alert/1 producer failed')
     @staticmethod
     def _compatible(a:DetectionMessage,b:DetectionMessage)->bool:
         if a.classification.unknown or b.classification.unknown: return True
@@ -58,12 +68,29 @@ class StationFusionService:
         target=solve_target(grouped) if is_alert else TargetEstimate()
         conf=float(np.mean([x.classification.confidence for x in grouped])) if grouped else d.classification.confidence
         event_type='AIR_ALERT' if is_alert else 'AIR_WARNING'
-        sid=f"{event_type}-{min(x.event_id for x in grouped):016x}" if grouped else f"{event_type}-{d.event_id:016x}"
+        # event_id is unique within a station only: the id names the earliest (event_id, station) pair of the group
+        first=min(((x.event_id,x.station_id) for x in grouped),default=(d.event_id,d.station_id))
+        sid=f"{event_type}-{first[0]:016x}-{first[1]}"
         if is_alert and target.lat is not None:
             target=self._track(sid,target,grouped)
         e=SystemEvent(system_event_id=sid,event_type=event_type,created_time_us=max(x.event_time_us for x in grouped),source_event_ids=[x.event_id for x in grouped],source_station_ids=[x.station_id for x in grouped],classification_label=self._label(grouped),confidence=conf,stations_used=len(grouped),target=target,route_summary=[f"{x.station_id}:{x.route.transport}:{x.route.hop_count}" for x in grouped])
-        self.store.save_system_event(e); self.store.link_detections(e.source_event_ids,sid); self.bus.publish_nowait(e.model_dump())
+        self.store.save_system_event(e); self.store.link_detections(list(zip(e.source_station_ids,e.source_event_ids)),sid); self.bus.publish_nowait(e.model_dump())
+        self._alert(self.alerts.on_event,e,grouped)
         return e
+    def ingest_bearings(self,batch)->int:
+        """A bearing batch of a tracking window (ICD addendum H): stored, then published live with the system event its
+        track belongs to; bearings of two or more stations are fused into the points of one target track."""
+        inserted=self.store.save_bearings(batch)
+        if inserted:
+            self.bus.publish_nowait({'type':'bearings','station_id':batch.station_id,'track_event_id':batch.track_event_id,
+                                     'system_event_id':self.store.system_event_of_detection(batch.station_id,batch.track_event_id),
+                                     'time_trust':batch.time_trust,'samples':[s.as_dict() for s in batch.samples]})
+            tracks=self.tracks.on_batch(batch)         # two or more stations: the fused tracks of its segments, recomputed
+            for track in tracks:
+                if track['last'] is not None: self.bus.publish_nowait({'type':'track',**track})
+            self._alert(self.alerts.on_bearings,batch)   # a line from the station while no fused track carries it
+            for track in tracks: self._alert(self.alerts.on_track,track)
+        return inserted
     @staticmethod
     def _label(dets):
         if not dets:return 'UNKNOWN'

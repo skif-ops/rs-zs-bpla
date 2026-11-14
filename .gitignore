@@ -1,5 +1,9 @@
 # Build outputs
 firmware/build*/
+android/.gradle/
+android/build/
+android/app/build/
+/outputs/
 **/__pycache__/
 **/.pytest_cache/
 *.pyc
@@ -12,7 +16,14 @@ firmware/build*/
 
 # Runtime data
 server/data/*.sqlite3
+server/data/*.sqlite3-*
+# operator accounts, session key and uploaded event audio: secrets and recordings, never in Git
+server/data/operators.json
+server/data/operator_session.key
+server/data/audio/
 server/output/
+server/bench-data/
+server/bench-output/
 server/uploads/
 .env
 server/deploy/tls/
@@ -35,6 +46,7 @@ artifacts/evt_pre_20_bom_workbook_audit.json
 artifacts/evt_pre_20_hardware_release_audit.json
 artifacts/pcb_layer_count_authority_rev_a.json
 artifacts/harness_manufacturing_rev_a.json
+artifacts/evt-pre-20-current/
 
 # OS/editor
 .DS_Store

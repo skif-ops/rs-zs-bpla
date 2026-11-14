@@ -13,10 +13,13 @@ Detection schema: `4`
 | Topic | Направление | QoS | Retain | Payload | Статус реализации |
 |---|---|---:|---:|---|---|
 | `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | PORTABLE_BG95_SESSION_FIXED_LENGTH_QMTPUB_QG_PASS; TARGET_USART_DMA_AND_HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 / 2 (§3.2) | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | PORTABLE_BG95_SESSION_LENGTH_DELIMITED_QMTRECV_QG_PASS; TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/fwreq` | station -> server | 1 | false | firmware chunk request (addendum F) | HOST_TWIN_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/fw` | server -> station | 0 | false | firmware chunk (addendum F); subscribed only while a download runs | HOST_TWIN_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/bearing` | station -> server | 1 | false | bearing batch while tracking (addendum H), message type 7; live data, never stored in NOR | HOST_TWIN_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
 
@@ -40,12 +43,13 @@ an explicit signing key is loaded.
 | 3 | command_id | UUID as 16 bytes |
 | 4 | created_time_us | uint64 |
 | 5 | expires_time_us | uint64; maximum and default server TTL is 15 minutes |
-| 6 | command code | uint; `CMD_REQUEST_AUDIO` = 1 |
+| 6 | command code | uint; `CMD_REQUEST_AUDIO` = 1, `CMD_REBOOT` = 2, `CMD_SET_PARAMS` = 3 (addendum D), `CMD_ROTATE_COMMAND_KEY` = 4 (addendum E), `CMD_UPDATE_FIRMWARE` = 5 (addendum F), `CMD_SET_NETWORK_CONFIG` = 6 (addendum G) |
 | 7 | command payload | CBOR map |
 | 8 | signing key ID | first 8 bytes of SHA-256 over the raw Ed25519 public key |
 | 9 | signature | 64-byte Ed25519 signature over canonical keys 0..8 |
 
-`CMD_REQUEST_AUDIO` key 7 is a four-entry numeric map:
+`CMD_REQUEST_AUDIO` key 7 is a four-entry numeric map, or five entries with the
+optional event time (sub-key 4, addendum B):
 
 | Sub-key | Field | Encoding |
 |---:|---|---|
@@ -53,6 +57,7 @@ an explicit signing key is loaded.
 | 1 | segment | 0 pre, 1 post, 2 both, 3 range |
 | 2 | start_offset_ms | signed int32 for range, otherwise null |
 | 3 | duration_ms | positive uint32 for range, otherwise null |
+| 4 | event_time_us | optional; positive int64, the detection's event time as the server stored it; the station uses it only when its own event table no longer holds the event (after a reboot) |
 
 The portable station codec rejects an unknown/rejected key ID, invalid
 signature callback result, non-canonical encoding, wrong `station_id`, duplicate
@@ -241,10 +246,10 @@ assembled-station evidence.
 | 8 | position, GNSS, classification, detector profile, sample rate |
 | 9 | 43 float16 features, только full packet |
 | 10 | power and route status; INA226 extension described below |
-| 11 | DOA block, только full packet |
+| 11 | DOA block, только full packet: 0 azimuth, uint сотые градуса 0..35999 по часовой от севера; 1 elevation, int сотые градуса; 2 sigma, uint сотые градуса; 3 valid. С 2026-09-30 станция заполняет его пеленгом решётки 3+1 для окон CONFIRMED (`zs_bearing`) |
 | 12 | hierarchical classification |
 | 13 | single-station estimate |
-| 14 | 3+1 spatial block, `geometry_id=1` |
+| 14 | 3+1 spatial block, `geometry_id=1`: медианные t_j − t_1 (мкс) того же пеленга, остаток решателя, уверенность |
 
 ### 3.1 Key 10 power/route sub-map
 
@@ -270,14 +275,16 @@ The INA226 extension is deliberately excluded from P0 summary so the LoRa worst-
 
 P0 summary должен оставаться не более 220 bytes до LoRa framing. Full packet size is monitored in CI and is not a LoRa payload contract.
 
-## 3.2 Compact heartbeat CBOR schema 1
+## 3.2 Compact heartbeat CBOR schema 1 / 2
 
 Heartbeat предназначен только для LTE/NB-IoT/2G транспорта и не включается в
-LoRa/P0. Верхний map использует message type `3` и следующие ключи:
+LoRa/P0. Верхний map использует message type `3` и следующие ключи (schema 2 =
+schema 1 плюс необязательный ключ 13; сервер принимает обе, ключ 13 в schema 1
+игнорируется):
 
 | Key | Назначение |
 |---:|---|
-| 0 | heartbeat schema, сейчас 1 |
+| 0 | heartbeat schema, 1 или 2 |
 | 1 | message type, heartbeat = 3 |
 | 2 | station_id |
 | 3 | time_us |
@@ -290,6 +297,24 @@ LoRa/P0. Верхний map использует message type `3` и следу�
 | 10 | hardware revision |
 | 11 | self-test result |
 | 12 | protected cellular telemetry |
+| 13 | detector health (schema 2, необязательный; прошивка `zs_detector_health_t`, сервер `DetectorHealth`) |
+
+Detector sub-map key 13 (schema 2, счётчики с момента загрузки; станция шлёт его с 2026‑09‑23):
+
+| Sub-key | Field | Назначение |
+|---:|---|---|
+| 0 | boot_id | NOR‑счётчик загрузок (`zs_boot_counter`); `event_id = (boot_id << 32) + seq_no` |
+| 1 | uptime_s | секунд с загрузки |
+| 2 | windows | окон 1 с проанализировано |
+| 3 | windows_dropped | пропущенных шагов (анализ отстал от кольца) |
+| 4 | confirmed_windows | окон уровня 1 CONFIRMED |
+| 5 | suspect_windows | окон уровня 1 SUSPECT |
+| 6 | engine_windows | окон уровня 1 ENGINE_UNCONFIRMED |
+| 7 | events_emitted | событий детекции положено в outbox |
+| 8 | events_refused | отказов outbox (переполнение/ошибка хранения) |
+| 9 | outbox_pending | событий, ещё не подтверждённых квитанцией сервера |
+| 10 | window_max_ms | самое долгое окно анализа |
+| 11 | presence_level | текущий уровень 1: 0 NONE, 1 SUSPECT, 2 ENGINE_UNCONFIRMED, 3 CONFIRMED |
 
 Cellular sub-map key 12:
 
@@ -334,7 +359,8 @@ CA, клиентского сертификата и ключа. Явный `--i
 Его отсутствие безопасно отключает публикацию команд, не понижая transport до
 unsigned режима. Файл не хранится в Git; raw 32-byte public key provisioned на
 станции отдельным контролируемым процессом. Ротация использует новый key ID и
-период явного доверия к старому и новому public key.
+период явного доверия к старому и новому public key: `CMD_ROTATE_COMMAND_KEY`, подписанная текущим ключом,
+ставит следующий ключ, первая команда с ним делает его текущим (аддендум E).
 
 ## 5. HTTPS fallback
 

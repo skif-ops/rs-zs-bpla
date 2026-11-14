@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Second-pass EVT-PRE-20 release completeness audit.
 
-Default mode reports blockers without failing CI. Use --strict for the actual release gate.
+Default mode reports open items without failing CI. Use --strict for the formal
+release gate.
 """
 
 from __future__ import annotations
@@ -12,6 +13,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+BASELINE = ROOT / "config/EVT_PRE_20_BASELINE.yaml"
+HANDOFF_RECORD = ROOT / "docs/EVT_PRE_20_CUSTOMER_PROCUREMENT_HANDOFF_2026-10-05.md"
 
 REQUIRED_GROUPS: dict[str, list[str]] = {
     "configuration": [
@@ -31,6 +34,9 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/EVT_PRE_20_BOM_POLICY_REV_A.md",
         "hardware/EVT_PRE_20_BOM_EVIDENCE_REV_A.md",
         "hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md",
+        "hardware/reviews/FABRICATOR_PUBLIC_CAPABILITY_SCREEN_REV_A.md",
+        "manufacturing/EVT_PRE_20_EXTERNAL_RESPONSE_BUNDLE_REV_A.json",
+        "manufacturing/EVT_PRE_20_EXTERNAL_RESPONSE_BUNDLE_REV_A.md",
         "hardware/CHINA_PROCUREMENT_RFQ.csv",
         "hardware/kicad/README.md",
         "hardware/kicad/REV_A_CAPTURE_SPEC.md",
@@ -41,8 +47,8 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
         "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",
         "hardware/CONNECTOR_FREEZE_REV_A.csv",
-        "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
-        "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.md",
+        "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv",
+        "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.md",
         "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
         "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md",
         "hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_REQUEST_REV_A.json",
@@ -60,6 +66,29 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json",
         "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md",
         "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv",
+        "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json",
+        "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md",
+        "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json",
+        "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.md",
+        "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.json",
+        "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md",
+        "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.json",
+        "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.md",
+        "hardware/reviews/PCB_MAIN_RF_RETURN_001_REVIEW_COMMIT_MAPPING.json",
+        "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPLICATION_REV_A.json",
+        "hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb",
+        "hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb",
+        "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.json",
+        "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.md",
+        "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPROVAL_REV_A.json",
+        "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPROVAL_REV_A.md",
+        "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_REVIEW_COMMIT_MAPPING.json",
+        "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json",
+        "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb",
+        "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb",
+        "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb",
+        "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.json",
+        "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.md",
         "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json",
         "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md",
         "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv",
@@ -72,6 +101,7 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md",
         "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
         "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md",
+        "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
         "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json",
         "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md",
         "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
@@ -81,7 +111,20 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json",
         "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md",
         "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md",
         "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md",
+        "hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.json",
+        "hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.md",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md",
+        "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json",
+        "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.md",
         "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
         "hardware/kicad/native/PCB-PWR/PCB-PWR_01_INPUT_PROTECTION.kicad_sch",
         "hardware/kicad/native/PCB-PWR/PCB-PWR_02_3V8_MODEM.kicad_sch",
@@ -96,7 +139,10 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "tools/audit_evt_pre_20_bom_qg2.py",
         "tools/audit_evt_pre_20_bom_workbook.py",
         "tools/audit_evt_pre_20_hardware_release.py",
-        "tools/audit_pcb_layer_count_authority_rev_a.py",
+        "tools/audit_evt_pre_20_external_response_bundle.py",
+        "tools/build_evt_pre_20_packages.py",
+        "tools/audit_evt_system_ots_procurement_identity_rev_a.py",
+        "tools/audit_pcb_main_8l_adoption_rev_b.py",
         "tools/audit_harness_manufacturing_rev_a.py",
         "tools/audit_pcb_mic_native_schematic_rev_a.py",
         "tools/audit_pcb_mic_manufacturing_handoff_rev_a.py",
@@ -105,10 +151,18 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "tools/generate_pcb_main_routing_authority_rev_a.py",
         "tools/audit_pcb_main_routing_authority_rev_a.py",
         "tools/audit_pcb_main_stackup_impedance_request_rev_a.py",
+        "tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py",
+        "tools/generate_pcb_main_rf_return_001_candidate_rev_a.py",
+        "tools/audit_pcb_main_rf_return_001_candidate_rev_a.py",
+        "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
+        "tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
+        "tools/generate_pcb_main_rf_remediation_application_rev_a.py",
+        "tools/audit_pcb_main_rf_remediation_application_rev_a.py",
         "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py",
         "tools/verify_pcb_main_passive_support_authority_rev_a.py",
         "tools/verify_pcb_main_mechanical_placement_authority_rev_a.py",
         "tools/generate_pcb_pwr_layout_candidate_rev_a.py",
+        "tools/audit_pcb_pwr_design_rev_a.py",
         "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
         "tools/audit_pcb_pwr_native_schematic_rev_a.py",
         "tools/audit_pcb_pwr_native_completeness_rev_a.py",
@@ -119,8 +173,13 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "tools/audit_pcb_pwr_placement_clearance_rev_a.py",
         "tools/generate_pcb_pwr_routing_authority_rev_a.py",
         "tools/audit_pcb_pwr_routing_authority_rev_a.py",
+        "tools/generate_pcb_pwr_evt_route_rules_rev_a.py",
+        "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py",
         "tools/audit_pcb_pwr_dim_003_request_rev_a.py",
         "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py",
+        "tools/audit_pcb_pwr_input_protection_sources_rev_a.py",
+        "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py",
+        "tools/audit_pcb_pwr_input_protection_rev_a.py",
     ],
     "firmware_source": [
         "firmware/CMakeLists.txt",
@@ -310,6 +369,41 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def baseline_value(text: str, key: str) -> str:
+    prefix = f"{key}:"
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(prefix):
+            return stripped.split(":", 1)[1].strip().strip('"')
+    return ""
+
+
+def customer_procurement_handoff_from_baseline(text: str) -> dict[str, object]:
+    status = baseline_value(text, "customer_procurement_handoff_status")
+    revision = baseline_value(text, "customer_procurement_handoff_revision")
+    scope = baseline_value(text, "customer_procurement_handoff_scope")
+    policy = baseline_value(text, "customer_procurement_order_policy")
+    followup = baseline_value(text, "engineering_release_gate_after_customer_handoff")
+    sent = all(
+        (
+            status == "SENT_TO_CUSTOMER_FOR_ORDER",
+            revision == "EVT-PRE-20 Rev_D",
+            scope == "FULL_PROGRAM_2X20_PLUS_1",
+            policy == "ORDER_ALL_AT_ONCE_NO_FIRST_ARTICLE_PAUSE",
+            followup == "TRACK_OPEN_ITEMS_AS_FOLLOWUP_NOT_PROCUREMENT_BLOCKERS",
+            HANDOFF_RECORD.is_file(),
+        )
+    )
+    return {
+        "sent": sent,
+        "status": status or "MISSING",
+        "revision": revision or "MISSING",
+        "scope": scope or "MISSING",
+        "order_policy": policy or "MISSING",
+        "handoff_record": str(HANDOFF_RECORD.relative_to(ROOT)),
+    }
+
+
 def audit() -> dict[str, object]:
     groups: dict[str, object] = {}
     blockers: list[str] = []
@@ -338,7 +432,8 @@ def audit() -> dict[str, object]:
     if "TARGET_PORT_REQUIRED" in target_status:
         blockers.append("firmware STM32 target port is not complete")
 
-    baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
+    baseline = BASELINE.read_text(encoding="utf-8")
+    handoff = customer_procurement_handoff_from_baseline(baseline)
     if "operating_ambient_c: [-40, 70]" not in baseline:
         blockers.append("environment operating range is not locked to -40..+70 C")
     if "electronic_component_minimum_rating_c: [-40, 85]" not in baseline:
@@ -362,7 +457,11 @@ def audit() -> dict[str, object]:
     if bom_qg2.is_file():
         qg2 = json.loads(bom_qg2.read_text(encoding="utf-8"))
         if not qg2.get("production_bom_complete"):
-            blockers.append("production BOM QG-2 remains BLOCKED; see artifacts/evt_pre_20_bom_qg2.json")
+            blockers.append(
+                "production BOM QG-2 open follow-up after customer handoff; see artifacts/evt_pre_20_bom_qg2.json"
+                if handoff["sent"]
+                else "production BOM QG-2 remains BLOCKED; see artifacts/evt_pre_20_bom_qg2.json"
+            )
     else:
         blockers.append("production BOM QG-2 report is missing")
 
@@ -403,8 +502,8 @@ def audit() -> dict[str, object]:
         ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
         ROOT / "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",
         ROOT / "hardware/CONNECTOR_FREEZE_REV_A.csv",
-        ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
-        ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.md",
+        ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv",
+        ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.md",
         ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
         ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
         ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -417,6 +516,29 @@ def audit() -> dict[str, object]:
         ROOT / "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json",
         ROOT / "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md",
         ROOT / "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv",
+        ROOT / "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json",
+        ROOT / "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.md",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.json",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.json",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.md",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_REVIEW_COMMIT_MAPPING.json",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPLICATION_REV_A.json",
+        ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb",
+        ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb",
+        ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.json",
+        ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.md",
+        ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPROVAL_REV_A.json",
+        ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPROVAL_REV_A.md",
+        ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_REVIEW_COMMIT_MAPPING.json",
+        ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json",
+        ROOT / "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb",
+        ROOT / "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb",
+        ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.json",
+        ROOT / "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.md",
         ROOT / "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json",
         ROOT / "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md",
         ROOT / "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv",
@@ -426,6 +548,7 @@ def audit() -> dict[str, object]:
         ROOT / "hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv",
         ROOT / "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
         ROOT / "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md",
+        ROOT / "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
         ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json",
         ROOT / "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md",
         ROOT / "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
@@ -435,7 +558,11 @@ def audit() -> dict[str, object]:
         ROOT / "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json",
         ROOT / "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md",
         ROOT / "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
+        ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+        ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md",
         ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md",
+        ROOT / "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json",
+        ROOT / "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.md",
         ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
         ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR_01_INPUT_PROTECTION.kicad_sch",
         ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR_02_3V8_MODEM.kicad_sch",
@@ -444,7 +571,8 @@ def audit() -> dict[str, object]:
         ROOT / "tools/generate_evt_pre_20_bom_rev_a.py",
         ROOT / "tools/validate_evt_pre_20_bom_qg1.py",
         ROOT / "tools/audit_evt_pre_20_bom_qg2.py",
-        ROOT / "tools/audit_pcb_layer_count_authority_rev_a.py",
+        ROOT / "tools/audit_evt_system_ots_procurement_identity_rev_a.py",
+        ROOT / "tools/audit_pcb_main_8l_adoption_rev_b.py",
         ROOT / "tools/audit_harness_manufacturing_rev_a.py",
         ROOT / "tools/audit_pcb_mic_manufacturing_handoff_rev_a.py",
         ROOT / "tools/audit_pcb_main_capture_authority_rev_a.py",
@@ -452,6 +580,13 @@ def audit() -> dict[str, object]:
         ROOT / "tools/generate_pcb_main_routing_authority_rev_a.py",
         ROOT / "tools/audit_pcb_main_routing_authority_rev_a.py",
         ROOT / "tools/audit_pcb_main_stackup_impedance_request_rev_a.py",
+        ROOT / "tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py",
+        ROOT / "tools/generate_pcb_main_rf_return_001_candidate_rev_a.py",
+        ROOT / "tools/audit_pcb_main_rf_return_001_candidate_rev_a.py",
+        ROOT / "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
+        ROOT / "tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
+        ROOT / "tools/generate_pcb_main_rf_remediation_application_rev_a.py",
+        ROOT / "tools/audit_pcb_main_rf_remediation_application_rev_a.py",
         ROOT / "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py",
         ROOT / "tools/audit_pcb_pwr_native_schematic_rev_a.py",
         ROOT / "tools/audit_pcb_pwr_native_completeness_rev_a.py",
@@ -461,6 +596,8 @@ def audit() -> dict[str, object]:
         ROOT / "tools/audit_pcb_pwr_hierarchy_rev_a.py",
         ROOT / "tools/generate_pcb_pwr_routing_authority_rev_a.py",
         ROOT / "tools/audit_pcb_pwr_routing_authority_rev_a.py",
+        ROOT / "tools/generate_pcb_pwr_evt_route_rules_rev_a.py",
+        ROOT / "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py",
         ROOT / "tools/audit_pcb_pwr_placement_clearance_rev_a.py",
         ROOT / "tools/audit_pcb_pwr_dim_003_request_rev_a.py",
         ROOT / "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py",
@@ -487,15 +624,25 @@ def audit() -> dict[str, object]:
         if path.is_file()
     }
 
+    formal_release_ready = not blockers
+    status = (
+        "PASS" if formal_release_ready
+        else "CUSTOMER_PROCUREMENT_HANDOFF_SENT_OPEN_FOLLOWUP" if handoff["sent"]
+        else "BLOCKED"
+    )
     return {
         "configuration": "EVT-PRE-20",
         "source_complete": all(bool(item["pass"]) for item in groups.values()),
         "production_complete": all(bool(item["pass"]) for item in production.values()),
-        "release_ready": not blockers,
+        "release_ready": formal_release_ready,
+        "status": status,
+        "formal_release_ready": formal_release_ready,
+        "customer_procurement_handoff": handoff,
         "source_groups": groups,
         "production_groups": production,
         "baseline_hashes": hashes,
         "blockers": blockers,
+        "open_followup_items": blockers if handoff["sent"] and blockers else [],
     }
 
 
@@ -510,9 +657,13 @@ def main() -> int:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    print(f"EVT-PRE-20 second-pass release audit: {'PASS' if result['release_ready'] else 'BLOCKED'}")
+    print(f"EVT-PRE-20 second-pass release audit: {result['status']}")
+    handoff = result["customer_procurement_handoff"]
+    if handoff["sent"] and not result["release_ready"]:
+        print(f"customer procurement handoff: {handoff['status']} ({handoff['revision']})")
+    label = "open follow-up" if handoff["sent"] and not result["release_ready"] else "blocker"
     for blocker in result["blockers"]:
-        print(f"- {blocker}")
+        print(f"- {label}: {blocker}")
     try:
         display_output = output.relative_to(ROOT)
     except ValueError:

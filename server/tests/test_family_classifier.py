@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from ml.acoustic_family import AcousticFamily, family_for_label, hierarchical_label
-from ml.family_classifier import AcousticFamilyClassifier
+from ml.family_classifier import AcousticFamilyClassifier, _source_balanced_rows
 from ml.feature_vector import FEATURE_COLUMNS
 from ml.online_type_classifier import source_training_weight
 
@@ -84,6 +84,26 @@ def test_weak_source_has_lower_training_weight():
         "meta_label_confidence_score": [0.4],
     })
     assert source_training_weight(weak) < source_training_weight(confirmed)
+
+
+def test_family_balancing_caps_multiple_views_as_one_source_group():
+    rows = []
+    for source in ("view-a.wav", "view-b.wav", "view-c.wav"):
+        for index in range(20):
+            rows.append(
+                {
+                    "label": "Лютый",
+                    "family": "PROP_PISTON",
+                    "source_file": source,
+                    "meta_source_group": "same-flight",
+                    "start_seconds": index * 0.5,
+                }
+            )
+
+    balanced = _source_balanced_rows(pd.DataFrame(rows), max_rows=7)
+
+    assert len(balanced) == 7
+    assert balanced["_source_identity"].nunique() == 1
 
 
 def test_v08_family_model_trains_from_real_feature_dataset(tmp_path):

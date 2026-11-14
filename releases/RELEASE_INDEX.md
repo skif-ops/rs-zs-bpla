@@ -1,43 +1,49 @@
-# Интеграционный реестр актуальных материалов
+# Реестр выпусков ветки `evt-pre-20`
 
-Версия контрольного среза: `DIONEA-INTEGRATION-v0.14`.
-Дата: 17.09.2026.
-Статус: `OPEN / NOT FOR MANUFACTURE`.
+## Текущий инженерный baseline
 
-Описание интеграционного среза: [`releases/integration/v0.14/README.md`](integration/v0.14/README.md).
+- конфигурация: `EVT-PRE-20 Rev.A v0.3`;
+- дата среза: 14.09.2026;
+- источник синхронизированных authority: `f3411e51938aa1423fdbaeeef9585aeea385c239`;
+- `MAIN-AUTH-001…011`: `CLOSED / VERIFIED`;
+- native-схемы PCB-MAIN и PCB-PWR, а также их KiCad 9 ERC: `PASS / REVIEW A`;
+- PCB-MAIN и PCB-PWR routing, Review B и manufacturing release: `OPEN / BLOCKED`;
+- повторный PCB-MIC Review A: `PASS`; copper-return subgate Review B: `ACCEPTED`;
+- PCB-MIC manufacturing handoff: `PACKET READY / EXTERNAL DFM ACCEPTANCE PENDING`;
+- оставшиеся PCB-MIC panelization/DFM/acoustic/physical-EVT gates: `OPEN`;
+- аппаратный EVT: `NOT RUN`;
+- общий статус: `OPEN / NOT FOR MANUFACTURE`.
 
-`main` и `develop` содержат согласованный интеграционный срез. Поставочные материалы
-`evt-mb` и `evt-pre-20` сохраняются в раздельных пространствах и не являются взаимозаменяемыми.
+До REV_D7 производственный архив EVT-PRE-20 не был выпущен. Унаследованный
+полный EVT v0.7 остаётся справочным источником методик и не является комплектом
+производства партии из 20 станций. REV_D7 ниже фиксирует документальную выдачу;
+физические Review-B, first article, EOL и EVT остаются отдельными фактическими gates.
 
-## Выпущенные и контрольные комплекты
+## EVT-PRE-20 REV_D7 — 2026-10-16
 
-| Линия | Комплект | SHA-256 | Статус |
-|---|---|---|---|
-| Полный EVT | `РС_ЗС-БПЛА_EVT_gate_3plus1_v0_7.zip` | `37eaee4e85e8f12f26da3fbd3a7c40d4cda19c9192dca2e5bb30963435747e6c` | OPEN |
-| EVT-MB | `РС_Дионея_EVT_MB_v1_3_ПОЛНЫЙ_КОМПЛЕКТ_OPEN.zip` | `df7275e4915da534fee284e78c6eef6419b1672223d2c823707140cee6dfb446` | OPEN |
-| EVT-MB | `РС_Дионея_EVT_MB_v1_3_ПМИ_И_ОТЧЕТНЫЕ_МАТЕРИАЛЫ_OPEN.zip` | `0e997293fdceb396dfc5c8fb9b0e482bbb413d6af4fd47e00cfb42090e3f5ecb` | OPEN |
-| Презентация | `Дионея_презентация_проекта_v0_3.pptx` | `3ea0a8ba33eaf17208678dfb94ae4d975d44d4b129452b48a7bdacb0eda19c38` | RELEASED |
-| Аудиопроверка | `Результаты_прогона_звуков_Мухоед_2026-09-07.zip` | `84b9ad6cead103ce19abc94ca49f222ac863133113549e228708a70ab1364466` | 3/3 TRUE_POSITIVE; диагностический прогон |
+- Полный производственный комплект: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_REV_D7_FULL.zip`.
+- Фабричный комплект плат: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_REV_D7_ALTIUM.zip`.
+- Программа, методики, отчёты и Мухоед: `releases/EVT_PRE_20_REV_D7/Архивы/EVT_PRE_20_REV_D7_TESTS.zip`.
+- PCB-MAIN Rev.B — 8 слоёв; PCB-PWR — 4; PCB-MIC — 2. Платы выдаются в Altium; KiCad в основном и фабричном архивах отсутствует.
+- Документальный пакет готов; physical first article/EOL/EVT остаются NOT RUN до фактического изготовления.
 
-## Текущий инженерный baseline EVT-PRE-20
+\n
 
-- исходная ветка: `evt-pre-20`;
-- зафиксированный SHA: `7ed5b021b1e7eddfda616b54fbc79e1bf0221702`;
-- аппаратная конфигурация: `EVT-PRE-20 Rev.A`, 20 станций, собственные PCB;
-- `PCB-MAIN`: десятистраничная hierarchy и pad/net equivalence приняты только как `ACCEPT_HIERARCHY_ONLY`; routing и Review B открыты;
-- `PCB-PWR`: F1 `0451008.MRL` применён bounded value-only ECO; commit-bound KiCad 9 ERC/PDF evidence прошли, независимый post-ECO hierarchy review открыт, qualification 1/20;
-- `PCB-MIC`: copper-return subgate принят, но общий Review B и manufacturing handoff открыты;
-- контролируемый BOM: 295 engineering-строк и 124 procurement-строки; QG-1 `PASS`, QG-2 `BLOCKED`;
-- системные кандидаты: RB40, SLP080S-12M, SCC075010060R, SBS050150200,
-  Taoglas G30.B.108111, AA.166.A.301111, TI.89.B.2111W и `CAB.0243`;
-- производственный BOM, routing, Gerber/CAM/DFM и выпуск в изготовление заблокированы;
-- аппаратный EVT: `NOT RUN`.
+## EVT-PRE-20 REV_D8 - 2026-10-16
 
-Инженерные пакеты EVT-PRE-20 формируются CI как воспроизводимые артефакты. Они не
-получают статус производственного выпуска до завершения обоих контролей и закрытия
-аппаратных evidence.
+- Полный комплект закупки, производства, сборки и программного кандидата: `releases/EVT_PRE_20_REV_D8/Архивы/EVT_PRE_20_REV_D8_FULL.zip`.
+- Фабричный комплект Altium/CAM для PCB/PCBA: `releases/EVT_PRE_20_REV_D8/Архивы/EVT_PRE_20_REV_D8_ALTIUM.zip`.
+- Программа, методики, отчётные формы и пакет Мухоеда: `releases/EVT_PRE_20_REV_D8/Архивы/EVT_PRE_20_REV_D8_TESTS.zip`.
+- Программа EVT: две группы по 20 станций и одна стендовая, 41 серийный номер `DIO-EVT-001...040` и `DIO-EVT-B01`.
+- Варианты закупки: 21 станция как первая фаза и 41 станция как полная программа. Варианты не суммируются.
+- PCB-MAIN - 8 слоёв; PCB-PWR - 4; PCB-MIC - 2. Основной и фабричный архивы не содержат KiCad.
+- Подписанный software release candidate: `2026101601`; firmware lock запрещён до закрытия аппаратной квалификации.
+- Число 21 в форме MFG-004 означает количество открытых EOL-критериев, а не количество станций.
+- CRC, полная распаковка, отсутствие закрытых ключей и отсутствие KiCad в FULL/ALTIUM: `PASS`.
+- Физические first article, числовые EOL-пределы и EVT остаются `NOT RUN / OPEN` до измерений собранных станций.
 
-## Правило применения
+SHA-256:
 
-Перед использованием архива восстановить его штатным `reassemble.sh` или
-`reassemble.ps1`, проверить SHA-256 и выполнить входной gate соответствующей линии.
+- FULL: `A215CC4D579A7E856E651AB0C2C578E03A64525330F1F4CFA34E9BDB9E678423`
+- ALTIUM: `FDF68CF277E36D0943473FDA077C372D0307CA9A0ADED400F6259486347F7C2D`
+- TESTS: `3B20614280335E1DFB406210BD5137C32AEA7AAF08675B8106661B01A6CE0BB5`

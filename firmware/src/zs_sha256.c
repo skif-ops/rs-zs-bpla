@@ -139,3 +139,24 @@ void zs_sha256_digest(const void *data, size_t size, uint8_t digest[ZS_SHA256_DI
   zs_sha256_update(&ctx, data, size);
   zs_sha256_final(&ctx, digest);
 }
+
+void zs_hmac_sha256(const uint8_t *key, size_t key_len, const void *data, size_t size, uint8_t mac[ZS_SHA256_DIGEST_BYTES]) {
+  uint8_t k[ZS_SHA256_BLOCK_BYTES], pad[ZS_SHA256_BLOCK_BYTES], inner[ZS_SHA256_DIGEST_BYTES];
+  zs_sha256_t ctx;
+  if (mac == NULL || (key == NULL && key_len != 0u) || (data == NULL && size != 0u)) return;
+  memset(k, 0, sizeof(k));
+  if (key_len > ZS_SHA256_BLOCK_BYTES) zs_sha256_digest(key, key_len, k);
+  else if (key_len) memcpy(k, key, key_len);
+  for (size_t i = 0u; i < ZS_SHA256_BLOCK_BYTES; i++) pad[i] = (uint8_t)(k[i] ^ 0x36u);
+  zs_sha256_init(&ctx); zs_sha256_update(&ctx, pad, sizeof(pad)); zs_sha256_update(&ctx, data, size); zs_sha256_final(&ctx, inner);
+  for (size_t i = 0u; i < ZS_SHA256_BLOCK_BYTES; i++) pad[i] = (uint8_t)(k[i] ^ 0x5cu);
+  zs_sha256_init(&ctx); zs_sha256_update(&ctx, pad, sizeof(pad)); zs_sha256_update(&ctx, inner, sizeof(inner)); zs_sha256_final(&ctx, mac);
+  memset(k, 0, sizeof(k)); memset(pad, 0, sizeof(pad));
+}
+
+bool zs_sha256_equal(const uint8_t *a, const uint8_t *b, size_t len) {
+  uint8_t d = 0u;
+  if (a == NULL || b == NULL) return false;
+  for (size_t i = 0u; i < len; i++) d |= (uint8_t)(a[i] ^ b[i]);
+  return d == 0u;
+}

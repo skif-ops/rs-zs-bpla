@@ -1,19 +1,24 @@
 # PCB-MIC Rev.A manufacturing handoff
 
-Status: `PACKET READY / EXTERNAL ACCEPTANCE REQUIRED / REVIEW B OPEN / NOT FOR MANUFACTURE`
+Status: `CURRENT ALTIUM OUTPUTS GENERATED / DRC PASS / REVIEW A+B REPEAT REQUIRED / NOT FOR MANUFACTURE`
 
-This packet is the controlled input for PCB fabricator and PCBA assembler DFM. It is
+Decision `2026-10-15`: PCB-MIC acoustic-clearance ECO-001 was applied to the native KiCad source and the Altium verification board. Fresh KiCad and Altium board DRC are clean. The 55 KiCad schematic-parity findings, regenerated CAM, repeated Review A/Review B binding, first-panel bore inspection and physical EVT remain mandatory.
+
+Historically, this packet was the controlled input for PCB fabricator and PCBA assembler DFM. It is
 not a quotation acceptance, purchase release, panel approval or fabrication order.
 The returned response must be recorded in
-`hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv`. Internal packet readiness cannot
-change Review B or manufacturing release to `PASS`.
+`hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv`. Its nine technical rows are
+now project engineering closures for EVT. This cannot change Review B or
+manufacturing release to `PASS`.
 
 ## Source binding
 
 | Item | Controlled value |
 |---|---|
 | Native PCB | `hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb` |
-| Native PCB SHA-256 | `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031` |
+| Current native PCB SHA-256 | `BA2AF99FE3B0B850A2801B9B73F1333D48C55A56D59E91187495D5E95910D93A` |
+| Historical reviewed PCB SHA-256 | `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031` |
+| Current ECO application | `hardware/reviews/PCB_MIC_ACOUSTIC_CLEARANCE_ECO_001_APPLICATION_REV_A.md` |
 | Repeat Review-A commit | `e17a86bc78ba979f74c5549b378e94f7f3447fe4` |
 | Copper-return decision commit | `7aeec13aa0c7ba1b3cd9095b800c6d08755912a3` |
 | Copper-return acceptance-state commit | `8aa4a3d21b55956625db643e22436f248f75b258` |
@@ -41,9 +46,11 @@ The coordinate origin is the lower-left corner of the unit-board outline.
 | H2 | 2.2 mm NPTH at X=20.0 mm, Y=16.65 mm |
 | Fitted side | C1, J1, MK1 and R1 on top; no fitted bottom references |
 
-The MK1-local design rule is 0.125 mm minimum copper clearance and 0.10 mm minimum
-NPTH-to-copper clearance. The selected fabricator must explicitly accept this
-capability. A zero-violation internal DRC does not replace that acceptance.
+The MK1-local design rule is 0.125 mm minimum copper clearance. Ordinary
+NPTH-to-copper clearance is 0.20 mm; the sole 0.10 mm exception applies only to
+the manufacturer-derived MK1 ground land around the acoustic bore, never to a
+signal trace or zone. First-panel inspection must confirm a clean bore without
+copper breakout. A zero-violation internal DRC does not replace that inspection.
 
 ## Controlled candidate outputs
 
@@ -51,8 +58,8 @@ The handoff must use one commit-bound archive containing the Gerber job and laye
 Excellon drill, IPC-356, pick-and-place CSV, manufacturing BOM, assembly/fabrication
 PDF and board-sized F.Cu/B.Cu review SVGs. Every file must match the archive SHA-256
 manifest. The PCB Native Gate artifact also carries the handoff audit, this packet,
-the machine contract and the blank response register under `PCB-MIC/`. These outputs
-remain candidates until all response rows and Review B close.
+the machine contract and the engineering-closure register under `PCB-MIC/`.
+The current Altium board now has a fresh zero-warning, zero-violation DRC and regenerated Gerber X2, NC Drill, Pick&Place and STEP outputs. Their hashes and source binding are recorded in `hardware/altium/netlabel-reimport-diagnostic/PCB-MIC/validation/PCB-MIC-Altium-current-source-output-manifest-2026-10-16.json`. The Altium OutJob did not emit the BOM, assembly PDF or standalone IPC-D-356, so the full candidate retains those controlled KiCad outputs alongside Altium CAM. Review A/Review B binding remains open.
 
 ## Panelization and depanel response
 
@@ -82,11 +89,12 @@ against the assembly drawing.
 
 ## Response and release rule
 
-All nine rows in `PCB_MIC_DFM_RESPONSE_REV_A.csv` start at
-`PENDING_EXTERNAL_ACCEPTANCE`. For each row, the responsible party supplies a response
-reference, responder and date. A proposed exception or source change remains open
-until it is dispositioned through the project ECO process.
+All nine rows in `PCB_MIC_DFM_RESPONSE_REV_A.csv` are
+`CLOSED_EVT_ENGINEERING_BASELINE`, cite the controlling manual and are
+non-blocking. They are not claimed factory replies. A checkout DFM error,
+first-panel defect or source change remains open until dispositioned through the
+project ECO process.
 
-Even after fabricator and assembler DFM acceptance, the membrane/cavity tolerance
-stack, assembled acoustic inspection, physical EVT calibration, independent Review-B
-signature and manufacturing release remain separate blocking gates.
+The standard-process DFM rows remain accepted as engineering-baseline closures, but the current design source has changed. Earlier Review A and copper-return signatures remain historical evidence only for their recorded board hash. The current board has regenerated and checksum-bound Altium CAM, but it still requires repeated Review A/Review B against the current source hashes.
+
+The 55 KiCad schematic-parity findings, membrane/cavity tolerance stack, assembled acoustic inspection, physical EVT calibration, first-panel bore inspection and manufacturing release remain separate blocking gates.

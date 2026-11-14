@@ -8,7 +8,7 @@ manufacturer-source review is not manufacturing approval when the source omits
 a PCB land pattern: every
 `PROJECT_IPC_PATTERN_CONTROLLED_ASSEMBLY_DFM_REQUIRED` item remains blocked
 until the assembly house accepts its land, mask and stencil rules. The
-machine-readable 19-pattern inventory is
+machine-readable 20-pattern inventory is
 `hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv`.
 
 ## Current controlled result
@@ -17,7 +17,7 @@ machine-readable 19-pattern inventory is
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 50 | Fourteen initially controlled instances plus thirty-six reviewed instances controlled locally |
+| Manufacturer-drawing controlled patterns | 50 | Thirteen initially controlled instances plus thirty-seven reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
 | KiCad library patterns pending drawing review | 0 | Manufacturer-source review is complete for every registered pattern |
 | Package-outline-only library geometry | 0 | No routing depends on an uncontrolled workstation library snapshot |
@@ -35,7 +35,10 @@ paste-only pads are retained but excluded from the schematic pin-set comparison.
 The `D3` and `D5` SOD962-2 patterns are project-local and derived from Nexperia
 PESD5V0C1BSF data sheet v3, Figure 14; their source files are hash-bound by the
 capture manifest.
-The same control now covers `U4` from ST DS12606 Rev8 Figures 10/11, `U5`
+The same control now covers `U4` from ST DS12606 Rev8 Figures 10/11. Approved
+ECO-004 corrects its six signal-pad row centres from `+/-0.540 mm` to
+`+/-0.865 mm`, producing the controlled `0.190 mm` copper gap to the exposed
+pad; the U4 courtyard is `2.50 x 3.00 mm`. The control also covers `U5`
 from Analog Devices/LTC drawing 05-08-1715 and `X1` from SiTime SiT1552
 Rev 1.43 POD-35 Rev A. The X1 land pattern has four 0.25 mm NSMD pads on a
 1.00 x 0.41 mm pitch with 0.35 mm solder-mask openings.

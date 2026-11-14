@@ -1,15 +1,34 @@
 # PCB-PWR Rev.A input-protection qualification
 
-Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN REVIEW AND PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
+Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
 
 Configuration: `EVT-PRE-20 Rev.A`
 
 This packet controls the PCB-PWR input fuse and TVS decision. The bounded F1
 value-only ECO is applied without changing footprint, placement, topology, nets
 or pad mapping. The previously accepted five-page source remains historical
-evidence only. Post-ECO commit-bound ERC/PDF evidence now passes; a new
-independent human hierarchy decision is still required before any PCB assembly
-procurement.
+evidence only. The post-ECO PDF was superseded after independent review found
+text/symbol overlap. The later C20/C21 electrical ECO superseded the first
+remediated artifact. Fresh commit-bound ERC/PDF evidence for the active source
+passes, and reviewer `Скиф` accepted the exact active source/PDF hierarchy on
+`2026-09-17`. Physical qualification remains required before production PCBA
+or manufacturing release. A separate sample-only purchase is not required:
+the exact parts may be included in the controlled EVT test-batch order when
+other procurement gates permit and may proceed to kitting without an incoming
+identity hold.
+
+Manufacturer source control is now complete. The machine-audited
+`PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` record binds
+the exact four orderables to six official Littelfuse/Molex payloads, retrieval
+date, byte sizes and SHA-256 values. This closes `PWR-IPQ-001` only.
+
+The machine-audited
+`PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.{md,json}` record now
+closes `PWR-IPQ-002` as a documentary procurement gate. It binds manufacturer
+data sheets, product pages and drawings to exact-MPN supplier catalogue
+records. It requires no quarantine, incoming photographs, minimum body sample,
+future date/lot record or CoC. Inventory and delivery are reconfirmed at PO
+placement because they are volatile commercial fields.
 
 ## 1. Controlled decision
 
@@ -29,7 +48,7 @@ The exact EVT qualification pair is:
 
 | Function | Candidate | Controlled rating | State |
 |---|---|---|---|
-| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO and commit-bound ERC/PDF evidence pass; human review and physical qualification pending |
+| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO retained through C20/C21 ECO; active-source ERC/PDF/human hierarchy evidence passes; physical qualification pending |
 | D1 transient clamp | Littelfuse `SMBJ18A` | 18 V standoff; 20.0–22.1 V breakdown; 29.2 V maximum clamp at 20.6 A; 600 W at 10/1000 us | Selected for qualification; measured transient envelope pending |
 
 At 5 A the fuse's nominal cold loss is:
@@ -40,6 +59,10 @@ The J1 `43045-0213` header and `43030-0038` 18 AWG / 0.75 mm² terminal each
 publish a maximum of 8.5 A per contact. This does not release an 8 A continuous
 system current. The operating envelope stays 5 A, and the complete
 connector/crimp/wire path must pass the +70 C test.
+
+The exact source payload hashes and ordering-code derivations are controlled in
+`PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}`. No adjacent
+family member is accepted as evidence for any of the four orderables.
 
 ## 2. Native-source interlock
 
@@ -53,12 +76,28 @@ This is a two-stage ECO gate:
 
 The earlier commit-bound ERC, PDF and human acceptance remain the historical
 record for the superseded 5 A value. They do not approve the active 8 A value.
-For the active value, KiCad 9.0.9 ERC passes with zero violations on five sheets,
-and the new five-page A3 PDF passes visual preflight. Source, ERC, PDF and
-artifact hashes are bound to commit `091a2eb223161cb4396fc6838921eeb79150c38d`.
-A repeat independent hierarchy decision remains mandatory.
+For the active value, KiCad 9.0.9 ERC passed with zero violations on five sheets
+at commit `091a2eb223161cb4396fc6838921eeb79150c38d`, but independent review found
+text overlapping symbols and connection marks in that commit's five-page A3
+PDF. That PDF is superseded as active review evidence. A presentation-only
+legibility remediation retains the exact pin/net semantic hash. For source
+commit `6ba3ba5d219b95cb7de12f37c4eb646f7f18cfa8`, KiCad 9.0.9 ERC passes
+with zero violations on five sheets and PDF SHA-256
+`16afef6ecb337109f2a61318c9459167c6d06f4b74534b656c97884c1fed57dd`
+covers five visually preflighted A3 landscape pages without text/symbol/
+connection overlap or clipping. That evidence was superseded before review by
+the subsequent C20/C21 CIN_HF electrical ECO, which retains F1 and changes
+the active pin/net digest. For exact source commit
+`e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a`, Schematic Gate
+[#35217048575](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35217048575)
+passes KiCad 9.0.9 ERC with zero violations on five sheets. Its five-page A3
+PDF SHA-256 is
+`7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`
+and passes visual preflight without text/symbol/connection overlap or clipping.
+Reviewer `Скиф` accepted that exact source/PDF pair on `2026-09-17` with
+decision `ACCEPT_HIERARCHY_ONLY`; `PWR-IPQ-004` is therefore `PASS`.
 
-Until then:
+The retained interlocks are:
 
 - no PCB-PWR PCBA procurement is authorized;
 - no BOM line may claim `CONTROLLED` release for F1;
@@ -99,9 +138,11 @@ register wrap or overflow as a plausible valid current.
 Tests run in the order controlled by
 `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv`:
 
-1. source control, sample identity and bounded native ECO;
-2. repeat ERC/PDF/human hierarchy gate (ERC/PDF evidence passes; human review pending);
-3. 25 C, +70 C and -40 C operating tests;
+1. source control (`PWR-IPQ-001 PASS`), documentary procurement identity
+   (`PWR-IPQ-002 PASS`) and the bounded native ECO;
+2. repeat ERC/PDF/human hierarchy gate after the legibility remediation and C20/C21 ECO (`PASS`);
+3. 25 C, EVT +60 C and -20 C operating tests; -40 C and +70 C are repeated for
+   post-EVT series qualification;
 4. inrush and modem-burst tests;
 5. overload, prospective-short and primary-fuse coordination using a
    current/energy-limited fixture;
@@ -111,7 +152,7 @@ Tests run in the order controlled by
 9. INA226 range/error-state verification;
 10. independent evidence audit.
 
-An unprotected direct short of an RB40 is prohibited. The test fixture must limit
+An unprotected direct short of `DIO-BAT-LFP-12V50-H-REV-A` is prohibited. The test fixture must limit
 available current and energy, provide remote shutdown, use a guarded enclosure
 and capture source impedance before the fault is applied.
 
@@ -125,7 +166,44 @@ date, every required artifact has a SHA-256, the native F1 value equals
 This packet never closes PCB-PWR routing, DIM-003, stackup/copper, DRC, CAM, DFM,
 Review B or manufacturing release.
 
-## 7. Primary evidence
+The current matrix state is `4/20 PASS`; 16 rows remain open.
+
+## 7. Procurement identity
+
+No stand-alone identity samples are purchased. Identity is controlled before
+purchase from official manufacturer documents and exact-MPN supplier catalogue
+records. Each PO line states manufacturer, exact MPN and `NO SUBSTITUTION` and
+retains the supplier URL or quote line that maps the seller entry to that MPN.
+Inventory, price, packaging option and delivery date are checked in the cart or
+quote at order time against the two-week schedule.
+
+The controlled source data are:
+
+- `0451008.MRL`: Littelfuse 451/453 data sheet, official product page and
+  DigiKey exact-MPN catalogue record;
+- `SMBJ18A`: Littelfuse SMBJ data sheet, official product page and Mouser
+  exact-MPN catalogue record; `BT` remains the rejected `SMBJ18CA` code;
+- `43045-0213`: exact Molex product page and DigiKey exact numeric-MPN record;
+- `43030-0038`: exact official Molex product image and packaging drawing
+  `PK-43030-001-001` Rev.B1 plus DigiKey and Mouser exact-MPN records.
+
+There is no input-protection receiving quarantine, mandatory package or body
+photography, five-piece inspection, lot/date record, CoC or new receiving
+evidence package. Existing PO or packing-slip data may be used for routine
+quantity and obvious-discrepancy reconciliation; otherwise parts proceed to
+kitting. Electrical and functional confirmation remains in assembly/EOL and
+physical rows `PWR-IPQ-005` through `PWR-IPQ-020`.
+
+Controlled JSON SHA-256:
+`2b3acbc5bcee5b08bb1a45f009d75d57210592d8488f2e5dc29358c072a62250`.
+
+## 8. Primary evidence
+
+- Controlled hash record:
+  `PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}`
+
+- Controlled procurement-identity record:
+  `PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.{md,json}`
 
 - [Littelfuse 0451008 product page](https://www.littelfuse.com/products/fuses-overcurrent-protection/fuses/surface-mount-fuses/nano-2-fuses/451/0451008)
 - [Littelfuse 451/453 series data sheet](https://www.littelfuse.com/assetdocs/fuse-451-and-453-datasheet?assetguid=533cd5cc-956c-4243-867f-6ab5a62f6ba1)

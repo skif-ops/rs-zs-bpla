@@ -1,0 +1,106 @@
+{
+  "schema": "dioneya-pcb-pwr-buck-switch-node-routing-005-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005",
+  "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_005_CREATION_SUBGATE",
+  "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+  "scope": "ONLY_DUAL_BUCK_SWITCH_NODE_CONNECTIONS",
+  "selection_rationale": "CLOSE_THE_TWO_SYMMETRIC_P0_SWITCH_NODE_NETS_AFTER_ACCEPTED_BOOTSTRAP_AND_PLACEMENT_SUBGATES_WITH_EXPLICIT_PAD_LIMITED_NECKDOWNS",
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pcb",
+    "sha256": "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+    "semantic_sha256": "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d",
+    "trace_items": 8,
+    "copper_zones": 0
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pcb",
+    "sha256": "5d135a38774c4e223c1db8d6a3fc0e8c9c492fe3ba24f5e2ec4c1b00ab2166d7",
+    "semantic_sha256": "465f5b41265a7f8ccb80a6f7edbb937b2eebad0333730e7586e8f76e3d1d8391",
+    "trace_items": 22,
+    "copper_zones": 0,
+    "routed_nets": [
+      "SW_3V8",
+      "SW_3V3"
+    ],
+    "connections": [
+      "U3.3-C4.2-L1.1",
+      "U4.3-C6.2-L2.1"
+    ],
+    "layer": "F.Cu",
+    "vias": 0,
+    "added_segments": 14,
+    "per_net_route_length_mm": 7.469896,
+    "per_net_width_length_mm": {
+      "0.5": 4.578427,
+      "1.0": 0.35,
+      "1.5": 0.851469,
+      "2.1": 1.69
+    },
+    "nominal_switch_node_width_mm": 2.1,
+    "explicit_pad_entry_neckdown_width_mm": 0.5,
+    "minimum_screened_edge_clearance_mm": 0.403,
+    "minimum_required_switch_node_separation_mm": 0.4
+  },
+  "pad_entry_disposition": {
+    "full_2_1_mm_to_qfn_pad_possible": false,
+    "reason": "THE_ACCEPTED_QFN_PAD_3_EXIT_IS_BOUNDED_BY_ADJACENT_GND_PAD_2_AND_ACCEPTED_BOOT_PAD_4_COPPER",
+    "implementation": "VISIBLE_0P5_MM_PAD_EXIT_THEN_1P0_1P5_2P1_MM_PROGRESSIVE_EXPANSION",
+    "hidden_uniform_narrow_substitute": false,
+    "thermal_and_current_density_qualified": false,
+    "physical_evt_validation_required": true
+  },
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py",
+    "generator_sha256": "965c722290d47d662d9a4d6f08c09ca01d1fa1d50f9d64928f3809e819afbd57",
+    "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+    "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "evt_stackup_basis_sha256": "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca"
+  },
+  "deferred_boundary": {
+    "buck_hot_loop_and_return_routes": [
+      "VBAT_SYS",
+      "GND_PWR"
+    ],
+    "kelvin_and_feedback_routes": [
+      "SHUNT_SOURCE_SENSE",
+      "SHUNT_LOAD_SENSE",
+      "FB_3V8"
+    ],
+    "power_input_load_copper": [
+      "VBAT_FUSED",
+      "VBAT_PROTECTED",
+      "VBAT_SYS"
+    ],
+    "application_authorized": false
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "predecessor_copper_changed": false,
+    "component_poses_changed": false,
+    "pad_geometry_or_nets_changed": false,
+    "outline_or_layers_changed": false,
+    "non_switch_node_copper_added": false
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "required_violations": [
+      86,
+      86
+    ],
+    "required_unconnected": [
+      121,
+      117
+    ],
+    "required_new_errors": 0,
+    "required_other_drc_fingerprint_delta": 0
+  },
+  "human_gate_after_machine_pass": {
+    "accept_value": "ACCEPT_PCB_PWR_BUCK_SWITCH_NODE_ROUTING_005_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_BUCK_SWITCH_NODE_ROUTING_005_SUBGATE"
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}

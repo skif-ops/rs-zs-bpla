@@ -1,0 +1,45 @@
+# PROPOSED workflow: copy to .github/workflows/ci-apply.yml (the connector cannot
+# write .github/workflows).  It runs queued deterministic tools/apply_*.py scripts
+# on the pushed branch, verifies each with --check and commits the result.
+# Large generated files (native boards, regenerated BOM) are materialised here
+# instead of being pushed through the connector.  Changes under .github/ are refused.
+name: ci-apply
+on:
+  push:
+    branches-ignore: [main, develop]
+    paths: ["ci/apply/queue.txt"]
+permissions:
+  contents: write
+concurrency:
+  group: ci-apply-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install kiutils==1.4.8
+      - name: Run queued apply scripts and commit
+        run: |
+          set -euo pipefail
+          test -f ci/apply/queue.txt || exit 0
+          scripts=""
+          while read -r script; do
+            case "$script" in ""|\#*) continue ;; tools/apply_*.py) ;; *) echo "refused: $script"; exit 1 ;; esac
+            python "$script"
+            python "$script" --check
+            scripts="$scripts $script"
+          done < ci/apply/queue.txt
+          git rm -q ci/apply/queue.txt
+          git add -A hardware tools
+          if git diff --cached --name-only | grep -q '^\.github/'; then echo "workflow changes refused"; exit 1; fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "apply:${scripts}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

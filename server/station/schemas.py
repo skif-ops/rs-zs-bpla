@@ -347,6 +347,44 @@ class CellularTelemetry(BaseModel):
     settings_valid: Literal[True]
 
 
+class DetectorHealth(BaseModel):
+    """Compact heartbeat schema 2, key 13: the station detector since boot (firmware zs_detector_health_t)."""
+    boot_id: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    uptime_s: int = Field(default=0, ge=0)
+    windows: int = Field(default=0, ge=0)
+    windows_dropped: int = Field(default=0, ge=0)
+    confirmed_windows: int = Field(default=0, ge=0)
+    suspect_windows: int = Field(default=0, ge=0)
+    engine_windows: int = Field(default=0, ge=0)
+    events_emitted: int = Field(default=0, ge=0)
+    events_refused: int = Field(default=0, ge=0)
+    outbox_pending: int = Field(default=0, ge=0)
+    window_max_ms: int = Field(default=0, ge=0)
+    presence_level: Literal["NONE", "SUSPECT", "ENGINE_UNCONFIRMED", "CONFIRMED"] = "NONE"
+    # key 12/13: why this boot started and which supervised tasks let the hardware watchdog fire before it
+    reset_cause: Literal["UNKNOWN", "POWER", "PIN", "SOFTWARE", "IWDG", "WWDG", "LOW_POWER", "OPTION_BYTES"] = "UNKNOWN"
+    watchdog_missed_tasks: int = 0
+    # key 14: version of the runtime parameter set in force (ICD addendum D, CMD_SET_PARAMS; 0 = defaults)
+    params_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    # key 15: self-tests whose last run failed, bit = self-test id (firmware zs_selftest_id_t: 1 power/INA226,
+    # 4 microphone capture, 5 microphone alignment, 7 GNSS PPS, 12 RTC LSE, ...); 0 = none
+    selftest_failed_tests: int = Field(default=0, ge=0, le=0xFFFF)
+    # key 16/17 (ICD addendum E): ids of the command keys the station trusts (hex of the 8-byte §2.1 key id), the next
+    # one only while a rotation is in flight; None = not provisioned / firmware without the keys
+    command_key_id: str | None = None
+    command_next_key_id: str | None = None
+    # key 18..20 (ICD addendum F): version of the running image (.fw_info), the update state and the version held by
+    # the other flash bank (0 = none / firmware without the update)
+    fw_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    fw_state: Literal["IDLE", "DOWNLOADING", "INSTALL_PENDING", "TRIAL", "ROLLED_BACK"] = "IDLE"
+    fw_other_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    # key 21..23 (ICD addendum G): version of the network configuration in use (the candidate's while on trial), the
+    # remote-change state and the version of the last configuration that failed its trial (0 = none / older firmware)
+    net_config_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    net_state: Literal["STABLE", "ACCEPTED", "TRIAL", "ROLLED_BACK"] = "STABLE"
+    net_failed_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+
+
 class HeartbeatMessage(BaseModel):
     station_id: int
     time_us: int
@@ -361,6 +399,7 @@ class HeartbeatMessage(BaseModel):
     self_test_ok: bool = True
     fault_flags: list[str] = Field(default_factory=list)
     cellular: CellularTelemetry | None = None
+    detector: DetectorHealth | None = None
 
 
 class SecurityEventMessage(BaseModel):
@@ -386,6 +425,51 @@ class SecurityEventMessage(BaseModel):
     route: RouteStatus = Field(default_factory=RouteStatus)
 
 
+class FirmwareUpdateRequest(BaseModel):
+    """ICD addendum F: the release (its version in the server's firmware repository) to install."""
+    version: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
+
+
+class RolloutRequest(BaseModel):
+    """A firmware rollout (station/rollout.py): the release, the stations, the canary stations (``canary`` or the first
+    ``canary_count`` of the list, default 1), and the limits that pause it or hold it back."""
+    version: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
+    stations: list[int] = Field(min_length=1, max_length=10_000)
+    canary: list[int] | None = None
+    canary_count: int | None = Field(default=None, strict=True, ge=0)
+    max_failures: int | None = Field(default=None, strict=True, ge=1)
+    max_in_flight: int | None = Field(default=None, strict=True, ge=1)
+
+
+class RolloutReason(BaseModel):
+    reason: str = Field(default="", max_length=500)
+
+
+class RevertRequest(BaseModel):
+    """The revert release: a version above the reverted one (a station refuses a version that is not newer)."""
+    version: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
+    reason: str = Field(default="", max_length=500)
+
+
+class NetworkConfigRequest(BaseModel):
+    """ICD addendum G: the network fields to change (at least one); version defaults to the reported one + 1."""
+    version: int | None = Field(default=None, strict=True, ge=1, le=0xFFFFFFFF)
+    server_host: str | None = None
+    mqtt_port: int | None = Field(default=None, strict=True)
+    https_port: int | None = Field(default=None, strict=True)
+    server_fingerprint: str | None = None
+    tenant: str | None = None
+    topic_prefix: str | None = None
+    preferred_sim: int | None = Field(default=None, strict=True)
+    apn1: str | None = None
+    apn2: str | None = None
+
+
+class CommandKeyRotationRequest(BaseModel):
+    """ICD addendum E: the next command public key (raw Ed25519, 64 hex characters)."""
+    public_key: str = Field(min_length=64, max_length=64, pattern=r"^[0-9a-fA-F]{64}$")
+
+
 class AudioRequest(BaseModel):
     event_id: int = Field(strict=True, ge=1, le=0xFFFFFFFFFFFFFFFF)
     segment: Literal["pre", "post", "both", "range"] = "both"
@@ -393,6 +477,8 @@ class AudioRequest(BaseModel):
         default=None, strict=True, ge=-0x80000000, le=0x7FFFFFFF
     )
     duration_ms: int | None = Field(default=None, strict=True, ge=1, le=0xFFFFFFFF)
+    # the event time (station clock, us); the audio-request route fills it from the stored detection when omitted
+    event_time_us: int | None = Field(default=None, strict=True, ge=1, le=0x7FFFFFFFFFFFFFFF)
 
     @model_validator(mode="after")
     def validate_range_fields(self):

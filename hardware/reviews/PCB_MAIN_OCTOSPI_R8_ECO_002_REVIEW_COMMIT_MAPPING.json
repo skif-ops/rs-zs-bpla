@@ -1,0 +1,29 @@
+{
+  "schema_version": "dioneya.pcb-main-octospi-r8-eco-002-review-commit-mapping.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-OCTOSPI-R8-ECO-002",
+  "reviewed_github_commit_sha": "0104cf1bddd28f6bd4b0abc52d8b12bc6cc8cf67",
+  "reviewed_tree_sha": "8a6d4b82727df6449db731a5aea47290e01cc1df",
+  "proposal_path": "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.json",
+  "proposal_blob_sha": "275995446b4660fd59429415b487497a4d79ca7b",
+  "proposal_sha256": "32fae30b0f4da789f584d56c5ed0e5bb09521ed64749a0069a0a295d6971ec12",
+  "proposal_record_path": "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.md",
+  "proposal_record_blob_sha": "d6e1dd527d96e84d222bf8179230e837b7136412",
+  "proposal_record_sha256": "476b9c497a5cd7ea9b887f3c1bab9cd0f4e2b1ae89197f57679ee06ada48a4b9",
+  "candidate_board_path": "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb",
+  "candidate_board_blob_sha": "8bd048725557e2603427cd9639776cda6c4e0373",
+  "candidate_board_sha256": "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f",
+  "audit_path": "tools/audit_pcb_main_octospi_r8_eco_candidate_rev_a.py",
+  "audit_blob_sha": "4b20f060672c371219bf00a0dbf3c151107d7afa",
+  "machine_gate": {
+    "pcb_native_run_id": 35459421992,
+    "pcb_native_conclusion": "success",
+    "kicad_9_comparative_drc_step": "success",
+    "ci_run_id": 35459421983,
+    "ci_conclusion": "success"
+  },
+  "equivalence": "EXACT_REVIEWED_TREE_AND_BLOBS",
+  "transport": "GITHUB_APP_GIT_DATABASE_API",
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

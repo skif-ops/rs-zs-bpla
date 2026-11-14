@@ -1,0 +1,6452 @@
+{
+  "pins": [
+    {
+      "component": "C19",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C19",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C20",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "C20",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "1",
+      "pin_name": "3V8_MODEM",
+      "net": "3V8_MODEM"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "2",
+      "pin_name": "GND_MODEM",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "3",
+      "pin_name": "3V3_DIGITAL",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "4",
+      "pin_name": "GND_DIGITAL",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "5",
+      "pin_name": "1V8_MIC",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "6",
+      "pin_name": "GND_MIC",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "7",
+      "pin_name": "PWR_GOOD",
+      "net": "PWR_GOOD"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "8",
+      "pin_name": "FAULT",
+      "net": "FAULT"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "9",
+      "pin_name": "EN_MODEM",
+      "net": "EN_MODEM"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "10",
+      "pin_name": "EN_AUX",
+      "net": "EN_AUX"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "11",
+      "pin_name": "I2C2_SCL",
+      "net": "I2C2_SCL_BUS"
+    },
+    {
+      "component": "J_PWR",
+      "pin": "12",
+      "pin_name": "I2C2_SDA",
+      "net": "I2C2_SDA_BUS"
+    },
+    {
+      "component": "R103",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "FAULT"
+    },
+    {
+      "component": "R103",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "PWR_FAULT"
+    },
+    {
+      "component": "C1",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C1",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C2",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C2",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C3",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C3",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C4",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C4",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C5",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C5",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C6",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C6",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C7",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C7",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C8",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C8",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C9",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C9",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C10",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "VREF+"
+    },
+    {
+      "component": "C10",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C11",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "VREF+"
+    },
+    {
+      "component": "C11",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C12",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C12",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C13",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C13",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C14",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "VCORE_1V1"
+    },
+    {
+      "component": "C14",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C15",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "VCORE_1V1"
+    },
+    {
+      "component": "C15",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C16",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "VCORE_1V1"
+    },
+    {
+      "component": "C16",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C17",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "VCORE_1V1"
+    },
+    {
+      "component": "C17",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C18",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "NRST"
+    },
+    {
+      "component": "C18",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "L1",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SMPS_SW"
+    },
+    {
+      "component": "L1",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "VCORE_1V1"
+    },
+    {
+      "component": "R1",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R1",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "NRST"
+    },
+    {
+      "component": "R2",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "BOOT0"
+    },
+    {
+      "component": "R2",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R3",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "HW_REV0"
+    },
+    {
+      "component": "R3",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R4",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R4",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "HW_REV0"
+    },
+    {
+      "component": "R5",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "HW_REV1"
+    },
+    {
+      "component": "R5",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R6",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R6",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "HW_REV1"
+    },
+    {
+      "component": "U1",
+      "pin": "1",
+      "pin_name": "PE2",
+      "net": "SIM_MUX_EN"
+    },
+    {
+      "component": "U1",
+      "pin": "2",
+      "pin_name": "PE3",
+      "net": "SIM1_DET"
+    },
+    {
+      "component": "U1",
+      "pin": "3",
+      "pin_name": "PE4",
+      "net": "PDM_DATA4"
+    },
+    {
+      "component": "U1",
+      "pin": "4",
+      "pin_name": "PE5",
+      "net": "SIM2_DET"
+    },
+    {
+      "component": "U1",
+      "pin": "5",
+      "pin_name": "PE6",
+      "net": "BLE_EN"
+    },
+    {
+      "component": "U1",
+      "pin": "6",
+      "pin_name": "VBAT",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "7",
+      "pin_name": "PC13",
+      "net": "SD_DET"
+    },
+    {
+      "component": "U1",
+      "pin": "8",
+      "pin_name": "PC14-OSC32_IN (PC14)",
+      "net": "LSE_IN"
+    },
+    {
+      "component": "U1",
+      "pin": "9",
+      "pin_name": "PC15-OSC32_OUT (PC15)",
+      "net": "NetU1_9"
+    },
+    {
+      "component": "U1",
+      "pin": "10",
+      "pin_name": "VSS",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "11",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "12",
+      "pin_name": "PH0-OSC_IN (PH0)",
+      "net": "NetU1_12"
+    },
+    {
+      "component": "U1",
+      "pin": "13",
+      "pin_name": "PH1-OSC_OUT (PH1)",
+      "net": "NetU1_13"
+    },
+    {
+      "component": "U1",
+      "pin": "14",
+      "pin_name": "NRST",
+      "net": "NRST"
+    },
+    {
+      "component": "U1",
+      "pin": "15",
+      "pin_name": "PC0",
+      "net": "TEST_UART_RX_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "16",
+      "pin_name": "PC1",
+      "net": "TEST_UART_TX_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "17",
+      "pin_name": "PC2",
+      "net": "LORA_DIO1"
+    },
+    {
+      "component": "U1",
+      "pin": "18",
+      "pin_name": "PC3",
+      "net": "NetU1_18"
+    },
+    {
+      "component": "U1",
+      "pin": "19",
+      "pin_name": "VSSA",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "20",
+      "pin_name": "VREF+",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "21",
+      "pin_name": "VDDA",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "22",
+      "pin_name": "PA0",
+      "net": "GNSS_PPS_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "23",
+      "pin_name": "PA1",
+      "net": "NetU1_23"
+    },
+    {
+      "component": "U1",
+      "pin": "24",
+      "pin_name": "PA2",
+      "net": "GNSS_TX_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "25",
+      "pin_name": "PA3",
+      "net": "GNSS_RX_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "26",
+      "pin_name": "VSS",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "27",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "28",
+      "pin_name": "PA4",
+      "net": "LORA_NSS_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "29",
+      "pin_name": "PA5",
+      "net": "LORA_SCK_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "30",
+      "pin_name": "PA6",
+      "net": "LORA_MISO_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "31",
+      "pin_name": "PA7",
+      "net": "LORA_MOSI_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "32",
+      "pin_name": "PB0",
+      "net": "NetU1_32"
+    },
+    {
+      "component": "U1",
+      "pin": "33",
+      "pin_name": "PB1",
+      "net": "PDM_DATA1"
+    },
+    {
+      "component": "U1",
+      "pin": "34",
+      "pin_name": "PB2",
+      "net": "BLE_DFU_REQ"
+    },
+    {
+      "component": "U1",
+      "pin": "35",
+      "pin_name": "PE7",
+      "net": "PDM_DATA3"
+    },
+    {
+      "component": "U1",
+      "pin": "36",
+      "pin_name": "PE8",
+      "net": "NetU1_36"
+    },
+    {
+      "component": "U1",
+      "pin": "37",
+      "pin_name": "PE9",
+      "net": "PDM_CLK"
+    },
+    {
+      "component": "U1",
+      "pin": "38",
+      "pin_name": "PE10",
+      "net": "NOR_CLK_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "39",
+      "pin_name": "PE11",
+      "net": "NOR_NCS_U2"
+    },
+    {
+      "component": "U1",
+      "pin": "40",
+      "pin_name": "PE12",
+      "net": "NOR_IO0_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "41",
+      "pin_name": "PE13",
+      "net": "NOR_IO1_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "42",
+      "pin_name": "PE14",
+      "net": "NOR_IO2_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "43",
+      "pin_name": "PE15",
+      "net": "NOR_IO3_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "44",
+      "pin_name": "PB10",
+      "net": "BLE_TX_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "45",
+      "pin_name": "PB11",
+      "net": "BLE_RX_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "46",
+      "pin_name": "VLXSMPS",
+      "net": "SMPS_SW"
+    },
+    {
+      "component": "U1",
+      "pin": "47",
+      "pin_name": "VDDSMPS",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "48",
+      "pin_name": "VSSSMPS",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "49",
+      "pin_name": "VDD11",
+      "net": "VCORE_1V1"
+    },
+    {
+      "component": "U1",
+      "pin": "50",
+      "pin_name": "VSS",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "51",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "52",
+      "pin_name": "PB13",
+      "net": "I2C2_SCL_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "53",
+      "pin_name": "PB14",
+      "net": "I2C2_SDA_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "54",
+      "pin_name": "PB15",
+      "net": "LORA_TXEN"
+    },
+    {
+      "component": "U1",
+      "pin": "55",
+      "pin_name": "PD8",
+      "net": "LORA_RXEN"
+    },
+    {
+      "component": "U1",
+      "pin": "56",
+      "pin_name": "PD9",
+      "net": "LORA_BUSY"
+    },
+    {
+      "component": "U1",
+      "pin": "57",
+      "pin_name": "PD10",
+      "net": "LORA_RESET_N"
+    },
+    {
+      "component": "U1",
+      "pin": "58",
+      "pin_name": "PD11",
+      "net": "CELL_PWRKEY_CMD"
+    },
+    {
+      "component": "U1",
+      "pin": "59",
+      "pin_name": "PD12",
+      "net": "CELL_RESET_N_CMD"
+    },
+    {
+      "component": "U1",
+      "pin": "60",
+      "pin_name": "PD13",
+      "net": "CELL_STATUS_U16"
+    },
+    {
+      "component": "U1",
+      "pin": "61",
+      "pin_name": "PD14",
+      "net": "CELL_DTR_U16"
+    },
+    {
+      "component": "U1",
+      "pin": "62",
+      "pin_name": "PD15",
+      "net": "CELL_RI_U16"
+    },
+    {
+      "component": "U1",
+      "pin": "63",
+      "pin_name": "PC6",
+      "net": "ACCEL_INT"
+    },
+    {
+      "component": "U1",
+      "pin": "64",
+      "pin_name": "PC7",
+      "net": "TAMPER_IN_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "65",
+      "pin_name": "PC8",
+      "net": "SD_D0_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "66",
+      "pin_name": "PC9",
+      "net": "SD_D1_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "67",
+      "pin_name": "PA8",
+      "net": "MIC_WAKE"
+    },
+    {
+      "component": "U1",
+      "pin": "68",
+      "pin_name": "PA9",
+      "net": "USB_VBUS_SENSE"
+    },
+    {
+      "component": "U1",
+      "pin": "69",
+      "pin_name": "PA10",
+      "net": "NetU1_69"
+    },
+    {
+      "component": "U1",
+      "pin": "70",
+      "pin_name": "PA11",
+      "net": "USB_DM_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "71",
+      "pin_name": "PA12",
+      "net": "USB_DP_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "72",
+      "pin_name": "PA13 (JTMS/SWDIO)",
+      "net": "SWDIO"
+    },
+    {
+      "component": "U1",
+      "pin": "73",
+      "pin_name": "VDDUSB",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "74",
+      "pin_name": "VSS",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "75",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "76",
+      "pin_name": "PA14 (JTCK/SWCLK)",
+      "net": "SWCLK"
+    },
+    {
+      "component": "U1",
+      "pin": "77",
+      "pin_name": "PA15 (JTDI)",
+      "net": "AAD_CFG"
+    },
+    {
+      "component": "U1",
+      "pin": "78",
+      "pin_name": "PC10",
+      "net": "SD_D2_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "79",
+      "pin_name": "PC11",
+      "net": "SD_D3_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "80",
+      "pin_name": "PC12",
+      "net": "SD_CK_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "81",
+      "pin_name": "PD0",
+      "net": "PWR_GOOD"
+    },
+    {
+      "component": "U1",
+      "pin": "82",
+      "pin_name": "PD1",
+      "net": "PWR_FAULT"
+    },
+    {
+      "component": "U1",
+      "pin": "83",
+      "pin_name": "PD2",
+      "net": "SD_CMD_U1"
+    },
+    {
+      "component": "U1",
+      "pin": "84",
+      "pin_name": "PD3",
+      "net": "NetU1_84"
+    },
+    {
+      "component": "U1",
+      "pin": "85",
+      "pin_name": "PD4",
+      "net": "EN_MODEM"
+    },
+    {
+      "component": "U1",
+      "pin": "86",
+      "pin_name": "PD5",
+      "net": "EN_AUX"
+    },
+    {
+      "component": "U1",
+      "pin": "87",
+      "pin_name": "PD6",
+      "net": "PDM_DATA2"
+    },
+    {
+      "component": "U1",
+      "pin": "88",
+      "pin_name": "PD7",
+      "net": "NetU1_88"
+    },
+    {
+      "component": "U1",
+      "pin": "89",
+      "pin_name": "PB3 (JTDO/TRACESWO)",
+      "net": "NetU1_89"
+    },
+    {
+      "component": "U1",
+      "pin": "90",
+      "pin_name": "PB4 (NJTRST)",
+      "net": "NetU1_90"
+    },
+    {
+      "component": "U1",
+      "pin": "91",
+      "pin_name": "PB5",
+      "net": "NetU1_91"
+    },
+    {
+      "component": "U1",
+      "pin": "92",
+      "pin_name": "PB6",
+      "net": "CELL_TX_U16"
+    },
+    {
+      "component": "U1",
+      "pin": "93",
+      "pin_name": "PB7",
+      "net": "CELL_RX_U16"
+    },
+    {
+      "component": "U1",
+      "pin": "94",
+      "pin_name": "PH3-BOOT0",
+      "net": "BOOT0"
+    },
+    {
+      "component": "U1",
+      "pin": "95",
+      "pin_name": "PB8",
+      "net": "REV_STRAP0"
+    },
+    {
+      "component": "U1",
+      "pin": "96",
+      "pin_name": "PB9",
+      "net": "REV_STRAP1"
+    },
+    {
+      "component": "U1",
+      "pin": "97",
+      "pin_name": "PE0",
+      "net": "SIM_MUX_SEL"
+    },
+    {
+      "component": "U1",
+      "pin": "98",
+      "pin_name": "VDD11",
+      "net": "VCORE_1V1"
+    },
+    {
+      "component": "U1",
+      "pin": "99",
+      "pin_name": "VSS",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U1",
+      "pin": "100",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "X1",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "X1",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "LSE_IN"
+    },
+    {
+      "component": "X1",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "X1",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C27",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "C27",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C28",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C28",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C29",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C29",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C30",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "C30",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "C31",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "C31",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C32",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C32",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J_MIC1",
+      "pin": "1",
+      "pin_name": "1V8_MIC",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "J_MIC1",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "J_MIC1",
+      "pin": "3",
+      "pin_name": "PDM_CLK",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "J_MIC1",
+      "pin": "4",
+      "pin_name": "PDM_DATA1",
+      "net": "PDM_DATA1_1V8"
+    },
+    {
+      "component": "J_MIC1",
+      "pin": "5",
+      "pin_name": "MIC_WAKE1",
+      "net": "MIC_WAKE1"
+    },
+    {
+      "component": "J_MIC1",
+      "pin": "6",
+      "pin_name": "AAD_CFG",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "J_MIC2",
+      "pin": "1",
+      "pin_name": "1V8_MIC",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "J_MIC2",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "J_MIC2",
+      "pin": "3",
+      "pin_name": "PDM_CLK",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "J_MIC2",
+      "pin": "4",
+      "pin_name": "PDM_DATA2",
+      "net": "PDM_DATA2_1V8"
+    },
+    {
+      "component": "J_MIC2",
+      "pin": "5",
+      "pin_name": "MIC_WAKE2",
+      "net": "MIC_WAKE2"
+    },
+    {
+      "component": "J_MIC2",
+      "pin": "6",
+      "pin_name": "AAD_CFG",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "J_MIC3",
+      "pin": "1",
+      "pin_name": "1V8_MIC",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "J_MIC3",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "J_MIC3",
+      "pin": "3",
+      "pin_name": "PDM_CLK",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "J_MIC3",
+      "pin": "4",
+      "pin_name": "PDM_DATA3",
+      "net": "PDM_DATA3_1V8"
+    },
+    {
+      "component": "J_MIC3",
+      "pin": "5",
+      "pin_name": "MIC_WAKE3",
+      "net": "MIC_WAKE3"
+    },
+    {
+      "component": "J_MIC3",
+      "pin": "6",
+      "pin_name": "AAD_CFG",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "J_MIC4",
+      "pin": "1",
+      "pin_name": "1V8_MIC",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "J_MIC4",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "J_MIC4",
+      "pin": "3",
+      "pin_name": "PDM_CLK",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "J_MIC4",
+      "pin": "4",
+      "pin_name": "PDM_DATA4",
+      "net": "PDM_DATA4_1V8"
+    },
+    {
+      "component": "J_MIC4",
+      "pin": "5",
+      "pin_name": "MIC_WAKE4",
+      "net": "MIC_WAKE4"
+    },
+    {
+      "component": "J_MIC4",
+      "pin": "6",
+      "pin_name": "AAD_CFG",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "R17",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "PDM_CLK_1V8_U7"
+    },
+    {
+      "component": "R17",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "R18",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "AAD_CFG_1V8_U7"
+    },
+    {
+      "component": "R18",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "R19",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "MIC_WAKE1"
+    },
+    {
+      "component": "R19",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "R20",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "MIC_WAKE2"
+    },
+    {
+      "component": "R20",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "R21",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "MIC_WAKE3"
+    },
+    {
+      "component": "R21",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "R22",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "MIC_WAKE4"
+    },
+    {
+      "component": "R22",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "R23",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "MIC_WAKE"
+    },
+    {
+      "component": "R23",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U7",
+      "pin": "1",
+      "pin_name": "VCCA",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "U7",
+      "pin": "2",
+      "pin_name": "DIR1",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "U7",
+      "pin": "3",
+      "pin_name": "A1",
+      "net": "PDM_DATA1_1V8"
+    },
+    {
+      "component": "U7",
+      "pin": "4",
+      "pin_name": "A2",
+      "net": "PDM_DATA2_1V8"
+    },
+    {
+      "component": "U7",
+      "pin": "5",
+      "pin_name": "A3",
+      "net": "PDM_DATA3_1V8"
+    },
+    {
+      "component": "U7",
+      "pin": "6",
+      "pin_name": "A4",
+      "net": "PDM_DATA4_1V8"
+    },
+    {
+      "component": "U7",
+      "pin": "7",
+      "pin_name": "A5",
+      "net": "PDM_CLK_1V8_U7"
+    },
+    {
+      "component": "U7",
+      "pin": "8",
+      "pin_name": "A6",
+      "net": "AAD_CFG_1V8_U7"
+    },
+    {
+      "component": "U7",
+      "pin": "9",
+      "pin_name": "A7",
+      "net": "NetU7_9"
+    },
+    {
+      "component": "U7",
+      "pin": "10",
+      "pin_name": "A8",
+      "net": "NetU7_10"
+    },
+    {
+      "component": "U7",
+      "pin": "11",
+      "pin_name": "DIR2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U7",
+      "pin": "12",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U7",
+      "pin": "13",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U7",
+      "pin": "14",
+      "pin_name": "B8",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U7",
+      "pin": "15",
+      "pin_name": "B7",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U7",
+      "pin": "16",
+      "pin_name": "B6",
+      "net": "AAD_CFG"
+    },
+    {
+      "component": "U7",
+      "pin": "17",
+      "pin_name": "B5",
+      "net": "PDM_CLK"
+    },
+    {
+      "component": "U7",
+      "pin": "18",
+      "pin_name": "B4",
+      "net": "PDM_DATA4"
+    },
+    {
+      "component": "U7",
+      "pin": "19",
+      "pin_name": "B3",
+      "net": "PDM_DATA3"
+    },
+    {
+      "component": "U7",
+      "pin": "20",
+      "pin_name": "B2",
+      "net": "PDM_DATA2"
+    },
+    {
+      "component": "U7",
+      "pin": "21",
+      "pin_name": "B1",
+      "net": "PDM_DATA1"
+    },
+    {
+      "component": "U7",
+      "pin": "22",
+      "pin_name": "OE",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U7",
+      "pin": "23",
+      "pin_name": "VCCB",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U7",
+      "pin": "24",
+      "pin_name": "VCCB",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U17",
+      "pin": "1",
+      "pin_name": "1A",
+      "net": "MIC_WAKE1"
+    },
+    {
+      "component": "U17",
+      "pin": "2",
+      "pin_name": "1B",
+      "net": "MIC_WAKE2"
+    },
+    {
+      "component": "U17",
+      "pin": "3",
+      "pin_name": "1Y",
+      "net": "MIC_WAKE12_OR_1V8"
+    },
+    {
+      "component": "U17",
+      "pin": "4",
+      "pin_name": "2A",
+      "net": "MIC_WAKE3"
+    },
+    {
+      "component": "U17",
+      "pin": "5",
+      "pin_name": "2B",
+      "net": "MIC_WAKE4"
+    },
+    {
+      "component": "U17",
+      "pin": "6",
+      "pin_name": "2Y",
+      "net": "MIC_WAKE34_OR_1V8"
+    },
+    {
+      "component": "U17",
+      "pin": "7",
+      "pin_name": "GND",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U17",
+      "pin": "8",
+      "pin_name": "3Y",
+      "net": "MIC_WAKE_OR_1V8"
+    },
+    {
+      "component": "U17",
+      "pin": "9",
+      "pin_name": "3A",
+      "net": "MIC_WAKE12_OR_1V8"
+    },
+    {
+      "component": "U17",
+      "pin": "10",
+      "pin_name": "3B",
+      "net": "MIC_WAKE34_OR_1V8"
+    },
+    {
+      "component": "U17",
+      "pin": "11",
+      "pin_name": "4Y",
+      "net": "NetU17_11"
+    },
+    {
+      "component": "U17",
+      "pin": "12",
+      "pin_name": "4A",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U17",
+      "pin": "13",
+      "pin_name": "4B",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U17",
+      "pin": "14",
+      "pin_name": "VCC",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "U18",
+      "pin": "1",
+      "pin_name": "VCCA",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "U18",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U18",
+      "pin": "3",
+      "pin_name": "A",
+      "net": "MIC_WAKE_OR_1V8"
+    },
+    {
+      "component": "U18",
+      "pin": "4",
+      "pin_name": "B",
+      "net": "MIC_WAKE"
+    },
+    {
+      "component": "U18",
+      "pin": "5",
+      "pin_name": "DIR",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "U18",
+      "pin": "6",
+      "pin_name": "VCCB",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U19",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "U19",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "PDM_DATA1_1V8"
+    },
+    {
+      "component": "U19",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U19",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "MIC_WAKE1"
+    },
+    {
+      "component": "U19",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "U19",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "NetU19_6"
+    },
+    {
+      "component": "U19",
+      "pin": "7",
+      "pin_name": "7",
+      "net": "NetU19_7"
+    },
+    {
+      "component": "U19",
+      "pin": "8",
+      "pin_name": "8",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U19",
+      "pin": "9",
+      "pin_name": "9",
+      "net": "NetU19_9"
+    },
+    {
+      "component": "U19",
+      "pin": "10",
+      "pin_name": "10",
+      "net": "NetU19_10"
+    },
+    {
+      "component": "U20",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "U20",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "PDM_DATA2_1V8"
+    },
+    {
+      "component": "U20",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U20",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "MIC_WAKE2"
+    },
+    {
+      "component": "U20",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "U20",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "NetU20_6"
+    },
+    {
+      "component": "U20",
+      "pin": "7",
+      "pin_name": "7",
+      "net": "NetU20_7"
+    },
+    {
+      "component": "U20",
+      "pin": "8",
+      "pin_name": "8",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U20",
+      "pin": "9",
+      "pin_name": "9",
+      "net": "NetU20_9"
+    },
+    {
+      "component": "U20",
+      "pin": "10",
+      "pin_name": "10",
+      "net": "NetU20_10"
+    },
+    {
+      "component": "U21",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "U21",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "PDM_DATA3_1V8"
+    },
+    {
+      "component": "U21",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U21",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "MIC_WAKE3"
+    },
+    {
+      "component": "U21",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "U21",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "NetU21_6"
+    },
+    {
+      "component": "U21",
+      "pin": "7",
+      "pin_name": "7",
+      "net": "NetU21_7"
+    },
+    {
+      "component": "U21",
+      "pin": "8",
+      "pin_name": "8",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U21",
+      "pin": "9",
+      "pin_name": "9",
+      "net": "NetU21_9"
+    },
+    {
+      "component": "U21",
+      "pin": "10",
+      "pin_name": "10",
+      "net": "NetU21_10"
+    },
+    {
+      "component": "U22",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "PDM_CLK_1V8_FANOUT"
+    },
+    {
+      "component": "U22",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "PDM_DATA4_1V8"
+    },
+    {
+      "component": "U22",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U22",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "MIC_WAKE4"
+    },
+    {
+      "component": "U22",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "AAD_CFG_1V8_FANOUT"
+    },
+    {
+      "component": "U22",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "NetU22_6"
+    },
+    {
+      "component": "U22",
+      "pin": "7",
+      "pin_name": "7",
+      "net": "NetU22_7"
+    },
+    {
+      "component": "U22",
+      "pin": "8",
+      "pin_name": "8",
+      "net": "GND_MIC"
+    },
+    {
+      "component": "U22",
+      "pin": "9",
+      "pin_name": "9",
+      "net": "NetU22_9"
+    },
+    {
+      "component": "U22",
+      "pin": "10",
+      "pin_name": "10",
+      "net": "NetU22_10"
+    },
+    {
+      "component": "C60",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C60",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C61",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C61",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C62",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C62",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C63",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_ANT_SHORT_N"
+    },
+    {
+      "component": "C63",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C64",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_RF_ANT_BIASED"
+    },
+    {
+      "component": "C64",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_RF_DC_BLOCK"
+    },
+    {
+      "component": "C65",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_ANT_BIAS_RAW"
+    },
+    {
+      "component": "C65",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "D4",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_RF_ANT_BIASED"
+    },
+    {
+      "component": "D4",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "FL1",
+      "pin": "A",
+      "pin_name": "A",
+      "net": "GNSS_RF_FILTERED"
+    },
+    {
+      "component": "FL1",
+      "pin": "B",
+      "pin_name": "B",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "FL1",
+      "pin": "C",
+      "pin_name": "C",
+      "net": "GNSS_RF_DC_BLOCK"
+    },
+    {
+      "component": "FL1",
+      "pin": "D",
+      "pin_name": "D",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "FL1",
+      "pin": "E",
+      "pin_name": "E",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J9",
+      "pin": "1",
+      "pin_name": "SIGNAL",
+      "net": "GNSS_RF_ANT_BIASED"
+    },
+    {
+      "component": "J9",
+      "pin": "SHIELD",
+      "pin_name": "SHELL",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "L2",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_ANT_SHORT_N"
+    },
+    {
+      "component": "L2",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_RF_ANT_BIASED"
+    },
+    {
+      "component": "Q4",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "Q4",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_ANT_OFF_N"
+    },
+    {
+      "component": "Q4",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GNSS_ANT_SWITCHED"
+    },
+    {
+      "component": "Q4",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "GNSS_ANT_BIAS_RAW"
+    },
+    {
+      "component": "Q4",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "GNSS_ANT_GATE"
+    },
+    {
+      "component": "Q4",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "GNSS_ANT_GATE"
+    },
+    {
+      "component": "R56",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_RX_U9"
+    },
+    {
+      "component": "R56",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_RX_U1"
+    },
+    {
+      "component": "R57",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_TX_U1"
+    },
+    {
+      "component": "R57",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_TX_U9"
+    },
+    {
+      "component": "R58",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_PPS_U9"
+    },
+    {
+      "component": "R58",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_PPS_U1"
+    },
+    {
+      "component": "R59",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_ANT_SWITCHED"
+    },
+    {
+      "component": "R59",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_ANT_DIV"
+    },
+    {
+      "component": "R60",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_ANT_DIV"
+    },
+    {
+      "component": "R60",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R61",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_ANT_BIAS_RAW"
+    },
+    {
+      "component": "R61",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_ANT_GATE"
+    },
+    {
+      "component": "R62",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_ANT_SWITCHED"
+    },
+    {
+      "component": "R62",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_ANT_SHORT_N"
+    },
+    {
+      "component": "U5",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "GNSS_ANT_DIV"
+    },
+    {
+      "component": "U5",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GNSS_ANT_SHORT_N"
+    },
+    {
+      "component": "U5",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GNSS_ANT_BIAS_RAW"
+    },
+    {
+      "component": "U5",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "GNSS_ANT_BIAS_RAW"
+    },
+    {
+      "component": "U5",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U5",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "GNSS_ANT_DETECT"
+    },
+    {
+      "component": "U5",
+      "pin": "EP",
+      "pin_name": "EP",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U9",
+      "pin": "1",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U9",
+      "pin": "2",
+      "pin_name": "TXD",
+      "net": "GNSS_RX_U9"
+    },
+    {
+      "component": "U9",
+      "pin": "3",
+      "pin_name": "RXD",
+      "net": "GNSS_TX_U9"
+    },
+    {
+      "component": "U9",
+      "pin": "4",
+      "pin_name": "TIMEPULSE",
+      "net": "GNSS_PPS_U9"
+    },
+    {
+      "component": "U9",
+      "pin": "5",
+      "pin_name": "EXTINT",
+      "net": "NetU9_5"
+    },
+    {
+      "component": "U9",
+      "pin": "6",
+      "pin_name": "V_BCKP",
+      "net": "NetU9_6"
+    },
+    {
+      "component": "U9",
+      "pin": "7",
+      "pin_name": "V_IO",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U9",
+      "pin": "8",
+      "pin_name": "VCC",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U9",
+      "pin": "9",
+      "pin_name": "RESET_N",
+      "net": "NetU9_9"
+    },
+    {
+      "component": "U9",
+      "pin": "10",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U9",
+      "pin": "11",
+      "pin_name": "RF_IN",
+      "net": "GNSS_RF_FILTERED"
+    },
+    {
+      "component": "U9",
+      "pin": "12",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U9",
+      "pin": "13",
+      "pin_name": "LNA_EN",
+      "net": "GNSS_ANT_OFF_N"
+    },
+    {
+      "component": "U9",
+      "pin": "14",
+      "pin_name": "VCC_RF",
+      "net": "GNSS_ANT_BIAS_RAW"
+    },
+    {
+      "component": "U9",
+      "pin": "15",
+      "pin_name": "VIO_SEL",
+      "net": "NetU9_15"
+    },
+    {
+      "component": "U9",
+      "pin": "16",
+      "pin_name": "SDA",
+      "net": "GNSS_ANT_DETECT"
+    },
+    {
+      "component": "U9",
+      "pin": "17",
+      "pin_name": "SCL",
+      "net": "GNSS_ANT_SHORT_N"
+    },
+    {
+      "component": "U9",
+      "pin": "18",
+      "pin_name": "SAFEBOOT_N",
+      "net": "NetU9_18"
+    },
+    {
+      "component": "C33",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "U8_VDD_EXT_1V8"
+    },
+    {
+      "component": "C33",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C34",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C34",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C35",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C35",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C36",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "C36",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C37",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "C37",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C38",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "C38",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C39",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "C39",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C40",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "C40",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C41",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "C41",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C42",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "C42",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C43",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "C43",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C44",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_RF"
+    },
+    {
+      "component": "C44",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C45",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_RF"
+    },
+    {
+      "component": "C45",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C46",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_RF"
+    },
+    {
+      "component": "C46",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C47",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_RF"
+    },
+    {
+      "component": "C47",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C48",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "U8_PWRKEY_N"
+    },
+    {
+      "component": "C48",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C49",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C49",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C50",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM1_VDD_CONN"
+    },
+    {
+      "component": "C50",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C51",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM2_VDD_CONN"
+    },
+    {
+      "component": "C51",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C52",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM1_DET"
+    },
+    {
+      "component": "C52",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C53",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM2_DET"
+    },
+    {
+      "component": "C53",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C54",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM1_RST_CONN"
+    },
+    {
+      "component": "C54",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C55",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM1_CLK_CONN"
+    },
+    {
+      "component": "C55",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C56",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM1_DATA_CONN"
+    },
+    {
+      "component": "C56",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C57",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM2_RST_CONN"
+    },
+    {
+      "component": "C57",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C58",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM2_CLK_CONN"
+    },
+    {
+      "component": "C58",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C59",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM2_DATA_CONN"
+    },
+    {
+      "component": "C59",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C79",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_RF"
+    },
+    {
+      "component": "C79",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "C80",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_RF_ANT"
+    },
+    {
+      "component": "C80",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "D1",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "D1",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "D2",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM_RF"
+    },
+    {
+      "component": "D2",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "D3",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_RF_ANT"
+    },
+    {
+      "component": "D3",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "D10",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_USB_VBUS"
+    },
+    {
+      "component": "D10",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "FB1",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM"
+    },
+    {
+      "component": "FB1",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "J6",
+      "pin": "1",
+      "pin_name": "C1_VCC",
+      "net": "SIM1_VDD_CONN"
+    },
+    {
+      "component": "J6",
+      "pin": "2",
+      "pin_name": "C2_RST",
+      "net": "SIM1_RST_CONN"
+    },
+    {
+      "component": "J6",
+      "pin": "3",
+      "pin_name": "C3_CLK",
+      "net": "SIM1_CLK_CONN"
+    },
+    {
+      "component": "J6",
+      "pin": "4",
+      "pin_name": "C5_GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "J6",
+      "pin": "5",
+      "pin_name": "C6_VPP",
+      "net": "NetJ6_5"
+    },
+    {
+      "component": "J6",
+      "pin": "6",
+      "pin_name": "C7_IO",
+      "net": "SIM1_DATA_CONN"
+    },
+    {
+      "component": "J6",
+      "pin": "7",
+      "pin_name": "CD",
+      "net": "SIM1_DET"
+    },
+    {
+      "component": "J6",
+      "pin": "SHIELD",
+      "pin_name": "SHELL",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "J7",
+      "pin": "1",
+      "pin_name": "C1_VCC",
+      "net": "SIM2_VDD_CONN"
+    },
+    {
+      "component": "J7",
+      "pin": "2",
+      "pin_name": "C2_RST",
+      "net": "SIM2_RST_CONN"
+    },
+    {
+      "component": "J7",
+      "pin": "3",
+      "pin_name": "C3_CLK",
+      "net": "SIM2_CLK_CONN"
+    },
+    {
+      "component": "J7",
+      "pin": "4",
+      "pin_name": "C5_GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "J7",
+      "pin": "5",
+      "pin_name": "C6_VPP",
+      "net": "NetJ7_5"
+    },
+    {
+      "component": "J7",
+      "pin": "6",
+      "pin_name": "C7_IO",
+      "net": "SIM2_DATA_CONN"
+    },
+    {
+      "component": "J7",
+      "pin": "7",
+      "pin_name": "CD",
+      "net": "SIM2_DET"
+    },
+    {
+      "component": "J7",
+      "pin": "SHIELD",
+      "pin_name": "SHELL",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "J8",
+      "pin": "1",
+      "pin_name": "SIGNAL",
+      "net": "CELL_RF_ANT"
+    },
+    {
+      "component": "J8",
+      "pin": "SHIELD",
+      "pin_name": "SHELL",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "Q1",
+      "pin": "1",
+      "pin_name": "B",
+      "net": "Q1_BASE"
+    },
+    {
+      "component": "Q1",
+      "pin": "2",
+      "pin_name": "E",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "Q1",
+      "pin": "3",
+      "pin_name": "C",
+      "net": "U8_PWRKEY_N"
+    },
+    {
+      "component": "Q2",
+      "pin": "1",
+      "pin_name": "B",
+      "net": "Q2_BASE"
+    },
+    {
+      "component": "Q2",
+      "pin": "2",
+      "pin_name": "E",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "Q2",
+      "pin": "3",
+      "pin_name": "C",
+      "net": "U8_RESET_N"
+    },
+    {
+      "component": "Q3",
+      "pin": "1",
+      "pin_name": "B",
+      "net": "Q3_BASE"
+    },
+    {
+      "component": "Q3",
+      "pin": "2",
+      "pin_name": "E",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "Q3",
+      "pin": "3",
+      "pin_name": "C",
+      "net": "U13_EN_N"
+    },
+    {
+      "component": "R24",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_PWRKEY_CMD"
+    },
+    {
+      "component": "R24",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "Q1_BASE"
+    },
+    {
+      "component": "R25",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "Q1_BASE"
+    },
+    {
+      "component": "R25",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "R26",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_RESET_N_CMD"
+    },
+    {
+      "component": "R26",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "Q2_BASE"
+    },
+    {
+      "component": "R27",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "Q2_BASE"
+    },
+    {
+      "component": "R27",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "R28",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R28",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_TX_U16"
+    },
+    {
+      "component": "R29",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_DTR_U16"
+    },
+    {
+      "component": "R29",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "R30",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "U8_VDD_EXT_1V8"
+    },
+    {
+      "component": "R30",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "U8_MAIN_TXD_1V8"
+    },
+    {
+      "component": "R31",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "U8_VDD_EXT_1V8"
+    },
+    {
+      "component": "R31",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "U8_MAIN_RI_1V8"
+    },
+    {
+      "component": "R32",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R32",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_RX_U16"
+    },
+    {
+      "component": "R33",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R33",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_RI_U16"
+    },
+    {
+      "component": "R34",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_STATUS_U16"
+    },
+    {
+      "component": "R34",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "R35",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_USB_BOOT_1V8"
+    },
+    {
+      "component": "R35",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "R36",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_DBG_TXD_U8"
+    },
+    {
+      "component": "R36",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_DBG_TXD_TP"
+    },
+    {
+      "component": "R37",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_DBG_RXD_TP"
+    },
+    {
+      "component": "R37",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_DBG_RXD_U8"
+    },
+    {
+      "component": "R38",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_USB_BOOT_TP"
+    },
+    {
+      "component": "R38",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_USB_BOOT_1V8"
+    },
+    {
+      "component": "R39",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_USB_DP_U8"
+    },
+    {
+      "component": "R39",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_USB_DP_TP"
+    },
+    {
+      "component": "R40",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_USB_DM_U8"
+    },
+    {
+      "component": "R40",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_USB_DM_TP"
+    },
+    {
+      "component": "R41",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "U8_VDD_EXT_1V8"
+    },
+    {
+      "component": "R41",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_DBG_VREF_TP"
+    },
+    {
+      "component": "R42",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V8_MODEM"
+    },
+    {
+      "component": "R42",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "3V8_MODEM_RF"
+    },
+    {
+      "component": "R43",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_RF"
+    },
+    {
+      "component": "R43",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_RF_ANT"
+    },
+    {
+      "component": "R44",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R44",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "U13_EN_N"
+    },
+    {
+      "component": "R45",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM_MUX_SEL"
+    },
+    {
+      "component": "R45",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "R46",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM_MUX_EN"
+    },
+    {
+      "component": "R46",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "Q3_BASE"
+    },
+    {
+      "component": "R47",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "Q3_BASE"
+    },
+    {
+      "component": "R47",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "R48",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R48",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SIM1_DET"
+    },
+    {
+      "component": "R49",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R49",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SIM2_DET"
+    },
+    {
+      "component": "R50",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM1_RST_MUX"
+    },
+    {
+      "component": "R50",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SIM1_RST_CONN"
+    },
+    {
+      "component": "R51",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM1_CLK_MUX"
+    },
+    {
+      "component": "R51",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SIM1_CLK_CONN"
+    },
+    {
+      "component": "R52",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM1_DATA_MUX"
+    },
+    {
+      "component": "R52",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SIM1_DATA_CONN"
+    },
+    {
+      "component": "R53",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM2_RST_MUX"
+    },
+    {
+      "component": "R53",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SIM2_RST_CONN"
+    },
+    {
+      "component": "R54",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM2_CLK_MUX"
+    },
+    {
+      "component": "R54",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SIM2_CLK_CONN"
+    },
+    {
+      "component": "R55",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SIM2_DATA_MUX"
+    },
+    {
+      "component": "R55",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SIM2_DATA_CONN"
+    },
+    {
+      "component": "TP_CELL_DBG",
+      "pin": "1",
+      "pin_name": "VREF_1V8",
+      "net": "U8_VDD_EXT_1V8"
+    },
+    {
+      "component": "TP_CELL_DBG",
+      "pin": "2",
+      "pin_name": "DUT_TX",
+      "net": "CELL_DBG_TXD_TP"
+    },
+    {
+      "component": "TP_CELL_DBG",
+      "pin": "3",
+      "pin_name": "DUT_RX",
+      "net": "CELL_DBG_RXD_TP"
+    },
+    {
+      "component": "TP_CELL_DBG",
+      "pin": "4",
+      "pin_name": "USB_BOOT",
+      "net": "CELL_USB_BOOT_TP"
+    },
+    {
+      "component": "TP_CELL_DBG",
+      "pin": "5",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "TP_CELL_USB",
+      "pin": "1",
+      "pin_name": "HOST_VBUS",
+      "net": "CELL_USB_VBUS"
+    },
+    {
+      "component": "TP_CELL_USB",
+      "pin": "2",
+      "pin_name": "USB_DP",
+      "net": "CELL_USB_DP_TP"
+    },
+    {
+      "component": "TP_CELL_USB",
+      "pin": "3",
+      "pin_name": "USB_DM",
+      "net": "CELL_USB_DM_TP"
+    },
+    {
+      "component": "TP_CELL_USB",
+      "pin": "4",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "1",
+      "pin_name": "PSM_IND",
+      "net": "NetU8_1"
+    },
+    {
+      "component": "U8",
+      "pin": "2",
+      "pin_name": "ADC1",
+      "net": "NetU8_2"
+    },
+    {
+      "component": "U8",
+      "pin": "3",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "4",
+      "pin_name": "PCM_CLK",
+      "net": "NetU8_4"
+    },
+    {
+      "component": "U8",
+      "pin": "5",
+      "pin_name": "PCM_SYNC",
+      "net": "NetU8_5"
+    },
+    {
+      "component": "U8",
+      "pin": "6",
+      "pin_name": "PCM_DIN",
+      "net": "NetU8_6"
+    },
+    {
+      "component": "U8",
+      "pin": "7",
+      "pin_name": "PCM_DOUT",
+      "net": "NetU8_7"
+    },
+    {
+      "component": "U8",
+      "pin": "8",
+      "pin_name": "USB_VBUS",
+      "net": "CELL_USB_VBUS"
+    },
+    {
+      "component": "U8",
+      "pin": "9",
+      "pin_name": "USB_DP",
+      "net": "CELL_USB_DP_U8"
+    },
+    {
+      "component": "U8",
+      "pin": "10",
+      "pin_name": "USB_DM",
+      "net": "CELL_USB_DM_U8"
+    },
+    {
+      "component": "U8",
+      "pin": "11",
+      "pin_name": "RESERVED",
+      "net": "NetU8_11"
+    },
+    {
+      "component": "U8",
+      "pin": "12",
+      "pin_name": "RESERVED",
+      "net": "NetU8_12"
+    },
+    {
+      "component": "U8",
+      "pin": "13",
+      "pin_name": "RESERVED",
+      "net": "NetU8_13"
+    },
+    {
+      "component": "U8",
+      "pin": "14",
+      "pin_name": "RESERVED",
+      "net": "NetU8_14"
+    },
+    {
+      "component": "U8",
+      "pin": "15",
+      "pin_name": "PWRKEY",
+      "net": "U8_PWRKEY_N"
+    },
+    {
+      "component": "U8",
+      "pin": "16",
+      "pin_name": "RESERVED",
+      "net": "NetU8_16"
+    },
+    {
+      "component": "U8",
+      "pin": "17",
+      "pin_name": "RESET_N",
+      "net": "U8_RESET_N"
+    },
+    {
+      "component": "U8",
+      "pin": "18",
+      "pin_name": "W_DISABLE#",
+      "net": "NetU8_18"
+    },
+    {
+      "component": "U8",
+      "pin": "19",
+      "pin_name": "AP_READY",
+      "net": "NetU8_19"
+    },
+    {
+      "component": "U8",
+      "pin": "20",
+      "pin_name": "STATUS",
+      "net": "U8_STATUS_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "21",
+      "pin_name": "NET_STATUS",
+      "net": "NetU8_21"
+    },
+    {
+      "component": "U8",
+      "pin": "22",
+      "pin_name": "DBG_RXD",
+      "net": "CELL_DBG_RXD_U8"
+    },
+    {
+      "component": "U8",
+      "pin": "23",
+      "pin_name": "DBG_TXD",
+      "net": "CELL_DBG_TXD_U8"
+    },
+    {
+      "component": "U8",
+      "pin": "24",
+      "pin_name": "ADC0",
+      "net": "NetU8_24"
+    },
+    {
+      "component": "U8",
+      "pin": "25",
+      "pin_name": "GPIO1",
+      "net": "NetU8_25"
+    },
+    {
+      "component": "U8",
+      "pin": "26",
+      "pin_name": "GPIO2",
+      "net": "NetU8_26"
+    },
+    {
+      "component": "U8",
+      "pin": "27",
+      "pin_name": "GNSS_TXD",
+      "net": "NetU8_27"
+    },
+    {
+      "component": "U8",
+      "pin": "28",
+      "pin_name": "GNSS_RXD",
+      "net": "NetU8_28"
+    },
+    {
+      "component": "U8",
+      "pin": "29",
+      "pin_name": "VDD_EXT",
+      "net": "U8_VDD_EXT_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "30",
+      "pin_name": "MAIN_DTR",
+      "net": "U8_MAIN_DTR_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "31",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "32",
+      "pin_name": "VBAT_BB",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "U8",
+      "pin": "33",
+      "pin_name": "VBAT_BB",
+      "net": "3V8_MODEM_BB"
+    },
+    {
+      "component": "U8",
+      "pin": "34",
+      "pin_name": "MAIN_RXD",
+      "net": "U8_MAIN_RXD_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "35",
+      "pin_name": "MAIN_TXD",
+      "net": "U8_MAIN_TXD_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "36",
+      "pin_name": "MAIN_CTS",
+      "net": "NetU8_36"
+    },
+    {
+      "component": "U8",
+      "pin": "37",
+      "pin_name": "MAIN_RTS",
+      "net": "NetU8_37"
+    },
+    {
+      "component": "U8",
+      "pin": "38",
+      "pin_name": "MAIN_DCD",
+      "net": "NetU8_38"
+    },
+    {
+      "component": "U8",
+      "pin": "39",
+      "pin_name": "MAIN_RI",
+      "net": "U8_MAIN_RI_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "40",
+      "pin_name": "I2C_SCL",
+      "net": "NetU8_40"
+    },
+    {
+      "component": "U8",
+      "pin": "41",
+      "pin_name": "I2C_SDA",
+      "net": "NetU8_41"
+    },
+    {
+      "component": "U8",
+      "pin": "42",
+      "pin_name": "USIM_DET",
+      "net": "NetU8_42"
+    },
+    {
+      "component": "U8",
+      "pin": "43",
+      "pin_name": "USIM_VDD",
+      "net": "CELL_USIM_VDD_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "44",
+      "pin_name": "USIM_RST",
+      "net": "CELL_USIM_RST_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "45",
+      "pin_name": "USIM_DATA",
+      "net": "CELL_USIM_DATA_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "46",
+      "pin_name": "USIM_CLK",
+      "net": "CELL_USIM_CLK_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "47",
+      "pin_name": "USIM_GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "48",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "49",
+      "pin_name": "ANT_GNSS",
+      "net": "NetU8_49"
+    },
+    {
+      "component": "U8",
+      "pin": "50",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "51",
+      "pin_name": "GNSS_LNA_EN",
+      "net": "NetU8_51"
+    },
+    {
+      "component": "U8",
+      "pin": "52",
+      "pin_name": "VBAT_RF",
+      "net": "3V8_MODEM_RF"
+    },
+    {
+      "component": "U8",
+      "pin": "53",
+      "pin_name": "VBAT_RF",
+      "net": "3V8_MODEM_RF"
+    },
+    {
+      "component": "U8",
+      "pin": "54",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "55",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "56",
+      "pin_name": "ANT_WIFI",
+      "net": "NetU8_56"
+    },
+    {
+      "component": "U8",
+      "pin": "57",
+      "pin_name": "RESERVED",
+      "net": "NetU8_57"
+    },
+    {
+      "component": "U8",
+      "pin": "58",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "59",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "60",
+      "pin_name": "ANT_MAIN",
+      "net": "CELL_RF"
+    },
+    {
+      "component": "U8",
+      "pin": "61",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "62",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "63",
+      "pin_name": "RESERVED",
+      "net": "NetU8_63"
+    },
+    {
+      "component": "U8",
+      "pin": "64",
+      "pin_name": "GPIO3",
+      "net": "NetU8_64"
+    },
+    {
+      "component": "U8",
+      "pin": "65",
+      "pin_name": "GPIO4",
+      "net": "NetU8_65"
+    },
+    {
+      "component": "U8",
+      "pin": "66",
+      "pin_name": "GPIO5",
+      "net": "NetU8_66"
+    },
+    {
+      "component": "U8",
+      "pin": "67",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "68",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "69",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "70",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "71",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "72",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "73",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "74",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "75",
+      "pin_name": "USB_BOOT",
+      "net": "CELL_USB_BOOT_1V8"
+    },
+    {
+      "component": "U8",
+      "pin": "76",
+      "pin_name": "RESERVED",
+      "net": "NetU8_76"
+    },
+    {
+      "component": "U8",
+      "pin": "77",
+      "pin_name": "RESERVED",
+      "net": "NetU8_77"
+    },
+    {
+      "component": "U8",
+      "pin": "78",
+      "pin_name": "RESERVED",
+      "net": "NetU8_78"
+    },
+    {
+      "component": "U8",
+      "pin": "79",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "80",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "81",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "82",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "83",
+      "pin_name": "GRFC1",
+      "net": "NetU8_83"
+    },
+    {
+      "component": "U8",
+      "pin": "84",
+      "pin_name": "GRFC2",
+      "net": "NetU8_84"
+    },
+    {
+      "component": "U8",
+      "pin": "85",
+      "pin_name": "GPIO6",
+      "net": "NetU8_85"
+    },
+    {
+      "component": "U8",
+      "pin": "86",
+      "pin_name": "GPIO7",
+      "net": "NetU8_86"
+    },
+    {
+      "component": "U8",
+      "pin": "87",
+      "pin_name": "GPIO8",
+      "net": "NetU8_87"
+    },
+    {
+      "component": "U8",
+      "pin": "88",
+      "pin_name": "GPIO9",
+      "net": "NetU8_88"
+    },
+    {
+      "component": "U8",
+      "pin": "89",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "90",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "91",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "92",
+      "pin_name": "RESERVED",
+      "net": "NetU8_92"
+    },
+    {
+      "component": "U8",
+      "pin": "93",
+      "pin_name": "RESERVED",
+      "net": "NetU8_93"
+    },
+    {
+      "component": "U8",
+      "pin": "94",
+      "pin_name": "RESERVED",
+      "net": "NetU8_94"
+    },
+    {
+      "component": "U8",
+      "pin": "95",
+      "pin_name": "RESERVED",
+      "net": "NetU8_95"
+    },
+    {
+      "component": "U8",
+      "pin": "96",
+      "pin_name": "PON_TRIG",
+      "net": "NetU8_96"
+    },
+    {
+      "component": "U8",
+      "pin": "97",
+      "pin_name": "RESERVED",
+      "net": "NetU8_97"
+    },
+    {
+      "component": "U8",
+      "pin": "98",
+      "pin_name": "RESERVED",
+      "net": "NetU8_98"
+    },
+    {
+      "component": "U8",
+      "pin": "99",
+      "pin_name": "RESERVED",
+      "net": "NetU8_99"
+    },
+    {
+      "component": "U8",
+      "pin": "100",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "101",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U8",
+      "pin": "102",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U13",
+      "pin": "1",
+      "pin_name": "NC2",
+      "net": "SIM1_RST_MUX"
+    },
+    {
+      "component": "U13",
+      "pin": "2",
+      "pin_name": "NC1",
+      "net": "SIM1_VDD_CONN"
+    },
+    {
+      "component": "U13",
+      "pin": "3",
+      "pin_name": "N.C.",
+      "net": "NetU13_3"
+    },
+    {
+      "component": "U13",
+      "pin": "4",
+      "pin_name": "COM1",
+      "net": "CELL_USIM_VDD_1V8"
+    },
+    {
+      "component": "U13",
+      "pin": "5",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U13",
+      "pin": "6",
+      "pin_name": "COM2",
+      "net": "CELL_USIM_RST_1V8"
+    },
+    {
+      "component": "U13",
+      "pin": "7",
+      "pin_name": "COM3",
+      "net": "CELL_USIM_CLK_1V8"
+    },
+    {
+      "component": "U13",
+      "pin": "8",
+      "pin_name": "VCC",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U13",
+      "pin": "9",
+      "pin_name": "COM4",
+      "net": "CELL_USIM_VDD_1V8"
+    },
+    {
+      "component": "U13",
+      "pin": "10",
+      "pin_name": "COM5",
+      "net": "CELL_USIM_DATA_1V8"
+    },
+    {
+      "component": "U13",
+      "pin": "11",
+      "pin_name": "NO1",
+      "net": "SIM2_VDD_CONN"
+    },
+    {
+      "component": "U13",
+      "pin": "12",
+      "pin_name": "COM6",
+      "net": "CELL_USIM_VDD_1V8"
+    },
+    {
+      "component": "U13",
+      "pin": "13",
+      "pin_name": "NO2",
+      "net": "SIM2_RST_MUX"
+    },
+    {
+      "component": "U13",
+      "pin": "14",
+      "pin_name": "IN2",
+      "net": "SIM_MUX_SEL"
+    },
+    {
+      "component": "U13",
+      "pin": "15",
+      "pin_name": "NO3",
+      "net": "SIM2_CLK_MUX"
+    },
+    {
+      "component": "U13",
+      "pin": "16",
+      "pin_name": "NO6",
+      "net": "SIM2_VDD_CONN"
+    },
+    {
+      "component": "U13",
+      "pin": "17",
+      "pin_name": "NO4",
+      "net": "SIM2_VDD_CONN"
+    },
+    {
+      "component": "U13",
+      "pin": "18",
+      "pin_name": "NO5",
+      "net": "SIM2_DATA_MUX"
+    },
+    {
+      "component": "U13",
+      "pin": "19",
+      "pin_name": "NC5",
+      "net": "SIM1_DATA_MUX"
+    },
+    {
+      "component": "U13",
+      "pin": "20",
+      "pin_name": "EN",
+      "net": "U13_EN_N"
+    },
+    {
+      "component": "U13",
+      "pin": "21",
+      "pin_name": "NC4",
+      "net": "SIM1_VDD_CONN"
+    },
+    {
+      "component": "U13",
+      "pin": "22",
+      "pin_name": "NC6",
+      "net": "SIM1_VDD_CONN"
+    },
+    {
+      "component": "U13",
+      "pin": "23",
+      "pin_name": "NC3",
+      "net": "SIM1_CLK_MUX"
+    },
+    {
+      "component": "U13",
+      "pin": "24",
+      "pin_name": "IN1",
+      "net": "SIM_MUX_SEL"
+    },
+    {
+      "component": "U14",
+      "pin": "1",
+      "pin_name": "I/O1",
+      "net": "SIM1_VDD_CONN"
+    },
+    {
+      "component": "U14",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U14",
+      "pin": "3",
+      "pin_name": "I/O2",
+      "net": "SIM1_RST_CONN"
+    },
+    {
+      "component": "U14",
+      "pin": "4",
+      "pin_name": "I/O3",
+      "net": "SIM1_CLK_CONN"
+    },
+    {
+      "component": "U14",
+      "pin": "5",
+      "pin_name": "I/O4",
+      "net": "SIM1_DATA_CONN"
+    },
+    {
+      "component": "U14",
+      "pin": "6",
+      "pin_name": "I/O5",
+      "net": "SIM1_DET"
+    },
+    {
+      "component": "U15",
+      "pin": "1",
+      "pin_name": "I/O1",
+      "net": "SIM2_VDD_CONN"
+    },
+    {
+      "component": "U15",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U15",
+      "pin": "3",
+      "pin_name": "I/O2",
+      "net": "SIM2_RST_CONN"
+    },
+    {
+      "component": "U15",
+      "pin": "4",
+      "pin_name": "I/O3",
+      "net": "SIM2_CLK_CONN"
+    },
+    {
+      "component": "U15",
+      "pin": "5",
+      "pin_name": "I/O4",
+      "net": "SIM2_DATA_CONN"
+    },
+    {
+      "component": "U15",
+      "pin": "6",
+      "pin_name": "I/O5",
+      "net": "SIM2_DET"
+    },
+    {
+      "component": "U16",
+      "pin": "1",
+      "pin_name": "VCCA",
+      "net": "U8_VDD_EXT_1V8"
+    },
+    {
+      "component": "U16",
+      "pin": "2",
+      "pin_name": "DIR1",
+      "net": "U8_VDD_EXT_1V8"
+    },
+    {
+      "component": "U16",
+      "pin": "3",
+      "pin_name": "A1",
+      "net": "U8_MAIN_TXD_1V8"
+    },
+    {
+      "component": "U16",
+      "pin": "4",
+      "pin_name": "A2",
+      "net": "U8_STATUS_1V8"
+    },
+    {
+      "component": "U16",
+      "pin": "5",
+      "pin_name": "A3",
+      "net": "U8_MAIN_RI_1V8"
+    },
+    {
+      "component": "U16",
+      "pin": "6",
+      "pin_name": "A4",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U16",
+      "pin": "7",
+      "pin_name": "A5",
+      "net": "U8_MAIN_RXD_1V8"
+    },
+    {
+      "component": "U16",
+      "pin": "8",
+      "pin_name": "A6",
+      "net": "U8_MAIN_DTR_1V8"
+    },
+    {
+      "component": "U16",
+      "pin": "9",
+      "pin_name": "A7",
+      "net": "NetU16_9"
+    },
+    {
+      "component": "U16",
+      "pin": "10",
+      "pin_name": "A8",
+      "net": "NetU16_10"
+    },
+    {
+      "component": "U16",
+      "pin": "11",
+      "pin_name": "DIR2",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U16",
+      "pin": "12",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U16",
+      "pin": "13",
+      "pin_name": "GND",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U16",
+      "pin": "14",
+      "pin_name": "B8",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U16",
+      "pin": "15",
+      "pin_name": "B7",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U16",
+      "pin": "16",
+      "pin_name": "B6",
+      "net": "CELL_DTR_U16"
+    },
+    {
+      "component": "U16",
+      "pin": "17",
+      "pin_name": "B5",
+      "net": "CELL_TX_U16"
+    },
+    {
+      "component": "U16",
+      "pin": "18",
+      "pin_name": "B4",
+      "net": "NetU16_18"
+    },
+    {
+      "component": "U16",
+      "pin": "19",
+      "pin_name": "B3",
+      "net": "CELL_RI_U16"
+    },
+    {
+      "component": "U16",
+      "pin": "20",
+      "pin_name": "B2",
+      "net": "CELL_STATUS_U16"
+    },
+    {
+      "component": "U16",
+      "pin": "21",
+      "pin_name": "B1",
+      "net": "CELL_RX_U16"
+    },
+    {
+      "component": "U16",
+      "pin": "22",
+      "pin_name": "OE",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U16",
+      "pin": "23",
+      "pin_name": "VCCB",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U16",
+      "pin": "24",
+      "pin_name": "VCCB",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U26",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_USB_DP_TP"
+    },
+    {
+      "component": "U26",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_USB_DM_TP"
+    },
+    {
+      "component": "U26",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U27",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "CELL_DBG_TXD_TP"
+    },
+    {
+      "component": "U27",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "CELL_DBG_RXD_TP"
+    },
+    {
+      "component": "U27",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U27",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "CELL_DBG_VREF_TP"
+    },
+    {
+      "component": "U27",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "CELL_USB_BOOT_TP"
+    },
+    {
+      "component": "U27",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "NetU27_6"
+    },
+    {
+      "component": "U27",
+      "pin": "7",
+      "pin_name": "7",
+      "net": "NetU27_7"
+    },
+    {
+      "component": "U27",
+      "pin": "8",
+      "pin_name": "8",
+      "net": "GND_MODEM"
+    },
+    {
+      "component": "U27",
+      "pin": "9",
+      "pin_name": "9",
+      "net": "NetU27_9"
+    },
+    {
+      "component": "U27",
+      "pin": "10",
+      "pin_name": "10",
+      "net": "NetU27_10"
+    },
+    {
+      "component": "C66",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C66",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C67",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C67",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C68",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_RESET_N"
+    },
+    {
+      "component": "C68",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C69",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_RF_MODULE"
+    },
+    {
+      "component": "C69",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C70",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_RF_ANT"
+    },
+    {
+      "component": "C70",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "D5",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_RF_ANT"
+    },
+    {
+      "component": "D5",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J10",
+      "pin": "1",
+      "pin_name": "SIGNAL",
+      "net": "LORA_RF_ANT"
+    },
+    {
+      "component": "J10",
+      "pin": "SHIELD",
+      "pin_name": "SHELL",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R63",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_TXEN"
+    },
+    {
+      "component": "R63",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R64",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_RXEN"
+    },
+    {
+      "component": "R64",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R65",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_DIO1"
+    },
+    {
+      "component": "R65",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R66",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_BUSY"
+    },
+    {
+      "component": "R66",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R67",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R67",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "LORA_RESET_N"
+    },
+    {
+      "component": "R68",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R68",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "LORA_NSS_U10"
+    },
+    {
+      "component": "R69",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_NSS_U1"
+    },
+    {
+      "component": "R69",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "LORA_NSS_U10"
+    },
+    {
+      "component": "R70",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_SCK_U1"
+    },
+    {
+      "component": "R70",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "LORA_SCK_U10"
+    },
+    {
+      "component": "R71",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_MOSI_U1"
+    },
+    {
+      "component": "R71",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "LORA_MOSI_U10"
+    },
+    {
+      "component": "R72",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_MISO_U10"
+    },
+    {
+      "component": "R72",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "LORA_MISO_U1"
+    },
+    {
+      "component": "R73",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "LORA_RF_MODULE"
+    },
+    {
+      "component": "R73",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "LORA_RF_ANT"
+    },
+    {
+      "component": "U10",
+      "pin": "1",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "3",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "4",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "5",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "6",
+      "pin_name": "RXEN",
+      "net": "LORA_RXEN"
+    },
+    {
+      "component": "U10",
+      "pin": "7",
+      "pin_name": "TXEN",
+      "net": "LORA_TXEN"
+    },
+    {
+      "component": "U10",
+      "pin": "8",
+      "pin_name": "DIO2",
+      "net": "NetU10_8"
+    },
+    {
+      "component": "U10",
+      "pin": "9",
+      "pin_name": "VCC",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "10",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "11",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "12",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "13",
+      "pin_name": "DIO1",
+      "net": "LORA_DIO1"
+    },
+    {
+      "component": "U10",
+      "pin": "14",
+      "pin_name": "BUSY",
+      "net": "LORA_BUSY"
+    },
+    {
+      "component": "U10",
+      "pin": "15",
+      "pin_name": "NRST",
+      "net": "LORA_RESET_N"
+    },
+    {
+      "component": "U10",
+      "pin": "16",
+      "pin_name": "MISO",
+      "net": "LORA_MISO_U10"
+    },
+    {
+      "component": "U10",
+      "pin": "17",
+      "pin_name": "MOSI",
+      "net": "LORA_MOSI_U10"
+    },
+    {
+      "component": "U10",
+      "pin": "18",
+      "pin_name": "SCK",
+      "net": "LORA_SCK_U10"
+    },
+    {
+      "component": "U10",
+      "pin": "19",
+      "pin_name": "NSS",
+      "net": "LORA_NSS_U10"
+    },
+    {
+      "component": "U10",
+      "pin": "20",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U10",
+      "pin": "21",
+      "pin_name": "ANT",
+      "net": "LORA_RF_MODULE"
+    },
+    {
+      "component": "U10",
+      "pin": "22",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C71",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C71",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C72",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C72",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C73",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C73",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R74",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "BLE_RX_U11"
+    },
+    {
+      "component": "R74",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "BLE_RX_U1"
+    },
+    {
+      "component": "R75",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "BLE_TX_U1"
+    },
+    {
+      "component": "R75",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "BLE_TX_U11"
+    },
+    {
+      "component": "R76",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R76",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "BLE_DFU_REQ"
+    },
+    {
+      "component": "R77",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "BLE_EN"
+    },
+    {
+      "component": "R77",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R78",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R78",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "NRF_RESET_N"
+    },
+    {
+      "component": "TP_BLE_SWD",
+      "pin": "1",
+      "pin_name": "VTREF",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "TP_BLE_SWD",
+      "pin": "2",
+      "pin_name": "SWDIO",
+      "net": "NRF_SWDIO"
+    },
+    {
+      "component": "TP_BLE_SWD",
+      "pin": "3",
+      "pin_name": "SWDCLK",
+      "net": "NRF_SWCLK"
+    },
+    {
+      "component": "TP_BLE_SWD",
+      "pin": "4",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U6",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "NetU6_1"
+    },
+    {
+      "component": "U6",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "BLE_EN"
+    },
+    {
+      "component": "U6",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U6",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "NRF_RESET_N"
+    },
+    {
+      "component": "U6",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U11",
+      "pin": "1",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U11",
+      "pin": "2",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U11",
+      "pin": "3",
+      "pin_name": "P1.10",
+      "net": "NetU11_3"
+    },
+    {
+      "component": "U11",
+      "pin": "4",
+      "pin_name": "P1.11",
+      "net": "NetU11_4"
+    },
+    {
+      "component": "U11",
+      "pin": "5",
+      "pin_name": "P1.12",
+      "net": "NetU11_5"
+    },
+    {
+      "component": "U11",
+      "pin": "6",
+      "pin_name": "P1.13",
+      "net": "NetU11_6"
+    },
+    {
+      "component": "U11",
+      "pin": "7",
+      "pin_name": "P1.14",
+      "net": "NetU11_7"
+    },
+    {
+      "component": "U11",
+      "pin": "8",
+      "pin_name": "P1.15",
+      "net": "NetU11_8"
+    },
+    {
+      "component": "U11",
+      "pin": "9",
+      "pin_name": "P0.03/AIN1",
+      "net": "NetU11_9"
+    },
+    {
+      "component": "U11",
+      "pin": "10",
+      "pin_name": "P0.29/AIN5",
+      "net": "NetU11_10"
+    },
+    {
+      "component": "U11",
+      "pin": "11",
+      "pin_name": "P0.02/AIN0",
+      "net": "NetU11_11"
+    },
+    {
+      "component": "U11",
+      "pin": "12",
+      "pin_name": "P0.31/AIN7",
+      "net": "NetU11_12"
+    },
+    {
+      "component": "U11",
+      "pin": "13",
+      "pin_name": "P0.28/AIN4",
+      "net": "NetU11_13"
+    },
+    {
+      "component": "U11",
+      "pin": "14",
+      "pin_name": "P0.30/AIN6",
+      "net": "NetU11_14"
+    },
+    {
+      "component": "U11",
+      "pin": "15",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U11",
+      "pin": "16",
+      "pin_name": "P0.27",
+      "net": "NetU11_16"
+    },
+    {
+      "component": "U11",
+      "pin": "17",
+      "pin_name": "P0.00/XL1",
+      "net": "NetU11_17"
+    },
+    {
+      "component": "U11",
+      "pin": "18",
+      "pin_name": "P0.01/XL2",
+      "net": "NetU11_18"
+    },
+    {
+      "component": "U11",
+      "pin": "19",
+      "pin_name": "P0.26",
+      "net": "NetU11_19"
+    },
+    {
+      "component": "U11",
+      "pin": "20",
+      "pin_name": "P0.04/AIN2",
+      "net": "NetU11_20"
+    },
+    {
+      "component": "U11",
+      "pin": "21",
+      "pin_name": "P0.05/AIN3",
+      "net": "NetU11_21"
+    },
+    {
+      "component": "U11",
+      "pin": "22",
+      "pin_name": "P0.06",
+      "net": "BLE_RX_U11"
+    },
+    {
+      "component": "U11",
+      "pin": "23",
+      "pin_name": "P0.07/TRACECLK",
+      "net": "NetU11_23"
+    },
+    {
+      "component": "U11",
+      "pin": "24",
+      "pin_name": "P0.08",
+      "net": "BLE_TX_U11"
+    },
+    {
+      "component": "U11",
+      "pin": "25",
+      "pin_name": "P1.08",
+      "net": "NetU11_25"
+    },
+    {
+      "component": "U11",
+      "pin": "26",
+      "pin_name": "P1.09/TRACEDATA3",
+      "net": "NetU11_26"
+    },
+    {
+      "component": "U11",
+      "pin": "27",
+      "pin_name": "P0.11/TRACEDATA2",
+      "net": "NetU11_27"
+    },
+    {
+      "component": "U11",
+      "pin": "28",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U11",
+      "pin": "29",
+      "pin_name": "P0.12/TRACEDATA1",
+      "net": "NetU11_29"
+    },
+    {
+      "component": "U11",
+      "pin": "30",
+      "pin_name": "VDDH",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U11",
+      "pin": "31",
+      "pin_name": "DCCH",
+      "net": "NetU11_31"
+    },
+    {
+      "component": "U11",
+      "pin": "32",
+      "pin_name": "VBUS",
+      "net": "NetU11_32"
+    },
+    {
+      "component": "U11",
+      "pin": "33",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U11",
+      "pin": "34",
+      "pin_name": "D-",
+      "net": "NetU11_34"
+    },
+    {
+      "component": "U11",
+      "pin": "35",
+      "pin_name": "D+",
+      "net": "NetU11_35"
+    },
+    {
+      "component": "U11",
+      "pin": "36",
+      "pin_name": "P0.14",
+      "net": "NetU11_36"
+    },
+    {
+      "component": "U11",
+      "pin": "37",
+      "pin_name": "P0.13",
+      "net": "NetU11_37"
+    },
+    {
+      "component": "U11",
+      "pin": "38",
+      "pin_name": "P0.16",
+      "net": "NetU11_38"
+    },
+    {
+      "component": "U11",
+      "pin": "39",
+      "pin_name": "P0.15",
+      "net": "BLE_DFU_REQ"
+    },
+    {
+      "component": "U11",
+      "pin": "40",
+      "pin_name": "P0.18/nRESET",
+      "net": "NRF_RESET_N"
+    },
+    {
+      "component": "U11",
+      "pin": "41",
+      "pin_name": "P0.17",
+      "net": "NetU11_41"
+    },
+    {
+      "component": "U11",
+      "pin": "42",
+      "pin_name": "P0.19",
+      "net": "NetU11_42"
+    },
+    {
+      "component": "U11",
+      "pin": "43",
+      "pin_name": "P0.21",
+      "net": "NetU11_43"
+    },
+    {
+      "component": "U11",
+      "pin": "44",
+      "pin_name": "P0.20",
+      "net": "NetU11_44"
+    },
+    {
+      "component": "U11",
+      "pin": "45",
+      "pin_name": "P0.23",
+      "net": "NetU11_45"
+    },
+    {
+      "component": "U11",
+      "pin": "46",
+      "pin_name": "P0.22",
+      "net": "NetU11_46"
+    },
+    {
+      "component": "U11",
+      "pin": "47",
+      "pin_name": "P1.00/TRACEDATA0",
+      "net": "NetU11_47"
+    },
+    {
+      "component": "U11",
+      "pin": "48",
+      "pin_name": "P0.24",
+      "net": "NetU11_48"
+    },
+    {
+      "component": "U11",
+      "pin": "49",
+      "pin_name": "P0.25",
+      "net": "NetU11_49"
+    },
+    {
+      "component": "U11",
+      "pin": "50",
+      "pin_name": "P1.02",
+      "net": "NetU11_50"
+    },
+    {
+      "component": "U11",
+      "pin": "51",
+      "pin_name": "SWDIO",
+      "net": "NRF_SWDIO"
+    },
+    {
+      "component": "U11",
+      "pin": "52",
+      "pin_name": "P0.09/NFC1",
+      "net": "NetU11_52"
+    },
+    {
+      "component": "U11",
+      "pin": "53",
+      "pin_name": "SWDCLK",
+      "net": "NRF_SWCLK"
+    },
+    {
+      "component": "U11",
+      "pin": "54",
+      "pin_name": "P0.10/NFC2",
+      "net": "NetU11_54"
+    },
+    {
+      "component": "U11",
+      "pin": "55",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U11",
+      "pin": "56",
+      "pin_name": "P1.04",
+      "net": "NetU11_56"
+    },
+    {
+      "component": "U11",
+      "pin": "57",
+      "pin_name": "P1.06",
+      "net": "NetU11_57"
+    },
+    {
+      "component": "U11",
+      "pin": "58",
+      "pin_name": "P1.07",
+      "net": "NetU11_58"
+    },
+    {
+      "component": "U11",
+      "pin": "59",
+      "pin_name": "P1.05",
+      "net": "NetU11_59"
+    },
+    {
+      "component": "U11",
+      "pin": "60",
+      "pin_name": "P1.03",
+      "net": "NetU11_60"
+    },
+    {
+      "component": "U11",
+      "pin": "61",
+      "pin_name": "P1.01",
+      "net": "NetU11_61"
+    },
+    {
+      "component": "C21",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C21",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C22",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C22",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C23",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C23",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C24",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C24",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C25",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C25",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C26",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C26",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C74",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C74",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C75",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "C75",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C76",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_DET"
+    },
+    {
+      "component": "C76",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "C78",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "TAMPER_IN_U1"
+    },
+    {
+      "component": "C78",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "D9",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "TAMPER_IN_CONN"
+    },
+    {
+      "component": "D9",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "D11",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "D11",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J12",
+      "pin": "1",
+      "pin_name": "DAT2",
+      "net": "SD_D2_CARD"
+    },
+    {
+      "component": "J12",
+      "pin": "2",
+      "pin_name": "CD/DAT3",
+      "net": "SD_D3_CARD"
+    },
+    {
+      "component": "J12",
+      "pin": "3",
+      "pin_name": "CMD",
+      "net": "SD_CMD_CARD"
+    },
+    {
+      "component": "J12",
+      "pin": "4",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "J12",
+      "pin": "5",
+      "pin_name": "CLK",
+      "net": "SD_CK_CARD"
+    },
+    {
+      "component": "J12",
+      "pin": "6",
+      "pin_name": "VSS",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J12",
+      "pin": "7",
+      "pin_name": "DAT0",
+      "net": "SD_D0_CARD"
+    },
+    {
+      "component": "J12",
+      "pin": "8",
+      "pin_name": "DAT1",
+      "net": "SD_D1_CARD"
+    },
+    {
+      "component": "J12",
+      "pin": "CD",
+      "pin_name": "CARD_DETECT",
+      "net": "SD_DET"
+    },
+    {
+      "component": "J12",
+      "pin": "SHIELD",
+      "pin_name": "SHELL",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J13",
+      "pin": "1",
+      "pin_name": "TAMPER",
+      "net": "TAMPER_IN_CONN"
+    },
+    {
+      "component": "J13",
+      "pin": "2",
+      "pin_name": "RETURN",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R7",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R7",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "NOR_NCS_U2"
+    },
+    {
+      "component": "R8",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "NOR_CLK_U1"
+    },
+    {
+      "component": "R8",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "NOR_CLK_U2"
+    },
+    {
+      "component": "R9",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "NOR_IO0_U1"
+    },
+    {
+      "component": "R9",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "NOR_IO0_U2"
+    },
+    {
+      "component": "R10",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "NOR_IO1_U1"
+    },
+    {
+      "component": "R10",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "NOR_IO1_U2"
+    },
+    {
+      "component": "R11",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "NOR_IO2_U1"
+    },
+    {
+      "component": "R11",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "NOR_IO2_U2"
+    },
+    {
+      "component": "R12",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "NOR_IO3_U1"
+    },
+    {
+      "component": "R12",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "NOR_IO3_U2"
+    },
+    {
+      "component": "R13",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R13",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "I2C2_SCL_BUS"
+    },
+    {
+      "component": "R14",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R14",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "I2C2_SDA_BUS"
+    },
+    {
+      "component": "R15",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "I2C2_SCL_U1"
+    },
+    {
+      "component": "R15",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "I2C2_SCL_BUS"
+    },
+    {
+      "component": "R16",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "I2C2_SDA_U1"
+    },
+    {
+      "component": "R16",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "I2C2_SDA_BUS"
+    },
+    {
+      "component": "R79",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_CK_U1"
+    },
+    {
+      "component": "R79",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_CK_CARD"
+    },
+    {
+      "component": "R80",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_CMD_U1"
+    },
+    {
+      "component": "R80",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_CMD_CARD"
+    },
+    {
+      "component": "R81",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_D0_U1"
+    },
+    {
+      "component": "R81",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D0_CARD"
+    },
+    {
+      "component": "R82",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_D1_U1"
+    },
+    {
+      "component": "R82",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D1_CARD"
+    },
+    {
+      "component": "R83",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_D2_U1"
+    },
+    {
+      "component": "R83",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D2_CARD"
+    },
+    {
+      "component": "R84",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_D3_U1"
+    },
+    {
+      "component": "R84",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D3_CARD"
+    },
+    {
+      "component": "R85",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R85",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_CMD_CARD"
+    },
+    {
+      "component": "R86",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R86",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D0_CARD"
+    },
+    {
+      "component": "R87",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R87",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D1_CARD"
+    },
+    {
+      "component": "R88",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R88",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D2_CARD"
+    },
+    {
+      "component": "R89",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R89",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D3_CARD"
+    },
+    {
+      "component": "R90",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R90",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_DET"
+    },
+    {
+      "component": "R99",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "R99",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "TAMPER_IN_CONN"
+    },
+    {
+      "component": "R100",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "TAMPER_IN_CONN"
+    },
+    {
+      "component": "R100",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "TAMPER_IN_U1"
+    },
+    {
+      "component": "U2",
+      "pin": "1",
+      "pin_name": "/HOLD or /RESET (IO3)",
+      "net": "NOR_IO3_U2"
+    },
+    {
+      "component": "U2",
+      "pin": "2",
+      "pin_name": "VCC",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U2",
+      "pin": "3",
+      "pin_name": "/RESET",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U2",
+      "pin": "4",
+      "pin_name": "N/C",
+      "net": "NetU2_4"
+    },
+    {
+      "component": "U2",
+      "pin": "5",
+      "pin_name": "N/C",
+      "net": "NetU2_5"
+    },
+    {
+      "component": "U2",
+      "pin": "6",
+      "pin_name": "N/C",
+      "net": "NetU2_6"
+    },
+    {
+      "component": "U2",
+      "pin": "7",
+      "pin_name": "/CS",
+      "net": "NOR_NCS_U2"
+    },
+    {
+      "component": "U2",
+      "pin": "8",
+      "pin_name": "DO (IO1)",
+      "net": "NOR_IO1_U2"
+    },
+    {
+      "component": "U2",
+      "pin": "9",
+      "pin_name": "/WP (IO2)",
+      "net": "NOR_IO2_U2"
+    },
+    {
+      "component": "U2",
+      "pin": "10",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U2",
+      "pin": "11",
+      "pin_name": "N/C",
+      "net": "NetU2_11"
+    },
+    {
+      "component": "U2",
+      "pin": "12",
+      "pin_name": "N/C",
+      "net": "NetU2_12"
+    },
+    {
+      "component": "U2",
+      "pin": "13",
+      "pin_name": "N/C",
+      "net": "NetU2_13"
+    },
+    {
+      "component": "U2",
+      "pin": "14",
+      "pin_name": "N/C",
+      "net": "NetU2_14"
+    },
+    {
+      "component": "U2",
+      "pin": "15",
+      "pin_name": "DI (IO0)",
+      "net": "NOR_IO0_U2"
+    },
+    {
+      "component": "U2",
+      "pin": "16",
+      "pin_name": "CLK",
+      "net": "NOR_CLK_U2"
+    },
+    {
+      "component": "U3",
+      "pin": "1",
+      "pin_name": "SCL/SPC",
+      "net": "I2C2_SCL_BUS"
+    },
+    {
+      "component": "U3",
+      "pin": "2",
+      "pin_name": "CS",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U3",
+      "pin": "3",
+      "pin_name": "SDO/SA0",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U3",
+      "pin": "4",
+      "pin_name": "SDA/SDI/SDO",
+      "net": "I2C2_SDA_BUS"
+    },
+    {
+      "component": "U3",
+      "pin": "5",
+      "pin_name": "NC",
+      "net": "NetU3_5"
+    },
+    {
+      "component": "U3",
+      "pin": "6",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U3",
+      "pin": "7",
+      "pin_name": "RES",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U3",
+      "pin": "8",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U3",
+      "pin": "9",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U3",
+      "pin": "10",
+      "pin_name": "VDD_IO",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U3",
+      "pin": "11",
+      "pin_name": "INT2",
+      "net": "NetU3_11"
+    },
+    {
+      "component": "U3",
+      "pin": "12",
+      "pin_name": "INT1",
+      "net": "ACCEL_INT"
+    },
+    {
+      "component": "U4",
+      "pin": "1",
+      "pin_name": "SCL",
+      "net": "I2C2_SCL_BUS"
+    },
+    {
+      "component": "U4",
+      "pin": "2",
+      "pin_name": "ALERT / INT",
+      "net": "NetU4_2"
+    },
+    {
+      "component": "U4",
+      "pin": "3",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U4",
+      "pin": "4",
+      "pin_name": "Addr",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U4",
+      "pin": "5",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U4",
+      "pin": "6",
+      "pin_name": "SDA",
+      "net": "I2C2_SDA_BUS"
+    },
+    {
+      "component": "U4",
+      "pin": "EP",
+      "pin_name": "Exposed pad",
+      "net": "NetU4_EP"
+    },
+    {
+      "component": "U12",
+      "pin": "1",
+      "pin_name": "DAT2",
+      "net": "SD_D2_CARD"
+    },
+    {
+      "component": "U12",
+      "pin": "2",
+      "pin_name": "CD/DAT3",
+      "net": "SD_D3_CARD"
+    },
+    {
+      "component": "U12",
+      "pin": "3",
+      "pin_name": "CMD",
+      "net": "SD_CMD_CARD"
+    },
+    {
+      "component": "U12",
+      "pin": "4",
+      "pin_name": "VDD",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "U12",
+      "pin": "5",
+      "pin_name": "CLK",
+      "net": "SD_CK_CARD"
+    },
+    {
+      "component": "U12",
+      "pin": "6",
+      "pin_name": "VSS",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U12",
+      "pin": "7",
+      "pin_name": "DAT0",
+      "net": "SD_D0_CARD"
+    },
+    {
+      "component": "U12",
+      "pin": "8",
+      "pin_name": "DAT1",
+      "net": "SD_D1_CARD"
+    },
+    {
+      "component": "U23",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_D2_CARD"
+    },
+    {
+      "component": "U23",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D3_CARD"
+    },
+    {
+      "component": "U23",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U23",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "SD_CMD_CARD"
+    },
+    {
+      "component": "U23",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "SD_CK_CARD"
+    },
+    {
+      "component": "U23",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "NetU23_6"
+    },
+    {
+      "component": "U23",
+      "pin": "7",
+      "pin_name": "7",
+      "net": "NetU23_7"
+    },
+    {
+      "component": "U23",
+      "pin": "8",
+      "pin_name": "8",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U23",
+      "pin": "9",
+      "pin_name": "9",
+      "net": "NetU23_9"
+    },
+    {
+      "component": "U23",
+      "pin": "10",
+      "pin_name": "10",
+      "net": "NetU23_10"
+    },
+    {
+      "component": "U24",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "SD_D0_CARD"
+    },
+    {
+      "component": "U24",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "SD_D1_CARD"
+    },
+    {
+      "component": "U24",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U24",
+      "pin": "4",
+      "pin_name": "4",
+      "net": "SD_DET"
+    },
+    {
+      "component": "U24",
+      "pin": "5",
+      "pin_name": "5",
+      "net": "NetU24_5"
+    },
+    {
+      "component": "U24",
+      "pin": "6",
+      "pin_name": "6",
+      "net": "NetU24_6"
+    },
+    {
+      "component": "U24",
+      "pin": "7",
+      "pin_name": "7",
+      "net": "NetU24_7"
+    },
+    {
+      "component": "U24",
+      "pin": "8",
+      "pin_name": "8",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U24",
+      "pin": "9",
+      "pin_name": "9",
+      "net": "NetU24_9"
+    },
+    {
+      "component": "U24",
+      "pin": "10",
+      "pin_name": "10",
+      "net": "NetU24_10"
+    },
+    {
+      "component": "C77",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_SHIELD"
+    },
+    {
+      "component": "C77",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "D6",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_VBUS_CONN"
+    },
+    {
+      "component": "D6",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "D7",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_CC1"
+    },
+    {
+      "component": "D7",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "D8",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_CC2"
+    },
+    {
+      "component": "D8",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J11",
+      "pin": "A1",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J11",
+      "pin": "A4",
+      "pin_name": "VBUS",
+      "net": "USB_VBUS_CONN"
+    },
+    {
+      "component": "J11",
+      "pin": "A5",
+      "pin_name": "CC1",
+      "net": "USB_CC1"
+    },
+    {
+      "component": "J11",
+      "pin": "A6",
+      "pin_name": "D+",
+      "net": "USB_DP_CONN"
+    },
+    {
+      "component": "J11",
+      "pin": "A7",
+      "pin_name": "D-",
+      "net": "USB_DM_CONN"
+    },
+    {
+      "component": "J11",
+      "pin": "A8",
+      "pin_name": "SBU1",
+      "net": "NetJ11_A8"
+    },
+    {
+      "component": "J11",
+      "pin": "A9",
+      "pin_name": "VBUS",
+      "net": "USB_VBUS_CONN"
+    },
+    {
+      "component": "J11",
+      "pin": "A12",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J11",
+      "pin": "B1",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J11",
+      "pin": "B4",
+      "pin_name": "VBUS",
+      "net": "USB_VBUS_CONN"
+    },
+    {
+      "component": "J11",
+      "pin": "B5",
+      "pin_name": "CC2",
+      "net": "USB_CC2"
+    },
+    {
+      "component": "J11",
+      "pin": "B6",
+      "pin_name": "D+",
+      "net": "USB_DP_CONN"
+    },
+    {
+      "component": "J11",
+      "pin": "B7",
+      "pin_name": "D-",
+      "net": "USB_DM_CONN"
+    },
+    {
+      "component": "J11",
+      "pin": "B8",
+      "pin_name": "SBU2",
+      "net": "NetJ11_B8"
+    },
+    {
+      "component": "J11",
+      "pin": "B9",
+      "pin_name": "VBUS",
+      "net": "USB_VBUS_CONN"
+    },
+    {
+      "component": "J11",
+      "pin": "B12",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "J11",
+      "pin": "SHIELD",
+      "pin_name": "SHELL",
+      "net": "USB_SHIELD"
+    },
+    {
+      "component": "R91",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_DP_U1"
+    },
+    {
+      "component": "R91",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "USB_DP_CONN"
+    },
+    {
+      "component": "R92",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_DM_U1"
+    },
+    {
+      "component": "R92",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "USB_DM_CONN"
+    },
+    {
+      "component": "R93",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_CC1"
+    },
+    {
+      "component": "R93",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R94",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_CC2"
+    },
+    {
+      "component": "R94",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R95",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_VBUS_CONN"
+    },
+    {
+      "component": "R95",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "USB_VBUS_SENSE"
+    },
+    {
+      "component": "R96",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_VBUS_SENSE"
+    },
+    {
+      "component": "R96",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R97",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_SHIELD"
+    },
+    {
+      "component": "R97",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R98",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_SHIELD"
+    },
+    {
+      "component": "R98",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "R101",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "TEST_UART_TX_U1"
+    },
+    {
+      "component": "R101",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "TEST_UART_TX_TP"
+    },
+    {
+      "component": "R102",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "TEST_UART_RX_TP"
+    },
+    {
+      "component": "R102",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "TEST_UART_RX_U1"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "1",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "2",
+      "pin_name": "VTREF_3V3",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "3",
+      "pin_name": "VSENSE_3V8",
+      "net": "3V8_MODEM"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "4",
+      "pin_name": "VSENSE_1V8",
+      "net": "1V8_MIC"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "5",
+      "pin_name": "DUT_TX",
+      "net": "TEST_UART_TX_TP"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "6",
+      "pin_name": "DUT_RX",
+      "net": "TEST_UART_RX_TP"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "7",
+      "pin_name": "PWR_GOOD",
+      "net": "PWR_GOOD"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "8",
+      "pin_name": "FAULT",
+      "net": "FAULT"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "9",
+      "pin_name": "BOOT0",
+      "net": "BOOT0"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "10",
+      "pin_name": "REV0",
+      "net": "REV_STRAP0"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "11",
+      "pin_name": "REV1",
+      "net": "REV_STRAP1"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "12",
+      "pin_name": "I2C_SCL",
+      "net": "I2C2_SCL_BUS"
+    },
+    {
+      "component": "TP_EOL",
+      "pin": "13",
+      "pin_name": "I2C_SDA",
+      "net": "I2C2_SDA_BUS"
+    },
+    {
+      "component": "TP_MCU_SWD",
+      "pin": "1",
+      "pin_name": "VTREF",
+      "net": "3V3_DIGITAL"
+    },
+    {
+      "component": "TP_MCU_SWD",
+      "pin": "2",
+      "pin_name": "SWDIO",
+      "net": "SWDIO"
+    },
+    {
+      "component": "TP_MCU_SWD",
+      "pin": "3",
+      "pin_name": "SWCLK",
+      "net": "SWCLK"
+    },
+    {
+      "component": "TP_MCU_SWD",
+      "pin": "4",
+      "pin_name": "NRST",
+      "net": "NRST"
+    },
+    {
+      "component": "TP_MCU_SWD",
+      "pin": "5",
+      "pin_name": "GND",
+      "net": "GND_DIGITAL"
+    },
+    {
+      "component": "U25",
+      "pin": "1",
+      "pin_name": "1",
+      "net": "USB_DP_CONN"
+    },
+    {
+      "component": "U25",
+      "pin": "2",
+      "pin_name": "2",
+      "net": "USB_DM_CONN"
+    },
+    {
+      "component": "U25",
+      "pin": "3",
+      "pin_name": "3",
+      "net": "GND_DIGITAL"
+    }
+  ],
+  "count": 1074,
+  "limit": 10000,
+  "limit_hit": false,
+  "skipped_nil": 0
+}

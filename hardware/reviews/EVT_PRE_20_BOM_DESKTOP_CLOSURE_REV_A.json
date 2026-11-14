@@ -1,0 +1,15 @@
+{
+  "schema": "dioneya-evt-bom-desktop-closure-v1",
+  "configuration": "EVT-PRE-20 Rev.A / PCB-MAIN Rev.B",
+  "date": "2026-10-16",
+  "status": "PASS_DESKTOP_REVIEW_PHYSICAL_VALIDATION_AT_EVT",
+  "closed_rows": 202,
+  "old_statuses": [
+    "LOCKED_CANDIDATE",
+    "LOCKED_CANDIDATE_PENDING_DERATING",
+    "SELECTED_PENDING_REVIEW_A"
+  ],
+  "new_status": "CONTROLLED_EVT_ENGINEERING_ACCEPTED_PHYSICAL_VALIDATION_AT_EVT",
+  "csv": "hardware/EVT_PRE_20_BOM_DESKTOP_CLOSURE_REV_A.csv",
+  "physical_evt_complete": false
+}

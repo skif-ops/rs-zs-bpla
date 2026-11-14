@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import csv
+import hashlib
+import json
 import math
 import sys
 from pathlib import Path
@@ -10,10 +12,45 @@ from pathlib import Path
 from kiutils.board import Board
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 sys.path.insert(0, str(ROOT / "tools"))
 from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E402
 
 PCB = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+GROUND_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/"
+    "PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
+)
+GROUND_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
+)
+SIGNAL_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/"
+    "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+)
+SIGNAL_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
+)
+OCTOSPI_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/"
+    "PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
+)
+OCTOSPI_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
+)
+RF_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/"
+    "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+)
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_REMEDIATION_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
+RF_REMEDIATION_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+)
 MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 FOOTPRINT_REVIEW = ROOT / "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
@@ -29,11 +66,37 @@ EXCLUSIVE_ZONE_GROUPS = {
 
 PASSIVE_COURTYARDS = {
     "0402": (-0.800, -0.500, 0.800, 0.500),
-    "0603": (-1.100, -0.650, 1.100, 0.650),
-    "0805": (-1.275, -0.875, 1.275, 0.875),
-    "1206": (-1.825, -1.050, 1.825, 1.050),
-    "1210": (-1.825, -1.500, 1.825, 1.500),
+    "0603": (-1.050, -0.650, 1.050, 0.650),
+    "0805": (-1.350, -0.850, 1.350, 0.850),
+    "1206": (-1.850, -1.050, 1.850, 1.050),
+    "1210": (-1.850, -1.450, 1.850, 1.450),
 }
+
+CONNECTOR_FACE_DATUM = {
+    "J_PWR": (7.500, -8.920, 180.0),
+    "J_MIC1": (0.000, 3.795, 0.0),
+    "J_MIC2": (0.000, 3.795, 0.0),
+    "J_MIC3": (0.000, 3.795, 0.0),
+    "J_MIC4": (0.000, 3.795, 0.0),
+    "J6": (0.000, 6.000, 0.0),
+    "J7": (0.000, 6.000, 0.0),
+    "J11": (0.000, 3.675, 0.0),
+    "J12": (0.000, 7.625, 0.0),
+    "J13": (0.000, 3.795, 0.0),
+}
+
+
+def authority_anchor_to_footprint_origin(
+    ref: str, anchor_x: float, anchor_y: float, normalized_angle: float,
+) -> tuple[float, float, float]:
+    if ref not in CONNECTOR_FACE_DATUM:
+        return anchor_x, anchor_y, normalized_angle
+    face_x, face_y, rotation_offset = CONNECTOR_FACE_DATUM[ref]
+    footprint_angle = (-(normalized_angle + rotation_offset)) % 360.0
+    radians = math.radians(footprint_angle)
+    rotated_x = face_x * math.cos(radians) + face_y * math.sin(radians)
+    rotated_y = -face_x * math.sin(radians) + face_y * math.cos(radians)
+    return anchor_x - rotated_x, anchor_y - rotated_y, footprint_angle
 
 
 def require(value: bool, message: str) -> None:
@@ -72,8 +135,8 @@ def absolute_courtyard_bounds(fp) -> tuple[float, float, float, float]:
                     f"{ref_of(fp)}: unsupported F.CrtYd primitive")
             local_x, local_y = float(point.X), float(point.Y)
             points.append((
-                local_x * cosine - local_y * sine + float(fp.position.X),
-                local_x * sine + local_y * cosine + float(fp.position.Y),
+                local_x * cosine + local_y * sine + float(fp.position.X),
+                -local_x * sine + local_y * cosine + float(fp.position.Y),
             ))
     return (
         min(point[0] for point in points), min(point[1] for point in points),
@@ -163,10 +226,15 @@ def main() -> int:
     require(antenna_keepout is not None, "BLE all-layer antenna keepout is missing")
     for ref, (x, y, angle) in locked.items():
         fp = footprints[ref]
-        require(abs(fp.position.X - x) < 0.002 and abs(fp.position.Y - y) < 0.002,
+        expected_x, expected_y, expected_angle = authority_anchor_to_footprint_origin(
+            ref, x, y, angle
+        )
+        require(abs(fp.position.X - expected_x) < 0.002 and
+                abs(fp.position.Y - expected_y) < 0.002,
                 f"{ref}: locked anchor drift")
         actual_angle = float(fp.position.angle or 0.0) % 360.0
-        require(abs(actual_angle - angle) < 0.01, f"{ref}: locked orientation drift")
+        require(abs(actual_angle - expected_angle) < 0.01,
+                f"{ref}: locked orientation drift")
 
     placement_rows = list(csv.DictReader(PLACEMENT.open(encoding="utf-8", newline="")))
     placement = {row["RefDes"]: row for row in placement_rows}
@@ -195,15 +263,19 @@ def main() -> int:
                 f"{ref}: unknown functional placement group")
         require(row["Placement_Method"] in {
                     "ACTIVE_SKELETON", "FUNCTIONAL_REGION_GREEDY",
+                    "ACCEPTED_GNSS_RF_ECO_001", "USB_SOURCE_TERMINATION_ECO_001",
                 } and bool(row["Target"]),
                 f"{ref}: placement method or target is not controlled")
         for coordinate in ("X_mm", "Y_mm"):
-            grid_units = float(row[coordinate]) / PLACEMENT_GRID_MM
+            grid = 0.1 if ref in {"FL1", "C64"} else PLACEMENT_GRID_MM
+            grid_units = float(row[coordinate]) / grid
             require(abs(grid_units - round(grid_units)) < 1e-6,
-                    f"{ref}: {coordinate} is off the 0.25 mm placement grid")
+                    f"{ref}: {coordinate} is off the controlled placement grid")
+        actual_angle = float(fp.position.angle or 0.0) % 360.0
+        expected_angle = float(row["Rotation_deg"]) % 360.0
         require(abs(fp.position.X - float(row["X_mm"])) < 0.002 and
                 abs(fp.position.Y - float(row["Y_mm"])) < 0.002 and
-                abs(float(fp.position.angle or 0.0) - float(row["Rotation_deg"])) < 0.01,
+                abs(actual_angle - expected_angle) < 0.01,
                 f"{ref}: native position differs from placement manifest")
         require(fp.properties.get("DIONEA_PLACEMENT_SOURCE") ==
                 "PCB_MAIN_PLACEMENT_REPACK_REV_A" and
@@ -276,8 +348,47 @@ def main() -> int:
 
     edge_items = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
     require(len(edge_items) == 8, f"rounded outline must contain 4 lines + 4 arcs, got {len(edge_items)}")
-    require(len(board.traceItems) == 0 and len(board.zones) == 0,
-            "candidate unexpectedly contains routing or copper zones")
+    require(GROUND_CANDIDATE.is_file() and GROUND_APPLICATION.is_file() and
+            SIGNAL_CANDIDATE.is_file() and SIGNAL_APPLICATION.is_file() and
+            OCTOSPI_CANDIDATE.is_file() and OCTOSPI_APPLICATION.is_file() and
+            RF_CANDIDATE.is_file() and RF_APPLICATION.is_file() and
+            RF_REMEDIATION_COMPOSED.is_file() and
+            RF_REMEDIATION_APPLICATION.is_file(),
+            "accepted routing subgate application evidence is missing")
+    ground_application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+    signal_application = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
+    octospi_application = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
+    rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    remediation_application = json.loads(
+        RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
+    )
+    require(((hashlib.sha256(PCB.read_bytes()).hexdigest() ==
+              "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273" and
+              len(board.traceItems) == 1023 and len(board.zones) == 8) or
+             # accepted inner reroute 003: OctoSPI/SDIO/EN_MODEM off In2/In3, In4 split, R9-R11 row
+             (_lineage.inner_reroute_003_applied() and
+              len(board.traceItems) == 1069 and len(board.zones) == 10)) and
+            hashlib.sha256(RF_REMEDIATION_COMPOSED.read_bytes()).hexdigest() ==
+            "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
+            ground_application.get("status") ==
+            "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+            ground_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            signal_application.get("status") ==
+            "APPLIED_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+            signal_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            octospi_application.get("status") ==
+            "APPLIED_ACCEPTED_OCTOSPI_R8_ECO_002_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+            octospi_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            rf_application.get("status") ==
+            "APPLIED_ACCEPTED_RF_P0_ROUTING_SUBGATE_REMAINING_ROUTING_AND_REVIEWS_OPEN" and
+            rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            remediation_application.get("decision") ==
+            "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE" and
+            remediation_application.get("applied", {}).get(
+                "exact_composed_board_byte_identity"
+            ) is True and
+            True,
+            "authoritative board accepted routing-subgate application drift")
     provisional = sorted(ref for ref, fp in footprints.items()
                          if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                          "PROVISIONAL_REQUIRES_MANUFACTURER_DRAWING")
@@ -314,7 +425,7 @@ def main() -> int:
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
 
     register_rows = list(csv.DictReader(FOOTPRINT_REVIEW.open(encoding="utf-8", newline="")))
-    require(len(register_rows) == 19, "KiCad footprint-review register must contain 19 patterns")
+    require(len(register_rows) == 20, "KiCad footprint-review register must contain 20 patterns")
     registered: set[str] = set()
     registered_by_status: dict[str, set[str]] = {}
     for row in register_rows:
@@ -341,7 +452,7 @@ def main() -> int:
                     f"{ref}: board/register footprint status mismatch")
             require(footprints[ref].properties.get("DIONEA_FOOTPRINT_SOURCE") == row["Board_Source"],
                     f"{ref}: board/register footprint source mismatch")
-    require(len(registered) == 44, "footprint-review register must cover 44 original instances")
+    require(len(registered) == 45, "footprint-review register must cover 45 original instances")
     require(registered_by_status.get("PENDING", set()) == set(library_pending),
             "register pending references differ from board")
     require(registered_by_status.get("PACKAGE_ONLY_IPC_CONTROL_REQUIRED", set()) ==
@@ -356,8 +467,47 @@ def main() -> int:
             {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U14", "U15", "U16", "U17",
              "U18", "U19", "U20", "U21", "U22", "U23", "U24", "U27",
              "D1", "D2", "D4", "D6", "D7", "D8", "D9", "D10", "D11",
-             "Q1", "Q2", "Q3", "Q4", "U6", "C36", "C44"},
+             "Q1", "Q2", "Q3", "Q4", "U4", "U6", "C36", "C44"},
             "register project-controlled replacement set differs from board")
+
+    # ECO-004 fixes a transposed U4 row-centre dimension.  The exact ST land
+    # contract is asserted here so a future library or generator drift cannot
+    # recreate the signal-pad-to-EP overlap.
+    u4 = footprints["U4"]
+    u4_pads = {pad.number: pad for pad in u4.pads if pad.number}
+    expected_u4 = {
+        "1": (-0.65, 0.865), "2": (0.0, 0.865), "3": (0.65, 0.865),
+        "4": (0.65, -0.865), "5": (0.0, -0.865), "6": (-0.65, -0.865),
+        "EP": (0.0, 0.0),
+    }
+    require(set(u4_pads) == set(expected_u4), "U4: STTS22H pad set drift")
+    for number, (x, y) in expected_u4.items():
+        pad = u4_pads[number]
+        expected_size = (1.45, 0.65) if number == "EP" else (0.27, 0.70)
+        expected_shape = "rect" if number in {"1", "EP"} else "roundrect"
+        require(abs(pad.position.X - x) < 0.002 and
+                abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - expected_size[0]) < 0.002 and
+                abs(pad.size.Y - expected_size[1]) < 0.002 and
+                pad.shape == expected_shape and
+                pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
+                abs(float(pad.clearance or 0.0) - 0.18) < 0.002,
+                f"U4.{number}: ECO-004 controlled pad geometry drift")
+        if number not in {"1", "EP"}:
+            require(abs(float(pad.roundrectRatio or 0.0) - 0.20) < 0.002,
+                    f"U4.{number}: round-rect ratio drift")
+        if number != "EP":
+            gap = abs(float(pad.position.Y)) - float(pad.size.Y) / 2.0 \
+                - float(u4_pads["EP"].size.Y) / 2.0
+            require(abs(gap - 0.190) < 0.002,
+                    f"U4.{number}: signal-to-EP gap is {gap:.6f} mm")
+    require(courtyard_bounds(u4) == (-1.25, -1.5, 1.25, 1.5),
+            "U4: ECO-004 courtyard drift")
+    u4_refs = [item for item in u4.graphicItems
+               if getattr(item, "type", None) == "reference"]
+    require(len(u4_refs) == 1 and abs(u4_refs[0].position.X) < 0.002 and
+            abs(u4_refs[0].position.Y + 1.8) < 0.002,
+            "U4: ECO-004 reference-text position drift")
 
     # These project-local lands freeze the package-compatible KiCad IPC
     # candidates so library drift cannot alter routing. Winbond Rev B package F
@@ -879,7 +1029,7 @@ def main() -> int:
             "U4: lead land differs from ST Figure 10")
     require(abs(u4["EP"].size.X - 1.45) < 0.002 and abs(u4["EP"].size.Y - 0.65) < 0.002,
             "U4: exposed pad differs from ST Figure 10")
-    require(abs(abs(u4["1"].position.Y - u4["6"].position.Y) - 1.08) < 0.002,
+    require(abs(abs(u4["1"].position.Y - u4["6"].position.Y) - 1.73) < 0.002,
             "U4: row spacing differs from ST Figure 10")
     u5 = {pad.number: pad for pad in footprints["U5"].pads if pad.number}
     require(set(u5) == {"1", "2", "3", "4", "5", "6", "EP"}, "U5: DCB pad set")
@@ -1094,7 +1244,8 @@ def main() -> int:
           f"project_ipc_candidates_dfm_required={len(ipc_candidates)} "
           f"kicad_library_drawing_verified={len(library_verified)} "
           f"manufacturer_controlled={len(manufacturer_controlled)} "
-          "routing=ABSENT review_b=BLOCKED")
+          "routing=GROUND_SIGNAL_HARD_NETS_OCTOSPI_R8_RF_P0_AND_RF_REMEDIATIONS_APPLIED "
+          "review_b=BLOCKED")
     return 0
 
 

@@ -2,9 +2,9 @@
 
 Status: `2D PLACEMENT CLEARANCE PASS / ROUTING AND 3D REVIEW PENDING / NOT FOR MANUFACTURE`
 
-Discovery date: 2026-09-15
-Inspected commit: `989ce217d44795ba2986453d1f37152af5a8e1fc`
-PCB SHA-256: `aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22`
+Discovery date: 2026-09-15  
+Inspected commit: `989ce217d44795ba2986453d1f37152af5a8e1fc`  
+PCB SHA-256: `aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22`  
 MAIN-AUTH-011 CSV SHA-256: `2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9`
 
 This record preserves a defect discovered after the signed PCB-MAIN electrical
@@ -122,13 +122,73 @@ finding in the unlocked placement scope. That inventory is retained in
 `PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json` as historical application
 evidence.
 
+Reviewer `Скиф` subsequently accepted `PCB-MAIN-MECH-ECO-002` on 2026-09-18
+with the same bounded decision `ACCEPT_LIMITED_MECHANICAL_ECO`. It changes only
+`MECH-007` (J_PWR mating-face Y 15.00 to 22.00 mm) and `MECH-012` (J6
+card-opening X 18.00 to 21.00 mm), with both rotations unchanged. H1 at
+`(8.00,5.00)` mm is retained from ECO-001 and is not an ECO-002 delta. The
+reviewed candidate SHA-256 is
+`5164195ebf6a9a66b6a30197abfcb314655bfe059d0aea5f3782a744069780ff`;
+the separate signature and application records are
+`PCB_MAIN_MECH_ECO_002_APPROVAL.json` and
+`PCB_MAIN_MECH_ECO_002_APPLICATION.json`. This remains a 2D mechanical subgate,
+not routing, Review B or fabrication authorization.
+
+Reviewer `Скиф` accepted `PCB-MAIN-RF-ROUTEABILITY-ECO-003` on 2026-09-19
+with decision `ACCEPT_LIMITED_RF_ROUTEABILITY_ECO`. Only FL1, D4 and L2 were
+moved in the controlled placement source. The 89-segment RF feasibility route
+was not copied to the authoritative board, which remains at zero tracks, zero
+vias and zero copper zones.
+
+Reviewer `Скиф` accepted `PCB-MAIN-STTS22H-FOOTPRINT-ECO-004` on 2026-09-19
+with decision `ACCEPT_STTS22H_FOOTPRINT_ECO_004`. The bounded application
+corrects only U4 signal-pad row centres, courtyard height and reference-text
+position. U4 placement and all other footprints remain unchanged; the board
+remains at zero tracks, zero vias and zero copper zones.
+
+Reviewer `Скиф` then accepted `PCB-MAIN-OCTOSPI-R8-ECO-002` on 2026-09-19
+with decision
+`ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE`. The exact
+application moves only R8 from (55.0, 19.5) mm to (54.5, 16.0) mm and applies
+the reviewed eleven-net OctoSPI routing candidate. Strict 2D clearance remains
+PASS; routing, return-path, SI/PI, Review B and manufacturing release remain
+open.
+
+Reviewer `Скиф` accepted `PCB-MAIN-RF-P0-001` on 2026-09-20 with decision
+`ACCEPT_RF_P0_ROUTING_SUBGATE`. The exact application adds 138 F.Cu segments
+for the seven controlled RF nets, adds no signal vias and preserves all 838
+previously accepted copper objects. Strict 2D placement clearance remains
+PASS; final RF return-path/SI review, Review B and manufacturing release remain
+open.
+
+Reviewer `Скиф` then accepted both RF remediation subgates on 2026-09-20.
+The exact cellular L2-zone candidate was applied first. The exact reviewed
+GNSS delta then moved only FL1 to `(56.8, 51.6, 270)` and C64 to
+`(58.3, 51.6, 180)`, retained U9/J9, and preserved the cellular zone.
+Strict 2D placement clearance remains PASS on composed board SHA-256
+`f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`;
+combined KiCad 9 and bounded repeat RF/SI return-path review pass on source
+commit `7ee9cfc9`; remaining routing, final SI, Review B and manufacture remain
+open.
+
+On 2026-09-20 reviewer `Скиф` also accepted
+`ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE`. The exact reviewed candidate
+moves only R91/R92 to `(64.0, 25.25, 0)` / `(64.0, 26.25, 0)` and is now the
+authoritative successor SHA-256
+`d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`.
+Strict 2D clearance remains PASS. Application commit `1f8c0bad` passed CI #557
+and PCB Native #284 with zero new errors and `429→429` unconnected. USB copper,
+Review B and manufacturing release remain open.
+
 ## Controlled post-repack result
 
 `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
-references on a 0.25 mm grid by functional group while leaving the 17
+references by functional group while leaving the 17
 MAIN-AUTH-011 connector/module anchors unchanged. Non-owner movable footprints
 are excluded from the locked CELL, GNSS, LoRa, BLE-body and audio allocations,
 and every movable footprint stays outside the BLE all-layer antenna keepout.
+The accepted GNSS RF ECO provides the bounded `0.1 mm`-grid exception for
+FL1/C64; other movable placements retain the original `0.25 mm` grid.
 The five generic passive packages receive the controlled rule in
 `hardware/PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A.md`: 184 explicit courtyards,
 including 169 fitted and 15 DNP footprints.
@@ -145,21 +205,31 @@ including 169 fitted and 15 DNP footprints.
 
 Controlled hashes:
 
-- native PCB SHA-256: `855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d`
-- placement manifest SHA-256: `0fe702d03af4457a3d44aae93ea6ddc539040f38546d4b09f200612627890e35`
-- MAIN-AUTH-011 CSV SHA-256: `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44`
+- active native PCB SHA-256: `9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
+- active placement manifest SHA-256: `70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925`
+- MAIN-AUTH-011 CSV SHA-256: `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9`
 
-The two independent controls now pass on the same source state:
+The original zero-copper post-repack board and placement hashes remain preserved
+in the signed ECO application lineage. The active hashes above include the
+accepted R8 move, exact OctoSPI routing and exact RF P0 routing candidate; they
+do not close Review B or authorize manufacture.
+
+The seven independent controls now pass on the same source state:
 
 1. `python tools/audit_pcb_main_layout_candidate_rev_a.py`
 2. `python tools/audit_pcb_main_placement_clearance_rev_a.py --strict`
+3. `python tools/audit_pcb_main_mech_eco_002_rev_a.py`
+4. `python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py`
+5. `python tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py`
+6. `python tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py`
+7. `python tools/audit_pcb_main_rf_p0_application_rev_a.py`
 
 ## Remaining release boundary
 
-The 2D placement-clearance subgate is closed. The board still has no routing or
-copper zones, and the 2D envelope method cannot approve component height,
-connector mates, cards, coax access or harness sweeps. The following remain
-mandatory:
+The 2D placement-clearance subgate is closed. The accepted ground, bounded
+signal, OctoSPI and RF P0 routing subgates are applied, but routing is not yet
+complete. The 2D envelope method cannot approve component height, connector
+mates, cards, coax access or harness sweeps. The following remain mandatory:
 
 1. electrically and RF-constrained routing, return planes, stitching and stackup;
 2. KiCad 9 DRC with zero blocker/critical violations and zero unrouted items;

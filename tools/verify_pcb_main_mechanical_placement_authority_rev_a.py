@@ -21,7 +21,7 @@ BLE_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv"
 OPEN_DIMENSIONS_PATH = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
 CAPTURE_SPEC_PATH = ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md"
 PCB_RULES_PATH = ROOT / "hardware/kicad/PCB_RULES.md"
-LAYER_AUTHORITY_PATH = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
+LAYER_AUTHORITY_PATH = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_B.csv"
 
 FIELDS = [
     "Record_ID", "Feature_Type", "RefDes", "Contact", "Side",
@@ -46,12 +46,12 @@ EXPECTED_COUNTS = Counter({
 })
 
 EXPECTED_CONNECTORS = {
-    "J_PWR": (0.0, 15.0, 90.0, "OUTBOARD_WEST"),
+    "J_PWR": (0.0, 22.0, 90.0, "OUTBOARD_WEST"),
     "J_MIC1": (0.0, 42.5, 90.0, "OUTBOARD_WEST"),
     "J_MIC2": (40.0, 75.0, 0.0, "OUTBOARD_NORTH"),
     "J_MIC3": (92.0, 75.0, 0.0, "OUTBOARD_NORTH"),
     "J_MIC4": (110.0, 54.0, 270.0, "OUTBOARD_EAST"),
-    "J6": (18.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
+    "J6": (21.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
     "J7": (64.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
     "J8": (16.0, 71.5, 0.0, "UP_Z"),
     "J9": (53.5, 68.0, 0.0, "UP_Z"),
@@ -174,7 +174,7 @@ def main() -> None:
     close(number(envelope, "Z_Max_mm"), 12.0, "assembled envelope Z")
 
     holes = {row["RefDes"]: row for row in rows if row["Feature_Type"] == "MOUNTING_HOLE"}
-    expected_holes = {"H1": (5.0, 5.0), "H2": (105.0, 5.0), "H3": (105.0, 70.0), "H4": (5.0, 70.0)}
+    expected_holes = {"H1": (8.0, 5.0), "H2": (105.0, 5.0), "H3": (105.0, 70.0), "H4": (5.0, 70.0)}
     require(set(holes) == set(expected_holes), "mounting-hole identity mismatch")
     for refdes, (x, y) in expected_holes.items():
         row = holes[refdes]
@@ -330,11 +330,11 @@ def main() -> None:
         "110 x 75", "31 production pogo pads", "capture-authority input set is complete",
     ):
         require(marker in capture_spec, f"capture spec missing mechanical marker: {marker}")
-    require("PCB-MAIN 6, PCB-PWR 4 and PCB-MIC 2 layers" in pcb_rules,
-            "controlled Rev.A layer-count statement missing")
-    require(layer_authority["PCB-MAIN"]["Copper_Layers"] == "6" and
-            layer_authority["PCB-MAIN"]["Layer_Count_Status"] == "FROZEN_REV_A",
-            "six-layer PCB-MAIN authority missing")
+    require("PCB-MAIN 8, PCB-PWR 4 and PCB-MIC 2 layers" in pcb_rules,
+            "controlled Rev.B layer-count statement missing")
+    require(layer_authority["PCB-MAIN"]["Copper_Layers"] == "8" and
+            layer_authority["PCB-MAIN"]["Layer_Count_Status"] == "FROZEN_REV_B_USER_ACCEPTED",
+            "eight-layer PCB-MAIN authority missing")
     require("no guessed trace width" in pcb_rules, "stackup-dependent impedance boundary missing")
 
     result = {

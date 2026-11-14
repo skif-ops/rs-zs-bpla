@@ -15,6 +15,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PublicKey,
 )
 
+from station import firmware_codec
+from station import network_config
 from station.schemas import StationCommand
 
 
@@ -24,11 +26,28 @@ ACK_MESSAGE_TYPE = 5
 MAX_COMMAND_BYTES = 2048
 MAX_ACK_BYTES = 128
 MAX_COMMAND_TTL_US = 15 * 60 * 1_000_000
-COMMAND_CODES = {"CMD_REQUEST_AUDIO": 1}
+COMMAND_CODES = {"CMD_REQUEST_AUDIO": 1, "CMD_REBOOT": 2, "CMD_SET_PARAMS": 3,   # 2, 3: ICD addendum D
+                 "CMD_ROTATE_COMMAND_KEY": 4,                                   # 4: ICD addendum E
+                 "CMD_UPDATE_FIRMWARE": 5,                                      # 5: ICD addendum F
+                 "CMD_SET_NETWORK_CONFIG": 6}                                   # 6: ICD addendum G
 COMMAND_NAMES = {value: key for key, value in COMMAND_CODES.items()}
 ACK_RESULTS = {0: "OK", 1: "REJECTED", 2: "FAILED", 3: "EXPIRED"}
 AUDIO_SEGMENT_CODES = {"pre": 0, "post": 1, "both": 2, "range": 3}
 AUDIO_SEGMENT_NAMES = {value: key for key, value in AUDIO_SEGMENT_CODES.items()}
+REBOOT_MAX_DELAY_S = 600
+PARAMS_MAX = 8
+# Runtime parameter whitelist (MQTT_TLS_ICD_v0_1 addendum D, table 2): name -> (id, min, max, default).
+# The station re-validates against its own copy; an unknown id or a value out of range rejects the whole command.
+STATION_PARAMS = {
+    "heartbeat_period_s": (1, 900, 86400, 21600),
+    "mic_channel": (2, 0, 3, 0),
+    "event_update_windows": (3, 4, 40, 10),
+    "comms_degraded_after": (4, 1, 10, 3),
+    "gsm_probe_s": (5, 300, 14400, 1800),
+    "listen_dwell_s": (6, 1, 10, 3),
+    "track_max_s": (7, 30, 900, 300),     # longest tracking window, addendum H
+}
+STATION_PARAM_NAMES = {spec[0]: name for name, spec in STATION_PARAMS.items()}
 
 
 @dataclass(frozen=True)
@@ -74,6 +93,51 @@ class CommandSigner:
     def sign(self, payload: bytes) -> bytes:
         return self._private_key.sign(payload)
 
+    @property
+    def public_key_hex(self) -> str:
+        return self.public_key.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw).hex()
+
+
+def key_id_hex(public_key_hex: str) -> str:
+    """MQTT ICD §2.1 key id (first 8 bytes of SHA-256 over the raw public key) as the heartbeat reports it."""
+    return hashlib.sha256(bytes.fromhex(public_key_hex)).digest()[:8].hex()
+
+
+class CommandKeyring:
+    """The bridge's command signers during a key rotation (ICD addendum E): the primary key every station trusts
+    and the next key that CMD_ROTATE_COMMAND_KEY installs.  A station is signed for with the next key once it trusts
+    it - its heartbeat lists the key (detector keys 16/17), or it acknowledged the rotation after its last heartbeat
+    - and with the primary key otherwise.  The first command it verifies with the next key promotes that key on the
+    station and drops the old one."""
+
+    def __init__(self, primary: CommandSigner, next_signer: CommandSigner | None = None):
+        if next_signer is not None and next_signer.key_id == primary.key_id:
+            raise ValueError("the next command signing key must differ from the current one")
+        self.primary = primary
+        self.next = next_signer
+
+    @property
+    def key_id(self) -> bytes:
+        return self.primary.key_id
+
+    def signer_for(self, station_id: int, event_store) -> CommandSigner:
+        if self.next is None:
+            return self.primary
+        wanted = self.next.key_id.hex()
+        heartbeat = event_store.get_station_heartbeat(station_id)
+        detector = heartbeat.detector if heartbeat is not None else None
+        if detector is not None and wanted in (detector.command_key_id, detector.command_next_key_id):
+            return self.next
+        acked = event_store.acked_key_rotation(station_id)
+        if acked is not None and key_id_hex(acked[0]) == wanted and (heartbeat is None or acked[1] > heartbeat.time_us):
+            return self.next                    # acknowledged after the last heartbeat: the station trusts both keys now
+        return self.primary
+
+
+def validate_command_payload(command_name: str, payload: dict) -> None:
+    """Raises ValueError when the payload would not encode (the operator routes check before queueing)."""
+    _command_payload_to_wire(command_name, payload)
+
 
 def _canonical(obj: object) -> bytes:
     return cbor2.dumps(obj, canonical=True)
@@ -90,7 +154,7 @@ def _uuid_bytes(value: str) -> bytes:
 
 
 def _audio_payload_to_wire(payload: dict) -> dict[int, object]:
-    allowed = {"event_id", "segment", "start_offset_ms", "duration_ms"}
+    allowed = {"event_id", "segment", "start_offset_ms", "duration_ms", "event_time_us"}
     if set(payload) - allowed:
         raise ValueError("unsupported audio request payload field")
     event_id = payload.get("event_id")
@@ -114,11 +178,18 @@ def _audio_payload_to_wire(payload: dict) -> dict[int, object]:
             raise ValueError("range audio request requires offset and duration")
     elif start is not None or duration is not None:
         raise ValueError("offset and duration are allowed only for range audio request")
-    return {0: event_id, 1: AUDIO_SEGMENT_CODES[segment], 2: start, 3: duration}
+    wire = {0: event_id, 1: AUDIO_SEGMENT_CODES[segment], 2: start, 3: duration}
+    # optional key 4 (addendum B): the event time the server knows, for events the station's own table has lost
+    event_time = payload.get("event_time_us")
+    if event_time is not None:
+        if type(event_time) is not int or not 0 < event_time <= 0x7FFFFFFFFFFFFFFF:
+            raise ValueError("audio request event_time_us is outside positive int64 range")
+        wire[4] = event_time
+    return wire
 
 
 def _audio_payload_from_wire(payload: object) -> dict[str, object]:
-    if not isinstance(payload, dict) or set(payload) != set(range(4)):
+    if not isinstance(payload, dict) or set(payload) not in (set(range(4)), set(range(5))):
         raise ValueError("invalid audio request payload keys")
     if type(payload[1]) is not int or payload[1] not in AUDIO_SEGMENT_NAMES:
         raise ValueError("unsupported audio request segment code")
@@ -128,19 +199,118 @@ def _audio_payload_from_wire(payload: object) -> dict[str, object]:
         "start_offset_ms": payload[2],
         "duration_ms": payload[3],
     }
+    if 4 in payload:
+        normalized["event_time_us"] = payload[4]
     _audio_payload_to_wire(normalized)
+    return normalized
+
+
+def _int(value: object) -> bool:
+    return type(value) is int
+
+
+def _reboot_payload_to_wire(payload: dict) -> dict[int, object]:
+    if set(payload) - {"delay_s"}:
+        raise ValueError("unsupported reboot payload field")
+    delay = payload.get("delay_s", 30)
+    if not _int(delay) or not 0 <= delay <= REBOOT_MAX_DELAY_S:
+        raise ValueError("reboot delay_s is outside 0..600")
+    return {0: delay}
+
+
+def _reboot_payload_from_wire(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict) or set(payload) != {0}:
+        raise ValueError("invalid reboot payload keys")
+    normalized = {"delay_s": payload[0]}
+    _reboot_payload_to_wire(normalized)
+    return normalized
+
+
+def _params_payload_to_wire(payload: dict) -> dict[int, object]:
+    if set(payload) - {"reset", "params"}:
+        raise ValueError("unsupported set-params payload field")
+    reset = payload.get("reset", False)
+    params = payload.get("params", {})
+    if type(reset) is not bool or not isinstance(params, dict):
+        raise ValueError("set-params needs reset: bool and params: map")
+    if len(params) > PARAMS_MAX or (not params and not reset):
+        raise ValueError("set-params carries 1..8 parameters (or none with reset)")
+    wire: dict[int, int] = {}
+    for name, value in params.items():
+        spec = STATION_PARAMS.get(name)
+        if spec is None:
+            raise ValueError(f"unknown station parameter: {name}")
+        if not _int(value) or not spec[1] <= value <= spec[2]:
+            raise ValueError(f"station parameter {name} outside {spec[1]}..{spec[2]}")
+        wire[spec[0]] = value
+    return {0: reset, 1: wire}
+
+
+def _params_payload_from_wire(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict) or set(payload) != {0, 1} or not isinstance(payload[1], dict):
+        raise ValueError("invalid set-params payload keys")
+    names = {}
+    for param_id, value in payload[1].items():
+        if param_id not in STATION_PARAM_NAMES:
+            raise ValueError(f"unknown station parameter id: {param_id}")
+        names[STATION_PARAM_NAMES[param_id]] = value
+    normalized = {"reset": payload[0], "params": names}
+    _params_payload_to_wire(normalized)
+    return normalized
+
+
+def _rotate_payload_to_wire(payload: dict) -> dict[int, object]:
+    if set(payload) != {"public_key"}:
+        raise ValueError("rotate payload carries exactly public_key")
+    raw = payload["public_key"]
+    if not isinstance(raw, str):
+        raise ValueError("rotate public_key must be 64 hex characters")
+    try:
+        key = bytes.fromhex(raw)
+    except ValueError:
+        raise ValueError("rotate public_key must be 64 hex characters") from None
+    if len(key) != 32 or not any(key):
+        raise ValueError("rotate public_key must be a non-zero 32-byte Ed25519 key")
+    return {0: key}
+
+
+def _rotate_payload_from_wire(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict) or set(payload) != {0} or not isinstance(payload[0], bytes):
+        raise ValueError("invalid rotate payload keys")
+    normalized = {"public_key": payload[0].hex()}
+    _rotate_payload_to_wire(normalized)
     return normalized
 
 
 def _command_payload_to_wire(command_name: str, payload: dict) -> dict[int, object]:
     if command_name == "CMD_REQUEST_AUDIO":
         return _audio_payload_to_wire(payload)
+    if command_name == "CMD_REBOOT":
+        return _reboot_payload_to_wire(payload)
+    if command_name == "CMD_SET_PARAMS":
+        return _params_payload_to_wire(payload)
+    if command_name == "CMD_ROTATE_COMMAND_KEY":
+        return _rotate_payload_to_wire(payload)
+    if command_name == "CMD_UPDATE_FIRMWARE":
+        return firmware_codec.payload_to_wire(payload)
+    if command_name == network_config.NETWORK_COMMAND:
+        return network_config.payload_to_wire(payload)
     raise ValueError(f"unsupported command: {command_name}")
 
 
 def _command_payload_from_wire(command_name: str, payload: object) -> dict[str, object]:
     if command_name == "CMD_REQUEST_AUDIO":
         return _audio_payload_from_wire(payload)
+    if command_name == "CMD_REBOOT":
+        return _reboot_payload_from_wire(payload)
+    if command_name == "CMD_SET_PARAMS":
+        return _params_payload_from_wire(payload)
+    if command_name == "CMD_ROTATE_COMMAND_KEY":
+        return _rotate_payload_from_wire(payload)
+    if command_name == "CMD_UPDATE_FIRMWARE":
+        return firmware_codec.payload_from_wire(payload)
+    if command_name == network_config.NETWORK_COMMAND:
+        return network_config.payload_from_wire(payload)
     raise ValueError(f"unsupported command: {command_name}")
 
 

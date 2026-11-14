@@ -1,0 +1,38 @@
+** Drc report for PCB-PWR.kicad_pcb **
+** Created on 2026-09-25T14:10:13+0000 **
+** Report includes: Errors, Warnings, Exclusions **
+
+** Found 9 DRC violations **
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(18.5200 mm, 28.9200 mm): Polygon of U1 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(29.6200 mm, 32.6200 mm): Polygon of Q1 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(33.0000 mm, 29.2500 mm): Polygon of RSH1 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.5200 mm, 14.9000 mm): Segment of U3 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.6200 mm, 15.0000 mm): Segment of U3 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(41.7000 mm, 21.8200 mm): Polygon of U2 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.5200 mm, 42.9000 mm): Segment of U4 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.6200 mm, 43.0000 mm): Segment of U4 on F.Silkscreen
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(72.9200 mm, 44.9200 mm): Polygon of U5 on F.Silkscreen
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** End of Report **

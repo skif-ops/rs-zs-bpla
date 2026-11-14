@@ -1,0 +1,8 @@
+{
+  "sample_rate_hz": 32000,
+  "window_samples": 32000,
+  "count": 100,
+  "feature_count": 43,
+  "pcm_format": "signed int16 little-endian mono",
+  "preprocess": "PCM -> float /32768 -> DC removal -> peak normalize -> FeatureExtractor"
+}

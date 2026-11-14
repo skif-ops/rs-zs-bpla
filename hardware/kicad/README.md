@@ -1,3 +1,5 @@
+> **CURRENT PCB-MAIN SOURCE — REV.B (2026-10-16):** `native/PCB-MAIN/PCB-MAIN.kicad_pcb` is now PCB-MAIN COMPLETE-105 Rev.B with 8 copper layers. The former 6-layer native source is preserved under `retired/PCB-MAIN-6L-REV-A-2026-10-16/`. Rev.A 6-layer routing/stack sections below are historical.
+
 # ZS-BPLA EVT-PRE-20 KiCad package
 
 Status: `NATIVE SOURCE CONTROLLED / NOT FOR MANUFACTURE`
@@ -26,7 +28,7 @@ This directory is the authoritative electrical-CAD source package for the EVT-PR
 2. `PCB-MIC`: one T5838 microphone leaf; four identical boards per station.
 3. `PCB-PWR`: protected battery interface and DC/DC rails for 3.8 V modem, 3.3 V digital/AON and 1.8 V microphone domains. External MPPT remains a separate assembly.
 
-PCB-PWR `C1-C19`, `R1-R15`, `NT1-NT3` and `TP1-TP10` are bound from
+PCB-PWR `C1-C21`, `R1-R15`, `NT1-NT3` and `TP1-TP10` are bound from
 `hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`. This is a capture/placement input,
 not a manufacturing release; its electrical, package, fixture and environmental
 blockers remain explicit in the authority.
@@ -35,34 +37,40 @@ PCB-PWR now uses a human-readable five-page native hierarchy: one system overvie
 plus four functional child sheets for input protection/current monitoring, 3V8,
 3V3 and 1V8/harness interfaces. The controlled materializer gives every connected
 pin an explicit wire stub and the independent audit proves exact pad/net
-equivalence to the native PCB. Post-ECO KiCad 9 ERC/PDF evidence passes and is
-commit/SHA-256 bound; independent human acceptance of the active drawing remains
-open. The earlier acceptance for the superseded F1 value does not release it.
+equivalence to the native PCB. The C20/C21 local-CIN_HF ECO supersedes prior
+KiCad 9 ERC/PDF and human decisions for the active source; fresh commit-bound
+evidence and independent human acceptance remain open.
 
-PCB-PWR currently contains a native, unrouted 60-footprint electrical placement
-canvas. Its `90 x 60 mm`, four-layer and `1.6 mm` assumptions are provisional;
-mounting holes, routing and copper zones are deliberately absent while `DIM-003`
-remains open. `hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` is the machine-readable
-release interlock for this state.
+PCB-PWR currently contains a native, unrouted placement canvas with 62 electrical
+footprints plus four board-only mounting holes. `DIM-003` is accepted `18/18`
+for the EVT batch: the `90 x 60 x 1.6 mm` basis, round H1-H4 NPTH pattern,
+connector/fixture service volumes and conservative STEP envelope are controlled.
+Routing and copper zones remain absent; serial enclosure revalidation is mandatory.
+`hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` is the machine-readable release
+interlock for this state.
 
-The bounded `DIM-003` request is now controlled by
-`hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json`; its 18-row response
-register remains `0/18` accepted. It requests outline, mounting, J1/J2, DFT,
-assembled-height, enclosure/thermal, harness-datum and frozen-STEP evidence but
-does not release any of those values.
+The bounded `DIM-003` authority is controlled by
+`hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json`; all 18 response rows are
+accepted for EVT. It freezes the EVT outline, mounting, J1/J2, DFT,
+assembled-height, enclosure/thermal, harness-datum and frozen-STEP inputs without
+authorizing serial mechanics or manufacture.
 
 The bounded fitted-body clearance repack passes a strict independent subgate:
-all 42 simultaneously fitted footprints have controlled courtyards, the required
+all 44 simultaneously fitted footprints have controlled courtyards, the required
 minimum gap is `0.20 mm`, the observed minimum is `0.22 mm`, and conflicts are
 zero. This result excludes DNP/PCB-feature service checks and does not approve
-the provisional J2 edge overhang, connector mating/bend volumes, mounting, DFT
-fixture access, assembled STEP, routing or Review B.
+the serial enclosure and exact component 3D fit; EVT connector mating/bend
+volumes, mounting, DFT fixture access and assembled envelope are accepted.
+Routing and Review B remain open.
 
 `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` classifies all 31 native nets as a
 pre-route input, including high-current paths, three controlled net-tie returns,
-switch/bootstrap loops, Kelvin sense, feedback and I2C. Its PASS does not permit
-routing: numeric width, via-array and plane geometry remain open until `DIM-003`,
-final current/fault envelopes, stackup/copper weights and thermal review close.
+switch/bootstrap loops, Kelvin sense, feedback and I2C. The separate
+`PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json` plus the 31-row
+`PCB_PWR_EVT_ROUTE_RULES_REV_A.csv` now permit a bounded engineering routing
+candidate using a conservative 35 µm screen. `DIM-003` is accepted for EVT;
+final copper/plating, via-current capacity, fault energy, physical thermal
+evidence, routing completion and manufacture remain open.
 
 ## Logical sheet plan
 
@@ -80,8 +88,9 @@ final current/fault envelopes, stackup/copper weights and thermal review close.
 
 - Pre-schematic PCB-MAIN authorities `MAIN-AUTH-001…011` are closed; the 110 x 75 mm outline, connector/module anchors, RF/keepout regions and 31 production pogo-pad coordinates are frozen by `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`.
 - Treat that frozen PCB-MAIN placement as a capture baseline, not a released
-  placement: the accepted limited mechanical ECO clears the six conflicts that
-  were inside MAIN-AUTH-011. The controlled 225-reference functional repack and
+  placement: the accepted limited mechanical ECO-001/002 chain clears the
+  conflicts that were inside MAIN-AUTH-011, including the bounded J_PWR/J6/H1
+  geometry. The controlled 225-reference functional repack and
   explicit generic-passive courtyards now pass the independent strict 2D audit:
   227/227 fitted assembly footprints have courtyards and all component,
   mounting-exclusion and U.FL tool-zone conflict sets are empty. Routing,
@@ -89,29 +98,34 @@ final current/fault envelopes, stackup/copper weights and thermal review close.
 - Use `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv` as the controlled pre-route
   input. It explicitly classifies all 186 native nets and preserves separate
   `GND_MODEM`, `GND_DIGITAL` and `GND_MIC` references. Its PASS is constraint
-  coverage only: final stackup-dependent RF/USB geometry, routed copper, pours,
+  coverage plus accepted EVT numeric geometry, not complete routing. The active
+  board has 1023 trace items and eight copper zones; final SI, remaining routing,
   DRC and manufacturing evidence remain open.
-- Use `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json` and its
-  blank response register only to obtain comparable construction data from
-  `FAB-A` and `FAB-B`. The current `0/2` accepted response state does not select
-  a stackup, authorize numeric 50-ohm/90-ohm rules or permit routing.
+- `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json` is a retained
+  historical checklist. Its 22/22 rows are engineering-baseline closures;
+  `JLC06161H-3313` and the controlled 50/90-ohm geometry are accepted for EVT.
 - Use `hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json` and
-  its blank 14-row register only for the bounded `U2/U25/U26/U9` process review.
-  The current `0/14` accepted state does not select an assembler or process,
-  create U9 paste apertures, close USB SI/whole-board DFM or permit manufacture.
+  its 14/14 engineering-closure register for the bounded `U2/U25/U26/U9`
+  standard-process review. Controlled paste export still waits for native DRC
+  and CAM; first article and Review B remain mandatory.
 - Use `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` as the 31-net PCB-PWR
-  pre-route input. Freeze `DIM-003`, current/fault envelopes, stackup/copper
-  weights and numeric thermal/current-density geometry before routing any copper.
-- Use `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json` and its blank
-  24-row register only to collect comparable stackup/copper inputs from two
-  fabricators. The current `0/24` and `0/2` state selects no construction and
-  authorizes no numeric power geometry, routing or fabrication.
+  pre-route input and `hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv` as the bounded
+  numeric EVT overlay. Preserve `DIM-003`; route an engineering candidate only
+  against the 35 µm lower-bound rules and accepted EVT ordering profile
+  `JLC04161H-3313A`, 1.6 mm, outer 2 oz / inner 1 oz. The active board has only
+  exactly 14 accepted trace items after hash-bound power-stage ECO-002 application
+  and zero vias/zones; the ECO-002 commit-bound application gate passed at CI #692,
+  PCB-PWR Schematic #103 and PCB Native #357.
+  Fabrication still requires remaining routing, current/fault and physical +70 °C
+  thermal evidence.
+- `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json` is retained for
+  traceability. Its 24/24 rows are engineering-baseline closures and no factory
+  reply is required. Any checkout DFM deviation must be resolved by ECO.
 - Preserve the strict PCB-PWR fitted-body clearance PASS and its six-reference
   coordinate delta; repeat the audit after any placement or footprint change.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
-- Replace provisional MAIN/PWR placement candidates with mechanically frozen,
-  reviewed and routed boards; keep all native `.kicad_sch/.kicad_pcb/.kicad_pro`
-  sources under CI control.
+- Complete and review MAIN/PWR routing; keep all native
+  `.kicad_sch/.kicad_pcb/.kicad_pro` sources under CI control.
 - Datasheet/reference-design review for STM32U585, T5838, BG95, MAX-M10S, E22/SX1262, nRF52840/Raytac module and all power ICs.
 - ERC: zero unexplained errors.
 - DRC: zero blocker/critical violations.

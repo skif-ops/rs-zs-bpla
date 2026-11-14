@@ -1,6 +1,6 @@
 # Дионея EVT-PRE-20 Rev.A — PCB-PWR footprint authority
 
-Status: `J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 MANUFACTURER LAND/HOLE/STENCIL VERIFIED / TP1-TP10 PROJECT DFT GEOMETRY VERIFIED / LAYOUT USE AUTHORIZED / NOT FOR MANUFACTURE`
+Status: `J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 MANUFACTURER LAND/HOLE/STENCIL VERIFIED / TP1-TP10 DFT + H1-H4 EVT MOUNTING GEOMETRY VERIFIED / LAYOUT USE AUTHORIZED / NOT FOR MANUFACTURE`
 Date: 2026-09-12
 Board: `PCB-PWR`
 
@@ -207,6 +207,13 @@ probe-wear validation remain layout/Review-B controls.
 
 ## Remaining controls
 
+H1-H4 use the project footprint
+`DioneyaPWR:MountingHole_M3_3.4_EVT`: one round `3.40 mm` NPTH, local clearance
+`2.30 mm` giving the controlled `D8.0 mm` all-copper exclusion, and an
+`F.CrtYd D10.0 mm` fitted-component exclusion. They are board-only and excluded
+from BOM and pick-and-place. The accepted coordinates and hardware are controlled
+by `PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.{md,json}`; PCB slots are prohibited.
+
 - TI does not define a Q1 solder-mask expansion in the cited figures; its final mask
   rule remains an assembly-house/DFM control. U3/U4 mask geometry is controlled by
   drawing `4229353/J`.
@@ -215,7 +222,8 @@ probe-wear validation remain layout/Review-B controls.
   remain assembly-house/DFM controls.
 - Drain thermal spreading, via field, current density, gate-loop placement and SOA are
   PCB-PWR layout/Review-B controls.
-- J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 and TP1-TP10 placement is not authorized until
-  `PCB-PWR.kicad_pcb` is created from the reviewed board outline and mechanical authority.
+- J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5, TP1-TP10 and H1-H4 are bound to the native
+  EVT board and accepted DIM-003 mechanical authority; serial mechanics require
+  repeat validation.
 - Manufacturing release remains blocked until layout DRC, thermal/fault evidence, DFM
   and both review gates pass.

@@ -1,0 +1,64 @@
+{
+    "$schema": "https://schemas.kicad.org/erc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-09-24T12:47:35+0000",
+    "included_severities": [
+        "error",
+        "warning",
+        "exclusion"
+    ],
+    "kicad_version": "9.0.9",
+    "sheets": [
+        {
+            "path": "/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92",
+            "violations": []
+        },
+        {
+            "path": "/Power entry and rail interface/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/5c56bc2f-3860-5270-a2b9-d40885f4337b",
+            "violations": []
+        },
+        {
+            "path": "/MCU clocks reset and straps/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/92628314-88c9-58b3-9a9d-20cf807eceb7",
+            "violations": []
+        },
+        {
+            "path": "/PDM audio AAD and microphone harnesses/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/12ef1bf2-41ba-5b81-ba1c-d4ae45c65eeb",
+            "violations": []
+        },
+        {
+            "path": "/GNSS timing antenna and supervisor/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/ac15222d-9ffe-5dc9-8294-4fad99284c6d",
+            "violations": []
+        },
+        {
+            "path": "/Cellular modem dual SIM and recovery/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/2a1cc975-6b66-588a-933e-7e17d2f6332b",
+            "violations": []
+        },
+        {
+            "path": "/LoRa radio control and conducted RF/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/1099e1c7-b0e8-598c-b786-d5905d6a1512",
+            "violations": []
+        },
+        {
+            "path": "/BLE module reset DFU and SWD/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/18486cd7-2c27-5327-b1e1-e19a0ab1477b",
+            "violations": []
+        },
+        {
+            "path": "/Storage sensors microSD and tamper/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/4dae9364-e7ce-5221-ae07-b2104330e5ef",
+            "violations": []
+        },
+        {
+            "path": "/USB service debug and EOL fixture/",
+            "uuid_path": "/4f6489df-621e-53b9-a680-cb2c3b40ef92/116cdbef-91e1-5f03-b6d9-653eabb22161",
+            "violations": []
+        }
+    ],
+    "source": "PCB-MAIN.kicad_sch"
+}

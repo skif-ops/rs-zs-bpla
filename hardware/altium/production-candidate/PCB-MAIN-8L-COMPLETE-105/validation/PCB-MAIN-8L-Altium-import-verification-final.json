@@ -1,0 +1,70 @@
+{
+  "source_route_count": 5969,
+  "imported_route_count": 5969,
+  "geometry_width_net_matches": 5969,
+  "source_routes_missing": 0,
+  "imported_routes_extra": 0,
+  "correct_copper_layer": 5969,
+  "incorrect_copper_layer": 0,
+  "source_layers": {
+    "B.Cu": 1377,
+    "F.Cu": 2776,
+    "In3.Cu": 1383,
+    "In5.Cu": 433
+  },
+  "imported_layers": {
+    "1": 2776,
+    "32": 1377,
+    "4": 1383,
+    "6": 433
+  },
+  "missing_examples": [],
+  "wrong_layer_examples": [],
+  "physical_paths": {
+    "source_path_count": 5856,
+    "imported_path_count": 5856,
+    "geometry_width_net_matches": 5856,
+    "source_paths_missing": 0,
+    "imported_paths_extra": 0,
+    "correct_copper_layer": 5856,
+    "incorrect_copper_layer": 0,
+    "equivalent_after_joining_collinear_splits": true,
+    "missing_examples": [],
+    "wrong_layer_examples": []
+  },
+  "schema": "dioneya-main8l-altium-import-verification-v1",
+  "source_board": "F:\\Проекты\\Codex\\altium-main-8l-evaluation-2026-10-15\\import-input-hybrid-verified-schematic\\PCB-MAIN.kicad_pcb",
+  "imported_board": "F:\\Проекты\\Codex\\altium-main-8l-evaluation-2026-10-15\\altium-output-final\\PCB-MAIN\\PCB-MAIN.PcbDoc",
+  "transform": {
+    "x_offset_mm": 3.685,
+    "y_reflection_sum_mm": 75.025
+  },
+  "source_counts": {
+    "components": 251,
+    "pads": 1143,
+    "vias": 853,
+    "zones": 13
+  },
+  "imported_counts": {
+    "components": 251,
+    "pads": 1143,
+    "vias": 853,
+    "polygons": 7,
+    "tracks": 7120,
+    "nets": 185
+  },
+  "net_name_sets_equal": true,
+  "source_net_count": 185,
+  "imported_net_count": 185,
+  "vias": {
+    "source_via_count": 853,
+    "imported_via_count": 853,
+    "position_diameter_drill_net_matches": 853,
+    "correct_layer_span": 853,
+    "incorrect_layer_span": 0,
+    "imported_layer_spans": {
+      "1-32": 853
+    }
+  },
+  "imported_no_net_vias": 0
+}

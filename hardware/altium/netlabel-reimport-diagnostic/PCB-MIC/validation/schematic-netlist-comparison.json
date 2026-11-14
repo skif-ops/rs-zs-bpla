@@ -1,0 +1,24 @@
+{
+  "source": "hardware\\altium\\netlabel-reimport-diagnostic\\PCB-MIC\\validation\\PCB-MIC-KiCad-base.xml",
+  "altium": "hardware\\altium\\netlabel-reimport-diagnostic\\PCB-MIC\\validation\\PCB-MIC-Protel2.NET",
+  "source_net_count": 9,
+  "altium_net_count": 7,
+  "source_physical_net_count": 7,
+  "altium_physical_net_count": 7,
+  "source_physical_pin_count": 17,
+  "altium_physical_pin_count": 17,
+  "omitted_kicad_unconnected_singletons": [
+    "J1-7",
+    "J1-8"
+  ],
+  "source_virtual_nodes": [],
+  "altium_virtual_nodes": [],
+  "physical_pin_universe_equal": true,
+  "physical_net_partitions_equal": true,
+  "physical_net_names_equal": true,
+  "missing_physical_pins": [],
+  "extra_physical_pins": [],
+  "missing_groups": [],
+  "extra_groups": [],
+  "name_mismatches": []
+}

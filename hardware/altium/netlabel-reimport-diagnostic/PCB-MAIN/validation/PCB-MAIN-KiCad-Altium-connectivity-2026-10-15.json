@@ -1,0 +1,705 @@
+{
+  "schema": "dioneya-kicad-altium-connectivity-comparison-v1",
+  "board": "PCB-MAIN",
+  "date": "2026-10-15",
+  "kicad_source": "PCB-MAIN-KiCad-current.xml",
+  "altium_project": {
+    "project_name": "PCB-MAIN.PrjPcb",
+    "project_path": "F:\\2AC9~1\\Codex\\rs-zs-bpla-evt-pre-20\\hardware\\altium\\netlabel-reimport-diagnostic\\PCB-MAIN\\PCB-MAIN.PrjPcb"
+  },
+  "comparison_policy": {
+    "virtual_erc_source_flags": "excluded because #FLG symbols are off-board, out-of-BOM, and have no footprint",
+    "single_pin_nets": "compared by physical ref/pin membership because KiCad and Altium assign different generated names",
+    "all_multi_pin_nets": "net name and complete physical ref/pin membership must match"
+  },
+  "counts": {
+    "kicad_physical_pins": 1074,
+    "altium_physical_pins": 1074,
+    "kicad_multi_pin_nets": 186,
+    "altium_multi_pin_nets": 186,
+    "kicad_single_pin_nets": 169,
+    "altium_single_pin_nets": 169
+  },
+  "ignored_virtual_pins": [],
+  "single_pin_aliases": {
+    "J11-A8": {
+      "kicad": "unconnected-(J11-SBU1-PadA8)",
+      "altium": "NetJ11_A8"
+    },
+    "J11-B8": {
+      "kicad": "unconnected-(J11-SBU2-PadB8)",
+      "altium": "NetJ11_B8"
+    },
+    "J6-5": {
+      "kicad": "unconnected-(J6-C6_VPP-Pad5)",
+      "altium": "NetJ6_5"
+    },
+    "J7-5": {
+      "kicad": "unconnected-(J7-C6_VPP-Pad5)",
+      "altium": "NetJ7_5"
+    },
+    "U1-12": {
+      "kicad": "unconnected-(U1-PH0-OSC_IN_(PH0)-Pad12)",
+      "altium": "NetU1_12"
+    },
+    "U1-13": {
+      "kicad": "unconnected-(U1-PH1-OSC_OUT_(PH1)-Pad13)",
+      "altium": "NetU1_13"
+    },
+    "U1-18": {
+      "kicad": "unconnected-(U1-PC3-Pad18)",
+      "altium": "NetU1_18"
+    },
+    "U1-23": {
+      "kicad": "unconnected-(U1-PA1-Pad23)",
+      "altium": "NetU1_23"
+    },
+    "U1-32": {
+      "kicad": "unconnected-(U1-PB0-Pad32)",
+      "altium": "NetU1_32"
+    },
+    "U1-36": {
+      "kicad": "unconnected-(U1-PE8-Pad36)",
+      "altium": "NetU1_36"
+    },
+    "U1-69": {
+      "kicad": "unconnected-(U1-PA10-Pad69)",
+      "altium": "NetU1_69"
+    },
+    "U1-84": {
+      "kicad": "unconnected-(U1-PD3-Pad84)",
+      "altium": "NetU1_84"
+    },
+    "U1-88": {
+      "kicad": "unconnected-(U1-PD7-Pad88)",
+      "altium": "NetU1_88"
+    },
+    "U1-89": {
+      "kicad": "TRACESWO)-Pad89)",
+      "altium": "NetU1_89"
+    },
+    "U1-9": {
+      "kicad": "unconnected-(U1-PC15-OSC32_OUT_(PC15)-Pad9)",
+      "altium": "NetU1_9"
+    },
+    "U1-90": {
+      "kicad": "unconnected-(U1-PB4_(NJTRST)-Pad90)",
+      "altium": "NetU1_90"
+    },
+    "U1-91": {
+      "kicad": "unconnected-(U1-PB5-Pad91)",
+      "altium": "NetU1_91"
+    },
+    "U10-8": {
+      "kicad": "unconnected-(U10-DIO2-Pad8)",
+      "altium": "NetU10_8"
+    },
+    "U11-10": {
+      "kicad": "AIN5-Pad10)",
+      "altium": "NetU11_10"
+    },
+    "U11-11": {
+      "kicad": "AIN0-Pad11)",
+      "altium": "NetU11_11"
+    },
+    "U11-12": {
+      "kicad": "AIN7-Pad12)",
+      "altium": "NetU11_12"
+    },
+    "U11-13": {
+      "kicad": "AIN4-Pad13)",
+      "altium": "NetU11_13"
+    },
+    "U11-14": {
+      "kicad": "AIN6-Pad14)",
+      "altium": "NetU11_14"
+    },
+    "U11-16": {
+      "kicad": "unconnected-(U11-P0.27-Pad16)",
+      "altium": "NetU11_16"
+    },
+    "U11-17": {
+      "kicad": "XL1-Pad17)",
+      "altium": "NetU11_17"
+    },
+    "U11-18": {
+      "kicad": "XL2-Pad18)",
+      "altium": "NetU11_18"
+    },
+    "U11-19": {
+      "kicad": "unconnected-(U11-P0.26-Pad19)",
+      "altium": "NetU11_19"
+    },
+    "U11-20": {
+      "kicad": "AIN2-Pad20)",
+      "altium": "NetU11_20"
+    },
+    "U11-21": {
+      "kicad": "AIN3-Pad21)",
+      "altium": "NetU11_21"
+    },
+    "U11-23": {
+      "kicad": "TRACECLK-Pad23)",
+      "altium": "NetU11_23"
+    },
+    "U11-25": {
+      "kicad": "unconnected-(U11-P1.08-Pad25)",
+      "altium": "NetU11_25"
+    },
+    "U11-26": {
+      "kicad": "TRACEDATA3-Pad26)",
+      "altium": "NetU11_26"
+    },
+    "U11-27": {
+      "kicad": "TRACEDATA2-Pad27)",
+      "altium": "NetU11_27"
+    },
+    "U11-29": {
+      "kicad": "TRACEDATA1-Pad29)",
+      "altium": "NetU11_29"
+    },
+    "U11-3": {
+      "kicad": "unconnected-(U11-P1.10-Pad3)",
+      "altium": "NetU11_3"
+    },
+    "U11-31": {
+      "kicad": "unconnected-(U11-DCCH-Pad31)",
+      "altium": "NetU11_31"
+    },
+    "U11-32": {
+      "kicad": "unconnected-(U11-VBUS-Pad32)",
+      "altium": "NetU11_32"
+    },
+    "U11-34": {
+      "kicad": "unconnected-(U11-D--Pad34)",
+      "altium": "NetU11_34"
+    },
+    "U11-35": {
+      "kicad": "unconnected-(U11-D+-Pad35)",
+      "altium": "NetU11_35"
+    },
+    "U11-36": {
+      "kicad": "unconnected-(U11-P0.14-Pad36)",
+      "altium": "NetU11_36"
+    },
+    "U11-37": {
+      "kicad": "unconnected-(U11-P0.13-Pad37)",
+      "altium": "NetU11_37"
+    },
+    "U11-38": {
+      "kicad": "unconnected-(U11-P0.16-Pad38)",
+      "altium": "NetU11_38"
+    },
+    "U11-4": {
+      "kicad": "unconnected-(U11-P1.11-Pad4)",
+      "altium": "NetU11_4"
+    },
+    "U11-41": {
+      "kicad": "unconnected-(U11-P0.17-Pad41)",
+      "altium": "NetU11_41"
+    },
+    "U11-42": {
+      "kicad": "unconnected-(U11-P0.19-Pad42)",
+      "altium": "NetU11_42"
+    },
+    "U11-43": {
+      "kicad": "unconnected-(U11-P0.21-Pad43)",
+      "altium": "NetU11_43"
+    },
+    "U11-44": {
+      "kicad": "unconnected-(U11-P0.20-Pad44)",
+      "altium": "NetU11_44"
+    },
+    "U11-45": {
+      "kicad": "unconnected-(U11-P0.23-Pad45)",
+      "altium": "NetU11_45"
+    },
+    "U11-46": {
+      "kicad": "unconnected-(U11-P0.22-Pad46)",
+      "altium": "NetU11_46"
+    },
+    "U11-47": {
+      "kicad": "TRACEDATA0-Pad47)",
+      "altium": "NetU11_47"
+    },
+    "U11-48": {
+      "kicad": "unconnected-(U11-P0.24-Pad48)",
+      "altium": "NetU11_48"
+    },
+    "U11-49": {
+      "kicad": "unconnected-(U11-P0.25-Pad49)",
+      "altium": "NetU11_49"
+    },
+    "U11-5": {
+      "kicad": "unconnected-(U11-P1.12-Pad5)",
+      "altium": "NetU11_5"
+    },
+    "U11-50": {
+      "kicad": "unconnected-(U11-P1.02-Pad50)",
+      "altium": "NetU11_50"
+    },
+    "U11-52": {
+      "kicad": "NFC1-Pad52)",
+      "altium": "NetU11_52"
+    },
+    "U11-54": {
+      "kicad": "NFC2-Pad54)",
+      "altium": "NetU11_54"
+    },
+    "U11-56": {
+      "kicad": "unconnected-(U11-P1.04-Pad56)",
+      "altium": "NetU11_56"
+    },
+    "U11-57": {
+      "kicad": "unconnected-(U11-P1.06-Pad57)",
+      "altium": "NetU11_57"
+    },
+    "U11-58": {
+      "kicad": "unconnected-(U11-P1.07-Pad58)",
+      "altium": "NetU11_58"
+    },
+    "U11-59": {
+      "kicad": "unconnected-(U11-P1.05-Pad59)",
+      "altium": "NetU11_59"
+    },
+    "U11-6": {
+      "kicad": "unconnected-(U11-P1.13-Pad6)",
+      "altium": "NetU11_6"
+    },
+    "U11-60": {
+      "kicad": "unconnected-(U11-P1.03-Pad60)",
+      "altium": "NetU11_60"
+    },
+    "U11-61": {
+      "kicad": "unconnected-(U11-P1.01-Pad61)",
+      "altium": "NetU11_61"
+    },
+    "U11-7": {
+      "kicad": "unconnected-(U11-P1.14-Pad7)",
+      "altium": "NetU11_7"
+    },
+    "U11-8": {
+      "kicad": "unconnected-(U11-P1.15-Pad8)",
+      "altium": "NetU11_8"
+    },
+    "U11-9": {
+      "kicad": "AIN1-Pad9)",
+      "altium": "NetU11_9"
+    },
+    "U13-3": {
+      "kicad": "unconnected-(U13-N.C.-Pad3)",
+      "altium": "NetU13_3"
+    },
+    "U16-10": {
+      "kicad": "unconnected-(U16-A8-Pad10)",
+      "altium": "NetU16_10"
+    },
+    "U16-18": {
+      "kicad": "unconnected-(U16-B4-Pad18)",
+      "altium": "NetU16_18"
+    },
+    "U16-9": {
+      "kicad": "unconnected-(U16-A7-Pad9)",
+      "altium": "NetU16_9"
+    },
+    "U17-11": {
+      "kicad": "unconnected-(U17-4Y-Pad11)",
+      "altium": "NetU17_11"
+    },
+    "U19-10": {
+      "kicad": "unconnected-(U19-Pad10)",
+      "altium": "NetU19_10"
+    },
+    "U19-6": {
+      "kicad": "unconnected-(U19-Pad6)",
+      "altium": "NetU19_6"
+    },
+    "U19-7": {
+      "kicad": "unconnected-(U19-Pad7)",
+      "altium": "NetU19_7"
+    },
+    "U19-9": {
+      "kicad": "unconnected-(U19-Pad9)",
+      "altium": "NetU19_9"
+    },
+    "U2-11": {
+      "kicad": "C-Pad11)",
+      "altium": "NetU2_11"
+    },
+    "U2-12": {
+      "kicad": "C-Pad12)",
+      "altium": "NetU2_12"
+    },
+    "U2-13": {
+      "kicad": "C-Pad13)",
+      "altium": "NetU2_13"
+    },
+    "U2-14": {
+      "kicad": "C-Pad14)",
+      "altium": "NetU2_14"
+    },
+    "U2-4": {
+      "kicad": "C-Pad4)",
+      "altium": "NetU2_4"
+    },
+    "U2-5": {
+      "kicad": "C-Pad5)",
+      "altium": "NetU2_5"
+    },
+    "U2-6": {
+      "kicad": "C-Pad6)",
+      "altium": "NetU2_6"
+    },
+    "U20-10": {
+      "kicad": "unconnected-(U20-Pad10)",
+      "altium": "NetU20_10"
+    },
+    "U20-6": {
+      "kicad": "unconnected-(U20-Pad6)",
+      "altium": "NetU20_6"
+    },
+    "U20-7": {
+      "kicad": "unconnected-(U20-Pad7)",
+      "altium": "NetU20_7"
+    },
+    "U20-9": {
+      "kicad": "unconnected-(U20-Pad9)",
+      "altium": "NetU20_9"
+    },
+    "U21-10": {
+      "kicad": "unconnected-(U21-Pad10)",
+      "altium": "NetU21_10"
+    },
+    "U21-6": {
+      "kicad": "unconnected-(U21-Pad6)",
+      "altium": "NetU21_6"
+    },
+    "U21-7": {
+      "kicad": "unconnected-(U21-Pad7)",
+      "altium": "NetU21_7"
+    },
+    "U21-9": {
+      "kicad": "unconnected-(U21-Pad9)",
+      "altium": "NetU21_9"
+    },
+    "U22-10": {
+      "kicad": "unconnected-(U22-Pad10)",
+      "altium": "NetU22_10"
+    },
+    "U22-6": {
+      "kicad": "unconnected-(U22-Pad6)",
+      "altium": "NetU22_6"
+    },
+    "U22-7": {
+      "kicad": "unconnected-(U22-Pad7)",
+      "altium": "NetU22_7"
+    },
+    "U22-9": {
+      "kicad": "unconnected-(U22-Pad9)",
+      "altium": "NetU22_9"
+    },
+    "U23-10": {
+      "kicad": "unconnected-(U23-Pad10)",
+      "altium": "NetU23_10"
+    },
+    "U23-6": {
+      "kicad": "unconnected-(U23-Pad6)",
+      "altium": "NetU23_6"
+    },
+    "U23-7": {
+      "kicad": "unconnected-(U23-Pad7)",
+      "altium": "NetU23_7"
+    },
+    "U23-9": {
+      "kicad": "unconnected-(U23-Pad9)",
+      "altium": "NetU23_9"
+    },
+    "U24-10": {
+      "kicad": "unconnected-(U24-Pad10)",
+      "altium": "NetU24_10"
+    },
+    "U24-5": {
+      "kicad": "unconnected-(U24-Pad5)",
+      "altium": "NetU24_5"
+    },
+    "U24-6": {
+      "kicad": "unconnected-(U24-Pad6)",
+      "altium": "NetU24_6"
+    },
+    "U24-7": {
+      "kicad": "unconnected-(U24-Pad7)",
+      "altium": "NetU24_7"
+    },
+    "U24-9": {
+      "kicad": "unconnected-(U24-Pad9)",
+      "altium": "NetU24_9"
+    },
+    "U27-10": {
+      "kicad": "unconnected-(U27-Pad10)",
+      "altium": "NetU27_10"
+    },
+    "U27-6": {
+      "kicad": "unconnected-(U27-Pad6)",
+      "altium": "NetU27_6"
+    },
+    "U27-7": {
+      "kicad": "unconnected-(U27-Pad7)",
+      "altium": "NetU27_7"
+    },
+    "U27-9": {
+      "kicad": "unconnected-(U27-Pad9)",
+      "altium": "NetU27_9"
+    },
+    "U3-11": {
+      "kicad": "unconnected-(U3-INT2-Pad11)",
+      "altium": "NetU3_11"
+    },
+    "U3-5": {
+      "kicad": "unconnected-(U3-NC-Pad5)",
+      "altium": "NetU3_5"
+    },
+    "U4-2": {
+      "kicad": "unconnected-(U4-ALERT_{slash}_INT-Pad2)",
+      "altium": "NetU4_2"
+    },
+    "U4-EP": {
+      "kicad": "unconnected-(U4-Exposed_pad-PadEP)",
+      "altium": "NetU4_EP"
+    },
+    "U6-1": {
+      "kicad": "unconnected-(U6-Pad1)",
+      "altium": "NetU6_1"
+    },
+    "U7-10": {
+      "kicad": "unconnected-(U7-A8-Pad10)",
+      "altium": "NetU7_10"
+    },
+    "U7-9": {
+      "kicad": "unconnected-(U7-A7-Pad9)",
+      "altium": "NetU7_9"
+    },
+    "U8-1": {
+      "kicad": "unconnected-(U8-PSM_IND-Pad1)",
+      "altium": "NetU8_1"
+    },
+    "U8-11": {
+      "kicad": "unconnected-(U8-RESERVED-Pad11)",
+      "altium": "NetU8_11"
+    },
+    "U8-12": {
+      "kicad": "unconnected-(U8-RESERVED-Pad12)",
+      "altium": "NetU8_12"
+    },
+    "U8-13": {
+      "kicad": "unconnected-(U8-RESERVED-Pad13)",
+      "altium": "NetU8_13"
+    },
+    "U8-14": {
+      "kicad": "unconnected-(U8-RESERVED-Pad14)",
+      "altium": "NetU8_14"
+    },
+    "U8-16": {
+      "kicad": "unconnected-(U8-RESERVED-Pad16)",
+      "altium": "NetU8_16"
+    },
+    "U8-18": {
+      "kicad": "unconnected-(U8-W_DISABLE#-Pad18)",
+      "altium": "NetU8_18"
+    },
+    "U8-19": {
+      "kicad": "unconnected-(U8-AP_READY-Pad19)",
+      "altium": "NetU8_19"
+    },
+    "U8-2": {
+      "kicad": "unconnected-(U8-ADC1-Pad2)",
+      "altium": "NetU8_2"
+    },
+    "U8-21": {
+      "kicad": "unconnected-(U8-NET_STATUS-Pad21)",
+      "altium": "NetU8_21"
+    },
+    "U8-24": {
+      "kicad": "unconnected-(U8-ADC0-Pad24)",
+      "altium": "NetU8_24"
+    },
+    "U8-25": {
+      "kicad": "unconnected-(U8-GPIO1-Pad25)",
+      "altium": "NetU8_25"
+    },
+    "U8-26": {
+      "kicad": "unconnected-(U8-GPIO2-Pad26)",
+      "altium": "NetU8_26"
+    },
+    "U8-27": {
+      "kicad": "unconnected-(U8-GNSS_TXD-Pad27)",
+      "altium": "NetU8_27"
+    },
+    "U8-28": {
+      "kicad": "unconnected-(U8-GNSS_RXD-Pad28)",
+      "altium": "NetU8_28"
+    },
+    "U8-36": {
+      "kicad": "unconnected-(U8-MAIN_CTS-Pad36)",
+      "altium": "NetU8_36"
+    },
+    "U8-37": {
+      "kicad": "unconnected-(U8-MAIN_RTS-Pad37)",
+      "altium": "NetU8_37"
+    },
+    "U8-38": {
+      "kicad": "unconnected-(U8-MAIN_DCD-Pad38)",
+      "altium": "NetU8_38"
+    },
+    "U8-4": {
+      "kicad": "unconnected-(U8-PCM_CLK-Pad4)",
+      "altium": "NetU8_4"
+    },
+    "U8-40": {
+      "kicad": "unconnected-(U8-I2C_SCL-Pad40)",
+      "altium": "NetU8_40"
+    },
+    "U8-41": {
+      "kicad": "unconnected-(U8-I2C_SDA-Pad41)",
+      "altium": "NetU8_41"
+    },
+    "U8-42": {
+      "kicad": "unconnected-(U8-USIM_DET-Pad42)",
+      "altium": "NetU8_42"
+    },
+    "U8-49": {
+      "kicad": "unconnected-(U8-ANT_GNSS-Pad49)",
+      "altium": "NetU8_49"
+    },
+    "U8-5": {
+      "kicad": "unconnected-(U8-PCM_SYNC-Pad5)",
+      "altium": "NetU8_5"
+    },
+    "U8-51": {
+      "kicad": "unconnected-(U8-GNSS_LNA_EN-Pad51)",
+      "altium": "NetU8_51"
+    },
+    "U8-56": {
+      "kicad": "unconnected-(U8-ANT_WIFI-Pad56)",
+      "altium": "NetU8_56"
+    },
+    "U8-57": {
+      "kicad": "unconnected-(U8-RESERVED-Pad57)",
+      "altium": "NetU8_57"
+    },
+    "U8-6": {
+      "kicad": "unconnected-(U8-PCM_DIN-Pad6)",
+      "altium": "NetU8_6"
+    },
+    "U8-63": {
+      "kicad": "unconnected-(U8-RESERVED-Pad63)",
+      "altium": "NetU8_63"
+    },
+    "U8-64": {
+      "kicad": "unconnected-(U8-GPIO3-Pad64)",
+      "altium": "NetU8_64"
+    },
+    "U8-65": {
+      "kicad": "unconnected-(U8-GPIO4-Pad65)",
+      "altium": "NetU8_65"
+    },
+    "U8-66": {
+      "kicad": "unconnected-(U8-GPIO5-Pad66)",
+      "altium": "NetU8_66"
+    },
+    "U8-7": {
+      "kicad": "unconnected-(U8-PCM_DOUT-Pad7)",
+      "altium": "NetU8_7"
+    },
+    "U8-76": {
+      "kicad": "unconnected-(U8-RESERVED-Pad76)",
+      "altium": "NetU8_76"
+    },
+    "U8-77": {
+      "kicad": "unconnected-(U8-RESERVED-Pad77)",
+      "altium": "NetU8_77"
+    },
+    "U8-78": {
+      "kicad": "unconnected-(U8-RESERVED-Pad78)",
+      "altium": "NetU8_78"
+    },
+    "U8-83": {
+      "kicad": "unconnected-(U8-GRFC1-Pad83)",
+      "altium": "NetU8_83"
+    },
+    "U8-84": {
+      "kicad": "unconnected-(U8-GRFC2-Pad84)",
+      "altium": "NetU8_84"
+    },
+    "U8-85": {
+      "kicad": "unconnected-(U8-GPIO6-Pad85)",
+      "altium": "NetU8_85"
+    },
+    "U8-86": {
+      "kicad": "unconnected-(U8-GPIO7-Pad86)",
+      "altium": "NetU8_86"
+    },
+    "U8-87": {
+      "kicad": "unconnected-(U8-GPIO8-Pad87)",
+      "altium": "NetU8_87"
+    },
+    "U8-88": {
+      "kicad": "unconnected-(U8-GPIO9-Pad88)",
+      "altium": "NetU8_88"
+    },
+    "U8-92": {
+      "kicad": "unconnected-(U8-RESERVED-Pad92)",
+      "altium": "NetU8_92"
+    },
+    "U8-93": {
+      "kicad": "unconnected-(U8-RESERVED-Pad93)",
+      "altium": "NetU8_93"
+    },
+    "U8-94": {
+      "kicad": "unconnected-(U8-RESERVED-Pad94)",
+      "altium": "NetU8_94"
+    },
+    "U8-95": {
+      "kicad": "unconnected-(U8-RESERVED-Pad95)",
+      "altium": "NetU8_95"
+    },
+    "U8-96": {
+      "kicad": "unconnected-(U8-PON_TRIG-Pad96)",
+      "altium": "NetU8_96"
+    },
+    "U8-97": {
+      "kicad": "unconnected-(U8-RESERVED-Pad97)",
+      "altium": "NetU8_97"
+    },
+    "U8-98": {
+      "kicad": "unconnected-(U8-RESERVED-Pad98)",
+      "altium": "NetU8_98"
+    },
+    "U8-99": {
+      "kicad": "unconnected-(U8-RESERVED-Pad99)",
+      "altium": "NetU8_99"
+    },
+    "U9-15": {
+      "kicad": "unconnected-(U9-VIO_SEL-Pad15)",
+      "altium": "NetU9_15"
+    },
+    "U9-18": {
+      "kicad": "unconnected-(U9-SAFEBOOT_N-Pad18)",
+      "altium": "NetU9_18"
+    },
+    "U9-5": {
+      "kicad": "unconnected-(U9-EXTINT-Pad5)",
+      "altium": "NetU9_5"
+    },
+    "U9-6": {
+      "kicad": "unconnected-(U9-V_BCKP-Pad6)",
+      "altium": "NetU9_6"
+    },
+    "U9-9": {
+      "kicad": "unconnected-(U9-RESET_N-Pad9)",
+      "altium": "NetU9_9"
+    }
+  },
+  "pin_mismatches": [],
+  "multi_pin_net_mismatches": [],
+  "pass": true
+}

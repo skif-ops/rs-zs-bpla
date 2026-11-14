@@ -1,0 +1,79 @@
+{
+  "schema_version": "dioneya.pcb-main-ground-domain-routing-candidate.v2",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-002",
+  "status": "READY_FOR_INDEPENDENT_HUMAN_DECISION",
+  "basis": "Review B R1 section 4: variant 1 accepted as ECO direction, variant 2 rejected",
+  "date_utc": "2026-09-25",
+  "record": "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_002_CANDIDATE_REV_A.md",
+  "baseline": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-ROUTING-002/PCB-MAIN_GROUND_DOMAIN_ROUTING_002_CANDIDATE_REV_A.kicad_pcb",
+    "board_sha256": "c168f5f2418776bf037598e856f4920d02c30c9702ab0a4c485146d93b17c536",
+    "committed_zone_fill_state": "UNFILLED_CI_AND_REVIEW_TOOLS_MUST_REFILL_BEFORE_DRC",
+    "generator": "tools/apply_pcb_main_ground_domain_routing_002_candidate_rev_a.py",
+    "geometry_rules": "tools/pcb_main_ground_domain_002_rev_a.py",
+    "kicad_stage": "tools/pcb_main_ground_domain_002_stage_rev_a.py",
+    "evidence": ["SPEC.json", "REFERENCE_MAP.json", "SUMMARY.json", "drc_base.json", "drc_candidate.json"]
+  },
+  "delta": {
+    "in4_gnd_modem_zone_replaced": {"before_mm2": 5238.3, "after_zones_mm2": [2444.8, 5.3], "priority": 1},
+    "in4_gnd_digital_zone_added": {"outline": "In1.Cu GND_DIGITAL outline", "outline_mm2": 6940.7, "effective_mm2": 5488.9, "priority": 0},
+    "gnd_digital_stitching_vias_added": 15,
+    "gnd_modem_in3_tie": {"width_mm": 0.3, "segments": 4, "length_mm": 12.61, "from_via": [56.225, 29.1], "to_via": [60.1, 17.225], "min_clearance_to_new_via_mm": 0.204},
+    "unchanged": ["netlist", "pin assignments", "placement", "outline", "RF keepouts", "H1-H4 rule areas", "domain joins", "In1.Cu", "In2.Cu", "all signal tracks and vias"],
+    "preserved_geometry_outside_delta": "PASS_BYTE_EXACT"
+  },
+  "filled_copper_continuity_share": {
+    "B.Cu|GND_DIGITAL": {"length_mm": 67.81, "base": 0.0, "candidate": 0.9458, "outline": 1.0},
+    "B.Cu|GND_MODEM": {"length_mm": 148.9, "base": 0.9939, "candidate": 0.9939, "outline": 1.0},
+    "F.Cu|GND_DIGITAL": {"length_mm": 238.02, "base": 0.9377, "candidate": 0.9377, "outline": 1.0},
+    "F.Cu|GND_MODEM": {"length_mm": 66.74, "base": 0.9145, "candidate": 0.9145, "outline": 0.9145},
+    "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": {"length_mm": 41.01, "base": 0.0, "candidate": 0.0},
+    "In2.Cu|GND_DIGITAL": {"length_mm": 157.41, "base": 0.0, "candidate": 0.0},
+    "In3.Cu|GND_DIGITAL": {"length_mm": 112.72, "base": 0.0, "candidate": 0.0}
+  },
+  "stitching": {"target_mm": 1.5, "search_mm": 2.5, "already_within_target": 9, "added_within_target": 11, "added_improved_above_target": 4, "no_free_spot": 7},
+  "kicad_9_drc_after_refill": {
+    "toolchain": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
+    "base": {"errors": 0, "silk_over_copper": 166, "silk_overlap": 66, "unconnected": 421},
+    "candidate": {"errors": 0, "silk_over_copper": 166, "silk_overlap": 66, "unconnected": 421},
+    "new_fingerprints": 0,
+    "removed_fingerprints": 0,
+    "runs": ["1: +1 unconnected (TP_CELL_DBG modem island) - fixed by In3 tie", "2: 1 clearance error In3 tie vs new stitching via - fixed", "3: clean"],
+    "ci_apply_bot_commit": "90ae5281"
+  },
+  "findings_outside_scope": {
+    "inner_layer_digital_tracks": {
+      "In2.Cu_mm": 157.41,
+      "In3.Cu_mm": 112.72,
+      "nets": ["NOR_IO0_U1", "NOR_IO1_U1", "NOR_IO1_U2", "NOR_IO3_U2", "SD_D2_U1", "EN_MODEM", "NOR_IO2_U1", "NOR_IO2_U2", "NOR_CLK_U1", "NOR_CLK_U2", "NOR_IO0_U2"],
+      "decision_required": ["REROUTE_TO_F_CU_B_CU_SEPARATE_ECO", "EXTEND_ECO_TO_IN2_STACKUP"]
+    },
+    "cross_domain_interfaces": {
+      "DIGITAL_MODEM": ["CELL_DTR_U16", "CELL_PWRKEY_CMD", "CELL_RESET_N_CMD", "CELL_RI_U16", "CELL_RX_U16", "CELL_STATUS_U16", "CELL_TX_U16", "SIM1_DET", "SIM2_DET", "SIM_MUX_EN", "SIM_MUX_SEL"],
+      "DIGITAL_MIC": ["AAD_CFG_1V8_FANOUT", "MIC_WAKE_OR_1V8", "PDM_CLK_1V8_FANOUT", "PDM_DATA1_1V8", "PDM_DATA2_1V8", "PDM_DATA3_1V8", "PDM_DATA4_1V8"],
+      "fixed_by_this_eco": false
+    }
+  },
+  "review_request": {
+    "requested_decision": "ACCEPT_OR_REJECT_ON_EXACT_CANDIDATE_SHA",
+    "candidate_sha256": "c168f5f2418776bf037598e856f4920d02c30c9702ab0a4c485146d93b17c536",
+    "accept_value": "ACCEPT_GROUND_DOMAIN_ROUTING_002",
+    "reject_value": "REJECT_GROUND_DOMAIN_ROUTING_002",
+    "acceptance_authorizes": ["Apply only this hash-bound candidate to the authoritative PCB-MAIN board, recorded separately with SHA verification"],
+    "acceptance_does_not_authorize": ["Treat In2/In3 digital tracks as accepted", "Treat cross-domain interfaces as reviewed", "Treat PCB-MAIN routing as complete", "Close Review B, SI, PI, thermal or DFM", "Manufacture PCB-MAIN"],
+    "separate_decisions_requested": ["inner_layer_digital_tracks", "gnd_modem_in3_tie"]
+  },
+  "decision_boundary": {
+    "proposal_only": true,
+    "applied_to_authoritative_board": false,
+    "routing_complete": false,
+    "return_path_review_complete": false,
+    "review_b_complete": false,
+    "manufacturing_release": false
+  }
+}

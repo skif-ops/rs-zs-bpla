@@ -1,0 +1,38 @@
+name: ci-dispatch
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.load.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: load
+        run: echo "matrix=$(jq -c . ci/jobs.json)" >> "$GITHUB_OUTPUT"
+  run:
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - if: matrix.shell == 'bash'
+        run: bash ${{ matrix.script }}
+      - if: matrix.shell == 'pwsh'
+        shell: pwsh
+        run: pwsh -File ${{ matrix.script }}
+      - if: matrix.artifacts != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.artifacts }}
+          if-no-files-found: warn
+          retention-days: 30

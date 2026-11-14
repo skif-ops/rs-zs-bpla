@@ -1,0 +1,51 @@
+PCB-MAIN KiCad / Altium validation evidence
+Date: 2026-10-15
+Altium: 26.10.1 Trial through the local eda-agent bridge
+KiCad: 10.0.6 CLI
+Project: hardware/altium/netlabel-reimport-diagnostic/PCB-MAIN/PCB-MAIN.PrjPcb
+
+Altium compile:
+- Net Identifier Scope: Strict Hierarchical (HierarchyMode=4)
+- project.compile: success
+- errors visible in Messages: 0
+- warnings visible in Messages: 146
+- warning groups: 64 missing component models, 43 nets with no driving
+  source, 39 possible connection problems
+- warnings remain visible and unsuppressed
+
+Current-source compiled connectivity:
+- physical pins: KiCad 1074, Altium 1074
+- multi-pin nets: KiCad 186, Altium 186
+- single-pin nets: KiCad 169, Altium 169
+- physical pin mismatches: 0
+- multi-pin net mismatches: 0
+- single-pin nets were compared by ref/pin membership because KiCad and Altium
+  assign different generated names
+
+KiCad current-source checks:
+- ERC: 0 violations
+- PCB DRC: 667 violations (203 errors, 464 warnings)
+- unconnected items: 499
+- schematic parity items: 601
+- violation groups: 4 hole clearance, 199 silkscreen over copper,
+  66 silkscreen overlap, 199 track width, 199 dangling via
+- parity groups: 4 extra footprints, 199 field mismatches,
+  199 symbol mismatches, 199 net conflicts
+
+Existing Altium PCB DRC evidence:
+- normalized diagnostic rules: 421 violations, all Un-Routed Net
+- clearance and short-circuit violations: 0
+- these normalized rules are diagnostic settings, not approved fabrication rules
+
+Related evidence:
+- PCB-MAIN-KiCad-Altium-connectivity-2026-10-15.json
+- PCB-MAIN-validation-summary-2026-10-15.json
+- PCB-MAIN-KiCad-ERC-2026-10-15.json
+- PCB-MAIN-Altium-DRC-normalized-rules-2026-10-14.drc
+- PCB-MAIN-KiCad-DRC-2026-10-14.json
+
+Conclusion:
+- Schematic electrical connectivity transfer is verified for the current source.
+- PCB routing, native DRC/parity, stackup, impedance, RF return paths, power
+  integrity, mechanical, CAM and DFM gates remain open.
+- Status: NOT FOR MANUFACTURE.

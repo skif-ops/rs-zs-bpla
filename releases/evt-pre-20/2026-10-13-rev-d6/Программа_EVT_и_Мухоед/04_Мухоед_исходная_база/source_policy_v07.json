@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "policy": "v0.7",
+  "sources": {
+    "dataset/raw/Лютый/v06_user_sources/Лютый 3/Лютый 3.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.78,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/v06_user_sources/Лютый 4/Лютый 4.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.776,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/v06_user_sources/Лютый 5/Лютый 5.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.78,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/FP-1/v06_user_sources/FP-1/FP-1.wav": {
+      "label": "FP-1",
+      "dataset_role": "training_provisional_weak",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.761,
+      "label_confidence": "weak",
+      "label_confidence_score": 0.4,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/FP-1/v06_user_sources/FP-1 (2)/FP-1 (2).wav": {
+      "label": "FP-1",
+      "dataset_role": "training_provisional_weak",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.78,
+      "label_confidence": "weak",
+      "label_confidence_score": 0.4,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/FP-1/v06_user_sources/FP-1 3/FP-1 3.wav": {
+      "label": "FP-1",
+      "dataset_role": "training_provisional_weak",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.78,
+      "label_confidence": "weak",
+      "label_confidence_score": 0.4,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "uploads/981a53c2-2afc-493b-9bfd-81d8f5c713ee/______.mp3": {
+      "label": "FP-1",
+      "dataset_role": "training_provisional_weak",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "weak",
+      "label_confidence_score": 0.4,
+      "source_origin": "pre_v06_dataset",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_audio14/lutyi_audio14_full.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "pre_v06_dataset",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_city_pass/lutyi_city_pass_0_10p5.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "pre_v06_dataset",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_daylight_pass/lutyi_daylight_pass_0_10.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "pre_v06_dataset",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_20260920_varied_range_altitude_le_90m/video_2026-09-20_21-07-06.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "source_group": "lutyi_20260920_varied_range_altitude_le_90m",
+      "distance_profile": "variable_unknown",
+      "altitude_max_m": 90.0,
+      "verification": "user_verified_2026-09-20",
+      "wav_sha256": "792a692a58e0194274222844f00b785877d1a70184aa79e5872f3182e8e6dc46",
+      "original_video_sha256": "12edb8225cd846ca50dacaa78ca82aa9c4e5c564e99d494bbc7b777d5a723fdb",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_20260920_varied_range_altitude_le_90m/video_2026-09-20_21-07-20.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "source_group": "lutyi_20260920_varied_range_altitude_le_90m",
+      "distance_profile": "variable_unknown",
+      "altitude_max_m": 90.0,
+      "verification": "user_verified_2026-09-20",
+      "wav_sha256": "92f47c1dac8aeca32f2784bb8f030907a84fbb9bc81260e49e4c4a1830ac60f8",
+      "original_video_sha256": "d6cbf6d8d7f91ab8b818ab32ce24c8c178fe7f826b6778cb927ab6bb7900c96b",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_20260920_varied_range_altitude_le_90m/video_2026-09-20_21-07-26.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "source_group": "lutyi_20260920_varied_range_altitude_le_90m",
+      "distance_profile": "variable_unknown",
+      "altitude_max_m": 90.0,
+      "verification": "user_verified_2026-09-20",
+      "wav_sha256": "6233b487fa5ad303b3e04582833502482663f7e59a33e3b114fe87ff0d3ad275",
+      "original_video_sha256": "8a56410f19f505662a315fe4ad26fb426d40cb2880092db8e10c2ad936232de3",
+      "validation_eligible": false
+    }
+  }
+}

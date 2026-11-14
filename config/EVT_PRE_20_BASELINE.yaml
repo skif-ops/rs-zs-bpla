@@ -19,14 +19,44 @@ authority_sync:
   native_pcb_main: PRESENT_SCHEMATIC_ERC_PASS_REVIEW_A_PASS_LAYOUT_CANDIDATE_UNROUTED
   review_a: PASS_SIGNED_COMMIT_35C9ED91
   review_b: OPEN_ROUTING_DRC_CAM_DFM_AND_EVIDENCE_PENDING
-  production_bom: BLOCKED
+  production_bom: CUSTOMER_PROCUREMENT_HANDOFF_SENT_TECHNICAL_FOLLOWUP_OPEN
 
 lot:
   maximum_station_quantity: 20
   supported_procurement_quantities: [4, 10, 20]
   selected_evt_quantity: 20
+  program_total_station_quantity: 41
+  program_structure: TWO_EVT20_PRODUCTION_SETS_PLUS_ONE_BENCH
+  program_production_set_quantities: [20, 20]
+  program_bench_station_quantity: 1
+  program_procurement_variants: [21, 41]
+  program_procurement_selection_status: CUSTOMER_TO_SELECT_21_PHASE1_OR_41_FULL_PROGRAM
+  program_procurement_authority_21: hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv
+  program_procurement_authority_41: hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv
+  program_procurement_variants_register: hardware/EVT_PROGRAM_PROCUREMENT_VARIANTS_REV_A.csv
+  program_procurement_authority: hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv
+  program_spare_rule: TWO_EVT20_RESERVE_POOLS_BENCH_ADDS_NO_THIRD_RESERVE_POOL
+  program_serial_register: manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv
+  program_serial_status: RESERVED_DIO_EVT_021_THROUGH_040_AND_DIO_EVT_B01
+  program_traveller_status: REQUIRED_BEFORE_BUILD
+  program_serial_and_traveller_status: SERIALS_RESERVED_TRAVELLERS_REQUIRED_BEFORE_BUILD
   selection_required_before_purchase_release: true
   selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20
+  commercial_procurement_owner: CUSTOMER
+  customer_procurement_handoff_status: SENT_TO_CUSTOMER_FOR_ORDER
+  customer_procurement_handoff_date: 2026-10-05
+  customer_procurement_handoff_revision: EVT-PRE-20 Rev_D
+  customer_procurement_handoff_scope: FULL_PROGRAM_2X20_PLUS_1
+  customer_procurement_order_policy: ORDER_ALL_AT_ONCE_NO_FIRST_ARTICLE_PAUSE
+  post_order_factory_feedback_policy: PROCESS_DFM_STACKUP_VIA_ASSEMBLY_AND_HOUSING_COMMENTS_AS_CONTROLLED_ECO_AFTER_ORDER
+  supplier_stock_price_moq_and_delivery_gate: NON_BLOCKING_CUSTOMER_ACTION
+  engineering_procurement_handoff_requires_quote_fields: false
+  engineering_release_gate_after_customer_handoff: TRACK_OPEN_ITEMS_AS_FOLLOWUP_NOT_PROCUREMENT_BLOCKERS
+  exact_mpn_and_no_substitution_required: true
+  job_specific_manufacturing_technical_responses_required: false
+  evt_public_engineering_baseline_authorized: true
+  customer_order_checkout_dfm_must_pass: true
+  series_transfer_manufacturing_revalidation_required: true
   selected_serial_range: ["001", "020"]
   serial_prefix: DIO-EVT-
   serial_range: ["001", "020"]
@@ -146,7 +176,7 @@ communications:
     pilot_frequency_windows_mhz: [[864.0, 865.0], [868.7, 869.2]]
     variants:
       - id: RU868
-        profile_status: OPEN_REGULATORY_AND_RF_VALIDATION
+        profile_status: FREQUENCY_PLAN_ACCEPTED_FIELD_TX_HARDWARE_RF_VALIDATION_PENDING
       - id: EU868
         profile_status: FUTURE_COMPATIBILITY_NOT_IN_PILOT
   ble:
@@ -179,7 +209,7 @@ mechanics:
   injection_molding_scope: source_data_and_dfm_only_no_pilot_tooling
 
 software:
-  station_firmware_status: TARGET_PORT_REQUIRED
+  station_firmware_status: ENGINEERING_ARM_TARGET_BUILD_PASS_RELEASE_AND_HARDWARE_VALIDATION_PENDING
   server_name: Mukhoyed
   server_targets: [Windows_11, Ubuntu_24_04]
   android_track: separate

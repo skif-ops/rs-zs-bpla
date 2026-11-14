@@ -1,0 +1,36 @@
+{
+  "schema": "dioneya-pcb-pwr-3v8-output-bulk-routing-010-review-mapping-v1",
+  "proposal_id": "PCB-PWR-3V8-OUTPUT-BULK-ROUTING-010",
+  "reviewed_commit_sha": "e203af7924dbd007a21a3f4cd0bc7fc901a740e2",
+  "reviewed_tree_sha": "83ebec4cdd38c95906b3e952a12f335ab46a41eb",
+  "gate_evidence_commit_sha": "97702d748f7e58fc43b3ca4b046adcadce23acc6",
+  "gate_evidence_tree_sha": "499424d53c0f232f6c0d6dad2586e2d11f2432af",
+  "candidate_sha256": "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469",
+  "ci_run_number": 751,
+  "ci_run_id": 35986953239,
+  "pcb_pwr_schematic_run_number": 121,
+  "pcb_pwr_schematic_run_id": 35986953246,
+  "pcb_native_run_number": 386,
+  "pcb_native_run_id": 35986953171,
+  "pcb_native_job_id": 107591764546,
+  "artifact_id": 10802971000,
+  "artifact_digest": "sha256:f84900812fa80350e4da4cbfeb9e5a017d72fc11d4fea4a7a09e1d8f020c1616",
+  "comparative_drc": {
+    "status": "PASS_NO_DRC_FINGERPRINT_DELTA_UNCONNECTED_REDUCED",
+    "base_violations": 85,
+    "candidate_violations": 85,
+    "base_unconnected": 105,
+    "candidate_unconnected": 101,
+    "new_drc_fingerprints": 0
+  },
+  "human_gate": {
+    "status": "ACCEPTED",
+    "reviewer": "Скиф",
+    "decision_date": "2026-09-24",
+    "accept_value": "ACCEPT_PCB_PWR_3V8_OUTPUT_BULK_ROUTING_010_SUBGATE"
+  },
+  "authoritative_board_modified": false,
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "dioneya-pcb-main-kicad-altium-validation-summary-v1",
+  "board": "PCB-MAIN",
+  "date": "2026-10-15",
+  "source_sha256": {
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch": "8f697d12d008ab996db17d7708ec3d22ad95f53988f7fdc6fddb7ac3300dfe03",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_01_POWER.kicad_sch": "f95e559b66a8adc500b2a8736039a4745dbf0c4ec19b5eb5f46f57eaebfd3911",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_02_MCU.kicad_sch": "7f7c8e6f35df1367224f55cb40bc58b7eaf062e3389cc1792c11b9598710a530",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_03_AUDIO.kicad_sch": "58f4db563dbbe35b900401b6ddb2bbd510982143800e39082379f2e5ae092239",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_04_GNSS.kicad_sch": "d4b0f833250559212ce0d0f9cb30d8062ec8157b08c038dc7065a2315cc14a02",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_05_CELLULAR.kicad_sch": "e9876591b0bc9dce42e096bcfcd9cb28c186109c8828332bfea3e67d10166f31",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_06_LORA.kicad_sch": "dfa6c3c2661595af7575926fb70ffc4f7299caac54164c29e03ce92c2daec553",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_07_BLE.kicad_sch": "32788ecacf2f1daf3506805ea7379e0567cc80bac4b761376b7047ee15868096",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_08_STORAGE_SENSORS.kicad_sch": "0985826f768f9b41182d0edf6a71184d2e353702900ae4e374637d13e5abc1df",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN_09_CONNECTORS_TEST.kicad_sch": "031c343711a1e7925db862eb9c41f409f334a71af44d8d9f6036f06317b9c9de",
+    "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb": "8f136fa072a16846690ac4c7aab844321160919cf2b3997ced826a17e2a181d9"
+  },
+  "kicad": {
+    "version": "10.0.6",
+    "erc_violations": 0,
+    "drc_violations": 667,
+    "drc_errors": 203,
+    "drc_warnings": 464,
+    "unconnected_items": 499,
+    "schematic_parity_items": 601,
+    "violation_types": {
+      "hole_clearance": 4,
+      "silk_over_copper": 199,
+      "silk_overlap": 66,
+      "track_width": 199,
+      "via_dangling": 199
+    },
+    "parity_types": {
+      "extra_footprint": 4,
+      "footprint_symbol_field_mismatch": 199,
+      "footprint_symbol_mismatch": 199,
+      "net_conflict": 199
+    },
+    "erc_report_sha256": "206d5a322c6644995ce4032094107df3b5b80aa0d4ceafbeb59207651e486328",
+    "drc_report_sha256": "e850d7454d8f576bed02b630df0420a415c4b922610091e2cdfc0b6369237a7e"
+  },
+  "altium": {
+    "version": "26.10.1 Trial",
+    "project": "hardware/altium/netlabel-reimport-diagnostic/PCB-MAIN/PCB-MAIN.PrjPcb",
+    "hierarchy_mode": 4,
+    "compile_success": true,
+    "compile_errors": 0,
+    "compile_warnings": 146,
+    "warning_groups": {
+      "Missing component models": 64,
+      "Nets with no driving source": 43,
+      "Nets with possible connection problems": 39
+    },
+    "saved_normalized_drc_unrouted_violations": 421
+  },
+  "connectivity": {
+    "pass": true,
+    "kicad_physical_pins": 1074,
+    "altium_physical_pins": 1074,
+    "kicad_multi_pin_nets": 186,
+    "altium_multi_pin_nets": 186,
+    "kicad_single_pin_nets": 169,
+    "altium_single_pin_nets": 169,
+    "pin_mismatches": 0,
+    "multi_pin_net_mismatches": 0
+  },
+  "release_status": "NOT_FOR_MANUFACTURE",
+  "open_findings": [
+    "499 native KiCad unconnected items and 421 saved Altium unrouted violations remain",
+    "667 native KiCad DRC violations remain",
+    "601 native schematic-to-PCB parity items remain",
+    "Altium compile warnings remain visible and unsuppressed",
+    "stackup, impedance, RF return path, power integrity, mechanical, CAM, and DFM release gates remain open"
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "schema": "dioneya-evt-housing-package-v1",
+  "configuration": "EVT-PRE-20",
+  "technology": "3D_PRINT_FDM",
+  "revision": "A",
+  "date": "2026-10-16",
+  "status": "RELEASED_FOR_EVT_FIRST_ARTICLE_BUILD",
+  "master_step": "EVT_HOUSING_MASTER_REV_A.step",
+  "drawing_pdf": "EVT_HOUSING_DRAWING_REV_A.pdf",
+  "printer_profile": "PRINT_PROFILE_EVT_ASA_REV_A.json",
+  "housing_bom": "HOUSING_BOM_EVT_REV_A.csv",
+  "parts": [
+    {
+      "part_number": "DIO_HSG_ELECTRONICS_BASE_REV_A",
+      "description": "Upper electronics enclosure base",
+      "quantity_per_station": 1,
+      "bbox_mm": [
+        150.004,
+        115.011,
+        44.004
+      ],
+      "volume_mm3": 171868.31,
+      "solid_count": 1,
+      "stl": "DIO_HSG_ELECTRONICS_BASE_REV_A.stl",
+      "stl_sha256": "cb6efa6032a17e9929d9d2f389ee2f55c56a3623165b250aff1ef79e217e7d71"
+    },
+    {
+      "part_number": "DIO_HSG_ELECTRONICS_LID_REV_A",
+      "description": "Gasketed upper electronics lid",
+      "quantity_per_station": 1,
+      "bbox_mm": [
+        150.004,
+        115.004,
+        12.003
+      ],
+      "volume_mm3": 131460.55,
+      "solid_count": 1,
+      "stl": "DIO_HSG_ELECTRONICS_LID_REV_A.stl",
+      "stl_sha256": "39b1853546a596c6acd7199ed785d2bacd1f5a586efc32bb65e5e3a3ee94c728"
+    },
+    {
+      "part_number": "DIO_HSG_POWER_BASE_REV_A",
+      "description": "RB40 battery enclosure base",
+      "quantity_per_station": 1,
+      "bbox_mm": [
+        215.005,
+        184.006,
+        196.005
+      ],
+      "volume_mm3": 992946.86,
+      "solid_count": 1,
+      "stl": "DIO_HSG_POWER_BASE_REV_A.stl",
+      "stl_sha256": "c90aeaa42404b56297c3525290b1d9b24e5dbb4f4423cd789fd3cec9b61b650b"
+    },
+    {
+      "part_number": "DIO_HSG_POWER_LID_REV_A",
+      "description": "Power electronics lid with PCB-PWR/MPPT mounting provisions",
+      "quantity_per_station": 1,
+      "bbox_mm": [
+        215.005,
+        184.005,
+        16.005
+      ],
+      "volume_mm3": 336325.23,
+      "solid_count": 1,
+      "stl": "DIO_HSG_POWER_LID_REV_A.stl",
+      "stl_sha256": "cc5362094272a67d52f30086e12831de877707e81ea6a88309b4a81b1cdd648b"
+    },
+    {
+      "part_number": "DIO_HSG_MIC_POD_BASE_REV_A",
+      "description": "PCB-MIC pod base",
+      "quantity_per_station": 4,
+      "bbox_mm": [
+        30.002,
+        28.002,
+        14.002
+      ],
+      "volume_mm3": 5622.72,
+      "solid_count": 1,
+      "stl": "DIO_HSG_MIC_POD_BASE_REV_A.stl",
+      "stl_sha256": "bf401ab32124d0bb9adbcc6190016c2725b05bba9fb7b8e778340c32cee5c07f"
+    },
+    {
+      "part_number": "DIO_HSG_MIC_POD_CAP_REV_A",
+      "description": "Acoustic membrane retaining cap",
+      "quantity_per_station": 4,
+      "bbox_mm": [
+        30.002,
+        28.002,
+        3.002
+      ],
+      "volume_mm3": 2431.98,
+      "solid_count": 1,
+      "stl": "DIO_HSG_MIC_POD_CAP_REV_A.stl",
+      "stl_sha256": "86da03fec6ae5a30ecceb017433ad8864608ac83b301833e57bb10adaef15857"
+    }
+  ],
+  "maximum_part_bbox_mm": [
+    215,
+    184,
+    196
+  ],
+  "printer_build_volume_mm": [
+    220,
+    220,
+    220
+  ],
+  "first_article_hold": true,
+  "physical_evt_complete": false,
+  "serial_release": false,
+  "master_step_sha256": "c4fb3182bdb219b7fdbe7aa937e9a6bb52c06e1258f02542eb14e54fe0d82fd6",
+  "drawing_pdf_sha256": "63ad39fa5d5e9899483f7ce81a208cf19bc8ef6ac9b7e6fb98cd72664e5c93a5"
+}

@@ -1,0 +1,449 @@
+{
+  "schema": "dioneya-pcb-pwr-power-copper-width-v1",
+  "board_sha256": "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610",
+  "method": "perpendicular cuts every 0.25 mm along power tracks >= 1 mm wide through the union of same-net tracks, filled zones and pads on the same layer; sense/escape stubs < 1 mm excluded",
+  "screen": "35 um outer copper, delta-T 10 C: 5 A 2.77 mm, 4 A 2.03 mm (hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json)",
+  "rows": [
+    {
+      "net": "3V3_DIGITAL",
+      "layer": "B.Cu",
+      "class": "PWR_RAIL_4A",
+      "screen_mm": 2.033,
+      "samples": 78,
+      "min_mm": 1.471,
+      "median_mm": 2.111,
+      "below_screen_samples": 14,
+      "narrowest": [
+        {
+          "width_mm": 1.471,
+          "at_mm": [
+            82.95,
+            42.75
+          ]
+        },
+        {
+          "width_mm": 1.496,
+          "at_mm": [
+            82.95,
+            42.5
+          ]
+        },
+        {
+          "width_mm": 1.536,
+          "at_mm": [
+            82.95,
+            43.0
+          ]
+        },
+        {
+          "width_mm": 1.578,
+          "at_mm": [
+            82.95,
+            41.25
+          ]
+        },
+        {
+          "width_mm": 1.605,
+          "at_mm": [
+            82.95,
+            42.25
+          ]
+        },
+        {
+          "width_mm": 1.649,
+          "at_mm": [
+            82.95,
+            41.5
+          ]
+        },
+        {
+          "width_mm": 1.689,
+          "at_mm": [
+            82.95,
+            43.25
+          ]
+        },
+        {
+          "width_mm": 1.726,
+          "at_mm": [
+            82.95,
+            41.0
+          ]
+        }
+      ]
+    },
+    {
+      "net": "3V3_DIGITAL",
+      "layer": "F.Cu",
+      "class": "PWR_RAIL_4A",
+      "screen_mm": 2.033,
+      "samples": 145,
+      "min_mm": 1.41,
+      "median_mm": 3.0,
+      "below_screen_samples": 26,
+      "narrowest": [
+        {
+          "width_mm": 1.41,
+          "at_mm": [
+            67.99,
+            49.02
+          ]
+        },
+        {
+          "width_mm": 1.412,
+          "at_mm": [
+            67.99,
+            49.27
+          ]
+        },
+        {
+          "width_mm": 1.49,
+          "at_mm": [
+            68.95,
+            50.24
+          ]
+        },
+        {
+          "width_mm": 1.563,
+          "at_mm": [
+            69.2,
+            50.24
+          ]
+        },
+        {
+          "width_mm": 1.639,
+          "at_mm": [
+            66.95,
+            50.05
+          ]
+        },
+        {
+          "width_mm": 1.66,
+          "at_mm": [
+            66.7,
+            50.05
+          ]
+        },
+        {
+          "width_mm": 1.758,
+          "at_mm": [
+            66.45,
+            50.05
+          ]
+        },
+        {
+          "width_mm": 1.769,
+          "at_mm": [
+            69.45,
+            50.24
+          ]
+        }
+      ]
+    },
+    {
+      "net": "3V8_MODEM",
+      "layer": "B.Cu",
+      "class": "PWR_RAIL_4A",
+      "screen_mm": 2.033,
+      "samples": 142,
+      "min_mm": 1.0,
+      "median_mm": 2.057,
+      "below_screen_samples": 68,
+      "narrowest": [
+        {
+          "width_mm": 1.0,
+          "at_mm": [
+            49.61,
+            41.38
+          ]
+        },
+        {
+          "width_mm": 1.0,
+          "at_mm": [
+            49.79,
+            41.2
+          ]
+        },
+        {
+          "width_mm": 1.043,
+          "at_mm": [
+            49.97,
+            41.03
+          ]
+        },
+        {
+          "width_mm": 1.057,
+          "at_mm": [
+            54.26,
+            37.67
+          ]
+        },
+        {
+          "width_mm": 1.057,
+          "at_mm": [
+            54.51,
+            37.67
+          ]
+        },
+        {
+          "width_mm": 1.094,
+          "at_mm": [
+            54.76,
+            37.67
+          ]
+        },
+        {
+          "width_mm": 1.118,
+          "at_mm": [
+            49.44,
+            41.56
+          ]
+        },
+        {
+          "width_mm": 1.144,
+          "at_mm": [
+            54.01,
+            37.67
+          ]
+        }
+      ]
+    },
+    {
+      "net": "3V8_MODEM",
+      "layer": "F.Cu",
+      "class": "PWR_RAIL_4A",
+      "screen_mm": 2.033,
+      "samples": 317,
+      "min_mm": 1.0,
+      "median_mm": 3.0,
+      "below_screen_samples": 41,
+      "narrowest": [
+        {
+          "width_mm": 1.0,
+          "at_mm": [
+            47.65,
+            51.9
+          ]
+        },
+        {
+          "width_mm": 1.0,
+          "at_mm": [
+            47.9,
+            51.9
+          ]
+        },
+        {
+          "width_mm": 1.035,
+          "at_mm": [
+            48.15,
+            51.9
+          ]
+        },
+        {
+          "width_mm": 1.113,
+          "at_mm": [
+            47.4,
+            51.9
+          ]
+        },
+        {
+          "width_mm": 1.349,
+          "at_mm": [
+            48.5,
+            52.08
+          ]
+        },
+        {
+          "width_mm": 1.599,
+          "at_mm": [
+            48.68,
+            52.25
+          ]
+        },
+        {
+          "width_mm": 1.903,
+          "at_mm": [
+            48.85,
+            52.43
+          ]
+        },
+        {
+          "width_mm": 1.993,
+          "at_mm": [
+            34.77,
+            57.55
+          ]
+        }
+      ]
+    },
+    {
+      "net": "VBAT_FUSED",
+      "layer": "F.Cu",
+      "class": "PWR_INPUT_5A",
+      "screen_mm": 2.766,
+      "samples": 154,
+      "min_mm": 1.2,
+      "median_mm": 3.952,
+      "below_screen_samples": 23,
+      "narrowest": [
+        {
+          "width_mm": 1.2,
+          "at_mm": [
+            29.77,
+            31.25
+          ]
+        },
+        {
+          "width_mm": 1.312,
+          "at_mm": [
+            29.77,
+            31.5
+          ]
+        },
+        {
+          "width_mm": 1.346,
+          "at_mm": [
+            29.77,
+            31.0
+          ]
+        },
+        {
+          "width_mm": 1.392,
+          "at_mm": [
+            29.77,
+            30.75
+          ]
+        },
+        {
+          "width_mm": 1.623,
+          "at_mm": [
+            29.77,
+            30.5
+          ]
+        },
+        {
+          "width_mm": 1.653,
+          "at_mm": [
+            29.77,
+            31.75
+          ]
+        },
+        {
+          "width_mm": 2.007,
+          "at_mm": [
+            29.77,
+            30.0
+          ]
+        },
+        {
+          "width_mm": 2.098,
+          "at_mm": [
+            29.77,
+            30.25
+          ]
+        }
+      ]
+    },
+    {
+      "net": "VBAT_PROTECTED",
+      "layer": "B.Cu",
+      "class": "PWR_INPUT_5A",
+      "screen_mm": 2.766,
+      "samples": 168,
+      "min_mm": 3.981,
+      "median_mm": 3.998,
+      "below_screen_samples": 0,
+      "narrowest": []
+    },
+    {
+      "net": "VBAT_PROTECTED",
+      "layer": "F.Cu",
+      "class": "PWR_INPUT_5A",
+      "screen_mm": 2.766,
+      "samples": 89,
+      "min_mm": 3.123,
+      "median_mm": 5.099,
+      "below_screen_samples": 0,
+      "narrowest": []
+    },
+    {
+      "net": "VBAT_RAW",
+      "layer": "F.Cu",
+      "class": "PWR_INPUT_5A",
+      "screen_mm": 2.766,
+      "samples": 26,
+      "min_mm": 3.574,
+      "median_mm": 4.175,
+      "below_screen_samples": 0,
+      "narrowest": []
+    },
+    {
+      "net": "VBAT_SYS",
+      "layer": "F.Cu",
+      "class": "PWR_INPUT_5A",
+      "screen_mm": 2.766,
+      "samples": 270,
+      "min_mm": 2.0,
+      "median_mm": 4.0,
+      "below_screen_samples": 15,
+      "narrowest": [
+        {
+          "width_mm": 2.0,
+          "at_mm": [
+            49.27,
+            16.7
+          ]
+        },
+        {
+          "width_mm": 2.014,
+          "at_mm": [
+            49.52,
+            16.7
+          ]
+        },
+        {
+          "width_mm": 2.05,
+          "at_mm": [
+            50.27,
+            44.7
+          ]
+        },
+        {
+          "width_mm": 2.05,
+          "at_mm": [
+            50.52,
+            44.7
+          ]
+        },
+        {
+          "width_mm": 2.05,
+          "at_mm": [
+            50.77,
+            44.7
+          ]
+        },
+        {
+          "width_mm": 2.059,
+          "at_mm": [
+            50.02,
+            44.7
+          ]
+        },
+        {
+          "width_mm": 2.074,
+          "at_mm": [
+            51.05,
+            44.7
+          ]
+        },
+        {
+          "width_mm": 2.146,
+          "at_mm": [
+            49.02,
+            16.7
+          ]
+        }
+      ]
+    }
+  ]
+}

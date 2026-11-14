@@ -1,0 +1,5036 @@
+{
+  "board": {
+    "section": "board",
+    "units": "coord",
+    "coord_per_mil": 10000,
+    "file": "ORIGINAL_CONTROL_COPY",
+    "origin": [
+      0,
+      0
+    ],
+    "outline": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        8661417
+      ],
+      [
+        9448819,
+        8661417
+      ],
+      [
+        9448819,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "layers": [
+      {
+        "id": "TopLayer",
+        "name": "F.Cu",
+        "kind": "signal",
+        "order": 0,
+        "copper": 14000
+      },
+      {
+        "id": "BottomLayer",
+        "name": "B.Cu",
+        "kind": "signal",
+        "order": 1,
+        "copper": 14000
+      }
+    ],
+    "mech_layers": [
+      {
+        "id": "Mechanical1",
+        "name": "User.4",
+        "kind": "Not Set"
+      },
+      {
+        "id": "Mechanical6",
+        "name": "F.Fab",
+        "kind": "Not Set"
+      },
+      {
+        "id": "Mechanical7",
+        "name": "F.CrtYd",
+        "kind": "Not Set"
+      },
+      {
+        "id": "Mechanical12",
+        "name": "Cmts.User",
+        "kind": "Not Set"
+      }
+    ],
+    "split_planes": []
+  },
+  "components": {
+    "section": "components",
+    "units": "coord",
+    "coord_per_mil": 10000,
+    "components": [
+      {
+        "ref": "H2",
+        "footprint": "",
+        "comment": "Comment",
+        "x": 7874016,
+        "y": 2106299,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "locked": false,
+        "height": 0,
+        "bbox": [
+          7440945,
+          1673228,
+          8307087,
+          2539370
+        ],
+        "mech": [],
+        "bodies": []
+      },
+      {
+        "ref": "H1",
+        "footprint": "",
+        "comment": "Comment",
+        "x": 1574803,
+        "y": 2106299,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "locked": false,
+        "height": 0,
+        "bbox": [
+          1141732,
+          1673228,
+          2007874,
+          2539370
+        ],
+        "mech": [],
+        "bodies": []
+      },
+      {
+        "ref": "R1",
+        "footprint": "R_0402_1005Metric",
+        "comment": "Comment",
+        "x": 4429134,
+        "y": 4507874,
+        "rotation": 270,
+        "layer": "TopLayer",
+        "locked": false,
+        "height": 0,
+        "bbox": [
+          4194095,
+          4091732,
+          4998782,
+          4924016
+        ],
+        "mech": [
+          {
+            "t": [
+              4614173,
+              4141732,
+              4614173,
+              4874016,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              4244095,
+              4141732,
+              4614173,
+              4141732,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              4244095,
+              4141732,
+              4244095,
+              4874016,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              4244095,
+              4874016,
+              4614173,
+              4874016,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              4535433,
+              4301181,
+              4535433,
+              4714567,
+              100000
+            ],
+            "layer": "Mechanical6"
+          },
+          {
+            "t": [
+              4322835,
+              4301181,
+              4535433,
+              4301181,
+              100000
+            ],
+            "layer": "Mechanical6"
+          },
+          {
+            "t": [
+              4322835,
+              4301181,
+              4322835,
+              4714567,
+              100000
+            ],
+            "layer": "Mechanical6"
+          },
+          {
+            "t": [
+              4322835,
+              4714567,
+              4535433,
+              4714567,
+              100000
+            ],
+            "layer": "Mechanical6"
+          }
+        ],
+        "bodies": []
+      },
+      {
+        "ref": "J1",
+        "footprint": "Molex_5040500691",
+        "comment": "Comment",
+        "x": 4724409,
+        "y": 6692913,
+        "rotation": 180,
+        "layer": "TopLayer",
+        "locked": false,
+        "height": 0,
+        "bbox": [
+          1978346,
+          3888612,
+          7470472,
+          8199606
+        ],
+        "mech": [
+          {
+            "a": [
+              6500000,
+              5535433,
+              78740,
+              0,
+              360,
+              100000
+            ],
+            "layer": "Mechanical12"
+          },
+          {
+            "t": [
+              7228346,
+              5685039,
+              7228346,
+              8094488,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              6653543,
+              8086614,
+              7228346,
+              8094488,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              6456692,
+              6795275,
+              6653543,
+              6795275,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              6653543,
+              6795275,
+              6653543,
+              8086614,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              6456692,
+              6795275,
+              6456692,
+              7307086,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              2984252,
+              7307086,
+              6456692,
+              7307086,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              2787401,
+              6795275,
+              2984252,
+              6795275,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              2984252,
+              6795275,
+              2984252,
+              7307086,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              2787401,
+              6795275,
+              2787401,
+              8086614,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              2212598,
+              8086614,
+              2787401,
+              8086614,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              2212598,
+              5685039,
+              7228346,
+              5685039,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              2212598,
+              5685039,
+              2212598,
+              8086614,
+              100000
+            ],
+            "layer": "Mechanical7"
+          }
+        ],
+        "bodies": []
+      },
+      {
+        "ref": "C1",
+        "footprint": "C_0402_1005Metric",
+        "comment": "Comment",
+        "x": 5551181,
+        "y": 3444882,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "locked": false,
+        "height": 0,
+        "bbox": [
+          5142913,
+          3213780,
+          5959449,
+          4010593
+        ],
+        "mech": [
+          {
+            "t": [
+              5192913,
+              3625984,
+              5909449,
+              3625984,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              5909449,
+              3263780,
+              5909449,
+              3625984,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              5192913,
+              3263780,
+              5909449,
+              3263780,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              5192913,
+              3263780,
+              5192913,
+              3625984,
+              100000
+            ],
+            "layer": "Mechanical7"
+          },
+          {
+            "t": [
+              5354331,
+              3543307,
+              5748031,
+              3543307,
+              100000
+            ],
+            "layer": "Mechanical6"
+          },
+          {
+            "t": [
+              5748031,
+              3346457,
+              5748031,
+              3543307,
+              100000
+            ],
+            "layer": "Mechanical6"
+          },
+          {
+            "t": [
+              5354331,
+              3346457,
+              5748031,
+              3346457,
+              100000
+            ],
+            "layer": "Mechanical6"
+          },
+          {
+            "t": [
+              5354331,
+              3346457,
+              5354331,
+              3543307,
+              100000
+            ],
+            "layer": "Mechanical6"
+          }
+        ],
+        "bodies": []
+      },
+      {
+        "ref": "MK1",
+        "footprint": "T5838_RevA",
+        "comment": "Comment",
+        "x": 4724409,
+        "y": 2362204,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "locked": false,
+        "height": 0,
+        "bbox": [
+          4244094,
+          1744094,
+          5204724,
+          3024015
+        ],
+        "mech": [],
+        "bodies": []
+      }
+    ]
+  },
+  "pads": {
+    "section": "pads",
+    "units": "coord",
+    "coord_per_mil": 10000,
+    "pads": [
+      {
+        "comp": "H2",
+        "name": "Un1",
+        "x": 7874016,
+        "y": 2106299,
+        "rotation": 0,
+        "layer": "MultiLayer",
+        "net": "",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "round",
+          866142,
+          866142
+        ],
+        "mid": [
+          "round",
+          866142,
+          866142
+        ],
+        "bot": [
+          "round",
+          866142,
+          866142
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "round",
+            866142,
+            866142,
+            50,
+            0,
+            0,
+            false
+          ],
+          [
+            "BottomLayer",
+            "round",
+            866142,
+            866142,
+            50,
+            0,
+            0,
+            false
+          ]
+        ],
+        "hole": 866142,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "H1",
+        "name": "Un1",
+        "x": 1574803,
+        "y": 2106299,
+        "rotation": 0,
+        "layer": "MultiLayer",
+        "net": "",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "round",
+          866142,
+          866142
+        ],
+        "mid": [
+          "round",
+          866142,
+          866142
+        ],
+        "bot": [
+          "round",
+          866142,
+          866142
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "round",
+            866142,
+            866142,
+            50,
+            0,
+            0,
+            false
+          ],
+          [
+            "BottomLayer",
+            "round",
+            866142,
+            866142,
+            50,
+            0,
+            0,
+            false
+          ]
+        ],
+        "hole": 866142,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "Un1",
+        "x": 4724409,
+        "y": 2106299,
+        "rotation": 0,
+        "layer": "MultiLayer",
+        "net": "",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "round",
+          314961,
+          314961
+        ],
+        "mid": [
+          "round",
+          314961,
+          314961
+        ],
+        "bot": [
+          "round",
+          314961,
+          314961
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "round",
+            314961,
+            314961,
+            50,
+            0,
+            0,
+            false
+          ],
+          [
+            "BottomLayer",
+            "round",
+            314961,
+            314961,
+            50,
+            0,
+            0,
+            false
+          ]
+        ],
+        "hole": 314961,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "R1",
+        "name": "2",
+        "x": 4429134,
+        "y": 4307087,
+        "rotation": 270,
+        "layer": "TopLayer",
+        "net": "PDM_DATA_MIC",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "roundrect",
+          212598,
+          251969
+        ],
+        "mid": [
+          "roundrect",
+          212598,
+          251969
+        ],
+        "bot": [
+          "roundrect",
+          212598,
+          251969
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "roundrect",
+            212598,
+            251969,
+            25,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "R1",
+        "name": "1",
+        "x": 4429134,
+        "y": 4708661,
+        "rotation": 270,
+        "layer": "TopLayer",
+        "net": "PDM_DATA",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "roundrect",
+          212598,
+          251969
+        ],
+        "mid": [
+          "roundrect",
+          212598,
+          251969
+        ],
+        "bot": [
+          "roundrect",
+          212598,
+          251969
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "roundrect",
+            212598,
+            251969,
+            25,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "J1",
+        "name": "6",
+        "x": 3248031,
+        "y": 5673228,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "AAD_CFG",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          236220,
+          393701
+        ],
+        "mid": [
+          "rect",
+          236220,
+          393701
+        ],
+        "bot": [
+          "rect",
+          236220,
+          393701
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            236220,
+            393701,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "J1",
+        "name": "5",
+        "x": 3838582,
+        "y": 5673228,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "MIC_WAKE",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          236220,
+          393701
+        ],
+        "mid": [
+          "rect",
+          236220,
+          393701
+        ],
+        "bot": [
+          "rect",
+          236220,
+          393701
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            236220,
+            393701,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "J1",
+        "name": "4",
+        "x": 4429133,
+        "y": 5673228,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "PDM_DATA",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          236220,
+          393701
+        ],
+        "mid": [
+          "rect",
+          236220,
+          393701
+        ],
+        "bot": [
+          "rect",
+          236220,
+          393701
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            236220,
+            393701,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "J1",
+        "name": "3",
+        "x": 5019685,
+        "y": 5673228,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "PDM_CLK",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          236220,
+          393701
+        ],
+        "mid": [
+          "rect",
+          236220,
+          393701
+        ],
+        "bot": [
+          "rect",
+          236220,
+          393701
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            236220,
+            393701,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "J1",
+        "name": "2",
+        "x": 5610236,
+        "y": 5673228,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          236220,
+          393701
+        ],
+        "mid": [
+          "rect",
+          236220,
+          393701
+        ],
+        "bot": [
+          "rect",
+          236220,
+          393701
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            236220,
+            393701,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "J1",
+        "name": "1",
+        "x": 6200787,
+        "y": 5673228,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "1V8_MIC",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          236220,
+          393701
+        ],
+        "mid": [
+          "rect",
+          236220,
+          393701
+        ],
+        "bot": [
+          "rect",
+          236220,
+          393701
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            236220,
+            393701,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "J1",
+        "name": "Un2",
+        "x": 2224409,
+        "y": 7712598,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          492126,
+          708661
+        ],
+        "mid": [
+          "rect",
+          492126,
+          708661
+        ],
+        "bot": [
+          "rect",
+          492126,
+          708661
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            492126,
+            708661,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "J1",
+        "name": "Un1",
+        "x": 7224409,
+        "y": 7712598,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          492126,
+          708661
+        ],
+        "mid": [
+          "rect",
+          492126,
+          708661
+        ],
+        "bot": [
+          "rect",
+          492126,
+          708661
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            492126,
+            708661,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "C1",
+        "name": "2",
+        "x": 5740157,
+        "y": 3444882,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "roundrect",
+          220472,
+          244094
+        ],
+        "mid": [
+          "roundrect",
+          220472,
+          244094
+        ],
+        "bot": [
+          "roundrect",
+          220472,
+          244094
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "roundrect",
+            220472,
+            244094,
+            25,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "C1",
+        "name": "1",
+        "x": 5362205,
+        "y": 3444882,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "1V8_MIC",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "roundrect",
+          220472,
+          244094
+        ],
+        "mid": [
+          "roundrect",
+          220472,
+          244094
+        ],
+        "bot": [
+          "roundrect",
+          220472,
+          244094
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "roundrect",
+            220472,
+            244094,
+            25,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "7",
+        "x": 4972440,
+        "y": 2921259,
+        "rotation": 90,
+        "layer": "TopLayer",
+        "net": "1V8_MIC",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          205512,
+          285433
+        ],
+        "mid": [
+          "rect",
+          205512,
+          285433
+        ],
+        "bot": [
+          "rect",
+          205512,
+          285433
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            205512,
+            285433,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "6",
+        "x": 4972440,
+        "y": 2598424,
+        "rotation": 90,
+        "layer": "TopLayer",
+        "net": "PDM_CLK",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          205512,
+          285433
+        ],
+        "mid": [
+          "rect",
+          205512,
+          285433
+        ],
+        "bot": [
+          "rect",
+          205512,
+          285433
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            205512,
+            285433,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "5",
+        "x": 5145669,
+        "y": 1803149,
+        "rotation": 90,
+        "layer": "TopLayer",
+        "net": "AAD_CFG",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          118110,
+          118110
+        ],
+        "mid": [
+          "rect",
+          118110,
+          118110
+        ],
+        "bot": [
+          "rect",
+          118110,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            118110,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "4",
+        "x": 4303149,
+        "y": 1803149,
+        "rotation": 90,
+        "layer": "TopLayer",
+        "net": "MIC_WAKE",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          118110,
+          118110
+        ],
+        "mid": [
+          "rect",
+          118110,
+          118110
+        ],
+        "bot": [
+          "rect",
+          118110,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            118110,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4985236,
+        "y": 2106299,
+        "rotation": 90,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4980224,
+        "y": 2055414,
+        "rotation": 101.25,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4980224,
+        "y": 2157184,
+        "rotation": 78.75,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4965381,
+        "y": 2006485,
+        "rotation": 112.5,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4965381,
+        "y": 2206113,
+        "rotation": 67.5,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4941278,
+        "y": 1961391,
+        "rotation": 123.75,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4941278,
+        "y": 2251206,
+        "rotation": 56.25,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4908841,
+        "y": 1921866,
+        "rotation": 135,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4908841,
+        "y": 2290731,
+        "rotation": 45,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4869316,
+        "y": 1889429,
+        "rotation": 146.25,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4869316,
+        "y": 2323168,
+        "rotation": 33.75,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4824223,
+        "y": 1865326,
+        "rotation": 157.5,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4824223,
+        "y": 2347271,
+        "rotation": 22.5,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4775294,
+        "y": 1850484,
+        "rotation": 168.75,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4775294,
+        "y": 2362114,
+        "rotation": 11.25,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4724409,
+        "y": 1845472,
+        "rotation": 180,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4724409,
+        "y": 2367126,
+        "rotation": 0,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4673524,
+        "y": 1850484,
+        "rotation": 191.25,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4673524,
+        "y": 2362114,
+        "rotation": 348.75,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4624595,
+        "y": 1865326,
+        "rotation": 202.5,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4624595,
+        "y": 2347271,
+        "rotation": 337.5,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4579501,
+        "y": 1889429,
+        "rotation": 213.75,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4579501,
+        "y": 2323168,
+        "rotation": 326.25,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4539976,
+        "y": 1921866,
+        "rotation": 225,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4539976,
+        "y": 2290731,
+        "rotation": 315,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4507539,
+        "y": 1961391,
+        "rotation": 236.25,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4507539,
+        "y": 2251206,
+        "rotation": 303.75,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4483436,
+        "y": 2006485,
+        "rotation": 247.5,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4483436,
+        "y": 2206113,
+        "rotation": 292.5,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4468594,
+        "y": 2055414,
+        "rotation": 258.75,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4468594,
+        "y": 2157184,
+        "rotation": 281.25,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "3",
+        "x": 4463582,
+        "y": 2106299,
+        "rotation": 270,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          57359,
+          118110
+        ],
+        "mid": [
+          "rect",
+          57359,
+          118110
+        ],
+        "bot": [
+          "rect",
+          57359,
+          118110
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            57359,
+            118110,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "2",
+        "x": 4476378,
+        "y": 2598424,
+        "rotation": 90,
+        "layer": "TopLayer",
+        "net": "GND",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          205512,
+          285433
+        ],
+        "mid": [
+          "rect",
+          205512,
+          285433
+        ],
+        "bot": [
+          "rect",
+          205512,
+          285433
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            205512,
+            285433,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      },
+      {
+        "comp": "MK1",
+        "name": "1",
+        "x": 4476378,
+        "y": 2921259,
+        "rotation": 90,
+        "layer": "TopLayer",
+        "net": "PDM_DATA_MIC",
+        "mode": 0,
+        "simple": true,
+        "top": [
+          "rect",
+          205512,
+          285433
+        ],
+        "mid": [
+          "rect",
+          205512,
+          285433
+        ],
+        "bot": [
+          "rect",
+          205512,
+          285433
+        ],
+        "copper": [
+          [
+            "TopLayer",
+            "rect",
+            205512,
+            285433,
+            50,
+            0,
+            0
+          ]
+        ],
+        "hole": 0,
+        "hole_type": "round",
+        "hole_width": 0,
+        "hole_rotation": 0,
+        "plated": true
+      }
+    ],
+    "count": 53
+  },
+  "copper": {
+    "section": "copper",
+    "units": "coord",
+    "coord_per_mil": 10000,
+    "copper": [
+      {
+        "k": "arc",
+        "v": [
+          7385826,
+          5551181,
+          11811,
+          0,
+          360,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "arc",
+        "v": [
+          6657480,
+          5413385,
+          78740,
+          0,
+          360,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "arc",
+        "v": [
+          6500000,
+          5535433,
+          78740,
+          0,
+          360,
+          100000
+        ],
+        "layer": "Mechanical12",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "arc",
+        "v": [
+          4724409,
+          2106299,
+          270669,
+          0,
+          360,
+          100000
+        ],
+        "layer": "TopPaste",
+        "net": "",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "via",
+        "v": [
+          5708661,
+          6023622,
+          255906,
+          118110
+        ],
+        "low": "TopLayer",
+        "high": "BottomLayer",
+        "sizes": [
+          [
+            "TopLayer",
+            255906
+          ],
+          [
+            "BottomLayer",
+            255906
+          ]
+        ],
+        "layer": "MultiLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "via",
+        "v": [
+          5905512,
+          2106299,
+          255906,
+          118110
+        ],
+        "low": "TopLayer",
+        "high": "BottomLayer",
+        "sizes": [
+          [
+            "TopLayer",
+            255906
+          ],
+          [
+            "BottomLayer",
+            255906
+          ]
+        ],
+        "layer": "MultiLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "via",
+        "v": [
+          6003937,
+          3444882,
+          255906,
+          118110
+        ],
+        "low": "TopLayer",
+        "high": "BottomLayer",
+        "sizes": [
+          [
+            "TopLayer",
+            255906
+          ],
+          [
+            "BottomLayer",
+            255906
+          ]
+        ],
+        "layer": "MultiLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "via",
+        "v": [
+          7322835,
+          5629921,
+          255906,
+          118110
+        ],
+        "low": "TopLayer",
+        "high": "BottomLayer",
+        "sizes": [
+          [
+            "TopLayer",
+            255906
+          ],
+          [
+            "BottomLayer",
+            255906
+          ]
+        ],
+        "layer": "MultiLayer",
+        "net": "1V8_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "via",
+        "v": [
+          5255906,
+          3877952,
+          255906,
+          118110
+        ],
+        "low": "TopLayer",
+        "high": "BottomLayer",
+        "sizes": [
+          [
+            "TopLayer",
+            255906
+          ],
+          [
+            "BottomLayer",
+            255906
+          ]
+        ],
+        "layer": "MultiLayer",
+        "net": "1V8_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4578740,
+          4447385,
+          4578740,
+          4568363,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4279528,
+          4447385,
+          4279528,
+          4568363,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          7322834,
+          5673228,
+          7322834,
+          7263779,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6409448,
+          5673228,
+          7322834,
+          5673228,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6377952,
+          7263779,
+          6496063,
+          6972441,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6496063,
+          7263779,
+          6496063,
+          8149606,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6496063,
+          8149606,
+          7322834,
+          8149606,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6200787,
+          6972441,
+          6318897,
+          7263779,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6200787,
+          6972441,
+          6496063,
+          6972441,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5818897,
+          5673228,
+          5992126,
+          5673228,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5610236,
+          6677165,
+          5905511,
+          6677165,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5905511,
+          6677165,
+          5905511,
+          7031496,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5610236,
+          6677165,
+          5610236,
+          7031496,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5610236,
+          7031496,
+          5905511,
+          7031496,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5228346,
+          5673228,
+          5401574,
+          5673228,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4637795,
+          5673228,
+          4811023,
+          5673228,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4047244,
+          5673228,
+          4220472,
+          5673228,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3543307,
+          6677165,
+          3838582,
+          6677165,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3838582,
+          6677165,
+          3838582,
+          7031496,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3456692,
+          5673228,
+          3629921,
+          5673228,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3543307,
+          6677165,
+          3543307,
+          7031496,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3543307,
+          7031496,
+          3838582,
+          7031496,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2125984,
+          5673228,
+          3039370,
+          5673228,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2952755,
+          7263779,
+          6496063,
+          7263779,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2952755,
+          7263779,
+          2952755,
+          8149606,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2125984,
+          5673228,
+          2125984,
+          7263779,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2125984,
+          8149606,
+          2952755,
+          8149606,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5508726,
+          3303150,
+          5593636,
+          3303150,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5508726,
+          3586614,
+          5593636,
+          3586614,
+          100000
+        ],
+        "layer": "TopOverlay",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4429134,
+          3366141,
+          4429134,
+          4307086,
+          86614
+        ],
+        "layer": "TopLayer",
+        "net": "PDM_DATA_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4429134,
+          3366141,
+          4476378,
+          2921260,
+          86614
+        ],
+        "layer": "TopLayer",
+        "net": "PDM_DATA_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3248031,
+          688976,
+          3248031,
+          5673228,
+          78740
+        ],
+        "layer": "TopLayer",
+        "net": "AAD_CFG",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5145669,
+          688976,
+          5145669,
+          1803149,
+          78740
+        ],
+        "layer": "TopLayer",
+        "net": "AAD_CFG",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3248031,
+          688976,
+          5145669,
+          688976,
+          78740
+        ],
+        "layer": "TopLayer",
+        "net": "AAD_CFG",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3838583,
+          1803149,
+          4303150,
+          1803149,
+          78740
+        ],
+        "layer": "TopLayer",
+        "net": "MIC_WAKE",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3838583,
+          1803149,
+          3838583,
+          5673228,
+          78740
+        ],
+        "layer": "TopLayer",
+        "net": "MIC_WAKE",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4429134,
+          4708661,
+          4429134,
+          5673228,
+          86614
+        ],
+        "layer": "TopLayer",
+        "net": "PDM_DATA",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5511811,
+          5118110,
+          6771654,
+          5118110,
+          86614
+        ],
+        "layer": "TopLayer",
+        "net": "PDM_CLK",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5019685,
+          5673228,
+          5511811,
+          5118110,
+          86614
+        ],
+        "layer": "TopLayer",
+        "net": "PDM_CLK",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4972441,
+          2598425,
+          6771654,
+          2598425,
+          86614
+        ],
+        "layer": "TopLayer",
+        "net": "PDM_CLK",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6771654,
+          2598425,
+          6771654,
+          5118110,
+          86614
+        ],
+        "layer": "TopLayer",
+        "net": "PDM_CLK",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5740157,
+          3444882,
+          6003937,
+          3444882,
+          118110
+        ],
+        "layer": "TopLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5000000,
+          2106299,
+          5905512,
+          2106299,
+          118110
+        ],
+        "layer": "TopLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5610236,
+          5673228,
+          5708661,
+          6023622,
+          137795
+        ],
+        "layer": "TopLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4476378,
+          2598425,
+          4606299,
+          2342519,
+          62992
+        ],
+        "layer": "TopLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6200787,
+          5673228,
+          7322835,
+          5629921,
+          137795
+        ],
+        "layer": "TopLayer",
+        "net": "1V8_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4972441,
+          2921260,
+          5362205,
+          3444882,
+          118110
+        ],
+        "layer": "TopLayer",
+        "net": "1V8_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5255906,
+          3877952,
+          5362205,
+          3444882,
+          118110
+        ],
+        "layer": "TopLayer",
+        "net": "1V8_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4614173,
+          4141732,
+          4614173,
+          4874016,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4244095,
+          4141732,
+          4614173,
+          4141732,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4244095,
+          4141732,
+          4244095,
+          4874016,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4244095,
+          4874016,
+          4614173,
+          4874016,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          7228346,
+          5685039,
+          7228346,
+          8094488,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6653543,
+          8086614,
+          7228346,
+          8094488,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6456692,
+          6795275,
+          6653543,
+          6795275,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6653543,
+          6795275,
+          6653543,
+          8086614,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          6456692,
+          6795275,
+          6456692,
+          7307086,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2984252,
+          7307086,
+          6456692,
+          7307086,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2787401,
+          6795275,
+          2984252,
+          6795275,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2984252,
+          6795275,
+          2984252,
+          7307086,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2787401,
+          6795275,
+          2787401,
+          8086614,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2212598,
+          8086614,
+          2787401,
+          8086614,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2212598,
+          5685039,
+          7228346,
+          5685039,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          2212598,
+          5685039,
+          2212598,
+          8086614,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "J1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5192913,
+          3625984,
+          5909449,
+          3625984,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5909449,
+          3263780,
+          5909449,
+          3625984,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5192913,
+          3263780,
+          5909449,
+          3263780,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5192913,
+          3263780,
+          5192913,
+          3625984,
+          100000
+        ],
+        "layer": "Mechanical7",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4202756,
+          1673228,
+          5246063,
+          1673228,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5246063,
+          1673228,
+          5246063,
+          3051181,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4202756,
+          1673228,
+          4202756,
+          3051181,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4202756,
+          3051181,
+          5246063,
+          3051181,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4535433,
+          4301181,
+          4535433,
+          4714567,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4322835,
+          4301181,
+          4535433,
+          4301181,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4322835,
+          4301181,
+          4322835,
+          4714567,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          4322835,
+          4714567,
+          4535433,
+          4714567,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "R1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5354331,
+          3543307,
+          5748031,
+          3543307,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5748031,
+          3346457,
+          5748031,
+          3543307,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5354331,
+          3346457,
+          5748031,
+          3346457,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5354331,
+          3346457,
+          5354331,
+          3543307,
+          100000
+        ],
+        "layer": "Mechanical6",
+        "net": "",
+        "comp": "C1",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          0,
+          0,
+          9448819,
+          0,
+          100000
+        ],
+        "layer": "KeepOutLayer",
+        "net": "",
+        "comp": "",
+        "keepout": true,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          9448819,
+          0,
+          9448819,
+          8661417,
+          100000
+        ],
+        "layer": "KeepOutLayer",
+        "net": "",
+        "comp": "",
+        "keepout": true,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          0,
+          8661417,
+          9448819,
+          8661417,
+          100000
+        ],
+        "layer": "KeepOutLayer",
+        "net": "",
+        "comp": "",
+        "keepout": true,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          0,
+          0,
+          0,
+          8661417,
+          100000
+        ],
+        "layer": "KeepOutLayer",
+        "net": "",
+        "comp": "",
+        "keepout": true,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          0,
+          0,
+          9448819,
+          0,
+          12
+        ],
+        "layer": "KeepOutLayer",
+        "net": "",
+        "comp": "",
+        "keepout": true,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          9448819,
+          0,
+          9448819,
+          8661417,
+          12
+        ],
+        "layer": "KeepOutLayer",
+        "net": "",
+        "comp": "",
+        "keepout": true,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          0,
+          8661417,
+          9448819,
+          8661417,
+          12
+        ],
+        "layer": "KeepOutLayer",
+        "net": "",
+        "comp": "",
+        "keepout": true,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          0,
+          0,
+          0,
+          8661417,
+          12
+        ],
+        "layer": "KeepOutLayer",
+        "net": "",
+        "comp": "",
+        "keepout": true,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5905512,
+          2106299,
+          6003937,
+          3444882,
+          196850
+        ],
+        "layer": "BottomLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5905512,
+          1535433,
+          5905512,
+          2106299,
+          196850
+        ],
+        "layer": "BottomLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3543307,
+          6023622,
+          5708661,
+          6023622,
+          196850
+        ],
+        "layer": "BottomLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3543307,
+          1535433,
+          5905512,
+          1535433,
+          196850
+        ],
+        "layer": "BottomLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          3543307,
+          1535433,
+          3543307,
+          6023622,
+          196850
+        ],
+        "layer": "BottomLayer",
+        "net": "GND",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          5255906,
+          3877952,
+          7874016,
+          4094488,
+          157480
+        ],
+        "layer": "BottomLayer",
+        "net": "1V8_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          7322835,
+          5629921,
+          7874016,
+          5314960,
+          157480
+        ],
+        "layer": "BottomLayer",
+        "net": "1V8_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "track",
+        "v": [
+          7874016,
+          4094488,
+          7874016,
+          5314960,
+          157480
+        ],
+        "layer": "BottomLayer",
+        "net": "1V8_MIC",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      },
+      {
+        "k": "region",
+        "kind": 3,
+        "cutout": true,
+        "copper": false,
+        "pts": [
+          [
+            0,
+            8661417
+          ],
+          [
+            9448819,
+            8661417
+          ],
+          [
+            9448819,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "holes": [],
+        "layer": "MultiLayer",
+        "net": "",
+        "comp": "",
+        "keepout": false,
+        "in_polygon": false,
+        "pour": "",
+        "pour_net": ""
+      }
+    ],
+    "count": 106
+  },
+  "rules": {
+    "section": "rules",
+    "units": "coord",
+    "coord_per_mil": 10000,
+    "rules": [
+      {
+        "name": "MK1_Internal_Acoustic_ClearanceInComponent('MK1')MK1_Internal_Acoustic_ClearanceInComponent('MK1')InComponent('MK1')MK1_Internal_Acoustic_Clearance",
+        "kind": 0,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "InComponent('MK1')",
+        "scope2": "InComponent('MK1')",
+        "descriptor": "Clearance Constraint (Gap=0.1mm) (InComponent('MK1')),(InComponent('MK1'))"
+      },
+      {
+        "name": "HoleSize",
+        "kind": 42,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Hole Size Constraint (Min=0.025mm) (Max=2.54mm) (All)"
+      },
+      {
+        "name": "Clearence 0,2_NetClass",
+        "kind": 0,
+        "enabled": true,
+        "priority": 2,
+        "scope1": "InNetClass('Default')",
+        "scope2": "All",
+        "descriptor": "Clearance Constraint (Gap=0.2mm) (InNetClass('Default')),(All)"
+      },
+      {
+        "name": "PolygonConnect",
+        "kind": 20,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Polygon Connect Rule(Direct Connect )(Conductor Width=0.254mm) (Relief Angle=90 Angle) (Entries=4) (Air Gap Width=0.254mm) (All),(All)"
+      },
+      {
+        "name": "Width",
+        "kind": 2,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Width Constraint (Min=0.15mm) (Max=10mm) (Preferred=0.2mm) (All)"
+      },
+      {
+        "name": "UnpouredPolygon",
+        "kind": 62,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Modified Polygon (Allow modified: No), (Allow shelved: No)"
+      },
+      {
+        "name": "NetAntennae",
+        "kind": 56,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Net Antennae (Tolerance=0mm) (All)"
+      },
+      {
+        "name": "SilkToBoardRegionClearance",
+        "kind": 59,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Silk primitive without silk layer"
+      },
+      {
+        "name": "SilkToSilkClearance",
+        "kind": 55,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Silk to Silk (Clearance=0mm) (All),(All)"
+      },
+      {
+        "name": "SilkToSolderMaskClearance",
+        "kind": 54,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "IsPad",
+        "scope2": "All",
+        "descriptor": "Silk To Solder Mask (Clearance=0mm) (IsPad),(All)"
+      },
+      {
+        "name": "MinimumSolderMaskSliver",
+        "kind": 53,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Minimum Solder Mask Sliver (Gap=0mm) (All),(All)"
+      },
+      {
+        "name": "HoleToHoleClearance",
+        "kind": 52,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Hole To Hole Clearance (Gap=0.254mm) (All),(All)"
+      },
+      {
+        "name": "DiffPairsRouting",
+        "kind": 51,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Differential Pairs Uncoupled Length using the Gap Constraints (Min=0.254mm) (Max=0.254mm) (Prefered=0.254mm)  and Width Constraints (Min=0.381mm) (Max=0.381mm) (Prefered=0.381mm) (All)"
+      },
+      {
+        "name": "Fanout_BGA",
+        "kind": 49,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "IsBGA",
+        "scope2": "All",
+        "descriptor": "Fanout Control Rule ( (IsBGA) )"
+      },
+      {
+        "name": "Fanout_LCC",
+        "kind": 49,
+        "enabled": true,
+        "priority": 2,
+        "scope1": "IsLCC",
+        "scope2": "All",
+        "descriptor": "Fanout Control Rule ( (IsLCC) )"
+      },
+      {
+        "name": "Fanout_SOIC",
+        "kind": 49,
+        "enabled": true,
+        "priority": 3,
+        "scope1": "IsSOIC",
+        "scope2": "All",
+        "descriptor": "Fanout Control Rule ( (IsSOIC) )"
+      },
+      {
+        "name": "Fanout_Small",
+        "kind": 49,
+        "enabled": true,
+        "priority": 4,
+        "scope1": "(CompPinCount < 5)",
+        "scope2": "All",
+        "descriptor": "Fanout Control Rule ( ((CompPinCount < 5)) )"
+      },
+      {
+        "name": "Fanout_Default",
+        "kind": 49,
+        "enabled": true,
+        "priority": 5,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Fanout Control Rule ( (All) )"
+      },
+      {
+        "name": "LayerPairs",
+        "kind": 48,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Pads and Vias to follow the Drill pairs settings"
+      },
+      {
+        "name": "Height",
+        "kind": 50,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Height Constraint (Min=0mm) (Max=25.4mm) (Prefered=12.7mm) (All)"
+      },
+      {
+        "name": "ComponentClearance",
+        "kind": 24,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Component Clearance Constraint ( Horizontal Gap = 0.254mm, Vertical Gap = 0.254mm ) (All),(All) "
+      },
+      {
+        "name": "AssemblyTestpoint",
+        "kind": 57,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Assembly Testpoint Style (Under Component=Yes) (All)"
+      },
+      {
+        "name": "AssemblyTestPointUsage",
+        "kind": 58,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Assembly Testpoint Usage (Valid =One Required, Allow multiple per net=No) (Disabled)(All)"
+      },
+      {
+        "name": "FabricationTestpoint",
+        "kind": 43,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Fabrication Testpoint Style (Under Component=Yes) (All)"
+      },
+      {
+        "name": "FabricationTestPointUsage",
+        "kind": 44,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Fabrication Testpoint Usage (Valid =One Required, Allow multiple per net=No) (Disabled)(All)"
+      },
+      {
+        "name": "RoutingTopology",
+        "kind": 7,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Routing Topology Rule(Topology=Shortest) (All)"
+      },
+      {
+        "name": "SolderMaskExpansion",
+        "kind": 13,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Solder Mask Expansion (Expansion =0mm) (All)"
+      },
+      {
+        "name": "PasteMaskExpansion",
+        "kind": 14,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Paste Mask Expansion (Expansion =0mm) (All)"
+      },
+      {
+        "name": "RoutingVias",
+        "kind": 11,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Routing Via (MinHoleWidth=0.3mm) (MaxHoleWidth=0.711mm) (PreferredHoleWidth=0.3mm) (MinWidth=0.5mm) (MaxWidth=1.27mm) (PreferedWidth=0.6mm) (All)"
+      },
+      {
+        "name": "RoutingCorners",
+        "kind": 10,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Routing Corners (Style=45-Degree) (Min Setback=2.54mm) (Max Setback=2.54mm) (All)"
+      },
+      {
+        "name": "RoutingLayers",
+        "kind": 9,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Routing Layers(All)"
+      },
+      {
+        "name": "RoutingPriority",
+        "kind": 8,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "TRoutingPriorityRule(Priority=0) (All)"
+      },
+      {
+        "name": "PlaneClearance",
+        "kind": 12,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Power Plane Clearance (Clearance =0.508mm) (All)"
+      },
+      {
+        "name": "PlaneConnect",
+        "kind": 6,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Power Plane Connect Rule(Relief Connect )(Expansion=0.508mm) (Conductor Width=0.254mm) (Air Gap=0.254mm) (Entries=4) (All)"
+      },
+      {
+        "name": "UnRoutedNet",
+        "kind": 16,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Un-Routed Net Constraint ( (All) )"
+      },
+      {
+        "name": "ShortCircuit",
+        "kind": 15,
+        "enabled": true,
+        "priority": 1,
+        "scope1": "All",
+        "scope2": "All",
+        "descriptor": "Short-Circuit Constraint (Allowed=No) (All),(All)"
+      }
+    ],
+    "typed": [
+      {
+        "name": "MK1_Internal_Acoustic_ClearanceInComponent('MK1')MK1_Internal_Acoustic_ClearanceInComponent('MK1')InComponent('MK1')MK1_Internal_Acoustic_Clearance",
+        "gap": 39370
+      },
+      {
+        "name": "Clearence 0,2_NetClass",
+        "gap": 78740
+      },
+      {
+        "name": "HoleToHoleClearance",
+        "gap": 100000
+      },
+      {
+        "name": "ComponentClearance",
+        "gap": 100000
+      },
+      {
+        "name": "Width",
+        "min": 59055,
+        "max": 3937008,
+        "preferred": 78740
+      },
+      {
+        "name": "HoleSize",
+        "hole_min": 10000,
+        "hole_max": 1000000
+      }
+    ],
+    "rooms": []
+  },
+  "classes": {
+    "section": "classes",
+    "units": "coord",
+    "coord_per_mil": 10000,
+    "net_classes": [
+      {
+        "name": "Default",
+        "nets": [
+          "PDM_DATA_MIC",
+          "AAD_CFG",
+          "MIC_WAKE",
+          "PDM_DATA",
+          "PDM_CLK",
+          "GND",
+          "1V8_MIC"
+        ]
+      },
+      {
+        "name": "All Nets",
+        "nets": [
+          "PDM_DATA_MIC",
+          "AAD_CFG",
+          "MIC_WAKE",
+          "PDM_DATA",
+          "PDM_CLK",
+          "GND",
+          "1V8_MIC"
+        ]
+      }
+    ],
+    "diff_pairs": []
+  }
+}

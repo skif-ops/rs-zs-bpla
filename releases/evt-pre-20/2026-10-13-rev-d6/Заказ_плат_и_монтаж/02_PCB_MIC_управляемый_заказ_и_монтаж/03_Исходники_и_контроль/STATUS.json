@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MIC",
+  "release_state": "REVIEW_B_PASS_CONTROLLED_FIRST_ARTICLE",
+  "manufacturing_release": true,
+  "authoritative_inputs": [
+    "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
+    "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+    "hardware/T5838_AAD_INTERFACE_REV_A.md",
+    "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+    "hardware/CONNECTOR_FREEZE_REV_A.csv",
+    "hardware/EVT_PRE_20_BOM_REV_A.csv"
+  ],
+  "native_source": {
+    "schematic": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch",
+    "board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
+    "project": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro",
+    "fabrication_metadata": "hardware/kicad/native/PCB-MIC/fabrication_metadata.json",
+    "independent_schematic_audit": "artifacts/pcb_mic_native_schematic_rev_a.json",
+    "independent_geometry_audit": "tools/audit_pcb_mic_review_a_geometry_rev_a.py",
+    "ci_geometry_evidence": [
+      "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "artifacts/kicad-native/PCB-MIC/committed_native_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/committed_molex_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/committed_mechanical_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_native_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_molex_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_mechanical_geometry_pcbnew.txt"
+    ],
+    "ci_erc_evidence": [
+      "artifacts/kicad-native/PCB-MIC/erc.json",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
+      "artifacts/kicad-native/sha256_manifest.json"
+    ],
+    "manufacturing_handoff_evidence": [
+      "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_B.md",
+      "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_B.json",
+      "hardware/reviews/PCB_MIC_REVIEW_B_APPROVAL_REV_B.json",
+      "hardware/reviews/PCB_MIC_PARITY_DISPOSITION_REV_B.csv",
+      "artifacts/kicad-native/PCB-MIC/manufacturing_handoff_audit.json"
+    ],
+    "routing_status": "REVIEW_B_SIGNED_CONTROLLED_FIRST_ARTICLE_RELEASE",
+    "ci_review_b_release_evidence": [
+      "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "artifacts/kicad-native/PCB-MIC/manufacturing_handoff_audit.json",
+      "artifacts/kicad-native/PCB-MIC/gerber/PCB-MIC-job.gbrjob",
+      "artifacts/kicad-native/PCB-MIC/drill/PCB-MIC-PTH.drl",
+      "artifacts/kicad-native/PCB-MIC/drill/PCB-MIC-NPTH.drl",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_manufacturing_bom.csv",
+      "artifacts/kicad-native/PCB-MIC/cam_source_transform.json"
+    ]
+  },
+  "component_contract": {
+    "microphone": "TDK InvenSense MMICT5838-00-012",
+    "connector": "Molex 5040500691",
+    "decoupling": "TDK CGA2B3X7R1E104K050BB",
+    "data_tuning_resistor": "Panasonic ERJ-2GE0R00X",
+    "boards_per_station": 4
+  },
+  "mechanical_contract": {
+    "outline_mm": [
+      24.0,
+      22.0
+    ],
+    "thickness_mm": 1.0,
+    "mounting_holes": "H1/H2 NPTH 2.2 mm at X4/X20 Y16.65",
+    "acoustic_port": "NPTH 0.8 mm at X12 Y16.65",
+    "authority": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+    "status": "DIM_004_CLOSED"
+  },
+  "review_a": {
+    "complete": true,
+    "status": "PASS",
+    "checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+    "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+    "geometry_audit_status": "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+    "reviewer": "Скиф",
+    "date": "2026-09-14",
+    "commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
+    "approval_scope": "REPEAT_PCB_MIC_REVIEW_A_AFTER_COPPER_ECO",
+    "approved_native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+    "evidence": {
+      "reviewed_commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
+      "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+      "signed_checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851983013",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851982915",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851983013/artifacts/10350269024",
+      "artifact_id": 10350269024,
+      "artifact_digest": "sha256:c54b6669b40fa4de3cd3b0515e4bdb742d90f4ab6f40a789eb1f7bb82dfd19ba",
+      "schematic_pdf": "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
+      "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
+      "drc_report": "artifacts/kicad-native/PCB-MIC/drc.json",
+      "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "review_b_preflight_audit": "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "review_b_preflight_audit_sha256": "c499522d06325b55629231901216774744390d7df15ddd7c85a58b0970ddfa80",
+      "copper_return_audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
+      "copper_return_audit_sha256": "68ca43f851b7a98b1519bffe7f6de1cada0e0d17902d17bbd99bd05584724c10",
+      "copper_review_svg_sha256": {
+        "F.Cu": "fb5299746e8c6cc75bd71dd5915b05eae81e577aea1ac0b16d6262546143fe95",
+        "B.Cu": "66dc3609592146848e5f61cbd3a8a03ac56df8c3bb844164091cd6b9e195b901"
+      },
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
+      "sha256_manifest_sha256": "6a7e59c2fa840f005d69863589829f8ee516f394fc11d4e0251545efe53ee4b8",
+      "archive_verification": {
+        "sha256_manifest_entries_verified": 62,
+        "controlled_source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "artifact_zip_sha256_verified": true,
+        "regenerated_preflight_byte_identical": true,
+        "regenerated_copper_audit_byte_identical": true
+      }
+    },
+    "superseded_signature": {
+      "status": "SUPERSEDED_BY_COPPER_ECO_BOARD_BYTE_CHANGE",
+      "reviewer": "Скиф",
+      "date": "2026-09-14",
+      "commit_sha": "3e215e26e0d4cb160b309de3d3fd5a3145a756bf",
+      "board_sha256": "aecd1a374b5f66d32a5ae056eb4ad452d68e2a2391e65f6068acc8cad37f2295"
+    },
+    "superseded_evidence": {
+      "signed_checklist_snapshot_commit": "ac124df132a911a2326c678d2ccebf37804c2444",
+      "signed_checklist": "ac124df132a911a2326c678d2ccebf37804c2444:hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34823813170",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34823813170/artifacts/10339034239",
+      "schematic_pdf": "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
+      "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
+      "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json"
+    },
+    "required_evidence": {
+      "status": "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A",
+      "design_commit_sha": "159068f2743904fc366a4a65ede5fee829797ed2",
+      "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294478",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547",
+      "artifact_id": 10350416547,
+      "artifact_digest": "sha256:cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d",
+      "kicad_cli": {
+        "version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0,
+        "schematic_parity_items": 0
+      },
+      "archive_verification": {
+        "sha256_manifest_entries_verified": 62,
+        "controlled_source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "artifact_zip_sha256_verified": true,
+        "regenerated_preflight_byte_identical": true
+      },
+      "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
+      "drc_report": "artifacts/kicad-native/PCB-MIC/drc.json",
+      "copper_return_audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
+      "copper_return_audit_sha256": "05fd68dcfe1f7f65df306e30772ffb253ee4f0cb5b56df00e03020d9e4d1c6b9",
+      "review_b_preflight_audit": "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "review_b_preflight_audit_sha256": "5b5b392aa2c16c731d51a04531d82205e2bb83e12d73b43e8dacf58c647502b6",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
+      "sha256_manifest_sha256": "b60faa4ad917af0ceaa137fe7f5ca9447e01226420c1ca0f8fdba4d2c3e98aa8"
+    }
+  },
+  "review_b": {
+    "complete": true,
+    "status": "ACCEPT_CONTROLLED_FIRST_ARTICLE",
+    "decision": "ACCEPT_CONTROLLED_FIRST_ARTICLE",
+    "reviewer": "Скиф",
+    "date": "2026-09-30",
+    "reviewed_design_commit_sha": "8d2e6229e453b186b10f2978e29c6df458c87b32",
+    "approved_native_board_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
+    "approval_scope": "PCB_MIC_REVIEW_B_CONTROLLED_FIRST_ARTICLE",
+    "checklist": "hardware/reviews/PCB_MIC_REVIEW_B_CHECKLIST_REV_B.md",
+    "approval": "hardware/reviews/PCB_MIC_REVIEW_B_APPROVAL_REV_B.json",
+    "parity_disposition": "hardware/reviews/PCB_MIC_PARITY_DISPOSITION_REV_B.csv",
+    "manufacturing_handoff": {
+      "status": "RELEASED_CONTROLLED_FIRST_ARTICLE",
+      "packet": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_B.md",
+      "machine_contract": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_B.json",
+      "first_lot_pcba_quantity": 80,
+      "first_article_gate": "ONE_BOARD_OR_ONE_PANEL"
+    },
+    "fabrication_authorized": true,
+    "pcba_authorized": true,
+    "order_sequence": "ONE_BOARD_OR_ONE_PANEL_THEN_REMAINDER_AFTER_INSPECTION",
+    "remaining_post_assembly_gates": [
+      "assembled acoustic-port inspection",
+      "membrane and cavity fit check",
+      "per-board sensitivity noise phase and delay calibration",
+      "environmental and moisture checks under the EVT programme"
+    ]
+  },
+  "physical_evt": {
+    "status": "REQUIRED_AFTER_ASSEMBLY_DOES_NOT_BLOCK_CONTROLLED_ORDER",
+    "required_evidence": [
+      "assembled acoustic-port inspection",
+      "membrane and cavity tolerance stack",
+      "per-board sensitivity noise phase and delay calibration",
+      "panelization and depanel damage inspection"
+    ]
+  }
+}

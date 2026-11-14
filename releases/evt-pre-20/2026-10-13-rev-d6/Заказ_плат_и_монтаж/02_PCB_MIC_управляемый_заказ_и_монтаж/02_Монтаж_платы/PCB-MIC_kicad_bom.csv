@@ -1,0 +1,5 @@
+"Reference","Value","Footprint","Quantity"
+"C1","100nF X7R","Capacitor_SMD:C_0402_1005Metric","1"
+"J1","5040500691","Dioneya:Molex_5040500691","1"
+"MK1","MMICT5838-00-012","Dioneya:T5838_RevA","1"
+"R1","0R EVT_SI_TUNE","Resistor_SMD:R_0402_1005Metric","1"

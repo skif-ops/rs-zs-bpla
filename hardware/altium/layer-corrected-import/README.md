@@ -1,0 +1,36 @@
+# EVT-PRE-20 — повторный диагностический импорт трёх плат
+
+Дата: 2026-10-14. Ветка: `evt-pre-20`. Altium Designer 26.10.1.5 Trial, KiCad Importer.
+
+**NOT FOR MANUFACTURE.** Это реальные файлы Altium после повторного импорта PCB-MAIN, PCB-PWR и PCB-MIC из отдельной копии исходников KiCad. Для KiCad 9 плат PWR и MIC в копии нормализованы числовые ID слоёв; MAIN скопирована без изменений. Исходные файлы в `hardware/kicad/native/` не менялись. Ранее импортированные версии сохранены в `diagnostic-import/` для сравнения.
+
+## Что исправлено
+
+Таблица исходных KiCad 9 плат использовала `B.Cu = 2`, `F.Mask = 1`, `B.Mask = 3` и другие номера, которые Altium импортировал как внутренние слои. Скрипт [prepare_kicad9_layer_test.py](../prepare_kicad9_layer_test.py) создал полную копию дерева KiCad на F и изменил только числовые ID в таблицах слоёв PCB-PWR и PCB-MIC на схему, применённую в PCB-MAIN. Для PCB-PWR и PCB-MIC KiCad 10 повторил исходные DRC и schematic parity результаты: PWR 7 нарушений / 251 замечание parity; MIC 8 / 55.
+
+При повторном импорте карта слоёв была проверена в мастере: `F.Cu → Top`, `B.Cu → Bottom`, внутренние медные слои MAIN `In1.Cu`–`In4.Cu → Mid Layer1`–`Mid Layer4`, PWR `In1.Cu`–`In2.Cu → Mid Layer1`–`Mid Layer2`; маски, паста и шелкография указывали на соответствующие верхние/нижние слои; `Edge.Cuts → Keep Out Layer` по стандартному отображению Altium. Отдельно созданы `DioneyaMain.PcbLib` (29 модулей KiCad), `DioneyaPWR.PcbLib` (9) и `Dioneya.PcbLib` (2). Все ссылки `DocumentPath` в трёх `PrjPcb` относительны и разрешаются на файлы этого каталога: MAIN 18/18, PWR 13/13, MIC 9/9.
+
+Независимая сверка [verify_diagnostic_pcb.py](../verify_diagnostic_pcb.py) читает `Tracks6`, `Vias6`, `Nets6` и заголовки других потоков `PcbDoc`. Результаты: [PCB-MAIN/verification.json](PCB-MAIN/verification.json), [PCB-PWR/verification.json](PCB-PWR/verification.json), [PCB-MIC/verification.json](PCB-MIC/verification.json).
+
+Дополнительно [verify_pad_geometry.py](../verify_pad_geometry.py) сопоставляет компоненты по уникальным координатам, затем сравнивает площадки через KiCad 10 `pcbnew` и потоки Altium `Components6`/`Pads6`: `refdes`, абсолютные координаты, размеры, обе оси сверления, сеть и номер вывода для нумерованных площадок. Допуск координат и размеров — 0,00025 мм. Результаты: [PCB-MAIN/pad-verification.json](PCB-MAIN/pad-verification.json), [PCB-PWR/pad-verification.json](PCB-PWR/pad-verification.json), [PCB-MIC/pad-verification.json](PCB-MIC/pad-verification.json). Совпали все 251/251 компоненты и 1143/1143 площадки MAIN, 66/66 и 210/210 PWR, 6/6 и 53/53 MIC. Для 66 ненумерованных площадок MAIN, 38 PWR и 5 MIC номер не сравнивался: Altium автоматически присвоил им имена `Un*`.
+
+| Плата | Трассы: геометрия, ширина, сеть и слой | Via: координаты, диаметр, сверло, сеть и диапазон слоёв | Совпало по количеству компонентов / площадок | Совпали имена сетей |
+| --- | ---: | ---: | --- | --- |
+| PCB-MAIN | 765 / 765 | 304 / 304 | 251 / 1143 | 186 / 186 |
+| PCB-PWR | 575 / 575 | 267 / 267 | 66 / 210 | 31 / 31 |
+| PCB-MIC | 27 / 27 | 5 / 5 | 6 / 53 | 7 / 7 |
+
+Через KiCad 10 API подтверждено, что число **медных зон** совпадает с числом импортированных полигонов: MAIN 6/6, PWR 28/28, MIC 0/0. Дополнительно в исходниках есть запретные области: MAIN 4 и PWR 5. Их геометрия и свойства в Altium ещё не сверены; совпадение числа полигонов не подтверждает корректность заливки.
+
+[verify_board_outline.py](../verify_board_outline.py) сопоставляет линии и дуги исходного `Edge.Cuts` с основным контуром `Board6` Altium, включая центры и радиусы дуг, с округлением координат до 0,001 мм. Совпали все 8/8 сегментов MAIN, 4/4 PWR и 4/4 MIC. Отчёты: [MAIN](PCB-MAIN/outline-verification.json), [PWR](PCB-PWR/outline-verification.json), [MIC](PCB-MIC/outline-verification.json). Это не проверяет механические слои, отверстия, запретные области и заливку меди.
+
+Для PCB-MIC владелец проекта запустил Altium Validate PCB Project: `Compile successful, no errors found`. Первый batch DRC на импортированных правилах дал 66 нарушений и 2 PCB Health Issues. Исходные файлы отчёта и разбор причин сохранены в [PCB-MIC/validation](PCB-MIC/validation/README.md). Большая часть нарушений связана с неподходящими правилами по умолчанию, но исходная геометрия акустического отверстия также имеет подтверждённые отклонения; статус выпуска не меняется.
+
+## Что остаётся открытым
+
+- Журналы импортера содержат `KiCadLib.PCB.PCBLine` errors: MAIN 873, PWR 703, MIC 73. Все трассы с назначенными сетями перенесены, но прочая графика, контуры и специальные объекты не проверены поэлементно. Предупреждения MAIN 891, PWR 2117, MIC 275 требуют разбора.
+- На уровне **PCB** сверены `refdes–pin–net`, координаты, размер и сверление, но эквивалентность со **схемой** ещё не доказана. Форма и поворот площадок, назначение слоёв и раскрытие маски не сверены. `PcbLib` создана, но её соответствие установленным компонентам платы не подтверждено.
+- Контуры и свойства медных зон, запретные области, остальные механические слои, поля стеков, RF/power, контролируемый импеданс, DRC/compile Altium, варианты сборки и производственные выходы не проверены.
+- Исходная база KiCad уже имеет нарушения DRC и schematic parity, перечисленные в [аудите](../EVT_PRE_20_KICAD_BASELINE_AUDIT_2026-10-14.md). `manufacturing_release=false` остаётся в силе.
+
+`OutJob`, Gerber, drill, BOM, Pick&Place и производственный ZIP из этих файлов не выпускаются до закрытия перечисленных пунктов.

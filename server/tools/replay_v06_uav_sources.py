@@ -17,6 +17,7 @@ import pandas as pd
 from audio.loader import AudioLoader
 from audio.separation import DroneSeparator
 from ml.online_type_classifier import OnlineTemporalTypeClassifier
+from ml.source_identity import SOURCE_ID_COLUMN, with_source_identity
 
 DATASET=ROOT/'dataset'/'features.csv'
 POLICY=ROOT/'dataset'/'source_policy_v06.json'
@@ -42,22 +43,24 @@ def candidate_time(path: Path) -> tuple[float|None,float,int,int]:
 
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
-    df=pd.read_csv(DATASET)
+    df=with_source_identity(pd.read_csv(DATASET))
     manifest=json.loads(POLICY.read_text(encoding='utf-8'))['sources']
     test_sources=[s for s in manifest if 'v06_user_sources' in s]
     records=[]; timelines={}
     for src in sorted(test_sources):
         meta=manifest[src]; test=df[df['source_file'].astype(str)==src].copy()
         if test.empty: continue
+        source_group=str(test[SOURCE_ID_COLUMN].iloc[0])
         raw=ROOT/src
         detect_s,best_det,present,total=candidate_time(raw)
-        train=df[df['source_file'].astype(str)!=src].copy()
+        train=df[df[SOURCE_ID_COLUMN].astype(str)!=source_group].copy()
         with tempfile.TemporaryDirectory() as td:
             clf=OnlineTemporalTypeClassifier(model_path=Path(td)/'temporal.json')
             model=clf.train(train)
             replay=clf.replay(test,source_file=src,candidate_detection_seconds=detect_s,model=model)
         records.append({
             'source_file':src,
+            'source_group':source_group,
             'file_name':Path(src).name,
             'label':meta['label'],
             'label_confidence':meta['label_confidence'],

@@ -1,0 +1,25 @@
+﻿Parameter_ID,Parameter_RU_EN,Required_Source,Unit,Approved_Value,Status,Approver,Approval_Date,Evidence_SHA256,Notes
+PAR-H01,430300001 / Alpha 3051 strip length,terminal and wire supplier instruction,mm,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H02,430300001 conductor crimp height,terminal applicator setup sheet,mm,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H03,430300001 minimum pull force,terminal and wire supplier instruction,N,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H04,430300038 / TE 55A0111-18 strip length,terminal and wire supplier instruction,mm,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H05,430300038 conductor crimp height,terminal applicator setup sheet,mm,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H06,430300038 minimum pull force,terminal and wire supplier instruction,N,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H07,5040520098 / TE 55A0111-24 strip length,terminal and wire supplier instruction,mm,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H08,5040520098 conductor crimp height,terminal applicator setup sheet,mm,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H09,5040520098 minimum pull force,terminal and wire supplier instruction,N,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H10,8-34114-1 / TE 55A0111-18 strip and crimp setup,TE tooling instruction and first-off record,controlled setup,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H11,8-34114-1 minimum pull force,TE terminal and wire instruction,N,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H12,production crimp sampling frequency,supplier quality plan,interval,,OPEN_SUPPLIER_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-H13,minimum installed bend radius by wire/harness,wire and connector supplier data,mm,,OPEN_SUPPLIER_REVIEW,,,,PASS prohibited until APPROVED
+PAR-A01,PCB-MAIN mounting torque,approved mechanical drawing and fastener data,N m,,OPEN_MECHANICAL_APPROVAL,,,,PASS prohibited until APPROVED
+PAR-A02,PCB-PWR mounting torque,approved mechanical drawing and fastener data,N m,,OPEN_MECHANICAL_APPROVAL,,,,PASS prohibited until APPROVED
+PAR-A03,battery M8 ring-terminal torque,battery and terminal manufacturer data,N m,,OPEN_VENDOR_APPROVAL,,,,PASS prohibited until APPROVED
+PAR-A04,enclosure fastener torque and sequence,approved enclosure drawing and first article,N m,,OPEN_B01_FIRST_ARTICLE,,,,PASS prohibited until APPROVED
+PAR-A05,cable-gland torque,selected gland manufacturer data,N m,,OPEN_VENDOR_APPROVAL,,,,PASS prohibited until APPROVED
+PAR-P01,first-power current limit and trip action,B01 power qualification record,A,,OPEN_B01_MEASUREMENT,,,,PASS prohibited until APPROVED
+PAR-P02,first-power dwell and thermal limit,B01 thermal qualification record,s / C,,OPEN_B01_MEASUREMENT,,,,PASS prohibited until APPROVED
+PAR-P03,rail resistance and voltage acceptance limits,B01 qualification and design review,ohm / V,,OPEN_B01_MEASUREMENT,,,,PASS prohibited until APPROVED
+PAR-I01,site anchors and tightening torque,approved site structural design,type / N m,,OPEN_SITE_DESIGN,,,,PASS prohibited until APPROVED
+PAR-I02,bonding and grounding acceptance limit,approved site electrical design and local rules,ohm,,OPEN_SITE_DESIGN,,,,PASS prohibited until APPROVED
+PAR-I03,installed enclosure leak test method and limit,enclosure qualification and site procedure,pressure / time / decay,,OPEN_B01_FIRST_ARTICLE,,,,PASS prohibited until APPROVED

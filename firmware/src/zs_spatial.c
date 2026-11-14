@@ -162,57 +162,47 @@ bool zs_spatial_direction_from_reference_tdoas(const zs_spatial_geometry_t *geom
   return out->valid;
 }
 
-bool zs_spatial_gcc_phat_delay_us(const int16_t *reference,
-                                  const int16_t *signal,
-                                  size_t sample_count,
-                                  uint32_t sample_rate_hz,
-                                  float max_delay_us,
-                                  float fmin_hz,
-                                  float fmax_hz,
-                                  zs_spatial_gcc_workspace_t *workspace,
-                                  float *delay_us,
-                                  float *quality) {
-  if (!reference || !signal || !workspace || !delay_us || !quality) return false;
-  if (sample_count != ZS_SPATIAL_GCC_N || sample_rate_hz == 0u) return false;
-  if (!(fmin_hz >= 0.0f && fmax_hz > fmin_hz && fmax_hz <= 0.5f * sample_rate_hz)) return false;
-
+/* Windowed (Hann) real frame -> spectrum in `out` (ZS_SPATIAL_GCC_N complex). */
+static bool frame_spectrum(const int16_t *x, zs_complex_t *out) {
   const float inv_scale = 1.0f / 32768.0f;
   for (size_t i = 0; i < ZS_SPATIAL_GCC_N; ++i) {
     const float w = 0.5f - 0.5f * cosf(2.0f * (float)M_PI * (float)i / (float)(ZS_SPATIAL_GCC_N - 1u));
-    workspace->reference[i].re = (float)reference[i] * inv_scale * w;
-    workspace->reference[i].im = 0.0f;
-    workspace->signal[i].re = (float)signal[i] * inv_scale * w;
-    workspace->signal[i].im = 0.0f;
+    out[i].re = (float)x[i] * inv_scale * w;
+    out[i].im = 0.0f;
   }
-  if (!zs_fft_radix2(workspace->reference, ZS_SPATIAL_GCC_N) ||
-      !zs_fft_radix2(workspace->signal, ZS_SPATIAL_GCC_N)) {
-    return false;
-  }
+  return zs_fft_radix2(out, ZS_SPATIAL_GCC_N);
+}
 
+/* PHAT-weighted cross spectrum of `sig` against `ref` (band-limited, in place in `sig`), back to the lag domain,
+   peak search within +-max_delay with parabolic interpolation. */
+static bool phat_peak(zs_complex_t *sig, const zs_complex_t *ref, uint32_t sample_rate_hz, float max_delay_us,
+                      float fmin_hz, float fmax_hz, float *delay_us, float *quality, float *coherence) {
+  unsigned band_bins = 0u;
   for (size_t k = 0; k < ZS_SPATIAL_GCC_N; ++k) {
     const size_t folded = k <= ZS_SPATIAL_GCC_N / 2u ? k : ZS_SPATIAL_GCC_N - k;
     const float freq = (float)folded * (float)sample_rate_hz / (float)ZS_SPATIAL_GCC_N;
     if (freq < fmin_hz || freq > fmax_hz) {
-      workspace->signal[k].re = 0.0f;
-      workspace->signal[k].im = 0.0f;
+      sig[k].re = 0.0f;
+      sig[k].im = 0.0f;
       continue;
     }
-    const float ar = workspace->signal[k].re;
-    const float ai = workspace->signal[k].im;
-    const float br = workspace->reference[k].re;
-    const float bi = workspace->reference[k].im;
+    const float ar = sig[k].re;
+    const float ai = sig[k].im;
+    const float br = ref[k].re;
+    const float bi = ref[k].im;
     const float cr = ar * br + ai * bi; /* signal * conj(reference) */
     const float ci = ai * br - ar * bi;
     const float mag = sqrtf(cr * cr + ci * ci);
     if (mag > 1.0e-12f) {
-      workspace->signal[k].re = cr / mag;
-      workspace->signal[k].im = ci / mag;
+      sig[k].re = cr / mag;
+      sig[k].im = ci / mag;
+      ++band_bins;
     } else {
-      workspace->signal[k].re = 0.0f;
-      workspace->signal[k].im = 0.0f;
+      sig[k].re = 0.0f;
+      sig[k].im = 0.0f;
     }
   }
-  if (!zs_ifft_radix2(workspace->signal, ZS_SPATIAL_GCC_N)) return false;
+  if (!zs_ifft_radix2(sig, ZS_SPATIAL_GCC_N)) return false;
 
   int max_lag = (int)ceilf(max_delay_us * 1.0e-6f * (float)sample_rate_hz) + 1;
   if (max_lag < 1) max_lag = 1;
@@ -224,7 +214,7 @@ bool zs_spatial_gcc_phat_delay_us(const int16_t *reference,
   unsigned count = 0u;
   for (int lag = -max_lag; lag <= max_lag; ++lag) {
     const size_t index = lag >= 0 ? (size_t)lag : ZS_SPATIAL_GCC_N + (size_t)lag;
-    const float v = fabsf(workspace->signal[index].re);
+    const float v = fabsf(sig[index].re);
     sum += v;
     ++count;
     if (v > best) {
@@ -240,9 +230,9 @@ bool zs_spatial_gcc_phat_delay_us(const int16_t *reference,
     const size_t i0 = lag0 >= 0 ? (size_t)lag0 : ZS_SPATIAL_GCC_N + (size_t)lag0;
     const size_t i1 = best_lag >= 0 ? (size_t)best_lag : ZS_SPATIAL_GCC_N + (size_t)best_lag;
     const size_t i2 = lag2 >= 0 ? (size_t)lag2 : ZS_SPATIAL_GCC_N + (size_t)lag2;
-    const float y0 = fabsf(workspace->signal[i0].re);
-    const float y1 = fabsf(workspace->signal[i1].re);
-    const float y2 = fabsf(workspace->signal[i2].re);
+    const float y0 = fabsf(sig[i0].re);
+    const float y1 = fabsf(sig[i1].re);
+    const float y2 = fabsf(sig[i2].re);
     const float denom = y0 - 2.0f * y1 + y2;
     if (fabsf(denom) > 1.0e-12f) frac = clampf(0.5f * (y0 - y2) / denom, -0.5f, 0.5f);
   }
@@ -250,5 +240,51 @@ bool zs_spatial_gcc_phat_delay_us(const int16_t *reference,
   *delay_us = ((float)best_lag + frac) / (float)sample_rate_hz * 1.0e6f;
   const float mean = sum / (float)count + 1.0e-12f;
   *quality = best / mean;
+  /* the inverse transform scales by 1/N: a fully coherent pair peaks at band_bins/N */
+  if (coherence) *coherence = band_bins ? clampf(best * (float)ZS_SPATIAL_GCC_N / (float)band_bins, 0.0f, 1.0f) : 0.0f;
   return isfinite(*delay_us) && isfinite(*quality);
+}
+
+static bool gcc_args_ok(size_t sample_count, uint32_t sample_rate_hz, float fmin_hz, float fmax_hz) {
+  return sample_count == ZS_SPATIAL_GCC_N && sample_rate_hz != 0u &&
+         fmin_hz >= 0.0f && fmax_hz > fmin_hz && fmax_hz <= 0.5f * sample_rate_hz;
+}
+
+bool zs_spatial_gcc_phat_delay_us(const int16_t *reference,
+                                  const int16_t *signal,
+                                  size_t sample_count,
+                                  uint32_t sample_rate_hz,
+                                  float max_delay_us,
+                                  float fmin_hz,
+                                  float fmax_hz,
+                                  zs_spatial_gcc_workspace_t *workspace,
+                                  float *delay_us,
+                                  float *quality) {
+  if (!reference || !signal || !workspace || !delay_us || !quality) return false;
+  if (!gcc_args_ok(sample_count, sample_rate_hz, fmin_hz, fmax_hz)) return false;
+  if (!frame_spectrum(reference, workspace->reference) || !frame_spectrum(signal, workspace->signal)) return false;
+  return phat_peak(workspace->signal, workspace->reference, sample_rate_hz, max_delay_us, fmin_hz, fmax_hz, delay_us, quality,
+                   NULL);
+}
+
+bool zs_spatial_gcc_phat_reference_delays(const int16_t *const channels[ZS_SPATIAL_MIC_COUNT],
+                                          size_t sample_count,
+                                          uint32_t sample_rate_hz,
+                                          float max_delay_us,
+                                          float fmin_hz,
+                                          float fmax_hz,
+                                          zs_spatial_gcc_workspace_t *workspace,
+                                          float delay_us[ZS_SPATIAL_REF_TDOA_COUNT],
+                                          float coherence[ZS_SPATIAL_REF_TDOA_COUNT]) {
+  if (!channels || !workspace || !delay_us || !coherence) return false;
+  for (unsigned i = 0; i < ZS_SPATIAL_MIC_COUNT; ++i) if (!channels[i]) return false;
+  if (!gcc_args_ok(sample_count, sample_rate_hz, fmin_hz, fmax_hz)) return false;
+  if (!frame_spectrum(channels[0], workspace->reference)) return false;           /* one reference transform */
+  for (unsigned i = 0; i < ZS_SPATIAL_REF_TDOA_COUNT; ++i) {
+    float peak_to_mean;
+    if (!frame_spectrum(channels[i + 1u], workspace->signal)) return false;
+    if (!phat_peak(workspace->signal, workspace->reference, sample_rate_hz, max_delay_us, fmin_hz, fmax_hz,
+                   &delay_us[i], &peak_to_mean, &coherence[i])) return false;
+  }
+  return true;
 }

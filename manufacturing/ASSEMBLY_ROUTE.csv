@@ -1,27 +1,33 @@
-Step,Gate,Operation,Applies_To,Prerequisite,Equipment_or_Document,Acceptance,Evidence,Rework_or_Hold,Status
-MFG-010,QG0,Verify released manufacturing bundle,LOT,SHA256 manifest available,Release index and verifier,All hashes match and no OPEN blocker authorized for build,Verification log,HOLD,OPEN
-MFG-020,QG0,Verify materials and deviations,LOT,Incoming inspection completed,BOM AVL IC records NCR log,All items accepted or deviation signed,Material release record,HOLD,OPEN
-MFG-030,QG0,Select lot and assign serials travellers and housing plan,20_SELECTED_EVT_UNITS,EVT-20 selected and serial/housing registers controlled,EVT_LOT_SELECTION LOT_SERIAL_REGISTER HOUSING_LOT_PLAN and traveller,DIO-EVT-001 through DIO-EVT-020 assigned with no duplicates; all primary housings vacuum cast; 3D fallback controlled,Selection plus serial and housing registers,HOLD,PARTIAL_SELECTION_COMPLETE_TRAVELLERS_PENDING
-MFG-040,QG1,Stencil paste placement and reflow,PCB_MAIN_PCB_PWR_PCB_MIC,Released Gerber PnP BOM stencil and profile,Printer placer oven thermocouples,Profile within frozen paste limits and traceable batch,Reflow profile plus machine exports,Approved rework only,OPEN
-MFG-050,QG1,AOI visual and X-ray,ALL_PCBA,Reflow complete,AOI microscope X-ray plan,IC-004 and IC-005 accepted,Images and defect log,Rework then repeat inspection,OPEN
-MFG-060,QG1,Bare power resistance check,ALL_PCBA,Inspection accepted,DMM current-limited supply,No rail-to-ground short against released limits,Measurements,HOLD and diagnose,OPEN
-MFG-070,QG1,First power with current limit,PCB_MAIN_PCB_PWR,Resistance accepted,Bench supply logger thermal camera,No latch-up overheating or current limit event,Power log plus thermal image,HOLD and diagnose,OPEN
-MFG-080,QG1,Program immutable boot foundation,PCB_MAIN,First power accepted,Trusted programmer signed release manifest,Readback version and protection state match release,Programmer log by serial,Scrap or controlled recovery,OPEN
-MFG-090,QG1,Program station and coprocessor test builds,PCB_MAIN,Boot foundation accepted,Programmer and manifests,Hashes and versions match selected release,Programmer log,Repeat only under work instruction,OPEN
-MFG-100,QG1,PCB_MAIN boundary scan and interface self-test,PCB_MAIN,Test firmware loaded,EOL fixture and self-test,All fitted interfaces including both SIM slots enumerate and test points pass,Machine-readable log,Rework and rerun full step,OPEN
-MFG-110,QG1,PCB_PWR load and protection test,PCB_PWR,First power accepted,Electronic load surge fixtures and thermal camera,All rails protection and temperature within frozen limits,CSV waveforms and thermal images,HOLD and diagnose,OPEN
-MFG-120,QG1,PCB_MIC individual acoustic test,PCB_MIC,Visual inspection accepted,Calibrated speaker reference mic fixture,Identity sensitivity noise and phase within frozen limits,Per-board calibration CSV,Reject or approved rework,OPEN
-MFG-130,QG1,Build and verify harnesses,HARNESS,Incoming accepted,Harness tester and drawing,100 percent continuity polarity labels and length pass,Tester export,Rework then full retest,OPEN
-MFG-140,QG1,Install PCB and antennas in electronics module,20_units,Subassemblies accepted,Assembly drawing torque tools ESD bench,No interference; antennas and coax routing match drawing,Traveller photos and torques,Disassemble under controlled instruction,OPEN
-MFG-150,QG1,Assemble four-microphone geometry,20_units,Four accepted PCB_MIC and housing parts,Geometry jig and calibrated measurement,Triangle sides and MIC4 offset within released tolerance,Measurements plus photo,Adjust or replace parts,OPEN
-MFG-160,QG1,Install seals membranes and vents,20_units,Housing parts accepted,Assembly drawing gauges and clean bench,Correct lot orientation compression and clean acoustic ports,Lot refs plus close-up photos,Replace single-use seals,OPEN
-MFG-170,QG1,Assemble lower power module,20_units,Battery MPPT PCB_PWR accepted,Insulated tools fuse and torque plan,Polarity fuse BMS MPPT and strain relief correct,Traveller plus torque values,HOLD on any polarity conflict,OPEN
-MFG-180,QG1,Join modules and protective earth if applicable,20_units,Upper and lower modules complete,Released interconnect drawing and DMM,Connector keying continuity insulation and fuse correct,Continuity record,HOLD and diagnose,OPEN
-MFG-190,QG1,Trusted provisioning,20_units,Hardware identity stable,Offline provisioning station and MFG-003 procedure,Unique serial IDs keys and certificates installed and verified,Controlled provisioning receipt,Zeroize and reprovision only by authorization,OPEN
-MFG-200,QG1,Apply labels and QR,20_units,Provisioning accepted,Released label artwork and scanner,Human text and QR resolve same serial HW region and device ID,Scan log plus photo,Replace label and rescan,OPEN
-MFG-210,QG2,Run 100 percent EOL,20_units,Fully assembled unit,EOL fixture network simulators RF loads and EOL spec,All mandatory EOL tests PASS with original logs,EOL bundle by serial,Rework then full EOL rerun,OPEN
-MFG-220,QG2,Leak test before live outdoor exposure,20_units,EOL electrical safe,Pressure decay or approved leak fixture,Meets frozen enclosure-specific limit,Leak curve,HOLD and inspect seals,OPEN
-MFG-230,QG2,Final visual and configuration audit,20_units,EOL and leak accepted,Traveller serial register manifests,No damage; all identifiers and configuration mutually consistent,Final checklist and photos,HOLD,OPEN
-MFG-240,QG2,Close traveller and unit passport,20_units,All steps accepted,Controlled records,No blank mandatory field and evidence paths resolve,Signed traveller and passport,HOLD,OPEN
-MFG-250,QG2,Pack for EVT transport,20_units,Unit released,Packing instruction ESD caps battery rules,Correct accessories protection state and labels,Packing photo and pack list,Repack,OPEN
-MFG-260,QG2,Lot release review,LOT,All records for the selected 4 10 or 20-unit lot closed,Lot review board,Zero unexplained missing selected-lot unit; deviations dispositioned,Lot release minutes,HOLD,OPEN
+﻿Step,Gate,Operation_RU_EN,Applies_To,Prerequisite_or_Parameters,Acceptance,Evidence,Rework_or_Hold,Status
+MFG-010,QG0,Verify REV_D10 archive and SHA-256 / Проверить архив и SHA-256,LOT,release index and verifier,all hashes match,verification log,HOLD,OPEN
+MFG-020,QG0,Select procurement option 21 or 41 / Выбрать вариант 21 или 41,LOT,procurement decision,one option signed,selection record,HOLD,OPEN
+MFG-030,QG0,Assign serial and traveller / Назначить serial и traveller,41_IDENTITIES,serial register,unique DIO-EVT-001..040+B01,traveller register,HOLD,OPEN
+MFG-040,QG0,Incoming inspection / Входной контроль,ALL_MATERIAL,BOM AVL inspection plan,accepted or approved deviation,inspection record,HOLD,OPEN
+MFG-050,QG1,Stencil paste placement and reflow / Печать пасты и оплавление,ALL_PCBA,released CAM PnP BOM profile,profile accepted and traceable,machine exports,REWORK_OR_HOLD,OPEN
+MFG-060,QG1,AOI visual and required X-ray / AOI визуальный и X-ray,ALL_PCBA,inspection plan,no unresolved defects,images and defect log,REWORK_AND_REPEAT,OPEN
+MFG-070,QG1,Bare-board rail resistance / Сопротивление шин,ALL_PCBA,approved limit set,within approved limits,measurement log,HOLD,OPEN
+MFG-080,QG1,PCBA first power / Первое питание плат,PCB_MAIN_PCB_PWR,approved B01 setup,no trip or abnormal heating,power and thermal log,HOLD,OPEN
+MFG-090,QG1,PCB-MAIN interface self-test / Самотест интерфейсов,PCB_MAIN,test firmware and fixture,all fitted interfaces pass,machine log,REWORK_AND_FULL_RETEST,OPEN
+MFG-100,QG1,PCB-PWR protection/load test / Нагрузочный тест,PCB_PWR,approved load profile,rails protection thermal pass,CSV waveform and thermal,HOLD,OPEN
+MFG-110,QG1,PCB-MIC calibration / Калибровка PCB-MIC,PCB_MIC,acoustic fixture,identity gain phase noise pass,per-board CSV,HOLD,OPEN
+MFG-120,QG1,Harness first-off / First-off жгутов,HARNESS_LOT,approved tooling parameters,crimp height pull and visual accepted,first-off record,HOLD,OPEN
+MFG-130,QG1,Build and 100 percent test harnesses / Сборка и контроль жгутов,246_HARNESSES,first-off accepted,continuity polarity resistance length pass,tester export,REWORK_AND_FULL_RETEST,OPEN
+MFG-140,QG1,Prepare enclosure / Подготовить корпус,41_IDENTITIES,accepted enclosure parts,fit and cleanliness pass,photos and lot IDs,HOLD,OPEN
+MFG-150,QG1,Install PCB-MAIN and RF / Установить PCB-MAIN и RF,41_IDENTITIES,accepted PCB and PAR-A01,routing and torque pass,traveller photos and torque,HOLD,OPEN
+MFG-160,QG1,Install four PCB-MIC / Установить четыре PCB-MIC,41_IDENTITIES,four accepted modules,identity and port cleanliness pass,IDs and photos,HOLD,OPEN
+MFG-170,QG1,Verify microphone geometry / Проверить геометрию,41_IDENTITIES,approved jig and limits,all dimensions pass,measurements and photo,HOLD,OPEN
+MFG-180,QG1,Install PCB-PWR and power module / Установить силовой модуль,41_IDENTITIES,PAR-A02/A03 approved,polarity torque strain relief pass,traveller and torque,HOLD,OPEN
+MFG-190,QG1,Connect inter-module harnesses / Соединить модули,41_IDENTITIES,accepted harnesses,keying continuity polarity pass,continuity record,HOLD,OPEN
+MFG-200,QG1,Install seals membranes and vents / Установить уплотнения,41_IDENTITIES,clean parts,orientation and condition pass,lot IDs and photos,REPLACE_AND_REPEAT,OPEN
+MFG-210,QG1,Close enclosure / Закрыть корпус,41_IDENTITIES,PAR-A04/A05 approved,sequence and torques pass,torque record,HOLD,OPEN
+MFG-220,QG1,Pre-power inspection / Предпусковой контроль,41_IDENTITIES,assembly complete,polarity fuse resistance pass,checklist,HOLD,OPEN
+MFG-230,QG1,Station initial power / Первое включение станции,41_IDENTITIES,PAR-P01/P02/P03 approved,currents rails thermal pass,source logs and SHA-256,HOLD,OPEN
+MFG-240,QG1,Battery and MPPT test / Проверка батареи и MPPT,41_IDENTITIES,bench first power pass,polarity charging protection pass,power log,HOLD,OPEN
+MFG-250,QG1,Provision identity keys and certificates / Provisioning,41_IDENTITIES,stable hardware identity,unique identity and receipt,controlled receipt,CONTROLLED_RECOVERY,OPEN
+MFG-260,QG1,Apply labels and QR / Нанести labels и QR,41_IDENTITIES,provisioning accepted,human and QR identity match,scan log and photo,REPLACE_AND_RESCAN,OPEN
+MFG-270,QG2,Run complete EOL / Выполнить полный EOL,41_IDENTITIES,fully assembled unit,all mandatory tests pass,EOL evidence bundle,REWORK_AND_FULL_EOL,OPEN
+MFG-280,QG2,Leak test / Проверка герметичности,41_IDENTITIES,PAR-I03 approved,approved limit pass,leak curve,HOLD,OPEN
+MFG-290,QG2,Final audit / Финальный аудит,41_IDENTITIES,EOL and leak accepted,identity configuration records consistent,final checklist,HOLD,OPEN
+MFG-300,QG2,Close traveller and passport / Закрыть traveller и паспорт,41_IDENTITIES,all steps closed,no blank mandatory fields,signed records,HOLD,OPEN
+MFG-310,QG2,Pack for transport / Упаковать,40_FIELD_PLUS_B01,unit released,protection and pack list pass,packing photo,REPACK,OPEN
+MFG-320,QG2,Lot release review / Выпуск лота,LOT,selected lot records closed,zero unexplained missing units,release minutes,HOLD,OPEN

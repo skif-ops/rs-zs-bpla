@@ -1,0 +1,10 @@
+Output: Export STEP
+Type  : ExportSTEP
+From  : Variant [[No Variations]] of PCB Document [PCB-MIC.PcbDoc]
+   Generated File[PCB-MIC.step]
+
+
+Files Generated   : 1
+Documents Printed : 0
+
+Finished Output Generation At 0:38:05 On 16.10.2026

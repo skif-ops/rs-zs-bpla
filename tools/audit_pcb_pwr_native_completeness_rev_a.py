@@ -17,6 +17,8 @@ CAP_NETS = {
     "C11": ("VBAT_SYS", "GND_PWR", "CIN_3V8"),
     "C12": ("VBAT_SYS", "GND_PWR", "CIN_3V3"),
     "C13": ("VBAT_SYS", "GND_PWR", "VBAT_SYS_BULK"),
+    "C20": ("VBAT_SYS", "GND_PWR", "CIN_HF_3V8"),
+    "C21": ("VBAT_SYS", "GND_PWR", "CIN_HF_3V3"),
 }
 TP_NETS = {
     "TP1": "VBAT_PROTECTED",
@@ -158,7 +160,7 @@ def main() -> int:
             raise RuntimeError(f"{ref}: ERC source must be schematic-only")
 
     print("PCB-PWR Rev.A independent native completeness audit PASS")
-    print("unidirectional TVS, 5 controlled passives, 10 controlled DFT points and ERC-source semantics verified")
+    print("unidirectional TVS, 7 controlled input passives, 10 controlled DFT points and ERC-source semantics verified")
     return 0
 
 

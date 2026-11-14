@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 
 from config import settings
+from ml.source_identity import SOURCE_ID_COLUMN, source_identity_series, with_source_identity
 from ml.temporal_features import TEMPORAL_FEATURE_COLUMNS, TemporalFeatureBuilder
 from ml.type_readiness import assess_type_readiness
 from models.schemas import OnlineTypeReplay, OnlineTypeSnapshot
@@ -82,7 +83,7 @@ class OnlineTemporalTypeClassifier:
         label_policy: dict[str, str] = {}
         for label, group in source.groupby("label"):
             roles = set(group.get("meta_dataset_role", pd.Series(["training"])).fillna("training").astype(str).str.lower())
-            source_count = int(group["source_file"].astype(str).nunique()) if "source_file" in group.columns else 0
+            source_count = int(source_identity_series(group).nunique()) if "source_file" in group.columns else 0
             if "training_provisional_weak" in roles or label in settings.ml_weak_labels:
                 label_policy[str(label)] = "weak"
             elif "training_provisional" in roles or label in settings.ml_provisional_labels or source_count < 2:
@@ -103,13 +104,16 @@ class OnlineTemporalTypeClassifier:
             std = np.where(std < 1e-9, 1.0, std)
             Z = (X - mean) / std
             temporal = temporal.reset_index(drop=True)
+            temporal = with_source_identity(temporal)
             source_centroids: dict[str, dict[str, Any]] = {}
-            for (label, src), indices in temporal.groupby(["label", "source_file"]).groups.items():
+            for (label, src), indices in temporal.groupby(["label", SOURCE_ID_COLUMN]).groups.items():
                 idx = np.asarray(list(indices), dtype=int)
                 group = temporal.loc[idx]
                 centroid = np.median(Z[idx], axis=0)
-                source_centroids[str(src)] = {
+                source_centroids[f"{label}::{src}"] = {
                     "label": str(label),
+                    "source_id": str(src),
+                    "source_files": sorted(set(group["source_file"].astype(str))),
                     "centroid": centroid.tolist(),
                     "weight": source_training_weight(group),
                     "role": str(group.get("meta_dataset_role", pd.Series(["training"])).dropna().iloc[0] if "meta_dataset_role" in group else "training"),
@@ -131,7 +135,7 @@ class OnlineTemporalTypeClassifier:
                     "centroid": centroid.tolist(),
                     "radius": radius,
                     "sources": len(items),
-                    "source_ids": [src for src, item in source_centroids.items() if item["label"] == label],
+                    "source_ids": [item["source_id"] for item in items],
                 }
             horizons[str(float(horizon))] = {
                 "mean": mean.tolist(),
@@ -367,8 +371,9 @@ class OnlineTemporalTypeClassifier:
     @staticmethod
     def _balance_temporal_windows(frame: pd.DataFrame, max_per_source: int = 8) -> pd.DataFrame:
         parts: list[pd.DataFrame] = []
-        for _, group in frame.groupby(["label", "source_file"], sort=False):
-            g = group.sort_values("start_seconds")
+        work = with_source_identity(frame)
+        for _, group in work.groupby(["label", SOURCE_ID_COLUMN], sort=False):
+            g = group.sort_values(["source_file", "start_seconds"])
             if len(g) > max_per_source:
                 positions = np.linspace(0, len(g) - 1, max_per_source)
                 g = g.iloc[sorted(set(int(round(v)) for v in positions))]

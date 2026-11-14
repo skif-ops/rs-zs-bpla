@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -12,8 +13,18 @@ if str(SERVER_ROOT) not in sys.path:
 
 from station.cbor_codec import decode_detection_cbor, decode_heartbeat_cbor
 
-exe = REPO_ROOT / "firmware" / "build" / "zs_emit_detection"
-heartbeat_exe = REPO_ROOT / "firmware" / "build" / "zs_emit_heartbeat"
+build_dir = Path(os.environ.get("ZS_FIRMWARE_BUILD_DIR", REPO_ROOT / "firmware" / "build"))
+
+
+def host_executable(name: str) -> Path:
+    path = build_dir / name
+    if os.name == "nt" and not path.exists():
+        path = path.with_suffix(".exe")
+    return path
+
+
+exe = host_executable("zs_emit_detection")
+heartbeat_exe = host_executable("zs_emit_heartbeat")
 
 full_raw = subprocess.check_output([str(exe)])
 full = decode_detection_cbor(full_raw)
@@ -79,6 +90,15 @@ assert heartbeat.power.monitor_valid
 assert heartbeat.cellular is not None
 assert heartbeat.cellular.imsi == "250011234567890"
 assert heartbeat.cellular.iccid == "89701012345678901234"
+assert heartbeat.detector is not None, "schema 2 heartbeat must carry the detector map"
+assert heartbeat.detector.boot_id == 7 and heartbeat.detector.windows == 7190 and heartbeat.detector.outbox_pending == 1
+assert heartbeat.detector.presence_level == "CONFIRMED" and heartbeat.detector.window_max_ms == 187
+assert heartbeat.detector.reset_cause == "IWDG" and heartbeat.detector.watchdog_missed_tasks == 0x20
+assert heartbeat.detector.params_version == 3
+assert not heartbeat.self_test_ok and heartbeat.detector.selftest_failed_tests == 0x10   # mic_capture (id 4)
+assert heartbeat.detector.command_key_id == "a1b2c3d4e5f60718" and heartbeat.detector.command_next_key_id == "0102030405060708"
+assert (heartbeat.detector.fw_version, heartbeat.detector.fw_state, heartbeat.detector.fw_other_version) == (7, "TRIAL", 6)   # addendum F
+assert (heartbeat.detector.net_config_version, heartbeat.detector.net_state, heartbeat.detector.net_failed_version) == (4, "ROLLED_BACK", 5)   # addendum G
 assert heartbeat.cellular.apn == "network.apn"
 assert heartbeat.cellular.apn_source == "NETWORK"
 assert heartbeat.cellular.settings_valid

@@ -3,21 +3,14 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    branches: [main, develop, evt, evt-mb, evt-pre-20, "feature/**", "integration/**"]
+    branches: [evt-pre-20]
   pull_request:
-    branches: [main, develop, evt, evt-mb, evt-pre-20]
+    branches: [evt-pre-20]
 
 jobs:
   evt-pre-20-config:
     name: EVT-PRE-20 configuration and release audit
-    if: >-
-      github.ref == 'refs/heads/main' ||
-      github.ref == 'refs/heads/develop' ||
-      github.ref == 'refs/heads/evt-pre-20' ||
-      startsWith(github.ref, 'refs/heads/integration/') ||
-      github.base_ref == 'main' ||
-      github.base_ref == 'develop' ||
-      github.base_ref == 'evt-pre-20'
+    if: github.ref == 'refs/heads/evt-pre-20' || github.base_ref == 'evt-pre-20'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,9 +37,19 @@ jobs:
       - name: QG-2 independent production BOM technical audit
         run: python tools/audit_evt_pre_20_bom_qg2.py
       - name: PCB-PWR input-protection qualification control
-        run: python tools/audit_pcb_pwr_input_protection_rev_a.py --output artifacts/pcb_pwr_input_protection_qualification_rev_a.json
+        run: |
+          python tools/audit_pcb_pwr_input_protection_sources_rev_a.py \
+            --output artifacts/pcb_pwr_input_protection_primary_source_evidence_rev_a.json
+          python tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py \
+            --output artifacts/pcb_pwr_input_protection_procurement_identity_rev_a.json
+          python tools/audit_pcb_pwr_input_protection_rev_a.py \
+            --output artifacts/pcb_pwr_input_protection_qualification_rev_a.json
       - name: Hardware-only design and purchase release audit
         run: python tools/audit_evt_pre_20_hardware_release.py
+      - name: Audit controlled external-response request bundle inputs
+        run: |
+          python tools/audit_evt_pre_20_external_response_bundle.py \
+            --output artifacts/evt_pre_20_external_response_bundle_audit.json
       - name: Independent PCB-MIC native schematic structural audit
         run: |
           python tools/audit_pcb_mic_native_schematic_rev_a.py \
@@ -104,12 +107,65 @@ jobs:
             --output artifacts/pcb_main_stackup_impedance_request_rev_a.json \
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
+          python tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py \
+            --output artifacts/pcb_main_jlc06161h_3313_routing_basis_rev_a.json
+          python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py \
+            --output artifacts/pcb_main_rf_routeability_eco_003_rev_a.json
+          python tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py \
+            --output artifacts/pcb_main_ground_domain_routing_candidate_rev_a.json
+          python tools/audit_pcb_main_signal_hard_nets_candidate_rev_a.py \
+            --output artifacts/pcb_main_signal_hard_nets_candidate_rev_a.json
+          python tools/audit_pcb_main_octospi_r8_eco_candidate_rev_a.py \
+            --output artifacts/pcb_main_octospi_r8_eco_candidate_rev_a.json
+          python tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py \
+            --output artifacts/pcb_main_octospi_r8_eco_application_rev_a.json
+          python tools/audit_pcb_main_rf_p0_candidate_rev_a.py \
+            --output artifacts/pcb_main_rf_p0_candidate_rev_a.json
+          python tools/audit_pcb_main_rf_p0_application_rev_a.py \
+            --output artifacts/pcb_main_rf_p0_application_rev_a.json
+          python tools/audit_pcb_main_rf_return_001_candidate_rev_a.py \
+            --output artifacts/pcb_main_rf_return_001_candidate_rev_a.json
+          python tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py \
+            --output artifacts/pcb_main_gnss_rf_eco_001_candidate_rev_a.json
+          python tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py \
+            --output artifacts/pcb_main_usb_placement_eco_001_candidate_rev_a.json
+          python tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --check \
+            --output hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
+          python tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --output artifacts/pcb_main_usb_placement_eco_001_application_rev_a.json
+          python tools/generate_pcb_main_usb_source_routing_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_source_routing_candidate_rev_a.py \
+            --output artifacts/pcb_main_usb_source_routing_001_candidate_rev_a.json
+          python tools/generate_pcb_main_usb_source_routing_001_application_rev_a.py \
+            --check \
+            --output hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb
+          python tools/audit_pcb_main_usb_source_routing_001_application_rev_a.py \
+            --output artifacts/pcb_main_usb_source_routing_001_application_rev_a.json
+          python tools/generate_pcb_main_usb_cell_modem_routing_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_cell_modem_routing_candidate_rev_a.py \
+            --output artifacts/pcb_main_usb_cell_modem_routing_001_candidate_rev_a.json
+          python tools/generate_pcb_main_usb_cell_modem_routing_001_application_rev_a.py --check
+          python tools/audit_pcb_main_usb_cell_modem_routing_001_application_rev_a.py \
+            --output artifacts/pcb_main_usb_cell_modem_routing_001_application_rev_a.json
+          python tools/generate_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py \
+            --output artifacts/pcb_main_usb_cell_fixture_routing_001_candidate_rev_a.json
+          python tools/generate_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py --check
+          python tools/audit_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py \
+            --output artifacts/pcb_main_usb_cell_fixture_routing_001_application_rev_a.json
+          python tools/generate_pcb_main_rf_remediation_application_rev_a.py --check
+          python tools/audit_pcb_main_rf_remediation_application_rev_a.py \
+            --output artifacts/pcb_main_rf_remediation_application_rev_a.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json \
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
           python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
             --output artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
+          python tools/audit_pcb_main_mech_eco_002_rev_a.py \
+            --output artifacts/pcb_main_mech_eco_002_rev_a.json
       - name: Audit PCB-PWR placement and pre-route constraint interlocks
         run: |
           python tools/audit_pcb_pwr_hierarchy_rev_a.py \
@@ -119,8 +175,82 @@ jobs:
           python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
             --output artifacts/pcb_pwr_placement_clearance_rev_a.json \
             --strict
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+            --check
+          python tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_buck_placement_eco_001_candidate_rev_a.json
+          python tools/audit_pcb_pwr_buck_placement_eco_001_application_rev_a.py \
+            --output artifacts/pcb_pwr_buck_placement_eco_001_application_rev_a.json
+          python tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_buck_warning_remediation_001_candidate_rev_a.json
+          python tools/generate_pcb_pwr_buck_warning_remediation_001_application_rev_a.py \
+            --output hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb --check
+          python tools/audit_pcb_pwr_buck_warning_remediation_001_application_rev_a.py \
+            --output artifacts/pcb_pwr_buck_warning_remediation_001_application_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py \
+            --check
+          python tools/audit_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py \
+            --output artifacts/pcb_pwr_buck_bootstrap_routing_001_application_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py --check
+          python tools/audit_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py \
+            --output artifacts/pcb_pwr_lm74700_vcap_routing_002_application_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_vbat_raw_routing_003_candidate_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_vbat_raw_routing_003_application_rev_a.py --check
+          python tools/audit_pcb_pwr_vbat_raw_routing_003_application_rev_a.py \
+            --output artifacts/pcb_pwr_vbat_raw_routing_003_application_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_rev_gate_routing_004_candidate_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_rev_gate_routing_004_application_rev_a.py --check
+          python tools/audit_pcb_pwr_rev_gate_routing_004_application_rev_a.py \
+            --output artifacts/pcb_pwr_rev_gate_routing_004_application_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py --check
+          python tools/run_pcb_pwr_hot_loop_006_historical_candidate_audit.py \
+            --output artifacts/pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.json
+          python tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py \
+            --output artifacts/pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.json
+          python tools/run_pcb_pwr_shunt_bulk_007_historical_audit.py \
+            --output artifacts/pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a.json
+          python tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py --check
+          python tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py \
+            --output artifacts/pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.json
+          python tools/run_pcb_pwr_c13_c12_008_historical_audit.py \
+            --output artifacts/pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.json
+          python tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py --check
+          python tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py \
+            --output artifacts/pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.json
+          python tools/run_pcb_pwr_c13_c11_009_historical_audit.py \
+            --output artifacts/pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.json
+          python tools/run_pcb_pwr_c13_c11_009_historical_application_audit.py \
+            --output artifacts/pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.json
+          python tools/run_pcb_pwr_3v8_output_bulk_010_historical_audit.py \
+            --output artifacts/pcb_pwr_3v8_output_bulk_routing_010_candidate_rev_a.json
+          python tools/generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py --check
+          python tools/audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py \
+            --output artifacts/pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py \
+            --output artifacts/pcb_pwr_buck_power_stage_eco_002_application_rev_a.json
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/pcb_pwr_routing_authority_rev_a.json
+          python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
+          python tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py \
+            --output artifacts/pcb_pwr_evt_routing_basis_rev_a.json
           python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
             --output artifacts/pcb_pwr_dim_003_request_rev_a.json \
             --commit-sha "$GITHUB_SHA" \
@@ -193,6 +323,8 @@ jobs:
             artifacts/evt_pre_20_bom_workbook_audit.json
             artifacts/evt_pre_20_bom_qg2.json
             artifacts/pcb_pwr_input_protection_qualification_rev_a.json
+            artifacts/pcb_pwr_input_protection_primary_source_evidence_rev_a.json
+            artifacts/pcb_pwr_input_protection_procurement_identity_rev_a.json
             artifacts/pcb_layer_count_authority_rev_a.json
             artifacts/harness_manufacturing_rev_a.json
             artifacts/pcb_mic_native_schematic_rev_a.json
@@ -203,22 +335,71 @@ jobs:
             artifacts/pcb_main_placement_clearance_rev_a.json
             artifacts/pcb_main_routing_authority_rev_a.json
             artifacts/pcb_main_stackup_impedance_request_rev_a.json
+            artifacts/pcb_main_jlc06161h_3313_routing_basis_rev_a.json
+            artifacts/pcb_main_rf_routeability_eco_003_rev_a.json
+            artifacts/pcb_main_ground_domain_routing_candidate_rev_a.json
+            artifacts/pcb_main_signal_hard_nets_candidate_rev_a.json
+            artifacts/pcb_main_octospi_r8_eco_candidate_rev_a.json
+            artifacts/pcb_main_octospi_r8_eco_application_rev_a.json
+            artifacts/pcb_main_rf_p0_candidate_rev_a.json
+            artifacts/pcb_main_rf_return_001_candidate_rev_a.json
+            artifacts/pcb_main_gnss_rf_eco_001_candidate_rev_a.json
+            artifacts/pcb_main_usb_placement_eco_001_candidate_rev_a.json
+            artifacts/pcb_main_usb_placement_eco_001_application_rev_a.json
+            artifacts/pcb_main_usb_source_routing_001_candidate_rev_a.json
+            artifacts/pcb_main_usb_source_routing_001_application_rev_a.json
+            artifacts/pcb_main_usb_cell_modem_routing_001_candidate_rev_a.json
+            artifacts/pcb_main_usb_cell_modem_routing_001_application_rev_a.json
+            artifacts/pcb_main_usb_cell_fixture_routing_001_candidate_rev_a.json
+            artifacts/pcb_main_usb_cell_fixture_routing_001_application_rev_a.json
+            artifacts/pcb_main_rf_remediation_application_rev_a.json
             artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json
             artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
+            artifacts/pcb_main_mech_eco_002_rev_a.json
             artifacts/pcb_pwr_placement_clearance_rev_a.json
+            artifacts/pcb_pwr_buck_placement_eco_001_candidate_rev_a.json
+            artifacts/pcb_pwr_buck_placement_eco_001_application_rev_a.json
+            artifacts/pcb_pwr_buck_warning_remediation_001_candidate_rev_a.json
+            artifacts/pcb_pwr_buck_warning_remediation_001_application_rev_a.json
+            artifacts/pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.json
+            artifacts/pcb_pwr_buck_bootstrap_routing_001_application_rev_a.json
+            artifacts/pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.json
+            artifacts/pcb_pwr_lm74700_vcap_routing_002_application_rev_a.json
+            artifacts/pcb_pwr_vbat_raw_routing_003_candidate_rev_a.json
+            artifacts/pcb_pwr_vbat_raw_routing_003_application_rev_a.json
+            artifacts/pcb_pwr_rev_gate_routing_004_candidate_rev_a.json
+            artifacts/pcb_pwr_rev_gate_routing_004_application_rev_a.json
+            artifacts/pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.json
+            artifacts/pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.json
+            artifacts/pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.json
+            artifacts/pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a.json
+            artifacts/pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.json
+            artifacts/pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.json
+            artifacts/pcb_pwr_buck_power_stage_eco_002_application_rev_a.json
             artifacts/pcb_pwr_hierarchy_rev_a.json
             artifacts/pcb_pwr_routing_authority_rev_a.json
+            artifacts/pcb_pwr_evt_routing_basis_rev_a.json
             artifacts/pcb_pwr_dim_003_request_rev_a.json
             artifacts/pcb_pwr_stackup_copper_request_rev_a.json
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json
+            hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.md
+            mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json
+            hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md
+            hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md
             artifacts/pcb_main_mcu_pin_authority_rev_a.json
             artifacts/pcb_main_storage_sensor_authority_rev_a.json
             artifacts/pcb_main_audio_logic_authority_rev_a.json
@@ -249,6 +430,23 @@ jobs:
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md
             hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md
             hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md
@@ -256,6 +454,44 @@ jobs:
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_OCTOSPI_ROUTING_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_ROUTING_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_APPLICATION_REV_A.json
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.md
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json
@@ -405,6 +641,12 @@ jobs:
         run: python tools/generate_evt_pre_20_bom_rev_a.py
       - name: Build reproducible current-state archives
         run: python tools/build_evt_pre_20_packages.py
+      - name: Audit external-response request archive and checksums
+        run: |
+          python tools/audit_evt_pre_20_external_response_bundle.py \
+            --archive artifacts/evt-pre-20-current/Dioneya_EVT_PRE_20_EXTERNAL_RESPONSE_REQUESTS_CURRENT.zip \
+            --sums artifacts/evt-pre-20-current/SHA256SUMS.txt \
+            --output artifacts/evt-pre-20-current/EXTERNAL_RESPONSE_BUNDLE_AUDIT.json
       - name: Upload engineering and separate PMI/report archives
         uses: actions/upload-artifact@v4
         with:

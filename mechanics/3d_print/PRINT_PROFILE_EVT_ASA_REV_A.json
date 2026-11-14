@@ -1,0 +1,38 @@
+{
+  "schema": "dioneya-fdm-profile-v1",
+  "revision": "A",
+  "date": "2026-10-16",
+  "printer": "FlashForge Adventurer 5M Pro",
+  "build_volume_mm": [
+    220,
+    220,
+    220
+  ],
+  "material": "UV-stabilized ASA, black or light grey, supplier lot recorded",
+  "nozzle_mm": 0.4,
+  "layer_height_mm": 0.2,
+  "first_layer_mm": 0.24,
+  "perimeters": 5,
+  "top_layers": 7,
+  "bottom_layers": 7,
+  "infill_percent": 35,
+  "infill_pattern": "gyroid",
+  "nozzle_temperature_c": 255,
+  "bed_temperature_c": 105,
+  "chamber": "closed; stabilize before print",
+  "fan_percent": 15,
+  "max_volumetric_speed_mm3_s": 8,
+  "supports": "organic/tree from build plate only where required; none in gasket grooves or threaded insert bores",
+  "brim": "5 mm except DIO_HSG_POWER_BASE_REV_A: no brim because 215 mm envelope; use controlled bed adhesive",
+  "seam": "rear face away from gasket and label surfaces",
+  "shrink_scale_xy": 1.006,
+  "shrink_scale_z": 1.003,
+  "post_process": [
+    "condition 24 h at 23 +/- 5 C",
+    "ream fastener and insert bores only to drawing size",
+    "install brass inserts with temperature-controlled tool",
+    "do not coat acoustic paths or RF connector seats",
+    "inspect gasket faces for gaps and layer separation"
+  ],
+  "first_article_hold": true
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "dioneya-evt-factory-public-capability-baseline-v1",
+  "configuration": "EVT-PRE-20 Rev.A / PCB-MAIN Rev.B",
+  "revision": "B",
+  "decision_date": "2026-10-16",
+  "status": "PASS_DESKTOP_DFM_RF_SI_POFV_STANDARD_PROCESS_ACCEPTED_CUSTOMER_CHECKOUT_REQUIRED",
+  "authority": "CUSTOMER_AUTHORIZED_PUBLIC_FACTORY_DATA_AND_STANDARD_ENGINEERING_PROCESS",
+  "scope": "Engineering release of the EVT fabrication and assembly data before customer-owned order placement",
+  "official_sources": [
+    {
+      "id": "JLC-IMPEDANCE",
+      "url": "https://jlcpcb.com/impedance",
+      "use": "multilayer capability, minimum geometry and dielectric data"
+    },
+    {
+      "id": "JLC-IMPEDANCE-GUIDE",
+      "url": "https://jlcpcb.com/help/article/user-guide-to-the-jlcpcb-impedance-calculator",
+      "use": "4-8 layer calculator scope, NP-155F material and copper assumptions"
+    },
+    {
+      "id": "JLC-MULTILAYER",
+      "url": "https://jlcpcb.com/help/article/multi-layer-pcb-standard-laminated-structures",
+      "use": "standard multilayer constructions and impedance test options"
+    },
+    {
+      "id": "JLC-8L-GUIDE",
+      "url": "https://jlcpcb.com/blog/multilayer-pcb-design-guidelines",
+      "use": "JLC08161H-3313 8-layer 1.6 mm reference structure"
+    },
+    {
+      "id": "JLC-VIA-COVERING",
+      "url": "https://jlcpcb.com/help/article/pcb-via-covering",
+      "use": "epoxy resin filled and capped via process for 6+ layer boards"
+    },
+    {
+      "id": "JLC-PCBA",
+      "url": "https://jlcpcb.com/capabilities/pcb-assembly-capabilities",
+      "use": "standard SMT/THT, BGA/LGA/QFN and X-ray capability"
+    },
+    {
+      "id": "JLC-STENCIL",
+      "url": "https://jlcpcb.com/help/article/instructions-for-stencil-order",
+      "use": "paste layer and stencil ordering requirements"
+    },
+    {
+      "id": "JLC-PNP",
+      "url": "https://jlcpcb.com/help/article/pick-place-file-for-pcb-assembly",
+      "use": "designator, center coordinates, side and rotation requirements"
+    },
+    {
+      "id": "JLC-GERBER",
+      "url": "https://jlcpcb.com/help/article/gerber-files-preparation",
+      "use": "Gerber, drill, special-process layer and order remark requirements"
+    },
+    {
+      "id": "JLC-PRODUCTION-CONFIRM",
+      "url": "https://jlcpcb.com/help/article/how-to-confirm-the-production-file",
+      "use": "customer review and confirmation of the job-specific production file"
+    }
+  ],
+  "pcb_main": {
+    "copper_layers": 8,
+    "selected_stackup": "JLC08161H-3313",
+    "nominal_thickness_mm": 1.6,
+    "outer_copper_oz": 1.0,
+    "inner_copper_oz": 0.5,
+    "surface_finish": "ENIG",
+    "minimum_factory_trace_space_mm": [
+      0.0889,
+      0.0889
+    ],
+    "minimum_via_finished_hole_mm": 0.2,
+    "as_routed_evt_impedance_control_ordered": false,
+    "return_path_review": "PASS_DESKTOP_CONTINUOUS_REFERENCE_PLANES_AND_ROUTE_PARITY",
+    "rf_validation": "POST_BUILD_EVT_VSWR_SENSITIVITY_COEXISTENCE",
+    "pofv": {
+      "locations": 76,
+      "process": "EPOXY_RESIN_FILL_PLANARIZE_COPPER_CAP",
+      "maximum_hole_mm": 0.5,
+      "order_control": "hardware/manufacturing/evt-build-release/PCB-MAIN/order-package-rev-d6/01_Изготовление_платы/VIA_FILL_CAP_76_ORDER_CONTROL.json",
+      "status": "PASS_PUBLIC_PROCESS_CAPABILITY_JOB_CONFIRMATION_AT_CHECKOUT"
+    },
+    "altium_net_antennae_disposition": {
+      "warning_count": 3,
+      "coordinates_mm": [
+        [
+          32.809,
+          38.01
+        ],
+        [
+          47.762,
+          37.361
+        ],
+        [
+          57.977,
+          32.251
+        ]
+      ],
+      "disposition": "ACCEPT_IMPORT_RULE_ARTIFACT",
+      "basis": "KiCad DRC has zero errors and zero unconnected items; KiCad-to-Altium route and physical-path parity is complete; no board geometry is changed by this disposition."
+    },
+    "selected_stack_rf_si_dfm_complete": true,
+    "rf_si_review_complete": true,
+    "review_b": "ACCEPTED",
+    "evt_build_authorized": true
+  },
+  "pcb_pwr": {
+    "stackup": "JLC04161H-3313A",
+    "copper_layers": 4,
+    "drc_errors": 0,
+    "unconnected_items": 0,
+    "review_b": "ACCEPTED_FOR_EVT_BUILD",
+    "evt_build_authorized": true
+  },
+  "pcb_mic": {
+    "copper_layers": 2,
+    "drc_errors": 0,
+    "unconnected_items": 0,
+    "review_a": "PASS",
+    "review_b": "PASS",
+    "evt_build_authorized": true
+  },
+  "pcba": {
+    "standard_process_accepted": true,
+    "paste_layers_required": true,
+    "placement_fields_required": [
+      "Designator",
+      "Mid X",
+      "Mid Y",
+      "Layer",
+      "Rotation"
+    ],
+    "xray_hidden_joints_required": true,
+    "first_article_quantity": 2,
+    "remaining_lot_hold_until_first_article": true
+  },
+  "customer_checkout_controls": [
+    "Upload the controlled archive without renaming or editing CAM layers.",
+    "Select the stated layer count, thickness, copper, finish and stackup for each board.",
+    "For PCB-MAIN, select epoxy resin via filling and copper capping for all 76 controlled locations and include the controlled CSV/order remark.",
+    "Resolve every upload-parser or DFM error before payment; do not approve an automatic geometry repair that changes copper, drills, outline, POFV or polarity.",
+    "Download and compare the job-specific production files with the controlled Gerber, drill, outline and special-process notes, then confirm them in the factory portal.",
+    "Record order number, selected options, production-file checksum and any factory engineering message in the order record."
+  ],
+  "post_build_evt_validation": [
+    "PCB-MAIN RF and GNSS/cellular/LoRa installed VSWR, sensitivity and coexistence",
+    "PCB-PWR rail drop, inrush, transient, thermal, cold start, protection and EMI",
+    "PCB-MIC acoustic-port inspection, phase, gain, noise and delay calibration",
+    "First-article SPI/AOI/X-ray disposition and functional test before releasing the remaining lot"
+  ],
+  "release_boundary": {
+    "desktop_engineering_complete": true,
+    "specific_factory_job_confirmed": false,
+    "specific_factory_job_confirmation_owner": "CUSTOMER",
+    "physical_evt_complete": false,
+    "series_release": false
+  }
+}

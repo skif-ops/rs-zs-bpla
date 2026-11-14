@@ -14,7 +14,9 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import io
+import json
 import math
 import re
 import sys
@@ -29,6 +31,8 @@ from kiutils.items.common import Position
 from kiutils.utils import sexpr
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 sys.path.insert(0, str(ROOT / "tools"))
 from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E402
 from audit_pcb_main_placement_clearance_rev_a import (  # noqa: E402
@@ -41,10 +45,91 @@ from audit_pcb_main_placement_clearance_rev_a import (  # noqa: E402
     rotate,
 )
 
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+BOARD = _lineage.historical_board()
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 PASSIVE_AUTHORITY = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
-PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+PLACEMENT = _lineage.historical_placement()
+ECO002_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json"
+ECO003_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
+)
+ECO004_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
+)
+GROUND_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
+)
+GROUND_BASE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/"
+    "PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb"
+)
+GROUND_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/"
+    "PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
+)
+SIGNAL_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
+)
+SIGNAL_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/"
+    "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+)
+OCTOSPI_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
+)
+OCTOSPI_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/"
+    "PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
+)
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/"
+    "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+)
+RF_REMEDIATION_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+)
+RF_REMEDIATION_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
+USB_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
+)
+USB_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/"
+    "PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+)
+USB_SOURCE_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"
+)
+USB_SOURCE_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/"
+    "PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb"
+)
+USB_CELL_MODEM_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
+)
+USB_CELL_MODEM_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-MODEM-ROUTING-001/"
+    "PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb"
+)
+USB_CELL_FIXTURE_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"
+)
+USB_CELL_FIXTURE_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001/"
+    "PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb"
+)
+
+ACTIVE_APPROVED_POSES = {
+    "FL1": (56.8, 51.6, 270.0),
+    "C64": (58.3, 51.6, 180.0),
+    "D4": (58.25, 70.0, 90.0),
+    "L2": (59.75, 70.25, 90.0),
+    "R91": (64.0, 25.25, 0.0),
+    "R92": (64.0, 26.25, 0.0),
+}
 
 PLACEMENT_GRID_MM = 0.25
 PLANNING_GAP_MM = 0.15
@@ -556,6 +641,10 @@ def decimal(value: float) -> str:
     return "0" if rendered in {"", "-0"} else rendered
 
 
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def find_sexpr_end(text: str, start: int) -> int:
     depth = 0
     quoted = False
@@ -696,8 +785,9 @@ def verify_materialized(board_text: str, rows: list[dict[str, str]]) -> None:
                 f"{row['RefDes']}: materialized X differs from manifest")
         require(abs(float(footprint.position.Y) - float(row["Y_mm"])) < 0.001,
                 f"{row['RefDes']}: materialized Y differs from manifest")
-        require(abs(float(footprint.position.angle or 0.0)
-                    - float(row["Rotation_deg"])) < 0.001,
+        actual_angle = float(footprint.position.angle or 0.0) % 360.0
+        expected_angle = float(row["Rotation_deg"]) % 360.0
+        require(abs(actual_angle - expected_angle) < 0.001,
                 f"{row['RefDes']}: materialized rotation differs from manifest")
         require(footprint.properties.get("DIONEA_PLACEMENT_SOURCE") == PLACEMENT_SOURCE,
                 f"{row['RefDes']}: placement source property is missing")
@@ -713,6 +803,239 @@ def verify_materialized(board_text: str, rows: list[dict[str, str]]) -> None:
                 PASSIVE_COURTYARD_SOURCE, f"{ref}: passive courtyard source is missing")
 
 
+def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
+    """Verify the latest exact hash-bound approved placement evidence.
+
+    ECO-002 froze the manually optimized collision-free placement, ECO-003
+    authorized only the FL1/D4/L2 pose delta, and ECO-004 changed only U4's
+    internal land geometry.  Exact lineage hashes control this check; none of
+    the approvals turns candidate copper into production routing.
+    """
+    if ECO003_APPLICATION.is_file():
+        application = json.loads(ECO003_APPLICATION.read_text(encoding="utf-8"))
+        proposal_id = "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
+        require(application.get("proposal_id") == proposal_id and
+                application.get("decision") == "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
+                application.get("placement_implementation_authorized") is True and
+                application.get("routing_engineering_continuation_authorized") is True and
+                application.get("candidate_copper_final_authorized") is False and
+                application.get("routing_complete") is False and
+                application.get("review_b_complete") is False and
+                application.get("manufacturing_release") is False,
+                "PCB-MAIN ECO-003 application identity or release boundary drift")
+        applied = application.get("applied", {})
+        require(applied.get("track_segments") == 0 and
+                applied.get("vias") == 0 and
+                applied.get("copper_zones") == 0 and
+                applied.get("changed_references") == ["D4", "FL1", "L2"],
+                "PCB-MAIN ECO-003 placement-only application drift")
+        board_applied = applied
+        if ECO004_APPLICATION.is_file():
+            eco004 = json.loads(ECO004_APPLICATION.read_text(encoding="utf-8"))
+            proposal_id = "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004"
+            require(eco004.get("proposal_id") == proposal_id and
+                    eco004.get("decision") == "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+                    eco004.get("routing_engineering_continuation_authorized") is True and
+                    eco004.get("candidate_or_future_copper_final_authorized") is False and
+                    eco004.get("routing_complete") is False and
+                    eco004.get("review_b_complete") is False and
+                    eco004.get("cam_or_manufacturing_release") is False,
+                    "PCB-MAIN ECO-004 application identity or release boundary drift")
+            board_applied = eco004.get("applied", {})
+            require(board_applied.get("changed_references") == ["U4"] and
+                    board_applied.get("track_segments") == 0 and
+                    board_applied.get("vias") == 0 and
+                    board_applied.get("copper_zones") == 0,
+                    "PCB-MAIN ECO-004 footprint-only application drift")
+    else:
+        application = json.loads(ECO002_APPLICATION.read_text(encoding="utf-8"))
+        proposal_id = "PCB-MAIN-MECH-ECO-002"
+        require(application.get("proposal_id") == proposal_id and
+                application.get("decision") == "ACCEPT_LIMITED_MECHANICAL_ECO",
+                "PCB-MAIN ECO-002 application identity drift")
+        require(application.get("routing_authorized") is False and
+                application.get("review_b_complete") is False and
+                application.get("manufacturing_release") is False,
+                "PCB-MAIN ECO-002 frozen repack crosses a release boundary")
+        applied = application.get("applied", {})
+        board_applied = applied
+    require(applied.get("placement_repack") ==
+            str(PLACEMENT.relative_to(ROOT)),
+            "PCB-MAIN approved placement-repack path drift")
+    if OCTOSPI_APPLICATION.is_file():
+        octospi_placement = json.loads(
+            OCTOSPI_APPLICATION.read_text(encoding="utf-8")
+        )
+        proposal_id = "PCB-MAIN-OCTOSPI-R8-ECO-002"
+        octospi_applied = octospi_placement.get("applied", {})
+        require(
+            applied.get("placement_repack_sha256") ==
+            "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4" and
+            octospi_placement.get("proposal_id") == proposal_id and
+            octospi_placement.get("decision") ==
+            "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
+            octospi_applied.get("placement_manifest") ==
+            str(PLACEMENT.relative_to(ROOT)) and
+            octospi_applied.get("placement_manifest_sha256") ==
+            "70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925" and
+            octospi_applied.get("r8_position_mm") == [54.5, 16.0],
+            "PCB-MAIN approved OctoSPI R8 placement successor drift",
+        )
+        remediation = json.loads(
+            RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
+        )
+        require(
+            remediation.get("decision") ==
+            "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+            and remediation.get("applied", {}).get("placement_manifest") ==
+            str(PLACEMENT.relative_to(ROOT))
+            and remediation.get("applied", {}).get("placement_manifest_sha256") ==
+            "0c32b3818ae1fbf9c0552d3734f1d6390f753e4f1b044d7c96dc8831d2d5f8a0",
+            "PCB-MAIN accepted GNSS placement-manifest successor drift",
+        )
+        usb = json.loads(USB_APPLICATION.read_text(encoding="utf-8"))
+        usb_source = json.loads(USB_SOURCE_APPLICATION.read_text(encoding="utf-8"))
+        usb_cell_modem = json.loads(
+            USB_CELL_MODEM_APPLICATION.read_text(encoding="utf-8")
+        )
+        usb_cell_fixture = json.loads(
+            USB_CELL_FIXTURE_APPLICATION.read_text(encoding="utf-8")
+        )
+        require(
+            usb.get("decision") ==
+            "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
+            and usb.get("applied", {}).get("board_sha256") == sha256(USB_CANDIDATE)
+            and usb.get("applied", {}).get("exact_candidate_byte_identity") is True
+            and usb.get("applied", {}).get("placement_manifest_sha256") ==
+            sha256(PLACEMENT)
+            and usb.get("usb_pair_routing_complete") is False
+            and usb.get("review_b_complete") is False
+            and usb.get("cam_or_manufacturing_release") is False,
+            "PCB-MAIN accepted USB placement-manifest successor drift",
+        )
+        require(
+            usb_source.get("decision") == "ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE"
+            and usb_source.get("applied", {}).get("board_sha256") ==
+            sha256(USB_SOURCE_CANDIDATE)
+            and usb_source.get("applied", {}).get("exact_candidate_byte_identity") is True
+            and usb_source.get("review_b_complete") is False
+            and usb_source.get("manufacturing_release") is False,
+            "PCB-MAIN accepted USB source-routing successor drift",
+        )
+        require(
+            usb_cell_modem.get("decision") ==
+            "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+            and usb_cell_modem.get("predecessor", {}).get("board_sha256") ==
+            sha256(USB_SOURCE_CANDIDATE)
+            and usb_cell_modem.get("applied", {}).get("board_sha256") ==
+            sha256(USB_CELL_MODEM_CANDIDATE)
+            and usb_cell_modem.get("applied", {}).get(
+                "exact_candidate_byte_identity"
+            ) is True
+            and usb_cell_modem.get("review_b_complete") is False
+            and usb_cell_modem.get("manufacturing_release") is False,
+            "PCB-MAIN accepted cellular USB modem-routing successor drift",
+        )
+        require(
+            usb_cell_fixture.get("decision") ==
+            "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+            and usb_cell_fixture.get("predecessor", {}).get("board_sha256") ==
+            sha256(USB_CELL_MODEM_CANDIDATE)
+            and usb_cell_fixture.get("applied", {}).get("board_sha256") ==
+            sha256(USB_CELL_FIXTURE_CANDIDATE)
+            and usb_cell_fixture.get("applied", {}).get(
+                "exact_candidate_byte_identity"
+            ) is True
+            and usb_cell_fixture.get("review_b_complete") is False
+            and usb_cell_fixture.get("manufacturing_release") is False,
+            "PCB-MAIN accepted cellular USB fixture-routing successor drift",
+        )
+    else:
+        require(applied.get("placement_repack_sha256") == sha256(PLACEMENT),
+                "PCB-MAIN approved placement-repack SHA-256 drift")
+    approved_board = GROUND_BASE if GROUND_APPLICATION.is_file() else BOARD
+    require(board_applied.get("board") == str(BOARD.relative_to(ROOT)) and
+            board_applied.get("board_sha256") == sha256(approved_board),
+            "PCB-MAIN approved placement board SHA-256 drift")
+    require(applied.get("mechanical_authority", applied.get("authority")) ==
+            str(AUTHORITY.relative_to(ROOT)) and
+            applied.get("mechanical_authority_sha256", applied.get("authority_sha256")) ==
+            sha256(AUTHORITY),
+            "PCB-MAIN approved mechanical authority SHA-256 drift")
+
+    with PLACEMENT.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        require(reader.fieldnames == PLACEMENT_FIELDS,
+                "PCB-MAIN approved placement manifest schema drift")
+        rows = list(reader)
+    board = Board.from_sexpr(sexpr.parse_sexp(board_text))
+    components = expected_components()
+    locked_refs, _mounting_holes = load_authority(AUTHORITY)
+    expected = expected_movable_refs(components, locked_refs)
+    require(len(rows) == len(expected) and
+            {row["RefDes"] for row in rows} == expected,
+            "PCB-MAIN approved placement reference set drift")
+    require(all(row["Placement_Class"] == "UNLOCKED_LAYOUT_CANDIDATE" and
+                row["Authority"] == "PCB-MAIN-PLACEMENT-REPACK-REV-A" and
+                row["Status"] == "ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE"
+                for row in rows),
+            "PCB-MAIN approved placement release boundary drift")
+    verify_materialized(board_text, rows)
+    if GROUND_APPLICATION.is_file():
+        ground = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+        signal = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
+        octospi = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
+        rf = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+        require(ground.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE" and
+                ground.get("status") ==
+                "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+                ground.get("applied", {}).get("exact_candidate_byte_identity") is True and
+                signal.get("decision") == "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
+                signal.get("applied", {}).get("exact_candidate_byte_identity") is True and
+                octospi.get("decision") ==
+                "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
+                octospi.get("applied", {}).get("exact_candidate_byte_identity") is True and
+                sha256(SIGNAL_CANDIDATE) ==
+                octospi.get("historical_baseline", {}).get("board_sha256") and
+                rf.get("decision") == "ACCEPT_RF_P0_ROUTING_SUBGATE" and
+                rf.get("historical_baseline", {}).get("board_sha256") ==
+                sha256(OCTOSPI_CANDIDATE) and
+                rf.get("applied", {}).get("exact_candidate_byte_identity") is True and
+                sha256(RF_REMEDIATION_COMPOSED) ==
+                "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
+                sha256(BOARD) == sha256(USB_CELL_FIXTURE_CANDIDATE) and
+                BOARD.read_bytes() == USB_CELL_FIXTURE_CANDIDATE.read_bytes() and
+                len(getattr(board, "traceItems", [])) == 1023 and
+                len(getattr(board, "zones", [])) == 8 and
+                ground.get("routing_complete") is False and
+                ground.get("review_b_complete") is False and
+                ground.get("cam_or_manufacturing_release") is False and
+                octospi.get("routing_complete") is False and
+                octospi.get("review_b_complete") is False and
+                octospi.get("cam_or_manufacturing_release") is False and
+                rf.get("routing_complete") is False and
+                rf.get("review_b_complete") is False and
+                rf.get("cam_or_manufacturing_release") is False,
+                "PCB-MAIN accepted routing-subgate application or copper inventory drift")
+        proposal_id = "PCB-MAIN-RF-P0-001"
+    else:
+        require(len(getattr(board, "traceItems", [])) == 0 and
+                len(getattr(board, "zones", [])) == 0,
+                "PCB-MAIN approved placement board unexpectedly contains copper")
+    if ECO003_APPLICATION.is_file():
+        by_ref = {row["RefDes"]: row for row in rows}
+        for ref, expected in ACTIVE_APPROVED_POSES.items():
+            actual = (
+                float(by_ref[ref]["X_mm"]),
+                float(by_ref[ref]["Y_mm"]),
+                float(by_ref[ref]["Rotation_deg"]) % 360.0,
+            )
+            require(all(abs(first - second) < 0.001
+                        for first, second in zip(actual, expected)),
+                    f"{ref}: approved placement-successor pose drift")
+    return len(rows), proposal_id
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true",
@@ -720,6 +1043,12 @@ def main() -> int:
     args = parser.parse_args()
 
     original = BOARD.read_text(encoding="utf-8")
+    if args.check and (ECO003_APPLICATION.is_file() or ECO002_APPLICATION.is_file()):
+        count, proposal_id = verify_approved_frozen_repack(original)
+        print(f"PCB-MAIN placement repack: PASS / approved {proposal_id} hashes and board placement match")
+        print(f"movable_placements={count} passive_courtyard_margin_mm={PASSIVE_COURTYARD_MARGIN_MM:.2f}")
+        print("status=USB_CELL_FIXTURE_ROUTING_APPLIED / MAIN_CONNECTOR_AND_REVIEW_B_PENDING")
+        return 0
     board = Board.from_sexpr(sexpr.parse_sexp(original))
     rows = build_plan(board)
     manifest = placement_csv(rows)

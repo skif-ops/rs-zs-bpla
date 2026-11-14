@@ -1,0 +1,53 @@
+{
+  "schema": "dioneya-main8l-altium-drc-summary-v1",
+  "date": "2026-10-15",
+  "status": "HOLD_FOR_DFM",
+  "pcb_sha256": "BFA1355CFE70B9794507C58FFD22923FBAEB3234DECDDB595796E8C0441141CF",
+  "altium_version": "26.10.1 Trial",
+  "violations_total": 3,
+  "waived_violations": 0,
+  "zero_violation_checks": [
+    "clearance",
+    "short_circuit",
+    "unrouted_net",
+    "modified_polygon",
+    "width",
+    "routing_topology",
+    "power_plane_connect",
+    "hole_size",
+    "hole_to_hole_clearance",
+    "solder_mask_sliver",
+    "silk_to_solder_mask",
+    "silk_to_silk",
+    "height"
+  ],
+  "open_violations": [
+    {
+      "rule": "Net Antennae",
+      "object": "Via",
+      "x_mm": 32.809,
+      "y_mm": 38.01,
+      "span": "F.Cu-B.Cu"
+    },
+    {
+      "rule": "Net Antennae",
+      "object": "Via",
+      "x_mm": 47.762,
+      "y_mm": 37.361,
+      "span": "F.Cu-B.Cu"
+    },
+    {
+      "rule": "Net Antennae",
+      "object": "Via",
+      "x_mm": 57.977,
+      "y_mm": 32.251,
+      "span": "F.Cu-B.Cu"
+    }
+  ],
+  "rule_corrections": {
+    "minimum_track_width_mm": 0.1,
+    "maximum_hole_size_mm": 3.2,
+    "polygons_repoured": true
+  },
+  "disposition": "Open source-design warnings; do not remove without electrical/layout design intent."
+}

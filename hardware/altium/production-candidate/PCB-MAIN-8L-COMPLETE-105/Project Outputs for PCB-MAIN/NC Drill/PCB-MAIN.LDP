@@ -1,0 +1,3 @@
+Layer Pairs Export File for PCB: F:\2AC9~1\Codex\altium-main-8l-evaluation-2026-10-15\altium-output-final\PCB-MAIN\PCB-MAIN.PcbDoc
+LayersSetName=Top_Bot_Plated_Thru_Holes|DrillFile=pcb-main-roundholes-plated.txt|DrillLayers=gtl,g1,g2,g3,g4,g5,g6,gbl
+LayersSetName=Top_Bot_Plated_Slot_Holes|DrillFile=pcb-main-slotholes-plated.txt|DrillLayers=gtl,g1,g2,g3,g4,g5,g6,gbl

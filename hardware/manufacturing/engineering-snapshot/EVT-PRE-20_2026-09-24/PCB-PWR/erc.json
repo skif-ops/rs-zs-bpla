@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schemas.kicad.org/erc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-09-24T12:47:40+0000",
+    "included_severities": [
+        "error",
+        "warning",
+        "exclusion"
+    ],
+    "kicad_version": "9.0.9",
+    "sheets": [
+        {
+            "path": "/",
+            "uuid_path": "/630df535-af27-5a6d-b3fe-890f0243b40c",
+            "violations": []
+        },
+        {
+            "path": "/Input protection and monitor/",
+            "uuid_path": "/630df535-af27-5a6d-b3fe-890f0243b40c/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2",
+            "violations": []
+        },
+        {
+            "path": "/3V8 modem rail/",
+            "uuid_path": "/630df535-af27-5a6d-b3fe-890f0243b40c/079baa7d-cb9e-5f99-8fa8-3059812ae49a",
+            "violations": []
+        },
+        {
+            "path": "/3V3 digital rail/",
+            "uuid_path": "/630df535-af27-5a6d-b3fe-890f0243b40c/88c96396-146a-566a-b60e-947667bc702e",
+            "violations": []
+        },
+        {
+            "path": "/1V8 auxiliary and MAIN harness/",
+            "uuid_path": "/630df535-af27-5a6d-b3fe-890f0243b40c/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f",
+            "violations": []
+        }
+    ],
+    "source": "PCB-PWR.kicad_sch"
+}

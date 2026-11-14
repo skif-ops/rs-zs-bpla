@@ -1,0 +1,30 @@
+{
+  "schema": "dioneya-pcb-pwr-lm74700-vcap-routing-002-review-mapping-v1",
+  "proposal_id": "PCB-PWR-LM74700-VCAP-ROUTING-002",
+  "reviewed_commit_sha": "186ad093d23d015cedbdbc7234f11ad3944cb843",
+  "reviewed_tree_sha": "751b9193422d1a9b84b47327196f7f39f1863b40",
+  "candidate_sha256": "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
+  "ci_run_number": 600,
+  "pcb_pwr_schematic_run_number": 78,
+  "pcb_native_run_number": 327,
+  "pcb_native_run_id": 35621587680,
+  "artifact_id": 10650111680,
+  "artifact_digest": "sha256:fc7ff469dddbebd8fa05a26681606eaba311d6ce35a60e73f0e42ad9f89b51e7",
+  "comparative_drc": {
+    "status": "PASS_ZERO_NEW_DRC_EXACT_ONE_CONNECTION_REDUCTION",
+    "base_violations": 86,
+    "candidate_violations": 86,
+    "base_unconnected": 124,
+    "candidate_unconnected": 123,
+    "new_drc_fingerprints": 0,
+    "removed_drc_fingerprints": 0
+  },
+  "human_gate": {
+    "status": "PENDING",
+    "accept_value": "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE"
+  },
+  "authoritative_board_modified": false,
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

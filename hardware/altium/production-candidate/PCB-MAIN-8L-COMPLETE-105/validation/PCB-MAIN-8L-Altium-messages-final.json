@@ -1,0 +1,589 @@
+{
+  "messages": [
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_07_BLE.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_01_POWER.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_07_BLE.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_02_MCU.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_07_BLE.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_07_BLE.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Missing component models",
+      "source": "PCB-MAIN_02_MCU.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_01_POWER.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_01_POWER.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_07_BLE.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_04_GNSS.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_06_LORA.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_07_BLE.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_07_BLE.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Nets with no driving source",
+      "source": "PCB-MAIN_09_CONNECTORS_TEST.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_03_AUDIO.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_08_STORAGE_SENSORS.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    },
+    {
+      "message": "Nets with possible connection problems",
+      "source": "PCB-MAIN_05_CELLULAR.SchDoc"
+    }
+  ],
+  "count": 146
+}

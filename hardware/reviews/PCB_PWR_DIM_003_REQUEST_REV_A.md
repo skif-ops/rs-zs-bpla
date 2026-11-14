@@ -1,76 +1,63 @@
-# PCB-PWR Rev.A DIM-003 mechanical freeze request
+# PCB-PWR Rev.A DIM-003 mechanical freeze
 
-Status: `PACKET READY / 0 OF 18 RESPONSES ACCEPTED / ROUTING NOT AUTHORIZED / NOT FOR MANUFACTURE`
+Status: `18 OF 18 RESPONSES ACCEPTED FOR EVT / MECHANICAL ROUTING INPUT AUTHORIZED / SERIAL REVALIDATION REQUIRED / NOT FOR MANUFACTURE`
 
-This packet converts the open `DIM-003` line into a bounded, attributable
-mechanical-freeze request for PCB-PWR. It is an engineering input request, not
-acceptance of the provisional outline, a routed-board release, a fixture
-release, a harness drawing or manufacturing authorization.
+The original 18-row request has been answered under the project owner's
+authorization to use rational engineering defaults for the EVT test batch. The
+accepted authority is bounded to EVT-PRE-20 Rev.A; it is not a serial enclosure,
+fabricator stackup, Review-B or manufacturing release.
 
 Machine contract:
 `hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json`
 
-Blank response register:
+Accepted engineering authority:
+`hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.{md,json}`
+
+Response register:
 `hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv`
+
+Frozen EVT STEP envelope:
+`mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step`
 
 Independent audit:
 `tools/audit_pcb_pwr_dim_003_request_rev_a.py`
 
-## Controlled provisional basis
+## Accepted EVT basis
 
-| Item | Current reference basis | Release state |
+| Item | Accepted value | Boundary |
 |---|---|---|
-| PCB outline | `90.00 x 60.00 mm` | provisional; explicit acceptance or ECO required |
-| PCB thickness | `1.60 mm` | provisional until DIM-003 and fabricator stackup agree |
-| Copper layers | `4` | frozen count; dielectric construction and copper weights open |
-| Mounting holes | `0` | absent; pattern must be supplied by DIM-003 |
-| J1 | `(6.00, 28.00) mm`, `0 deg`, top-entry intent | mating, cable and tool volumes open |
-| J2 | `(90.00, 56.00) mm`, `270 deg`, east-exit intent | mating, bundle, bend and tool volumes open |
-| DFT row | `TP1..TP10`, top, `2.54 mm` pitch | fixture datum, probe access and wear limits open |
-| Routed copper | `0` tracks, `0` vias, `0` zones | routing remains prohibited |
+| PCB outline | `90.00 x 60.00 mm`, four straight Edge.Cuts, no cut-outs | `+/-0.15 mm`; serial revalidation required |
+| PCB thickness | `1.60 +/-0.16 mm` | exact construction and copper remain fabricator inputs |
+| Copper layers | `4` | count frozen; dielectric construction and copper weights open |
+| Mounting | H1 `(5,5)`, H2 `(82,5)`, H3 `(68,55)`, H4 `(5,55) mm` | round NPTH `3.40 +/-0.10 mm`; no PCB slots |
+| Mounting keep-outs | all-copper `D8.0 mm`; fitted-body `D10.0 mm` | enforced by footprint clearance and independent geometry audit |
+| J1 | `(6.00,28.00) mm`, top entry | `+Z` mating and west cable exit; `20 mm` minimum bend radius |
+| J2 | `(90.00,56.00) mm`, east exit | `+X` mating; bundle `<=9 mm`; `45 mm` minimum bend radius |
+| DFT | TP1–TP10 top row, `2.54 mm` pitch | H1 primary datum; H2 diamond-pin fixture datum; top pogo access |
+| Assembled Z | `-3.0 ... +18.0 mm` from PCB bottom | EVT conservative envelope, not exact serial component CAD |
+| Routed copper | `0` tracks, `0` vias, `0` zones | remains blocked by stackup/copper and numeric power geometry |
 
-The reference coordinates are copied from the controlled placement authority.
-They are not enclosure or fixture dimensions. An attributable response must
-either accept them in a frozen datum or return a controlled ECO before routing.
+All four mounting features are native board-only footprints excluded from BOM and
+pick-and-place. The closest fitted-body margin outside the `D10` exclusion is
+positive (`0.53 mm`); existing-pad conflicts with the `D8` copper exclusions are
+zero. Board slots were rejected because round holes plus a diamond locator in the
+fixture provide a more repeatable datum without weakening the PCB edge.
 
-## Required response set
+## Acceptance and serial-transition rule
 
-All 18 rows of the response register are blocking. Together they require:
+All 18 response rows are attributable and `ACCEPTED_EVT_ENGINEERING`. The accepted
+STEP records the board, mounting holes, conservative assembled envelope and J1/J2
+service volumes. The serial enclosure must repeat the interference, connector,
+thermal and harness-route checks using final component and enclosure CAD.
 
-- one coordinate system shared by board, enclosure, harness and fixture CAD;
-- an explicit disposition of the provisional outline followed by complete
-  Edge.Cuts geometry, tolerances, finished thickness and mounting pattern;
-- mounting hardware, top/bottom assembled height envelopes and enclosure
-  wall, boss, rib, fastener and conductive-part keep-outs;
-- separate J1 and J2 mating/tool volumes and cable/bundle bend, strain-relief
-  and service volumes using the controlled mating parts;
-- DFT datum, retention, probe geometry, travel, access and wear criteria for
-  all ten test points;
-- thermal-interface boundary conditions and the assembly/service sequence;
-- board-side harness length datums that can replace the present TBD cut
-  lengths only after enclosure routing is frozen;
-- a versioned PCB assembly STEP, independent interference review and recorded
-  SHA-256.
-
-Response value, evidence reference, responder and date remain blank until the
-responsible discipline returns real evidence. `ACCEPTED` is valid only when all
-four attribution fields are populated and the cited controlled evidence exists.
-
-## Acceptance and ECO rule
-
-The present board has passed only fitted-body 2D clearance. Any accepted
-DIM-003 change to the outline, holes, J1/J2 positions, DFT row, keep-outs or
-assembled envelope requires a controlled PCB ECO and repeat placement,
-clearance, routing-authority and Review-B checks. The accepted STEP must match
-the post-ECO native PCB, not this provisional request basis.
-
-Closing all 18 rows does not by itself authorize routing. Selected-fabricator
-stackup and copper weights, numeric current-density and thermal geometry,
-fault/transient coordination and the remaining Review-B gates stay separate.
+Any change to outline, holes, J1/J2 positions, DFT row or service volumes requires
+a controlled PCB ECO and repeat placement/mounting clearance. Final harness cut
+lengths remain separately blocked by `DIM-001`, `DIM-012` and the enclosure route.
 
 ## Release interlock
 
-At packet creation all 18 dispositions are
-`PENDING_EXTERNAL_RESPONSE`; accepted rows are `0`, `DIM-003` remains open and
-the routing, harness-length, fixture, Review-B and manufacturing-release flags
-remain false.
+DIM-003 no longer blocks PCB-PWR routing input: outline/mounting, connector service,
+DFT access and the EVT STEP are accepted. Routing itself remains prohibited until
+the two-fabricator stackup/copper gate and numeric current-density, voltage-drop,
+fault-energy and thermal geometry are accepted. DRC, CAM, DFM, Review B and
+manufacturing release remain false.

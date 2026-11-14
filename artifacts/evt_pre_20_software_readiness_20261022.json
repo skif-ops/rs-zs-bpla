@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "configuration": "EVT-PRE-20",
+  "checked_on": "2026-10-22",
+  "status": "READY_FOR_DIO_EVT_B01_HARDWARE_QUALIFICATION",
+  "signed_release_status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
+  "do_not_release": true,
+  "firmware_lock_authorized": false,
+  "validation": {
+    "firmware_host_build": "PASS",
+    "firmware_host_tests": {
+      "passed": 74,
+      "failed": 0
+    },
+    "firmware_server_cbor": "PASS",
+    "server_tests": {
+      "passed": 493,
+      "failed": 0,
+      "skipped": 0,
+      "warnings": 16
+    },
+    "android_testDebugUnitTest": "PASS",
+    "android_assembleDebug": "PASS",
+    "android_release_signature_v2": "PASS",
+    "target_contract_qg1_qg2": "PASS",
+    "cubemx_ioc_qg1_qg2": "PASS",
+    "mqtt_command_qg1_qg2": "PASS",
+    "event_receipt_qg1_qg2": "PASS",
+    "event_outbox_qg1": "PASS",
+    "dual_sim_qg1_qg2": "PASS_SOFTWARE_SCOPE",
+    "stm32_vendor_lock_and_scaffold": "PASS",
+    "server_sbom_and_supply_chain": "PASS",
+    "canonical_release_archive": "PASS",
+    "private_material_scan": "PASS",
+    "firmware_lock_interlock": "PASS_LOCK_FORBIDDEN"
+  },
+  "validator_sync": {
+    "target_status_sha256": "dc757b951ac4fa5508f9bace1dbee162ddef82a57f2f00bf3bed1152a75faed1",
+    "mqtt_validator_sha256": "ef74dfc93823eec39c5bf7ea765f3dde023a084d8efca71ea84f86e8f8f7895b",
+    "result": "PASS"
+  },
+  "canonical_artifacts": {
+    "archive": "releases/evt-pre-20/2026-10-06-rev-e/EVT_PRE_20_BENCH_RELEASE_2026100601.zip",
+    "archive_sha256": "e574bde3895d0e0c02ed6094d3861e2ab52723e223c0101c859451f3efc05d43",
+    "stm32_image_sha256": "27a4e2ba3de7f3e6b9720cb1d1a1b25da62a5164cd6362349a99e3d48f884ef5",
+    "nrf52840_signed_image_sha256": "27a9e76b969ba6197de9b77874786a304dc0c04efe2f8994307fdc35560dd89b",
+    "nrf52840_merged_hex_sha256": "7528e8a474283776162c9ac49d3de5082aa86a9a0d0f98d66603fdb2132a0f7f",
+    "android_release_apk_sha256": "39f45d4cd24cb2ce318d6e748cb9a581857e98ceeee0a4f2ddfcec9d6e7519fe",
+    "android_signer_certificate_sha256": "64b9b31cc6e64bdbc09457254501812634872a8e05de1a95e7d8c638dbfed90a"
+  },
+  "hardware_validation_pending": [
+    "STM32U585 and nRF52840 flash and read-back",
+    "SWD, BOOT0, system memory recovery and option bytes",
+    "STM32 A/B trial confirmation and power-loss rollback",
+    "nRF52840 MCUboot, serial recovery, BLE LESC, GATT and UART IPC",
+    "BG95 mutual TLS, MQTT, application receipt and dual-SIM 100-cycle test",
+    "W25Q512JV OCTOSPI sample, slot and endurance validation",
+    "GNSS/PPS, LoRa, sensors, four microphones and DSP",
+    "approved EOL limits and complete DIO-EVT-B01 protocol"
+  ]
+}

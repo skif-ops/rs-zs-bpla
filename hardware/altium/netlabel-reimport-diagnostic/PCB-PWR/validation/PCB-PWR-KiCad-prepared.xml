@@ -1,0 +1,2225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>F:\Проекты\Codex\altium-netlabel-reimport-input\PCB-PWR\PCB-PWR.kicad_sch</source>
+    <date>2026-10-14T16:49:25</date>
+    <tool>Eeschema 10.0.6</tool>
+    <textvar name="BOARD">PCB-PWR</textvar>
+    <textvar name="PROJECT">Dioneya EVT-PRE-20</textvar>
+    <textvar name="REV">A</textvar>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>PCB-PWR system overview</title>
+        <company>Dioneya / ZS-BPLA</company>
+        <rev>A</rev>
+        <date>2026-09-17</date>
+        <source>PCB-PWR.kicad_sch</source>
+        <comment number="1" value="Human-readable hierarchy; exact pin/net equivalence enforced"/>
+        <comment number="2" value="Root sheet 1 of 5"/>
+        <comment number="3" value="NOT FOR MANUFACTURE - routing/DRC/DFM/Review B pending"/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="2" name="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/">
+      <title_block>
+        <title>Input protection + monitor</title>
+        <company>Dioneya / ZS-BPLA</company>
+        <rev>A</rev>
+        <date>2026-09-17</date>
+        <source>PCB-PWR_01_INPUT_PROTECTION.kicad_sch</source>
+        <comment number="1" value="Human-readable hierarchy; exact pin/net equivalence enforced"/>
+        <comment number="2" value="Functional sheet 2 of 5"/>
+        <comment number="3" value="NOT FOR MANUFACTURE - routing/DRC/DFM/Review B pending"/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="3" name="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/">
+      <title_block>
+        <title>3V8 modem rail</title>
+        <company>Dioneya / ZS-BPLA</company>
+        <rev>A</rev>
+        <date>2026-09-17</date>
+        <source>PCB-PWR_02_3V8_MODEM.kicad_sch</source>
+        <comment number="1" value="Human-readable hierarchy; exact pin/net equivalence enforced"/>
+        <comment number="2" value="Functional sheet 3 of 5"/>
+        <comment number="3" value="NOT FOR MANUFACTURE - routing/DRC/DFM/Review B pending"/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="4" name="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/">
+      <title_block>
+        <title>3V3 AON rail</title>
+        <company>Dioneya / ZS-BPLA</company>
+        <rev>A</rev>
+        <date>2026-09-17</date>
+        <source>PCB-PWR_03_3V3_DIGITAL.kicad_sch</source>
+        <comment number="1" value="Human-readable hierarchy; exact pin/net equivalence enforced"/>
+        <comment number="2" value="Functional sheet 4 of 5"/>
+        <comment number="3" value="NOT FOR MANUFACTURE - routing/DRC/DFM/Review B pending"/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="5" name="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/">
+      <title_block>
+        <title>1V8 + MAIN harness</title>
+        <company>Dioneya / ZS-BPLA</company>
+        <rev>A</rev>
+        <date>2026-09-17</date>
+        <source>PCB-PWR_04_AUX_HARNESS.kicad_sch</source>
+        <comment number="1" value="Human-readable hierarchy; exact pin/net equivalence enforced"/>
+        <comment number="2" value="Functional sheet 5 of 5"/>
+        <comment number="3" value="NOT FOR MANUFACTURE - routing/DRC/DFM/Review B pending"/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C1">
+      <value>100 nF 25 V X7R CGA2B3X7R1E104K050BB</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric</footprint>
+      <datasheet>TDK CGA exact product data</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0402_1005Metric</field>
+        <field name="Datasheet">TDK CGA exact product data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>fbf58981-aedb-5593-8227-3efe0b6c0e10</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C2">
+      <value>100 nF 25 V X7R CGA2B3X7R1E104K050BB</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric</footprint>
+      <datasheet>TDK CGA exact product data</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0402_1005Metric</field>
+        <field name="Datasheet">TDK CGA exact product data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>3ebe08b0-fe4a-5f75-9a0c-2e731288c112</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C9">
+      <value>100 nF 50 V X7R CGA3E2X7R1H104K080AA</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <datasheet>TDK exact product data for CGA3E2X7R1H104K080AA</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA3E2X7R1H104K080AA</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>27d41be3-9be0-5367-a09e-192a4a3f338e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C10">
+      <value>4.7 uF 50 V X7R CGA6P3X7R1H475K250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1H475K250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1H475K250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>05025323-959c-5a4a-aa09-f51b03f4178e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C13">
+      <value>100 uF 35 V hybrid EEH-ZK1V101XP</value>
+      <footprint>Capacitor_SMD:CP_Elec_6.3x7.7</footprint>
+      <datasheet>Panasonic EEH-ZK1V101XP exact product page</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:CP_Elec_6.3x7.7</field>
+        <field name="Datasheet">Panasonic EEH-ZK1V101XP exact product page</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>a4a1adb8-1692-5228-a87d-d3946d253a8d</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="D1">
+      <value>SMBJ18A CANDIDATE UNIDIRECTIONAL TVS</value>
+      <footprint>Diode_SMD:D_SMB</footprint>
+      <datasheet>Littelfuse SMBJ series</datasheet>
+      <fields>
+        <field name="Footprint">Diode_SMD:D_SMB</field>
+        <field name="Datasheet">Littelfuse SMBJ series</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="D_Zener" description="Zener diode"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="diode"/>
+      <property name="ki_fp_filters" value="TO-???* *_Diode_* *SingleDiode* D_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>ebb62c0b-b95a-5d91-a6ea-acf050839fdc</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="F1">
+      <value>0451008.MRL</value>
+      <footprint>Fuse:Fuse_1206_3216Metric</footprint>
+      <datasheet>Littelfuse 0451</datasheet>
+      <fields>
+        <field name="Footprint">Fuse:Fuse_1206_3216Metric</field>
+        <field name="Datasheet">Littelfuse 0451</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="Fuse" description="Fuse"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="fuse"/>
+      <property name="ki_fp_filters" value="*Fuse*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>e1b02a42-abd8-5e33-9a13-3791f6b5048a</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J1">
+      <value>PWR_INPUT_43045-0213</value>
+      <footprint>DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical</footprint>
+      <datasheet>Molex SD-43045-005 Rev.G1</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical</field>
+        <field name="Datasheet">Molex SD-43045-005 Rev.G1</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x02" description="Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>a4a892bf-d27c-5eba-8fbf-06d9631f5518</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="Q1">
+      <value>CSD18540Q5B</value>
+      <footprint>DioneyaPWR:CSD18540Q5B_DNK</footprint>
+      <datasheet>TI CSD18540Q5B Rev.B</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:CSD18540Q5B_DNK</field>
+        <field name="Datasheet">TI CSD18540Q5B Rev.B</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x08" description="Generic connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>65b35be0-3038-5f92-bd28-cca34fba8821</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+            <pin num="5"/>
+            <pin num="6"/>
+            <pin num="7"/>
+            <pin num="8"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="RSH1">
+      <value>WSK2512R0100FEA 10mOhm 1% 1W 4T</value>
+      <footprint>DioneyaPWR:Vishay_WSK2512_4T_T1.19mm</footprint>
+      <datasheet>Vishay WSK2512 document 30108</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:Vishay_WSK2512_4T_T1.19mm</field>
+        <field name="Datasheet">Vishay WSK2512 document 30108</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x04" description="Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>8a557019-bfa6-5ac1-88e5-2ce73a8cedaf</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="3"/>
+            <pin num="2"/>
+            <pin num="4"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP1">
+      <value>TP_VBAT_PROTECTED DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>72e147f4-4deb-5e13-9b5b-1fea369a6a40</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP2">
+      <value>TP_SHUNT_SRC DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>34b2a857-1525-5f48-8431-89da77e0e6a4</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP3">
+      <value>TP_SHUNT_LOAD DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>0a8b2284-e673-59ce-abbd-c7be477530b3</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP8">
+      <value>TP_FAULT DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>82a4cd49-f367-525a-8335-e024e474d660</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP9">
+      <value>TP_SCL DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>38d6d502-8cdc-5c2b-99e9-96ae971f9e5e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP10">
+      <value>TP_SDA DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>fd93cf2a-7c95-5677-a695-330fc1ffabe7</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U1">
+      <value>LM74700QDBVRQ1</value>
+      <footprint>DioneyaPWR:TI_DBV0006A_SOT23-6</footprint>
+      <datasheet>TI LM74700-Q1 Rev.G</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TI_DBV0006A_SOT23-6</field>
+        <field name="Datasheet">TI LM74700-Q1 Rev.G</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x06" description="Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>42175a5e-256d-54c6-98e7-eb72040ca73e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="6"/>
+            <pin num="3"/>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="4"/>
+            <pin num="5"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U2">
+      <value>INA226AIDGSR</value>
+      <footprint>DioneyaPWR:TI_DGS0010A_VSSOP10</footprint>
+      <datasheet>TI INA226 Rev.C</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TI_DGS0010A_VSSOP10</field>
+        <field name="Datasheet">TI INA226 Rev.C</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x10" description="Generic connector, single row, 01x10, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="Input protection and monitor"/>
+      <property name="Sheetfile" value="PCB-PWR_01_INPUT_PROTECTION.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/Input protection and monitor/" tstamps="/fad0ba62-0dc3-5b7b-9dda-800b91f8a3b2/"/>
+      <tstamps>9ba36190-f78f-540e-a484-0458e8331992</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="10"/>
+            <pin num="8"/>
+            <pin num="5"/>
+            <pin num="4"/>
+            <pin num="1"/>
+            <pin num="6"/>
+            <pin num="2"/>
+            <pin num="7"/>
+            <pin num="9"/>
+            <pin num="3"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C3">
+      <value>22 uF 25 V X7R CGA6P3X7R1E226M250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1E226M250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1E226M250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>72cee796-d675-5f81-9e82-254c8abdb1a3</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C4">
+      <value>100 nF 25 V X7R CGA2B3X7R1E104K050BB</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric</footprint>
+      <datasheet>TDK CGA exact product data</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0402_1005Metric</field>
+        <field name="Datasheet">TDK CGA exact product data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>979d2662-73cc-5063-bb28-63561323720c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C11">
+      <value>4.7 uF 50 V X7R CGA6P3X7R1H475K250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1H475K250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1H475K250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>cd4a0f7a-8459-5706-83cd-8f0636d9aa50</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C14">
+      <value>22 uF 25 V X7R CGA6P3X7R1E226M250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1E226M250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1E226M250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>ae6ee486-2844-5835-a37e-120a0096159c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C15">
+      <value>22 uF 25 V X7R CGA6P3X7R1E226M250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1E226M250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1E226M250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>651cf7a1-4d27-5232-bedc-1a072ac95ae2</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C16">
+      <value>22 uF 25 V X7R CGA6P3X7R1E226M250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1E226M250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1E226M250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>add231d1-4dad-5bf6-83ba-81fe0bbfb4a7</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C20">
+      <value>100 nF 50 V X7R CGA3E2X7R1H104K080AA</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <datasheet>TDK exact product data for CGA3E2X7R1H104K080AA</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA3E2X7R1H104K080AA</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>a1b75e48-4e4c-56c1-ad9f-6cd832f6f8ab</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="L1">
+      <value>XAL7030-472MEC 4.7uH</value>
+      <footprint>DioneyaPWR:Coilcraft_XAL7030_472</footprint>
+      <datasheet>Coilcraft XAL7030 document 863</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:Coilcraft_XAL7030_472</field>
+        <field name="Datasheet">Coilcraft XAL7030 document 863</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="L" description="Inductor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="inductor choke coil reactor magnetic"/>
+      <property name="ki_fp_filters" value="Choke_* *Coil* Inductor_* L_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>570aa912-413c-544d-82f8-f88cf946e37e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R1">
+      <value>100 kOhm 0.1% ERA-2AEB104X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERA-2A series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERA-2A series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>63193b35-f42c-5ebf-a9a4-7be1c70e4a82</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R2">
+      <value>35.7 kOhm 0.1% ERA-2AEB3572X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERA-2A series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERA-2A series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>6a1bea91-a525-5926-ab28-4fae37012c7e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R3">
+      <value>86.6 kOhm 0.1% ERA-2AEB8662X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERA-2A series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERA-2A series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>7858b1fe-14ac-53bb-a8a0-84897132180d</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R4">
+      <value>0 ohm ERJ-2GE0R00X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2G series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2G series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>9d73de23-2e65-5331-8f5d-78b376471bca</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R5">
+      <value>0 ohm ERJ-2GE0R00X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2G series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2G series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="dnp"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>b00db5af-ca9b-53ac-a641-13b2d6b88bd8</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R6">
+      <value>100 kOhm 1% ERJ-2RKF1003X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2R series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2R series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>5bc128d5-5b64-53db-998b-a91226cd2c3a</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R15">
+      <value>10 kOhm 1% ERJ-2RKF1002X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2R series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2R series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="dnp"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>466cc843-c83e-5bed-ad2d-a3f1ed05c66d</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP4">
+      <value>TP_3V8 DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>8fc4fe44-e06b-509d-98a3-ebef99d0a7a3</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP5">
+      <value>TP_PG_3V8 DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>fadf08df-bb34-512e-839f-c4257f220840</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U3">
+      <value>LMR604403SRAKR 3V8</value>
+      <footprint>DioneyaPWR:LMR60440_RAK0009A</footprint>
+      <datasheet>TI LMR60440 SNAS877</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:LMR60440_RAK0009A</field>
+        <field name="Datasheet">TI LMR60440 SNAS877</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x09" description="Generic connector, single row, 01x09, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="3V8 modem rail"/>
+      <property name="Sheetfile" value="PCB-PWR_02_3V8_MODEM.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/3V8 modem rail/" tstamps="/079baa7d-cb9e-5f99-8fa8-3059812ae49a/"/>
+      <tstamps>85b0f890-5ba8-50bb-8719-16fad6412b3f</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="9"/>
+            <pin num="7"/>
+            <pin num="8"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+            <pin num="5"/>
+            <pin num="6"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C5">
+      <value>22 uF 25 V X7R CGA6P3X7R1E226M250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1E226M250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1E226M250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>58290765-30cb-5c77-a936-81b6055a1fab</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C6">
+      <value>100 nF 25 V X7R CGA2B3X7R1E104K050BB</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric</footprint>
+      <datasheet>TDK CGA exact product data</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0402_1005Metric</field>
+        <field name="Datasheet">TDK CGA exact product data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>7deb691d-f44c-586d-b979-e87e667a2af8</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C12">
+      <value>4.7 uF 50 V X7R CGA6P3X7R1H475K250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1H475K250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1H475K250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>b8ec8dd8-6fd5-5956-9d0a-e9d6705bde89</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C17">
+      <value>22 uF 25 V X7R CGA6P3X7R1E226M250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1E226M250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1E226M250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>e6c4ba0c-1718-5f9e-8ba2-3fef30c02a75</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C18">
+      <value>22 uF 25 V X7R CGA6P3X7R1E226M250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1E226M250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1E226M250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>b313bf8e-0645-57a0-9022-27731f2778f5</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C19">
+      <value>22 uF 25 V X7R CGA6P3X7R1E226M250AB</value>
+      <footprint>Capacitor_SMD:C_1210_3225Metric</footprint>
+      <datasheet>TDK exact product data for CGA6P3X7R1E226M250AB</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_1210_3225Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA6P3X7R1E226M250AB</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>3b78b417-aca7-5ba9-b642-7ed56f1e6b3e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C21">
+      <value>100 nF 50 V X7R CGA3E2X7R1H104K080AA</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <datasheet>TDK exact product data for CGA3E2X7R1H104K080AA</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet">TDK exact product data for CGA3E2X7R1H104K080AA</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>55c75335-5358-5064-b1bf-eb0bbbb99d7c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="L2">
+      <value>XAL7030-472MEC 4.7uH</value>
+      <footprint>DioneyaPWR:Coilcraft_XAL7030_472</footprint>
+      <datasheet>Coilcraft XAL7030 document 863</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:Coilcraft_XAL7030_472</field>
+        <field name="Datasheet">Coilcraft XAL7030 document 863</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="L" description="Inductor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="inductor choke coil reactor magnetic"/>
+      <property name="ki_fp_filters" value="Choke_* *Coil* Inductor_* L_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>a31534b9-8ced-5dc1-b48b-7e9af948bc51</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R7">
+      <value>86.6 kOhm 0.1% ERA-2AEB8662X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERA-2A series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERA-2A series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>d34f77e7-609b-5eca-ad62-68d4f32d41ac</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R8">
+      <value>0 ohm ERJ-2GE0R00X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2G series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2G series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>71c1cc11-aa40-54fe-986c-2eb2024ad249</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R9">
+      <value>0 ohm ERJ-2GE0R00X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2G series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2G series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="dnp"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>aa361da7-dca7-503b-b8bb-7038ffc9fc64</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R10">
+      <value>10 kOhm 1% ERJ-2RKF1002X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2R series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2R series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>19bc5622-bee3-59f2-85be-c937a4a259a9</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R12">
+      <value>10 kOhm 1% ERJ-2RKF1002X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2R series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2R series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>2c0341dc-98f7-5ccf-a1c7-f8237ea0e7db</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R13">
+      <value>4.7 kOhm 1% ERJ-2RKF4701X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2R series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2R series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="dnp"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>0bd3c922-a756-56f2-9634-92a852326478</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R14">
+      <value>4.7 kOhm 1% ERJ-2RKF4701X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2R series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2R series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="dnp"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>2f30a390-5533-51aa-8587-30402c648e1a</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP6">
+      <value>TP_PWR_GOOD DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>4d8c9b5b-a59f-570e-9628-b2578c0e48a0</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U4">
+      <value>LMR604403SRAKR 3V3 AON</value>
+      <footprint>DioneyaPWR:LMR60440_RAK0009A</footprint>
+      <datasheet>TI LMR60440 SNAS877</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:LMR60440_RAK0009A</field>
+        <field name="Datasheet">TI LMR60440 SNAS877</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x09" description="Generic connector, single row, 01x09, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="3V3 digital rail"/>
+      <property name="Sheetfile" value="PCB-PWR_03_3V3_DIGITAL.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/3V3 digital rail/" tstamps="/88c96396-146a-566a-b60e-947667bc702e/"/>
+      <tstamps>b89062f2-39e9-53c6-8747-ddf5eec47c17</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="9"/>
+            <pin num="7"/>
+            <pin num="8"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+            <pin num="5"/>
+            <pin num="6"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C7">
+      <value>2.2 uF 10 V X7R CGA3E1X7R1A225K080AC</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <datasheet>TDK CGA exact product data</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet">TDK CGA exact product data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>fa74e68d-2e9b-565a-8c84-30d90bde5bd4</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C8">
+      <value>2.2 uF 10 V X7R CGA3E1X7R1A225K080AC</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <datasheet>TDK CGA exact product data</datasheet>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric</field>
+        <field name="Datasheet">TDK CGA exact product data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>7b6f7032-4ef1-59c1-aad5-0e5c34eaff7b</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J2">
+      <value>MAIN_PWR_43045-1202_12PIN</value>
+      <footprint>DioneyaMain:Molex_43045-1202_MicroFit-12_RA</footprint>
+      <datasheet>Molex 43045-1202</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaMain:Molex_43045-1202_MicroFit-12_RA</field>
+        <field name="Datasheet">Molex 43045-1202</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x12" description="Generic connector, single row, 01x12, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>16cdf75d-95a0-5006-a2a2-6e943cd08072</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+            <pin num="5"/>
+            <pin num="6"/>
+            <pin num="7"/>
+            <pin num="8"/>
+            <pin num="9"/>
+            <pin num="10"/>
+            <pin num="11"/>
+            <pin num="12"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="NT1">
+      <value>2-pad copper net tie NET_TIE_COPPER_REV_A</value>
+      <footprint>NetTie:NetTie-2_SMD_Pad0.5mm</footprint>
+      <datasheet>Project ground-return authority</datasheet>
+      <fields>
+        <field name="Footprint">NetTie:NetTie-2_SMD_Pad0.5mm</field>
+        <field name="Datasheet">Project ground-return authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>99bd2e82-5d5d-53c8-b292-543861f7dd80</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="NT2">
+      <value>2-pad copper net tie NET_TIE_COPPER_REV_A</value>
+      <footprint>NetTie:NetTie-2_SMD_Pad0.5mm</footprint>
+      <datasheet>Project ground-return authority</datasheet>
+      <fields>
+        <field name="Footprint">NetTie:NetTie-2_SMD_Pad0.5mm</field>
+        <field name="Datasheet">Project ground-return authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>8f228c8c-f8fd-50d0-a72a-ea0d932d45bc</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="NT3">
+      <value>2-pad copper net tie NET_TIE_COPPER_REV_A</value>
+      <footprint>NetTie:NetTie-2_SMD_Pad0.5mm</footprint>
+      <datasheet>Project ground-return authority</datasheet>
+      <fields>
+        <field name="Footprint">NetTie:NetTie-2_SMD_Pad0.5mm</field>
+        <field name="Datasheet">Project ground-return authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>891286a5-2fe1-50de-afb3-69aa9fdd0b2c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R11">
+      <value>100 kOhm 1% ERJ-2RKF1003X</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <datasheet>Panasonic ERJ-2R series data</datasheet>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet">Panasonic ERJ-2R series data</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>f841c242-a67d-573c-aaa3-af843479f2ec</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP7">
+      <value>TP_1V8 DFT_PAD_1P70_NOPASTE_REV_A</value>
+      <footprint>DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</footprint>
+      <datasheet>Project PCB-PWR DFT authority</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste</field>
+        <field name="Datasheet">Project PCB-PWR DFT authority</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="TESTPOINT" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>bf11086c-a7b5-5fe4-bba7-21339432e0e5</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U5">
+      <value>TPS7A2018PDBVR 1V8_MIC</value>
+      <footprint>DioneyaMain:TI_DBV0005A_SOT23-5</footprint>
+      <datasheet>TI TPS7A20 Rev.H</datasheet>
+      <fields>
+        <field name="Footprint">DioneyaMain:TI_DBV0005A_SOT23-5</field>
+        <field name="Datasheet">TI TPS7A20 Rev.H</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="DioneyaPWR" part="Conn_01x05" description="Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="1V8 auxiliary and MAIN harness"/>
+      <property name="Sheetfile" value="PCB-PWR_04_AUX_HARNESS.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/1V8 auxiliary and MAIN harness/" tstamps="/f733c734-d46a-5f4b-ac88-6f7b3b9ca01f/"/>
+      <tstamps>25810148-d1c2-51de-914c-c76b222afb3c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="3"/>
+            <pin num="2"/>
+            <pin num="5"/>
+            <pin num="4"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Unpolarized capacitor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="D_Zener">
+      <description>Zener diode</description>
+      <footprints>
+        <fp>TO-???*</fp>
+        <fp>*_Diode_*</fp>
+        <fp>*SingleDiode*</fp>
+        <fp>D_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">D_Zener</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Zener diode</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="Fuse">
+      <description>Fuse</description>
+      <footprints>
+        <fp>*Fuse*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">F</field>
+        <field name="Value">Fuse</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Fuse</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="L">
+      <description>Inductor</description>
+      <footprints>
+        <fp>Choke_*</fp>
+        <fp>*Coil*</fp>
+        <fp>Inductor_*</fp>
+        <fp>L_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">L</field>
+        <field name="Value">L</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Inductor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="Conn_01x02">
+      <description>Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x02</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VBAT_PLUS" type="passive"/>
+        <pin num="2" name="VBAT_MINUS" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="Conn_01x04">
+      <description>Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x04</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="CURRENT_SOURCE" type="passive"/>
+        <pin num="2" name="CURRENT_LOAD" type="passive"/>
+        <pin num="3" name="SENSE_SOURCE" type="passive"/>
+        <pin num="4" name="SENSE_LOAD" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="Conn_01x05">
+      <description>Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x05</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x05, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="IN" type="power_in"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="EN" type="input"/>
+        <pin num="4" name="NC" type="no_connect"/>
+        <pin num="5" name="OUT" type="power_out"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="Conn_01x06">
+      <description>Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x06</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x06, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VCAP" type="output"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="EN" type="input"/>
+        <pin num="4" name="CATHODE" type="input"/>
+        <pin num="5" name="GATE" type="output"/>
+        <pin num="6" name="ANODE" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="Conn_01x08">
+      <description>Generic connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x08</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x08, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="SOURCE" type="passive"/>
+        <pin num="2" name="SOURCE" type="passive"/>
+        <pin num="3" name="SOURCE" type="passive"/>
+        <pin num="4" name="GATE" type="input"/>
+        <pin num="5" name="DRAIN" type="passive"/>
+        <pin num="6" name="DRAIN" type="passive"/>
+        <pin num="7" name="DRAIN" type="passive"/>
+        <pin num="8" name="DRAIN" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="Conn_01x09">
+      <description>Generic connector, single row, 01x09, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x09</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x09, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VIN" type="power_in"/>
+        <pin num="2" name="PGND" type="power_in"/>
+        <pin num="3" name="SW" type="power_out"/>
+        <pin num="4" name="BOOT" type="output"/>
+        <pin num="5" name="PG" type="open_collector"/>
+        <pin num="6" name="FB" type="input"/>
+        <pin num="7" name="MODE/SYNC" type="input"/>
+        <pin num="8" name="RT" type="input"/>
+        <pin num="9" name="EN" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="Conn_01x10">
+      <description>Generic connector, single row, 01x10, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x10</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x10, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="A1" type="input"/>
+        <pin num="2" name="A0" type="input"/>
+        <pin num="3" name="ALERT" type="open_collector"/>
+        <pin num="4" name="SDA" type="bidirectional"/>
+        <pin num="5" name="SCL" type="input"/>
+        <pin num="6" name="VS" type="power_in"/>
+        <pin num="7" name="GND" type="power_in"/>
+        <pin num="8" name="VBUS" type="input"/>
+        <pin num="9" name="IN-" type="input"/>
+        <pin num="10" name="IN+" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="Conn_01x12">
+      <description>Generic connector, single row, 01x12, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x12</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x12, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="3V8_MODEM" type="passive"/>
+        <pin num="2" name="GND_MODEM" type="passive"/>
+        <pin num="3" name="3V3_DIGITAL" type="passive"/>
+        <pin num="4" name="GND_DIGITAL" type="passive"/>
+        <pin num="5" name="1V8_MIC" type="passive"/>
+        <pin num="6" name="GND_MIC" type="passive"/>
+        <pin num="7" name="PWR_GOOD" type="open_collector"/>
+        <pin num="8" name="FAULT" type="open_collector"/>
+        <pin num="9" name="EN_MODEM" type="input"/>
+        <pin num="10" name="EN_AUX" type="input"/>
+        <pin num="11" name="I2C2_SCL" type="bidirectional"/>
+        <pin num="12" name="I2C2_SDA" type="bidirectional"/>
+      </pins>
+    </libpart>
+    <libpart lib="DioneyaPWR" part="TESTPOINT">
+      <description>Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x01</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="TEST" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Device">
+      <uri>${KICAD9_SYMBOL_DIR}/Device.kicad_sym</uri>
+    </library>
+    <library logical="DioneyaPWR">
+      <uri>${KIPRJMOD}/libs/DioneyaPWR.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/1V8 auxiliary and MAIN harness/1V8_MIC" class="Default">
+      <node ref="C8" pin="1" pintype="passive"/>
+      <node ref="J2" pin="5" pinfunction="1V8_MIC_5" pintype="passive"/>
+      <node ref="TP7" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U5" pin="5" pinfunction="OUT_5" pintype="power_out"/>
+    </net>
+    <net code="2" name="/1V8 auxiliary and MAIN harness/EN_AUX" class="Default">
+      <node ref="J2" pin="10" pinfunction="EN_AUX_10" pintype="input"/>
+      <node ref="R11" pin="1" pintype="passive"/>
+      <node ref="U5" pin="3" pinfunction="EN_3" pintype="input"/>
+    </net>
+    <net code="3" name="/1V8 auxiliary and MAIN harness/GND_DIGITAL" class="Default">
+      <node ref="J2" pin="4" pinfunction="GND_DIGITAL_4" pintype="passive"/>
+      <node ref="NT2" pin="1" pintype="passive"/>
+    </net>
+    <net code="4" name="/1V8 auxiliary and MAIN harness/GND_MIC" class="Default">
+      <node ref="J2" pin="6" pinfunction="GND_MIC_6" pintype="passive"/>
+      <node ref="NT3" pin="1" pintype="passive"/>
+    </net>
+    <net code="5" name="/1V8 auxiliary and MAIN harness/GND_MODEM" class="Default">
+      <node ref="J2" pin="2" pinfunction="GND_MODEM_2" pintype="passive"/>
+      <node ref="NT1" pin="1" pintype="passive"/>
+    </net>
+    <net code="6" name="/3V3 digital rail/BOOT_3V3" class="Default">
+      <node ref="C6" pin="1" pintype="passive"/>
+      <node ref="U4" pin="4" pinfunction="BOOT_4" pintype="output"/>
+    </net>
+    <net code="7" name="/3V3 digital rail/MODE_3V3" class="Default">
+      <node ref="R8" pin="1" pintype="passive"/>
+      <node ref="R9" pin="1" pintype="passive"/>
+      <node ref="U4" pin="7" pinfunction="MODE/SYNC_7" pintype="input"/>
+    </net>
+    <net code="8" name="/3V3 digital rail/RT_3V3" class="Default">
+      <node ref="R7" pin="1" pintype="passive"/>
+      <node ref="R9" pin="2" pintype="passive"/>
+      <node ref="U4" pin="8" pinfunction="RT_8" pintype="input"/>
+    </net>
+    <net code="9" name="/3V3 digital rail/SW_3V3" class="Default">
+      <node ref="C6" pin="2" pintype="passive"/>
+      <node ref="L2" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U4" pin="3" pinfunction="SW_3" pintype="power_out"/>
+    </net>
+    <net code="10" name="/3V3_DIGITAL" class="Default">
+      <node ref="C17" pin="1" pintype="passive"/>
+      <node ref="C18" pin="1" pintype="passive"/>
+      <node ref="C19" pin="1" pintype="passive"/>
+      <node ref="C2" pin="1" pintype="passive"/>
+      <node ref="C5" pin="1" pintype="passive"/>
+      <node ref="C7" pin="1" pintype="passive"/>
+      <node ref="J2" pin="3" pinfunction="3V3_DIGITAL_3" pintype="passive"/>
+      <node ref="L2" pin="2" pinfunction="2_2" pintype="passive"/>
+      <node ref="R10" pin="1" pintype="passive"/>
+      <node ref="R12" pin="1" pintype="passive"/>
+      <node ref="R13" pin="1" pintype="passive"/>
+      <node ref="R14" pin="1" pintype="passive"/>
+      <node ref="R15" pin="2" pintype="passive"/>
+      <node ref="U2" pin="6" pinfunction="VS_6" pintype="power_in"/>
+      <node ref="U4" pin="6" pinfunction="FB_6" pintype="input"/>
+      <node ref="U5" pin="1" pinfunction="IN_1" pintype="power_in"/>
+    </net>
+    <net code="11" name="/3V8 modem rail/BOOT_3V8" class="Default">
+      <node ref="C4" pin="1" pintype="passive"/>
+      <node ref="U3" pin="4" pinfunction="BOOT_4" pintype="output"/>
+    </net>
+    <net code="12" name="/3V8 modem rail/FB_3V8" class="Default">
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="R2" pin="1" pintype="passive"/>
+      <node ref="U3" pin="6" pinfunction="FB_6" pintype="input"/>
+    </net>
+    <net code="13" name="/3V8 modem rail/MODE_3V8" class="Default">
+      <node ref="R4" pin="1" pintype="passive"/>
+      <node ref="R5" pin="1" pintype="passive"/>
+      <node ref="U3" pin="7" pinfunction="MODE/SYNC_7" pintype="input"/>
+    </net>
+    <net code="14" name="/3V8 modem rail/PG_3V8" class="Default">
+      <node ref="R15" pin="1" pintype="passive"/>
+      <node ref="TP5" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U3" pin="5" pinfunction="PG_5" pintype="open_collector"/>
+    </net>
+    <net code="15" name="/3V8 modem rail/RT_3V8" class="Default">
+      <node ref="R3" pin="1" pintype="passive"/>
+      <node ref="R5" pin="2" pintype="passive"/>
+      <node ref="U3" pin="8" pinfunction="RT_8" pintype="input"/>
+    </net>
+    <net code="16" name="/3V8 modem rail/SW_3V8" class="Default">
+      <node ref="C4" pin="2" pintype="passive"/>
+      <node ref="L1" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U3" pin="3" pinfunction="SW_3" pintype="power_out"/>
+    </net>
+    <net code="17" name="/3V8_MODEM" class="Default">
+      <node ref="C14" pin="1" pintype="passive"/>
+      <node ref="C15" pin="1" pintype="passive"/>
+      <node ref="C16" pin="1" pintype="passive"/>
+      <node ref="C3" pin="1" pintype="passive"/>
+      <node ref="J2" pin="1" pinfunction="3V8_MODEM_1" pintype="passive"/>
+      <node ref="L1" pin="2" pinfunction="2_2" pintype="passive"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+      <node ref="TP4" pin="1" pinfunction="TEST_1" pintype="passive"/>
+    </net>
+    <net code="18" name="/EN_MODEM" class="Default">
+      <node ref="J2" pin="9" pinfunction="EN_MODEM_9" pintype="input"/>
+      <node ref="R6" pin="1" pintype="passive"/>
+      <node ref="U3" pin="9" pinfunction="EN_9" pintype="input"/>
+    </net>
+    <net code="19" name="/FAULT" class="Default">
+      <node ref="J2" pin="8" pinfunction="FAULT_8" pintype="open_collector"/>
+      <node ref="R12" pin="2" pintype="passive"/>
+      <node ref="TP8" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U2" pin="3" pinfunction="ALERT_3" pintype="open_collector"/>
+    </net>
+    <net code="20" name="/GND_PWR" class="Default">
+      <node ref="C10" pin="2" pintype="passive"/>
+      <node ref="C11" pin="2" pintype="passive"/>
+      <node ref="C12" pin="2" pintype="passive"/>
+      <node ref="C13" pin="2" pintype="passive"/>
+      <node ref="C14" pin="2" pintype="passive"/>
+      <node ref="C15" pin="2" pintype="passive"/>
+      <node ref="C16" pin="2" pintype="passive"/>
+      <node ref="C17" pin="2" pintype="passive"/>
+      <node ref="C18" pin="2" pintype="passive"/>
+      <node ref="C19" pin="2" pintype="passive"/>
+      <node ref="C2" pin="2" pintype="passive"/>
+      <node ref="C20" pin="2" pintype="passive"/>
+      <node ref="C21" pin="2" pintype="passive"/>
+      <node ref="C3" pin="2" pintype="passive"/>
+      <node ref="C5" pin="2" pintype="passive"/>
+      <node ref="C7" pin="2" pintype="passive"/>
+      <node ref="C8" pin="2" pintype="passive"/>
+      <node ref="C9" pin="2" pintype="passive"/>
+      <node ref="D1" pin="2" pinfunction="A_2" pintype="passive"/>
+      <node ref="J1" pin="2" pinfunction="VBAT_MINUS_2" pintype="passive"/>
+      <node ref="NT1" pin="2" pintype="passive"/>
+      <node ref="NT2" pin="2" pintype="passive"/>
+      <node ref="NT3" pin="2" pintype="passive"/>
+      <node ref="R11" pin="2" pintype="passive"/>
+      <node ref="R2" pin="2" pintype="passive"/>
+      <node ref="R3" pin="2" pintype="passive"/>
+      <node ref="R4" pin="2" pintype="passive"/>
+      <node ref="R6" pin="2" pintype="passive"/>
+      <node ref="R7" pin="2" pintype="passive"/>
+      <node ref="R8" pin="2" pintype="passive"/>
+      <node ref="U1" pin="2" pinfunction="GND_2" pintype="power_in"/>
+      <node ref="U2" pin="1" pinfunction="A1_1" pintype="input"/>
+      <node ref="U2" pin="2" pinfunction="A0_2" pintype="input"/>
+      <node ref="U2" pin="7" pinfunction="GND_7" pintype="power_in"/>
+      <node ref="U3" pin="2" pinfunction="PGND_2" pintype="power_in"/>
+      <node ref="U4" pin="2" pinfunction="PGND_2" pintype="power_in"/>
+      <node ref="U5" pin="2" pinfunction="GND_2" pintype="power_in"/>
+    </net>
+    <net code="21" name="/I2C2_SCL" class="Default">
+      <node ref="J2" pin="11" pinfunction="I2C2_SCL_11" pintype="bidirectional"/>
+      <node ref="R13" pin="2" pintype="passive"/>
+      <node ref="TP9" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U2" pin="5" pinfunction="SCL_5" pintype="input"/>
+    </net>
+    <net code="22" name="/I2C2_SDA" class="Default">
+      <node ref="J2" pin="12" pinfunction="I2C2_SDA_12" pintype="bidirectional"/>
+      <node ref="R14" pin="2" pintype="passive"/>
+      <node ref="TP10" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U2" pin="4" pinfunction="SDA_4" pintype="bidirectional"/>
+    </net>
+    <net code="23" name="/Input protection and monitor/LM74700_VCAP" class="Default">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="U1" pin="1" pinfunction="VCAP_1" pintype="output"/>
+    </net>
+    <net code="24" name="/Input protection and monitor/REV_GATE" class="Default">
+      <node ref="Q1" pin="4" pinfunction="GATE_4" pintype="input"/>
+      <node ref="U1" pin="5" pinfunction="GATE_5" pintype="output"/>
+    </net>
+    <net code="25" name="/Input protection and monitor/SHUNT_LOAD_SENSE" class="Default">
+      <node ref="RSH1" pin="4" pinfunction="SENSE_LOAD_4" pintype="passive"/>
+      <node ref="TP3" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U2" pin="9" pinfunction="IN-_9" pintype="input"/>
+    </net>
+    <net code="26" name="/Input protection and monitor/SHUNT_SOURCE_SENSE" class="Default">
+      <node ref="RSH1" pin="3" pinfunction="SENSE_SOURCE_3" pintype="passive"/>
+      <node ref="TP2" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U2" pin="10" pinfunction="IN+_10" pintype="input"/>
+    </net>
+    <net code="27" name="/Input protection and monitor/VBAT_FUSED" class="Default">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="C9" pin="1" pintype="passive"/>
+      <node ref="D1" pin="1" pinfunction="K_1" pintype="passive"/>
+      <node ref="F1" pin="2" pintype="passive"/>
+      <node ref="Q1" pin="1" pinfunction="SOURCE_1" pintype="passive"/>
+      <node ref="Q1" pin="2" pinfunction="SOURCE_2" pintype="passive"/>
+      <node ref="Q1" pin="3" pinfunction="SOURCE_3" pintype="passive"/>
+      <node ref="U1" pin="3" pinfunction="EN_3" pintype="input"/>
+      <node ref="U1" pin="6" pinfunction="ANODE_6" pintype="input"/>
+    </net>
+    <net code="28" name="/Input protection and monitor/VBAT_PROTECTED" class="Default">
+      <node ref="C10" pin="1" pintype="passive"/>
+      <node ref="Q1" pin="5" pinfunction="DRAIN_5" pintype="passive"/>
+      <node ref="Q1" pin="6" pinfunction="DRAIN_6" pintype="passive"/>
+      <node ref="Q1" pin="7" pinfunction="DRAIN_7" pintype="passive"/>
+      <node ref="Q1" pin="8" pinfunction="DRAIN_8" pintype="passive"/>
+      <node ref="RSH1" pin="1" pinfunction="CURRENT_SOURCE_1" pintype="passive"/>
+      <node ref="TP1" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U1" pin="4" pinfunction="CATHODE_4" pintype="input"/>
+    </net>
+    <net code="29" name="/Input protection and monitor/VBAT_RAW" class="Default">
+      <node ref="F1" pin="1" pintype="passive"/>
+      <node ref="J1" pin="1" pinfunction="VBAT_PLUS_1" pintype="passive"/>
+    </net>
+    <net code="30" name="/PWR_GOOD" class="Default">
+      <node ref="J2" pin="7" pinfunction="PWR_GOOD_7" pintype="open_collector"/>
+      <node ref="R10" pin="2" pintype="passive"/>
+      <node ref="TP6" pin="1" pinfunction="TEST_1" pintype="passive"/>
+      <node ref="U4" pin="5" pinfunction="PG_5" pintype="open_collector"/>
+    </net>
+    <net code="31" name="/VBAT_SYS" class="Default">
+      <node ref="C11" pin="1" pintype="passive"/>
+      <node ref="C12" pin="1" pintype="passive"/>
+      <node ref="C13" pin="1" pintype="passive"/>
+      <node ref="C20" pin="1" pintype="passive"/>
+      <node ref="C21" pin="1" pintype="passive"/>
+      <node ref="RSH1" pin="2" pinfunction="CURRENT_LOAD_2" pintype="passive"/>
+      <node ref="U2" pin="8" pinfunction="VBUS_8" pintype="input"/>
+      <node ref="U3" pin="1" pinfunction="VIN_1" pintype="power_in"/>
+      <node ref="U4" pin="1" pinfunction="VIN_1" pintype="power_in"/>
+      <node ref="U4" pin="9" pinfunction="EN_9" pintype="input"/>
+    </net>
+    <net code="32" name="unconnected-(U5-NC-Pad4)" class="Default">
+      <node ref="U5" pin="4" pinfunction="NC_4" pintype="no_connect"/>
+    </net>
+  </nets>
+</export>

@@ -1,0 +1,196 @@
+"""Replay of a target's movement without a map (decision 3 of docs/ZVOOK_COMPARISON_DECISIONS_2026-09-30.md).
+
+One call gathers everything the replay page needs for a time window: the stations, the fused tracks (their points)
+and every station's bearings, all in one local east/north/up frame in metres around the stations, so the page draws a
+metric plane without map tiles.  The window comes from a fused track, a system event or explicit times.
+
+Bearing times are arrival times at the station (the sound heard then); track point times are emission times (where
+the target was).  The page shows both as they are: a ray at time t points where the target was range / c earlier.
+"""
+from __future__ import annotations
+
+import numpy as np
+
+from fusion.geodesy import EnuFrame
+from station.access_scope import UNRESTRICTED
+from station import target_match, track_segments
+
+MAX_WINDOW_US = 30 * 60 * 1_000_000        # one replay covers at most half an hour
+TRACK_MARGIN_US = 15_000_000               # bearings heard up to ~15 s (5 km of sound) around the track's points
+EVENT_WINDOW_US = 150_000_000              # an event without fused track: its detections' time +- 2.5 min
+EPISODE_GAP_US = 7_000_000                 # a longer quiet interval starts another live flight episode
+TRUSTED_TIME = ("GNSS_TIME_TRUSTED", "HOLDOVER")
+
+
+class ReplayError(ValueError):
+    pass
+
+
+def track_class(store, track: dict) -> dict:
+    """Return the acoustic class of one fused target, keeping multi-target station segments separate.
+
+    The alert stream already calculates the same value for every ``track.update``.  Replay is reconstructed from
+    persisted tracks and therefore calculates it again from the track members instead of depending on an outbox
+    message that may already have expired.
+    """
+    signatures = []
+    for member in track["members"]:
+        station_id = member["station_id"]
+        event_id = member["track_event_id"]
+        rows = [row for row in store.list_bearings(station_id=station_id, track_event_id=event_id, limit=50000)
+                if row["time_trust"] in TRUSTED_TIME]
+        segment = track_segments.by_key(track_segments.split(rows), member.get("segment_us", 0))
+        signatures.append(target_match.station_track_signature(store, station_id, event_id, segment))
+    return target_match.merge(signatures).as_replay_class()
+
+
+def latest_episode_start_us(times: list[int]) -> int | None:
+    """Return the first target-time sample after the latest quiet interval.
+
+    A long alert can contain several controlled flights.  The live page may
+    miss the WebSocket message at their boundary, so the replay response also
+    carries a boundary reconstructed from persisted track points.
+    """
+    ordered = sorted(set(times))
+    if not ordered:
+        return None
+    start = previous = ordered[0]
+    for current in ordered[1:]:
+        if current - previous > EPISODE_GAP_US:
+            start = current
+        previous = current
+    return start
+
+
+def _window(store, track_id: str | None, system_event_id: str | None, since_us: int | None, until_us: int | None,
+            scope=UNRESTRICTED):
+    stations = scope.station_list
+    if track_id:
+        track = scope.track(store.get_track(track_id))
+        if track is None:
+            raise ReplayError("track not found")
+        if track["first_time_us"] is None:
+            raise ReplayError("track has no points yet")
+        return track["first_time_us"] - TRACK_MARGIN_US, track["last_time_us"] + TRACK_MARGIN_US
+    if system_event_id:
+        event = store.get_event(system_event_id)
+        if event is None or scope.event(event) is None:
+            raise ReplayError("event not found")
+        tracks = [t for t in store.list_tracks(system_event_id=system_event_id, stations=stations) if t["first_time_us"] is not None]
+        bearings = store.list_bearings(system_event_id=system_event_id, limit=50000, stations=stations)
+        times = [t["first_time_us"] for t in tracks] + [t["last_time_us"] for t in tracks] + [b["time_us"] for b in bearings]
+        if times:
+            return min(times) - TRACK_MARGIN_US, max(times) + TRACK_MARGIN_US
+        created = int(event["created_time_us"])
+        return created - EVENT_WINDOW_US // 2, created + EVENT_WINDOW_US // 2
+    if since_us is None or until_us is None:
+        raise ReplayError("give track_id, system_event_id or since_us and until_us")
+    return since_us, until_us
+
+
+def build_replay(store, *, track_id: str | None = None, system_event_id: str | None = None,
+                 since_us: int | None = None, until_us: int | None = None, scope=UNRESTRICTED,
+                 include_scoped_stations: bool = False) -> dict:
+    """``scope`` (station/access_scope.py): an operator account limited to stations sees their bearings and the tracks
+    they took part in, and only their positions."""
+    t0, t1 = _window(store, track_id, system_event_id, since_us, until_us, scope)
+    if t1 <= t0:
+        raise ReplayError("empty time window")
+    if t1 - t0 > MAX_WINDOW_US:
+        raise ReplayError("time window longer than 30 minutes")
+    bearings = store.list_bearings(since_us=t0, until_us=t1, limit=50000, stations=scope.station_list)
+    tracks = [scope.track(store.get_track(t["track_id"]))
+              for t in store.list_tracks(since_us=t0, until_us=t1, limit=50, stations=scope.station_list)]
+    tracks = [t for t in tracks if t and t["track_points"]]
+    # station positions: from the detection of one of the station's tracks, else the heartbeat
+    station_tracks: dict[int, int | None] = {}
+    for b in bearings:
+        station_tracks.setdefault(b["station_id"], b["track_event_id"])
+    for t in tracks:
+        for m in t["members"]:
+            station_tracks.setdefault(m["station_id"], m["track_event_id"])
+    if include_scoped_stations:
+        for station_id in scope.station_list or []:
+            station_tracks.setdefault(station_id, None)
+    positions = {s: store.station_position(s, e) for s, e in sorted(station_tracks.items())}
+    positions = {s: p for s, p in positions.items() if p}
+    if positions:
+        lat0 = float(np.mean([p[0] for p in positions.values()]))
+        lon0 = float(np.mean([p[1] for p in positions.values()]))
+        alt0 = float(np.mean([p[2] for p in positions.values()]))
+    elif tracks:
+        first = tracks[0]["track_points"][0]
+        lat0, lon0, alt0 = first["lat"], first["lon"], 0.0
+    else:
+        return {"window": {"since_us": t0, "until_us": t1}, "origin": None, "stations": [], "tracks": [], "bearings": []}
+    frame = EnuFrame(lat0, lon0, alt0)
+
+    def enu(lat, lon, alt):
+        e, n, u = frame.to_enu(lat, lon, alt)
+        return round(float(e), 1), round(float(n), 1), round(float(u), 1)
+
+    stations = []
+    for s, (lat, lon, alt) in positions.items():
+        e, n, u = enu(lat, lon, alt)
+        stations.append({"station_id": s, "lat": lat, "lon": lon, "alt_msl_m": alt, "e": e, "n": n, "u": u})
+    out_tracks = []
+    for t in tracks:
+        points = []
+        for p in t["track_points"]:
+            e, n, u = enu(p["lat"], p["lon"], p["alt_msl_m"])
+            points.append({"t_us": p["time_us"], "e": e, "n": n, "u": u, "alt_msl_m": round(p["alt_msl_m"], 1),
+                           "h_err_m": p["horizontal_error_m"], "v_err_m": p["vertical_error_m"],
+                           "ve": round(p["vx_east_mps"], 2), "vn": round(p["vy_north_mps"], 2),
+                           "speed_mps": round(p["speed_mps"], 1), "course_deg": round(p["course_deg"], 1),
+                           "crossing_deg": p["crossing_deg"], "stations": p["stations"]})
+        out_tracks.append({"track_id": t["track_id"], "system_event_id": t["system_event_id"], "stations": t["stations"],
+                           "class": track_class(store, t),
+                           "points": points})
+    # Relate every station source to its fused target.  IDs are carried as strings as the station's uint64 event ID
+    # is wider than JavaScript's exact integer range.  A source can acquire another fused segment later; select the
+    # latest segment that had begun at the bearing time.
+    member_tracks: dict[tuple[int, int], list[tuple[int, str]]] = {}
+    for track in tracks:
+        for member in track["members"]:
+            member_tracks.setdefault((member["station_id"], member["track_event_id"]), []).append(
+                (member.get("segment_us", 0), track["track_id"]),
+            )
+    for candidates in member_tracks.values():
+        candidates.sort()
+
+    def bearing_track(bearing):
+        candidates = member_tracks.get((bearing["station_id"], bearing["track_event_id"]), [])
+        eligible = [track_id for segment_us, track_id in candidates if segment_us <= bearing["time_us"]]
+        return eligible[-1] if eligible else None
+
+    out_bearings = [{"station_id": b["station_id"], "track_event_id": str(b["track_event_id"]),
+                     "bearing_key": f'{b["station_id"]}:{b["track_event_id"]}', "track_id": bearing_track(b),
+                     "t_us": b["time_us"], "azimuth_deg": b["azimuth_deg"],
+                     "elevation_deg": b["elevation_deg"], "sigma_deg": b["sigma_deg"],
+                     "time_trust": b["time_trust"]}
+                    for b in bearings if b["station_id"] in positions]
+    target_times = [p["t_us"] for t in out_tracks for p in t["points"]]
+    times = [b["t_us"] for b in out_bearings] + target_times
+    return {
+        "window": {"since_us": t0, "until_us": t1,
+                   "first_us": min(times) if times else t0, "last_us": max(times) if times else t1,
+                   # Bearing time is when sound reached a station and can be several seconds later than the
+                   # target's emission-time track point.  The live UI must follow this value, otherwise its
+                   # cursor runs past the track and the target disappears while bearings still arrive.
+                   "target_last_us": max(target_times) if target_times else None,
+                   "episode_first_us": latest_episode_start_us(target_times)},
+        "origin": {"lat": lat0, "lon": lon0, "alt_msl_m": alt0},
+        "stations": stations,
+        "tracks": out_tracks,
+        "bearings": out_bearings,
+    }
+
+
+def replay_sources(store, limit: int = 50, scope=UNRESTRICTED) -> dict:
+    """What can be replayed: recent fused tracks and recent system events (of the account's stations)."""
+    events = [scope.event(e) for e in store.list_events(limit, stations=scope.station_list)
+              if e.get("event_type") in ("AIR_ALERT", "AIR_WARNING")]
+    return {"tracks": [scope.track(t) for t in store.list_tracks(limit=limit, stations=scope.station_list)],
+            "events": [{"system_event_id": e["system_event_id"], "event_type": e["event_type"],
+                        "created_time_us": e["created_time_us"], "classification_label": e.get("classification_label"),
+                        "stations": e.get("source_station_ids", [])} for e in events]}

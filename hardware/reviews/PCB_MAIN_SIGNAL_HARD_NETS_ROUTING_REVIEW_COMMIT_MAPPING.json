@@ -1,0 +1,29 @@
+{
+  "schema_version": "dioneya.pcb-main-signal-hard-nets-routing-review-commit-mapping.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-SIGNAL-HARD-NETS-001",
+  "reviewed_github_commit_sha": "4f3e5b18a49ebe2d11a33fcb833e57e18c56e34d",
+  "reviewed_tree_sha": "45add456a5fae77b8010b270b35492819b153268",
+  "proposal_path": "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.json",
+  "proposal_blob_sha": "6f82c0fa994d32d92be403b4ec69b9dc6cb9590b",
+  "proposal_sha256": "c388c273d279dcee0017d19b018ce5a9f59b43526797cd096421d5a4d3d76001",
+  "proposal_record_path": "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.md",
+  "proposal_record_blob_sha": "5b4fc47e4e6dfb8f77a31b6077bd29b63a42b7f2",
+  "proposal_record_sha256": "fc1677d29c8fd5b8ff9f66a7ba9861eb1897d11e38bad581efd80542f386b774",
+  "candidate_board_path": "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb",
+  "candidate_board_blob_sha": "853f1b7865f2b8fac2fcf2fb1adb8052aadfb60a",
+  "candidate_board_sha256": "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3",
+  "audit_path": "tools/audit_pcb_main_signal_hard_nets_candidate_rev_a.py",
+  "audit_blob_sha": "ff525a02169e52bcc41f0cb2e3fb1fb4b5952c32",
+  "machine_gate": {
+    "pcb_native_run_id": 35446985180,
+    "pcb_native_conclusion": "success",
+    "kiCad_9_comparative_drc_step": "success",
+    "ci_run_id": 35446985202,
+    "ci_conclusion": "success"
+  },
+  "equivalence": "EXACT_REVIEWED_TREE_AND_BLOBS",
+  "transport": "GITHUB_APP_GIT_DATABASE_API",
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

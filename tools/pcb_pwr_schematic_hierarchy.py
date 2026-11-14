@@ -51,8 +51,25 @@ def selected_pins(symbol, unit: int = 1) -> dict[str, object]:
 
 def endpoint(instance, symbol, pin_number: str) -> Point:
     pin = selected_pins(symbol, instance.unit or 1)[str(pin_number)]
-    return point(instance.position.X + pin.position.X,
-                 instance.position.Y - pin.position.Y)
+    # Library coordinates use +Y upward while schematic coordinates use +Y
+    # downward.  Hierarchy review sheets may rotate passive symbols to keep
+    # net labels horizontal, so the instance rotation must be applied before
+    # resolving the electrical endpoint.
+    angle = int(instance.position.angle or 0) % 360
+    x = float(pin.position.X)
+    y = float(pin.position.Y)
+    if angle == 0:
+        dx, dy = x, -y
+    elif angle == 90:
+        dx, dy = -y, -x
+    elif angle == 180:
+        dx, dy = -x, y
+    elif angle == 270:
+        dx, dy = y, x
+    else:
+        raise RuntimeError(f"unsupported schematic symbol rotation {angle}")
+    return point(float(instance.position.X) + dx,
+                 float(instance.position.Y) + dy)
 
 
 @dataclass(frozen=True)

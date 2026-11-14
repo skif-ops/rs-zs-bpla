@@ -1,0 +1,135 @@
+{
+  "schema": "dioneya-pcb-pwr-dim-003-evt-authority-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "revision": "A",
+  "status": "ACCEPTED_FOR_EVT_MECHANICAL_ROUTING_INPUT_SERIAL_REVALIDATION_REQUIRED",
+  "acceptance_date": "2026-09-21",
+  "acceptance_basis": "Project-owner authorization to use rational engineering defaults for the EVT test batch",
+  "coordinate_system": {
+    "units": "mm",
+    "origin": "LOWER_LEFT_EDGE_CUT_INTERSECTION",
+    "x_axis": "EAST_ALONG_90_MM_EDGE",
+    "y_axis": "NORTH_ALONG_60_MM_EDGE",
+    "z_axis": "UP_FROM_BOTTOM_PCB_FACE",
+    "pcb_bottom_z_mm": 0.0,
+    "pcb_top_z_mm": 1.6
+  },
+  "outline": {
+    "geometry": "RECTANGLE_FOUR_STRAIGHT_EDGE_CUTS_NO_CUTOUTS",
+    "size_mm": [90.0, 60.0],
+    "edge_profile_tolerance_mm": 0.15,
+    "finished_thickness_mm": 1.6,
+    "finished_thickness_tolerance_mm": 0.16,
+    "scope": "EVT_LOT_ONLY"
+  },
+  "mounting": {
+    "hole_type": "ROUND_NPTH",
+    "nominal_drill_mm": 3.4,
+    "drill_tolerance_mm": 0.1,
+    "position_tolerance_mm": 0.1,
+    "all_copper_exclusion_diameter_mm": 8.0,
+    "fitted_component_exclusion_diameter_mm": 10.0,
+    "holes": [
+      {"reference": "H1", "xy_mm": [5.0, 5.0]},
+      {"reference": "H2", "xy_mm": [82.0, 5.0]},
+      {"reference": "H3", "xy_mm": [68.0, 55.0]},
+      {"reference": "H4", "xy_mm": [5.0, 55.0]}
+    ],
+    "hardware": {
+      "screw": "M3",
+      "standoff_height_mm": 5.0,
+      "minimum_standoff_face_diameter_mm": 6.0,
+      "maximum_washer_outer_diameter_mm": 7.0,
+      "maximum_torque_nm": 0.4,
+      "electrical_isolation": "NYLON_WASHER_REQUIRED_FOR_CONDUCTIVE_HARDWARE",
+      "support": "ALL_FOUR_HOLES_SUPPORTED_DURING_CONNECTOR_INSERTION"
+    },
+    "slot_policy": "NO_PCB_SLOTS; USE_FIXTURE_DIAMOND_PIN_OR_STANDOFF_CLEARANCE_FOR_TOLERANCE"
+  },
+  "assembled_z_envelope_mm": {
+    "minimum": -3.0,
+    "maximum": 18.0,
+    "required_free_space_below_pcb_mm": 5.0,
+    "required_free_space_above_pcb_mm": 20.0,
+    "basis": "CONSERVATIVE_EVT_ENVELOPE_INCLUDING_THT_LEADS_CONNECTORS_AND_COMPONENT_TOLERANCE"
+  },
+  "connector_service_volumes": {
+    "J1": {
+      "reference_xy_mm": [6.0, 28.0],
+      "mating_direction": "+Z",
+      "mating_box_xyz_min_mm": [0.0, 20.0, 1.6],
+      "mating_box_xyz_max_mm": [12.0, 40.0, 40.0],
+      "cable_exit": "+Z_THEN_WEST",
+      "minimum_conductor_bend_radius_mm": 20.0,
+      "strain_relief_required": true
+    },
+    "J2": {
+      "reference_xy_mm": [90.0, 56.0],
+      "mating_direction": "+X_EAST",
+      "mating_box_xyz_min_mm": [80.0, 35.0, 1.6],
+      "mating_box_xyz_max_mm": [130.0, 60.0, 22.0],
+      "cable_exit": "+X_EAST",
+      "maximum_bundle_diameter_mm": 9.0,
+      "minimum_bundle_bend_radius_mm": 45.0,
+      "strain_relief_required": true
+    }
+  },
+  "dft_fixture": {
+    "primary_datum": "H1_CENTER",
+    "secondary_datum": "H2_CENTER_WITH_FIXTURE_DIAMOND_PIN",
+    "tertiary_datum": "PCB_BOTTOM_FACE",
+    "retention": "H3_AND_H4_SPRING_CLAMPS_OUTSIDE_COMPONENT_EXCLUSIONS",
+    "targets": "TP1_THROUGH_TP10_TOP_SIDE_2P54_MM_PITCH",
+    "probe_tip_max_diameter_mm": 1.0,
+    "probe_nominal_travel_mm": 2.0,
+    "probe_force_max_n_each": 1.0,
+    "approach": "+Z",
+    "wear_limit": "REPLACE_PROBE_AT_10000_CYCLES_OR_FIRST_CONTACT_INSTABILITY"
+  },
+  "thermal_interface": {
+    "evt_policy": "OPEN_AIR_NO_COMPRESSIVE_THERMAL_INTERFACE",
+    "minimum_free_air_above_power_stage_mm": 10.0,
+    "minimum_free_air_below_power_stage_mm": 5.0,
+    "optional_gap_pad": "PROHIBITED_UNTIL_POST_ROUTE_THERMAL_TEST_DEFINES_LOCATION_PRESSURE_AND_MATERIAL",
+    "serial_revalidation": true
+  },
+  "enclosure_keep_out": {
+    "evt_construction": "OPEN_FRAME_OR_NONCONDUCTIVE_GUARD",
+    "minimum_wall_clearance_from_board_edge_mm": 2.0,
+    "minimum_conductive_part_clearance_mm": 3.0,
+    "bosses_allowed_only_at": ["H1", "H2", "H3", "H4"],
+    "connector_service_volumes_must_remain_clear": true,
+    "serial_enclosure_revalidation_required": true
+  },
+  "assembly_service_sequence": [
+    "INSTALL_FOUR_5_MM_STANDOFFS",
+    "PLACE_PCB_AND_VERIFY_NO_ROCKING_OR_PRELOAD",
+    "TIGHTEN_M3_FASTENERS_IN_CROSS_PATTERN_TO_MAX_0P4_NM",
+    "MATE_J2_WITH_POWER_OFF_AND_APPLY_STRAIN_RELIEF",
+    "MATE_J1_LAST_WITH_SOURCE_DEENERGIZED_AND_APPLY_STRAIN_RELIEF",
+    "FOR_SERVICE_DISCONNECT_J1_FIRST_THEN_J2_THEN_FASTENERS"
+  ],
+  "harness_length_datums": {
+    "J1": "CONNECTOR_MATING_FACE_CENTERLINE_AT_NATIVE_REFERENCE_AND_ORIENTATION",
+    "J2": "CONNECTOR_MATING_FACE_CENTERLINE_AT_EAST_EXIT_PLANE",
+    "cut_length_release": "SEPARATELY_BLOCKED_BY_DIM_001_AND_DIM_012_AND_FINAL_ENCLOSURE_ROUTE"
+  },
+  "frozen_step": {
+    "path": "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step",
+    "sha256": "28482b57e8e8db09b198add6fefbbb88386f10c46ea6740cc84ab20e13c6a949",
+    "generator": "tools/generate_pcb_pwr_evt_mechanical_step_rev_a.py",
+    "model_scope": "BOARD_HOLES_CONSERVATIVE_ASSEMBLY_AND_CONNECTOR_SERVICE_ENVELOPES",
+    "interference_review": "PASS_NO_FITTED_BODY_TO_MOUNTING_EXCLUSION_CONFLICT",
+    "serial_component_cad_replacement_required": true
+  },
+  "release_boundary": {
+    "dim_003_accepted_for_evt": true,
+    "mechanical_input_to_routing_authorized": true,
+    "harness_board_datum_authorized": true,
+    "final_harness_cut_lengths_authorized": false,
+    "review_b_complete": false,
+    "manufacturing_release": false,
+    "serial_release": false
+  }
+}

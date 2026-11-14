@@ -24,6 +24,7 @@ typedef enum {
   ZS_BG95_READY,
   ZS_BG95_PDP_ACTIVATING,
   ZS_BG95_PDP_SETTINGS_QUERY,
+  ZS_BG95_TIME_QUERY,              /* AT+QLTS=1: network (NITZ) time for the command clock; ERROR is not a failure */
   ZS_BG95_TLS_CONFIGURING,
   ZS_BG95_MQTT_OPENING,
   ZS_BG95_MQTT_CONNECTING,
@@ -108,6 +109,11 @@ typedef struct {
   bool mqtt_receive_length_enabled;
   bool mqtt_open;
   bool mqtt_connected;
+  /* network time from AT+QLTS=1 during bring-up (valid only when plausible: the modem reports its RTC default
+     when the operator sends no NITZ) and the tick at which it was read */
+  bool network_time_valid;
+  int64_t network_time_us;
+  uint32_t network_time_at_ms;
 } zs_bg95_t;
 
 void zs_bg95_init(zs_bg95_t *m, const zs_hal_port_t *io,
@@ -134,5 +140,7 @@ bool zs_bg95_selected_apn_profile(const zs_bg95_t *m,
 bool zs_bg95_export_cellular_telemetry(const zs_bg95_t *m,
                                        zs_cellular_telemetry_t *telemetry);
 const char *zs_bg95_state_name(zs_bg95_state_t state);
+/* Network time read during the last bring-up: epoch microseconds and the tick it refers to. */
+bool zs_bg95_network_time(const zs_bg95_t *m, int64_t *epoch_us, uint32_t *at_ms);
 
 #endif

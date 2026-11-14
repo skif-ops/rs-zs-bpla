@@ -15,16 +15,18 @@ class StationModelsTest {
 
     @Test
     fun acceptsLotSerialBoundaries() {
-        for (serial in listOf("DIO-EVT-001", "DIO-EVT-020")) {
+        for (serial in listOf("DIO-EVT-001", "DIO-EVT-020", "DIO-EVT-021", "DIO-EVT-040", "DIO-EVT-B01")) {
             val identity = StationIdentity(serial, 1, "A", "1", "1", LoRaRegion.RU868)
             assertTrue(identity.validate().isEmpty())
         }
     }
 
     @Test
-    fun rejectsSerialOutsideLot() {
-        val identity = StationIdentity("DIO-EVT-021", 1, "A", "1", "1", LoRaRegion.EU868)
-        assertTrue("invalid_serial" in identity.validate())
+    fun rejectsSerialOutsideLots() {
+        for (serial in listOf("DIO-EVT-000", "DIO-EVT-041", "DIO-EVT-B02", "DIO-EVT-1", "DIO-EVT-0B1")) {
+            val identity = StationIdentity(serial, 1, "A", "1", "1", LoRaRegion.RU868)
+            assertTrue(serial, "invalid_serial" in identity.validate())
+        }
     }
 
     @Test

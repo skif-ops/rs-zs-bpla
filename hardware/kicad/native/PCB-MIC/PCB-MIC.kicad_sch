@@ -137,14 +137,6 @@
           (name "6" (effects (font (size 1.27 1.27))))
           (number "6" (effects (font (size 1.27 1.27))))
         )
-        (pin no_connect line (at 5.08 1.27 180) (length 2.54)
-          (name "8" (effects (font (size 1.27 1.27))))
-          (number "8" (effects (font (size 1.27 1.27))))
-        )
-        (pin no_connect line (at 5.08 -1.27 180) (length 2.54)
-          (name "7" (effects (font (size 1.27 1.27))))
-          (number "7" (effects (font (size 1.27 1.27))))
-        )
       )
     )
 
@@ -241,9 +233,6 @@
     )
   )
 
-  (no_connect (at 40.64 71.12) (uuid 853454f7-f9fa-41bc-9047-d60d4b389277))
-  (no_connect (at 40.64 68.58) (uuid 17ba8190-c303-4756-a441-4fbf93e1eb7e))
-
   (label "1V8_MIC" (at 30.48 63.5 0)
     (effects (font (size 1 1)))
     (uuid 4fcb0916-8904-45a6-a8d4-5d273162e771)
@@ -334,8 +323,6 @@
     (pin "4" (uuid 3fb7ec3b-4195-47f2-b966-af357e8d5b94))
     (pin "5" (uuid 32a1b970-51cd-4f0c-9e53-992be6120e5d))
     (pin "6" (uuid 2d05d8cd-2b42-4298-9ae2-4b2a5c165a3b))
-    (pin "7" (uuid 9df2dcd2-843c-4ad4-b502-a560cb83c886))
-    (pin "8" (uuid 5402f95b-e3fe-40c2-a936-c6e6bbb7607c))
     (instances
       (project "PCB-MIC"
         (path "/9ddeb6d6-243f-4a21-b1c7-1e6f9e354e2e"

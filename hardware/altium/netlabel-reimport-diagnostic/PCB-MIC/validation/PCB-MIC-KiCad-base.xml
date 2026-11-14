@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>F:\Проекты\Codex\rs-zs-bpla-evt-pre-20\hardware\kicad\native\PCB-MIC\PCB-MIC.kicad_sch</source>
+    <date>2026-10-14T22:47:20</date>
+    <tool>Eeschema 10.0.6</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>Dioneya EVT-PRE-20 PCB-MIC Rev.A</title>
+        <company>Dioneya / ZS-BPLA</company>
+        <rev>A</rev>
+        <date>2026-09-09</date>
+        <source>PCB-MIC.kicad_sch</source>
+        <comment number="1" value="T5838 PDM + AAD WAKE + THSEL"/>
+        <comment number="2" value="NOT FOR MANUFACTURE until Review A/B"/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C1">
+      <value>100nF X7R</value>
+      <footprint>Capacitor_SMD:C_0402_1005Metric</footprint>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0402_1005Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="PCB-MIC"/>
+      <property name="Sheetfile" value="PCB-MIC.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>1f431631-39cd-4c25-a937-e183829cad7c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J1">
+      <value>5040500691</value>
+      <footprint>Dioneya:Molex_5040500691</footprint>
+      <datasheet>Molex 504050 series</datasheet>
+      <fields>
+        <field name="Footprint">Dioneya:Molex_5040500691</field>
+        <field name="Datasheet">Molex 504050 series</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Dioneya" part="5040500691" description=""/>
+      <property name="Sheetname" value="PCB-MIC"/>
+      <property name="Sheetfile" value="PCB-MIC.kicad_sch"/>
+      <property name="ki_keywords" value="Wire To Board / Wire To Wire Connector"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>cfb359ef-80b8-40a2-bf11-3bfa17e5d12c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+            <pin num="5"/>
+            <pin num="6"/>
+            <pin num="8"/>
+            <pin num="7"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="MK1">
+      <value>MMICT5838-00-012</value>
+      <footprint>Dioneya:T5838_RevA</footprint>
+      <datasheet>TDK DS-000383 v1.2</datasheet>
+      <fields>
+        <field name="Footprint">Dioneya:T5838_RevA</field>
+        <field name="Datasheet">TDK DS-000383 v1.2</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Dioneya" part="MMICT5838-00-012" description=""/>
+      <property name="Sheetname" value="PCB-MIC"/>
+      <property name="Sheetfile" value="PCB-MIC.kicad_sch"/>
+      <property name="ki_keywords" value="MEMS Microphones"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>bf93dbed-20a2-45d0-8299-454d70f85aef</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+            <pin num="5"/>
+            <pin num="6"/>
+            <pin num="7"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R1">
+      <value>0R EVT_SI_TUNE</value>
+      <footprint>Resistor_SMD:R_0402_1005Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0402_1005Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="PCB-MIC"/>
+      <property name="Sheetfile" value="PCB-MIC.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>cf34ba07-4c2a-4fea-b0e6-ed6ed8e19318</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Unpolarized capacitor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Dioneya" part="5040500691">
+      <docs>https://www.lcsc.com/datasheet/C563981.pdf</docs>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">5040500691</field>
+        <field name="Footprint">Dioneya:Molex_5040500691</field>
+        <field name="Datasheet">https://www.lcsc.com/datasheet/C563981.pdf</field>
+        <field name="Description"/>
+        <field name="Manufacturer">MOLEX</field>
+        <field name="MPN">5040500691</field>
+        <field name="LCSC Part">C563981</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="power_out"/>
+        <pin num="2" name="2" type="power_out"/>
+        <pin num="3" name="3" type="output"/>
+        <pin num="4" name="4" type="input"/>
+        <pin num="5" name="5" type="input"/>
+        <pin num="6" name="6" type="output"/>
+        <pin num="7" name="7" type="no_connect"/>
+        <pin num="8" name="8" type="no_connect"/>
+      </pins>
+    </libpart>
+    <libpart lib="Dioneya" part="MMICT5838-00-012">
+      <docs>https://www.lcsc.com/datasheet/C7230692.pdf</docs>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">MMICT5838-00-012</field>
+        <field name="Footprint">Dioneya:T5838_RevA</field>
+        <field name="Datasheet">https://www.lcsc.com/datasheet/C7230692.pdf</field>
+        <field name="Description"/>
+        <field name="Manufacturer">TDK InvenSense(应美盛)</field>
+        <field name="MPN">MMICT5838-00-012</field>
+        <field name="LCSC Part">C7230692</field>
+      </fields>
+      <pins>
+        <pin num="1" name="DATA" type="output"/>
+        <pin num="2" name="SELECT" type="input"/>
+        <pin num="3" name="GND" type="power_in"/>
+        <pin num="4" name="WAKE" type="output"/>
+        <pin num="5" name="THSEL" type="input"/>
+        <pin num="6" name="CLK" type="input"/>
+        <pin num="7" name="VDD" type="power_in"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Device">
+      <uri>${KICAD9_SYMBOL_DIR}/Device.kicad_sym</uri>
+    </library>
+    <library logical="Dioneya">
+      <uri>${KIPRJMOD}/libs/Dioneya.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/1V8_MIC" class="Default">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="J1" pin="1" pinfunction="1_1" pintype="power_out"/>
+      <node ref="MK1" pin="7" pinfunction="VDD_7" pintype="power_in"/>
+    </net>
+    <net code="2" name="/AAD_CFG" class="Default">
+      <node ref="J1" pin="6" pinfunction="6_6" pintype="output"/>
+      <node ref="MK1" pin="5" pinfunction="THSEL_5" pintype="input"/>
+    </net>
+    <net code="3" name="/GND" class="Default">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="J1" pin="2" pinfunction="2_2" pintype="power_out"/>
+      <node ref="MK1" pin="2" pinfunction="SELECT_2" pintype="input"/>
+      <node ref="MK1" pin="3" pinfunction="GND_3" pintype="power_in"/>
+    </net>
+    <net code="4" name="/MIC_WAKE" class="Default">
+      <node ref="J1" pin="5" pinfunction="5_5" pintype="input"/>
+      <node ref="MK1" pin="4" pinfunction="WAKE_4" pintype="output"/>
+    </net>
+    <net code="5" name="/PDM_CLK" class="Default">
+      <node ref="J1" pin="3" pinfunction="3_3" pintype="output"/>
+      <node ref="MK1" pin="6" pinfunction="CLK_6" pintype="input"/>
+    </net>
+    <net code="6" name="/PDM_DATA" class="Default">
+      <node ref="J1" pin="4" pinfunction="4_4" pintype="input"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+    </net>
+    <net code="7" name="/PDM_DATA_MIC" class="Default">
+      <node ref="MK1" pin="1" pinfunction="DATA_1" pintype="output"/>
+      <node ref="R1" pin="2" pintype="passive"/>
+    </net>
+    <net code="8" name="unconnected-(J1-Pad7)" class="Default">
+      <node ref="J1" pin="7" pinfunction="7_7" pintype="no_connect"/>
+    </net>
+    <net code="9" name="unconnected-(J1-Pad8)" class="Default">
+      <node ref="J1" pin="8" pinfunction="8_8" pintype="no_connect"/>
+    </net>
+  </nets>
+</export>

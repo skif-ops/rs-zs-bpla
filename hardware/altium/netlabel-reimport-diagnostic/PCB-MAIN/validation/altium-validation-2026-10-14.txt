@@ -1,0 +1,80 @@
+PCB-MAIN Altium validation record
+Date: 2026-10-14
+Tool: Altium Designer 26.10.1 Trial
+DRC working copy: F:\Проекты\Codex\altium-main-drc-test-20261014\head\hardware\altium\netlabel-reimport-diagnostic\PCB-MAIN\PCB-MAIN.PrjPcb
+
+Net Identifier Scope test
+
+1. Hierarchical (Sheet entry <-> port connections, power ports global), HierarchyMode=2
+   Validation time: 19:30:05
+   Result: 12 errors.
+   Errors observed:
+   - Duplicate Net Names Wire 1V8_MIC: 2
+   - Duplicate Net Names Wire 3V3_DIGITAL: 7
+   - Net 1V8_MIC contains multiple Output Pins (U7-18, U7-19, U7-20, U7-21, U18-4): 1
+   - Net 3V3_DIGITAL contains multiple Output Pins (J12-CD, U3-12): 1
+   - Net 3V3_DIGITAL contains multiple Output Pins (U10-13, U10-14): 1
+
+2. Strict Hierarchical (Sheet entry <-> port connections, power ports local), HierarchyMode=4
+   Validation time: 19:43:27
+   Result: Compile successful, no errors found.
+   Warnings: 146.
+   Last message number: 147 (compile-success information row).
+
+The remaining messages are warning-level imported-object diagnostics. Visible categories include electrical pin versus unspecified port checks, IO/output compatibility checks, missing footprint model links, and nets reported without a driving source. They have not been suppressed.
+
+Post-validation Protel2 netlist generation
+Time: 19:46:37
+Output: validation\PCB-MAIN-Protel2.NET
+
+Exact comparison against both the tracked KiCad source export and prepared-import KiCad export:
+- Physical pin universe: equal (905/905)
+- Physical net partitions: equal (186/186)
+- Physical net names: equal (186/186)
+- Missing physical pins: 0
+- Extra physical pins: 0
+- Missing physical groups: 0
+- Extra physical groups: 0
+- Name mismatches: 0
+
+KiCad PCB DRC on tracked source
+Command class: pcb drc --severity-all --all-track-errors --schematic-parity
+Result:
+- Rule violations: 667 (203 errors, 464 warnings)
+- Unconnected items: 499
+- Schematic-parity issues: 601
+
+Altium PCB DRC with imported default rules
+Time: 23:09:12
+Result: 1188 violations, 0 warnings
+- Width Constraint: 761
+- Un-Routed Net Constraint: 421
+- Hole Size Constraint: 6
+- Clearance Constraint: 0
+- Short-Circuit Constraint: 0
+
+Diagnostic rule normalization
+- Width: minimum 0.15 mm, preferred 0.15 mm, maximum 10 mm on all six copper layers
+- Hole Size: minimum 0.025 mm, maximum 3.2 mm globally
+- Altium warned that some imported rule definitions were incorrect; automatic correction was declined.
+
+Altium PCB DRC after diagnostic normalization
+Time: 23:21:19
+Result: 421 violations, 0 warnings
+- Un-Routed Net Constraint: 421
+- Width Constraint: 0
+- Hole Size Constraint: 0
+- Clearance Constraint: 0
+- Short-Circuit Constraint: 0
+- Other enabled groups: 0
+
+Unrouted diagnostic comparison
+- KiCad unconnected items: 499
+- KiCad unique parseable pad-to-pad pairs: 248
+- Altium unique parseable pad-to-pad pairs: 419 (421 report rows; duplicate endpoint pairs collapse to 419)
+- Exact endpoint-pair intersection: 208
+- KiCad entries involving a track/via endpoint and not parseable as pad pairs: 251
+
+The exact netlist and geometry comparisons passed, while the source board itself remains extensively unrouted and has unresolved rule/parity findings. The normalized rule limits were used only to classify the Altium report. They are not approved fabrication constraints.
+
+This record does not waive ERC/DRC findings and does not establish manufacturing readiness.

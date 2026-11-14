@@ -16,8 +16,16 @@
 #define ZS_COMMAND_MAX_TTL_US UINT64_C(900000000)
 
 typedef enum {
-  ZS_COMMAND_REQUEST_AUDIO = 1
+  ZS_COMMAND_REQUEST_AUDIO = 1,
+  ZS_COMMAND_REBOOT = 2,          /* MQTT_TLS_ICD_v0_1 addendum D */
+  ZS_COMMAND_SET_PARAMS = 3,      /* addendum D: bounded whitelist of runtime parameters */
+  ZS_COMMAND_ROTATE_KEY = 4,      /* addendum E: install the next command public key (trusted with the current one) */
+  ZS_COMMAND_UPDATE_FIRMWARE = 5, /* addendum F: fetch, verify and install a signed release in the other flash bank */
+  ZS_COMMAND_SET_NETWORK = 6      /* addendum G: network configuration patch, tried and rolled back automatically */
 } zs_command_code_t;
+
+#define ZS_COMMAND_REBOOT_MAX_DELAY_S 600u
+#define ZS_COMMAND_PARAMS_MAX 8u
 
 typedef enum {
   ZS_AUDIO_SEGMENT_PRE = 0,
@@ -26,13 +34,57 @@ typedef enum {
   ZS_AUDIO_SEGMENT_RANGE = 3
 } zs_audio_segment_t;
 
+/* CMD_REQUEST_AUDIO payload {0: event_id, 1: segment, 2: start_offset_ms|null, 3: duration_ms|null
+   [, 4: event_time_us]}: the optional key 4 is the event time the server knows from the detection (MQTT ICD
+   addendum B), so the station can serve events its own table no longer holds (an earlier boot). */
 typedef struct {
   uint64_t event_id;
   zs_audio_segment_t segment;
   int32_t start_offset_ms;
   uint32_t duration_ms;
   bool has_range;
+  bool has_event_time;
+  int64_t event_time_us;
 } zs_audio_request_command_t;
+
+/* CMD_REBOOT payload {0: delay_s}: reset this many seconds after the ACK (the executor enforces a minimum). */
+typedef struct {
+  uint16_t delay_s;
+} zs_reboot_command_t;
+
+/* CMD_SET_PARAMS payload {0: reset_to_defaults, 1: {param_id: int32}} with strictly ascending ids.  The codec checks
+   the structure; ranges and the id whitelist belong to the executor (an unknown or out-of-range id rejects the whole
+   command, nothing is applied). */
+typedef struct {
+  bool reset_to_defaults;
+  uint8_t count;
+  uint16_t id[ZS_COMMAND_PARAMS_MAX];
+  int32_t value[ZS_COMMAND_PARAMS_MAX];
+} zs_set_params_command_t;
+
+/* CMD_ROTATE_COMMAND_KEY payload {0: bstr(32)}: the raw Ed25519 public key the server will sign with next.  The
+   codec checks the structure; zero or already-trusted keys belong to the executor (zs_command_keys). */
+typedef struct {
+  uint8_t public_key[32];
+} zs_rotate_key_command_t;
+
+/* CMD_UPDATE_FIRMWARE payload {0: manifest bstr(1..96), 1: release key id bstr(8), 2: release signature bstr(64)}:
+   the codec checks the structure; the release signature, target, version and size belong to zs_fw_update_check. */
+#define ZS_COMMAND_FW_MANIFEST_MAX 96u
+typedef struct {
+  uint8_t manifest[ZS_COMMAND_FW_MANIFEST_MAX];
+  uint8_t manifest_size;
+  uint8_t key_id[8];
+  uint8_t signature[64];
+} zs_update_firmware_command_t;
+
+/* CMD_SET_NETWORK_CONFIG payload {0: bstr(1..240)}: a station configuration patch in the BLE config_write format
+   (STATION_CONFIG_CBOR_v0_1 §2-3).  The codec checks the structure; the patch itself belongs to zs_net_trial. */
+#define ZS_COMMAND_NET_PATCH_MAX 240u
+typedef struct {
+  uint8_t patch[ZS_COMMAND_NET_PATCH_MAX];
+  uint8_t patch_size;
+} zs_set_network_command_t;
 
 typedef struct {
   uint32_t station_id;
@@ -41,6 +93,11 @@ typedef struct {
   uint64_t expires_time_us;
   zs_command_code_t code;
   zs_audio_request_command_t audio;
+  zs_reboot_command_t reboot;
+  zs_set_params_command_t params;
+  zs_rotate_key_command_t rotate;
+  zs_update_firmware_command_t firmware;
+  zs_set_network_command_t network;
   uint8_t key_id[ZS_COMMAND_KEY_ID_BYTES];
 } zs_command_t;
 

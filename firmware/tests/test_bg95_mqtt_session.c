@@ -474,10 +474,96 @@ static void test_disconnect_discards_ram_queue_and_resubscribes(void) {
                 sizeof(command_sub) - 1u) == 0);
 }
 
+/* Addendum F: an extra downlink topic (firmware chunks).  Routed even before it is subscribed (a late chunk is no
+   protocol error), subscribed only when wanted and only after command + receipt, binary payload intact; a refused
+   subscription is reported once and retried on a fresh request; offline drops the subscription. */
+static uint8_t topic_seen[2048];
+static size_t topic_seen_size;
+static unsigned topic_calls;
+static void topic_message(void *ctx, const uint8_t *payload, size_t size) {
+  (void)ctx;
+  assert(size <= sizeof(topic_seen));
+  memcpy(topic_seen, payload, size);
+  topic_seen_size = size;
+  ++topic_calls;
+}
+
+static void test_extra_topic_subscription(void) {
+  static const uint8_t fw_topic[] = "zs/v1/evt/17/fw";
+  static const char fw_sub[] = "AT+QMTSUB=0,32,\"zs/v1/evt/17/fw\",1\r\n";
+  test_context_t context;
+  zs_bg95_topic_subscription_t fw;
+  uint8_t payload[1100], frame[1400];
+  size_t frame_size, offset;
+
+  setup(&context);
+  assert(zs_bg95_topic_subscription_init(&fw, &context.modem, fw_topic, sizeof(fw_topic) - 1u, topic_message, NULL));
+  assert(zs_bg95_mqtt_session_attach(&context.session, &fw));
+  assert(!zs_bg95_mqtt_session_attach(&context.session, &fw));
+  establish_subscriptions(&context);
+
+  /* not wanted: the session stays idle, but a stray message on the topic is delivered, not a protocol error */
+  offset = context.fixture.uart_size;
+  zs_bg95_mqtt_session_tick(&context.session, 106u, UINT64_C(1750002), true);
+  assert(context.session.owner == ZS_BG95_MQTT_OWNER_NONE && context.fixture.uart_size == offset);
+  for (size_t i = 0u; i < sizeof(payload); i++) payload[i] = (uint8_t)(i * 7u);
+  payload[5] = '"'; payload[6] = '\r'; payload[7] = '\n'; payload[8] = 0u;
+  frame_size = make_frame(frame, sizeof(frame), 0u, fw_topic, sizeof(fw_topic) - 1u, payload, sizeof(payload));
+  feed_chunks(&context.session, frame, frame_size, 107u, UINT64_C(1750003));
+  assert(context.session.last_input_outcome == ZS_BG95_MQTT_INPUT_TOPIC_MESSAGE || context.session.last_input_outcome == ZS_BG95_MQTT_INPUT_LINE);
+  assert(topic_calls == 1u && topic_seen_size == sizeof(payload) && memcmp(topic_seen, payload, sizeof(payload)) == 0);
+  assert(zs_bg95_mqtt_session_ready(&context.session));
+
+  /* wanted: one QMTSUB for the exact topic, then ready */
+  zs_bg95_topic_subscription_want(&fw, true);
+  zs_bg95_mqtt_session_tick(&context.session, 108u, UINT64_C(1750004), true);
+  assert(context.session.owner == ZS_BG95_MQTT_OWNER_TOPIC_SUBSCRIBE);
+  assert(context.fixture.uart_size == offset + sizeof(fw_sub) - 1u && memcmp(&context.fixture.uart[offset], fw_sub, sizeof(fw_sub) - 1u) == 0);
+  assert(zs_bg95_mqtt_session_start_message(&context.session, &(zs_mqtt_event_message_t){fw_topic, 3u, payload, 4u, 1u, false}, 108u) == ZS_BG95_EVENT_UPLINK_BUSY);
+  feed_line(&context.session, "OK", 109u);
+  feed_line(&context.session, "+QMTSUB: 0,32,0,0", 110u);             /* granted QoS 0 is fine for the chunks */
+  assert(context.session.owner == ZS_BG95_MQTT_OWNER_NONE && zs_bg95_topic_subscription_ready(&fw));
+  offset = context.fixture.uart_size;
+  zs_bg95_mqtt_session_tick(&context.session, 111u, UINT64_C(1750005), true);
+  assert(context.fixture.uart_size == offset);                         /* no second subscription */
+  feed_chunks(&context.session, frame, frame_size, 112u, UINT64_C(1750006));
+  assert(topic_calls == 2u && fw.messages == 2u);
+
+  /* offline drops it; back online and still wanted, it subscribes again */
+  context.modem.state = ZS_BG95_ERROR;
+  zs_bg95_mqtt_session_tick(&context.session, 113u, UINT64_C(1750007), true);
+  assert(fw.state == ZS_BG95_TOPIC_IDLE && !fw.failed);
+
+  /* a refused subscription: reported, not retried until the owner asks again */
+  setup(&context);
+  assert(zs_bg95_topic_subscription_init(&fw, &context.modem, fw_topic, sizeof(fw_topic) - 1u, topic_message, NULL));
+  assert(zs_bg95_mqtt_session_attach(&context.session, &fw));
+  establish_subscriptions(&context);
+  zs_bg95_topic_subscription_want(&fw, true);
+  zs_bg95_mqtt_session_tick(&context.session, 106u, UINT64_C(1750002), true);
+  feed_line(&context.session, "ERROR", 107u);
+  assert(fw.failed && fw.state == ZS_BG95_TOPIC_IDLE && context.session.owner == ZS_BG95_MQTT_OWNER_NONE);
+  offset = context.fixture.uart_size;
+  zs_bg95_mqtt_session_tick(&context.session, 109u, UINT64_C(1750003), true);
+  assert(context.fixture.uart_size == offset);
+  zs_bg95_topic_subscription_want(&fw, false);
+  zs_bg95_topic_subscription_want(&fw, true);
+  zs_bg95_mqtt_session_tick(&context.session, 110u, UINT64_C(1750004), true);
+  assert(context.session.owner == ZS_BG95_MQTT_OWNER_TOPIC_SUBSCRIBE && context.fixture.uart_size > offset);
+
+  /* an unknown topic stays a protocol error */
+  setup(&context);
+  establish_subscriptions(&context);
+  frame_size = make_frame(frame, sizeof(frame), 0u, fw_topic, sizeof(fw_topic) - 1u, payload, 16u);
+  assert(!zs_bg95_mqtt_session_feed_uart(&context.session, frame, frame_size, 106u, UINT64_C(1750002), true));
+  assert(context.session.last_input_outcome == ZS_BG95_MQTT_INPUT_PROTOCOL_ERROR);
+}
+
 int main(void) {
   test_serialized_fragmented_end_to_end_lifecycle();
   test_binary_payload_and_protocol_guards();
   test_disconnect_discards_ram_queue_and_resubscribes();
+  test_extra_topic_subscription();
   puts("zs_bg95_mqtt_session_tests: OK");
   return 0;
 }

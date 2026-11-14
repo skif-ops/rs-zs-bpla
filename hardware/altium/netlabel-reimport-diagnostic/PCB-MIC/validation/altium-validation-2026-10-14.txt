@@ -1,0 +1,56 @@
+PCB-MIC Altium conversion verification
+Date: 2026-10-14
+Tool: Altium Designer 26.10.1 Trial
+Status: NOT FOR MANUFACTURE
+
+Project validation and netlist
+------------------------------
+Time: 22:45:27 Europe/Moscow
+Result: Compile successful, no errors found.
+Altium netlist: PCB-MIC-Protel2.NET
+KiCad reference: PCB-MIC-KiCad-base.xml, exported by KiCad 10.0.6
+
+Physical pin count: 17 KiCad / 17 Altium
+Physical net partitions: 7 KiCad / 7 Altium
+Physical pin universe equal: true
+Physical net partitions equal: true
+Physical net names equal: true
+Omitted KiCad unconnected singletons: J1-7, J1-8
+
+Geometry verification
+---------------------
+Routed segments: 27/27 exact; correct layer: 27/27
+Vias: 5/5 exact; correct layer span: 5/5
+Components: 6/6 origins matched
+Pads: 53/53 matched; 5 unnumbered pads matched without number check
+PCB net names: 7/7
+Board outline: 4/4 segments
+
+PCB DRC
+-------
+Time: 22:31:26 Europe/Moscow
+Report: PCB-MIC-Altium-DRC-2026-10-14.drc
+Total rule violations: 10
+Waived violations: 0
+
+Clearance Constraint, general 0.20 mm: 2
+1. 0.191 mm: hole of Pad MK1-Un1 to F.Cu track (11.37,6.6)-(11.7,5.95) mm.
+2. 0.150 mm: hole of Pad MK1-Un1 to F.Cu track (12.7,5.35)-(15,5.35) mm.
+
+Clearance Constraint, diagnostic internal MK1 minimum 0.10 mm: 8
+All eight are 0.096 mm between the MK1-Un1 acoustic hole and Pad MK1-3.
+
+Short-Circuit Constraint: 0
+Un-Routed Net Constraint: 0
+Width Constraint: 0
+Hole Size Constraint: 0
+Testpoint usage violations: 0
+
+Rule values used
+----------------
+General clearance: 0.20 mm.
+Width: minimum 0.15 mm, preferred 0.20 mm, maximum 10 mm.
+Via diameter/drill: minimum 0.50/0.30 mm, preferred 0.60/0.30 mm, maximum 1.27/0.711 mm.
+MK1 diagnostic rule: 0.10 mm, first and second object query InComponent('MK1').
+
+The manufacturing handoff specifies separate 0.125 mm copper and 0.10 mm hole clearances for the local MK1 ground land. The single diagnostic Altium clearance rule does not encode that distinction and is not a release rule. No violation was waived, and no manufacturing equivalence or release claim is made.

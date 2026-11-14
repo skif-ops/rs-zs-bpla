@@ -128,7 +128,7 @@ def main() -> int:
     sch = Schematic.from_file(str(args.schematic), encoding="utf-8")
     refs = {ref_of(s): s for s in sch.schematicSymbols}
 
-    reserved = {"C9","C10","C11","C12","C13", *(f"TP{i}" for i in range(1,11))}
+    reserved = {"C9","C10","C11","C12","C13","C20","C21", *(f"TP{i}" for i in range(1,11))}
     clash = sorted(reserved & set(refs))
     if clash:
         raise RuntimeError(f"completeness references already exist before finalization: {clash}")
@@ -173,6 +173,8 @@ def main() -> int:
         ("C11", "CIN_3V8 >=4.7uF EFFECTIVE MPN_TBD",       "VBAT_SYS",       40.64, 88.90),
         ("C12", "CIN_3V3 >=4.7uF EFFECTIVE MPN_TBD",       "VBAT_SYS",       106.68, 88.90),
         ("C13", "VBAT_SYS_BULK VALUE_TBD",                  "VBAT_SYS",       157.48, 48.26),
+        ("C20", "CIN_HF_3V8 100nF 50V",                    "VBAT_SYS",       30.48, 88.90),
+        ("C21", "CIN_HF_3V3 100nF 50V",                    "VBAT_SYS",       96.52, 88.90),
     ]
     for ref, value, net, x, y in caps:
         inst = make_instance(sch, capacitor, reference=ref, value=value, footprint="",
@@ -218,7 +220,7 @@ def main() -> int:
     # Independent round-trip verification of the additions and polarity.
     reread = Schematic.from_file(str(args.schematic), encoding="utf-8")
     refs2 = {ref_of(s): s for s in reread.schematicSymbols}
-    required_refs = {"D1","C9","C10","C11","C12","C13", *(f"TP{i}" for i in range(1,11))}
+    required_refs = {"D1","C9","C10","C11","C12","C13","C20","C21", *(f"TP{i}" for i in range(1,11))}
     missing = sorted(required_refs - set(refs2))
     if missing:
         raise RuntimeError(f"completeness refs lost on round-trip: {missing}")
@@ -237,7 +239,7 @@ def main() -> int:
         raise RuntimeError("D1 anode is not on GND_PWR")
 
     print("PCB-PWR schematic completeness finalization PASS")
-    print("added 5 missing input/protected-bus capacitors, unidirectional SMBJ18A symbol, 10 DFT testpoints")
+    print("added 7 input/protected-bus capacitors, unidirectional SMBJ18A symbol, 10 DFT testpoints")
     return 0
 
 

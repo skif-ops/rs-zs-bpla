@@ -74,14 +74,50 @@
     "repeat_pdf_evidence_required": true,
     "repeat_pdf_evidence_complete": true,
     "repeat_independent_human_hierarchy_review_required": true,
-    "repeat_independent_human_hierarchy_review_complete": false,
+    "repeat_independent_human_hierarchy_review_complete": true,
     "pcba_procurement_authorized": false,
     "manufacturing_release": false
+  },
+  "source_control": {
+    "complete": true,
+    "retrieved_utc_date": "2026-09-17",
+    "record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md",
+    "machine_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json",
+    "independent_audit": "tools/audit_pcb_pwr_input_protection_sources_rev_a.py",
+    "evidence_sha256": "1ee7d72b7f71bfd53879c43031ba0bf184a0c5d3beb0558ca1e691c585424823",
+    "exact_orderables": [
+      "0451008.MRL",
+      "SMBJ18A",
+      "43045-0213",
+      "43030-0038"
+    ],
+    "no_family_member_substitution": true
+  },
+  "procurement_identity": {
+    "prepurchase_documentary_identity_complete": true,
+    "standalone_engineering_sample_purchase_required": false,
+    "qualification_batch_may_be_ordered_without_identity_samples": true,
+    "mandatory_receiving_quarantine_required": false,
+    "mandatory_receiving_photography_required": false,
+    "mandatory_body_sampling_required": false,
+    "certificate_of_conformance_required": false,
+    "record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md",
+    "machine_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json",
+    "independent_audit": "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py",
+    "evidence_sha256": "2b3acbc5bcee5b08bb1a45f009d75d57210592d8488f2e5dc29358c072a62250",
+    "matrix_row": "PWR-IPQ-002",
+    "matrix_status": "PASS",
+    "exact_orderables": [
+      "0451008.MRL",
+      "SMBJ18A",
+      "43045-0213",
+      "43030-0038"
+    ]
   },
   "test_matrix": {
     "path": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
     "required_rows": 20,
-    "accepted_rows": 1,
+    "accepted_rows": 4,
     "complete": false
   },
   "source_evidence": [

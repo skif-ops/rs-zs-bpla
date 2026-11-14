@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -17,6 +18,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json"
 MATRIX = ROOT / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv"
+SOURCE_EVIDENCE = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json"
+)
+SOURCE_EVIDENCE_MD = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md"
+)
+PROCUREMENT_IDENTITY = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json"
+)
+PROCUREMENT_IDENTITY_MD = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md"
+)
 FREEZE = ROOT / "hardware/POWER_COMPONENT_FREEZE_REV_A.csv"
 BASELINE = ROOT / "hardware/POWER_DESIGN_BASELINE_REV_A.json"
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
@@ -59,6 +76,16 @@ def main() -> int:
     args = parser.parse_args()
 
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
+    source_evidence = json.loads(SOURCE_EVIDENCE.read_text(encoding="utf-8"))
+    source_evidence_sha256 = hashlib.sha256(
+        SOURCE_EVIDENCE.read_bytes().replace(b"\r\n", b"\n")
+    ).hexdigest()
+    procurement_identity_evidence = json.loads(
+        PROCUREMENT_IDENTITY.read_text(encoding="utf-8")
+    )
+    procurement_identity_sha256 = hashlib.sha256(
+        PROCUREMENT_IDENTITY.read_bytes().replace(b"\r\n", b"\n")
+    ).hexdigest()
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     capture_status = json.loads(STATUS.read_text(encoding="utf-8"))
     matrix = read_csv(MATRIX)
@@ -70,15 +97,79 @@ def main() -> int:
     require(contract["configuration"] == "EVT-PRE-20 Rev.A", "configuration drift")
     require(contract["assembly"] == "PCB-PWR", "assembly drift")
     require(contract["manufacturing_release"] is False, "qualification packet released manufacture")
+    require(
+        source_evidence["status"]
+        == "PASS_SOURCE_CONTROL_EXACT_ORDERABLES_HASH_BOUND_NOT_FOR_MANUFACTURE",
+        "input-protection source-control evidence drift",
+    )
+    source_control = contract.get("source_control", {})
+    require(source_control.get("complete") is True,
+            "input-protection source control is not complete")
+    require(source_control.get("record") == SOURCE_EVIDENCE_MD.relative_to(ROOT).as_posix(),
+            "source-control Markdown path drift")
+    require(source_control.get("machine_record") == SOURCE_EVIDENCE.relative_to(ROOT).as_posix(),
+            "source-control JSON path drift")
+    require(source_control.get("independent_audit") ==
+            "tools/audit_pcb_pwr_input_protection_sources_rev_a.py",
+            "source-control independent audit path drift")
+    require(source_control.get("evidence_sha256") == source_evidence_sha256,
+            "source-control evidence SHA-256 drift")
+    require(source_control.get("exact_orderables") ==
+            ["0451008.MRL", "SMBJ18A", "43045-0213", "43030-0038"],
+            "source-control exact orderable set drift")
+    require(source_control.get("no_family_member_substitution") is True,
+            "source-control family-substitution interlock removed")
+    require(
+        procurement_identity_evidence["status"]
+        == "PASS_DOCUMENTARY_PROCUREMENT_IDENTITY_NO_RECEIVING_HOLD",
+        "input-protection procurement-identity evidence drift",
+    )
+    procurement_identity = contract.get("procurement_identity", {})
+    require(procurement_identity.get("prepurchase_documentary_identity_complete") is True,
+            "pre-purchase identity subgate is not complete")
+    require(procurement_identity.get("standalone_engineering_sample_purchase_required") is False,
+            "qualification contract still requires a sample-only purchase")
+    require(
+        procurement_identity.get(
+            "qualification_batch_may_be_ordered_without_identity_samples"
+        ) is True,
+        "qualification batch still depends on identity samples",
+    )
+    require(
+        procurement_identity.get("mandatory_receiving_quarantine_required") is False
+        and procurement_identity.get(
+            "mandatory_receiving_photography_required"
+        ) is False
+        and procurement_identity.get("mandatory_body_sampling_required") is False
+        and procurement_identity.get("certificate_of_conformance_required") is False,
+        "receiving identity burden reintroduced",
+    )
+    require(procurement_identity.get("record") ==
+            PROCUREMENT_IDENTITY_MD.relative_to(ROOT).as_posix(),
+            "procurement-identity Markdown path drift")
+    require(procurement_identity.get("machine_record") ==
+            PROCUREMENT_IDENTITY.relative_to(ROOT).as_posix(),
+            "procurement-identity JSON path drift")
+    require(procurement_identity.get("independent_audit") ==
+            "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py",
+            "procurement-identity independent audit path drift")
+    require(procurement_identity.get("evidence_sha256") == procurement_identity_sha256,
+            "procurement-identity evidence SHA-256 drift")
+    require(procurement_identity.get("matrix_row") == "PWR-IPQ-002" and
+            procurement_identity.get("matrix_status") == "PASS",
+            "procurement-identity matrix binding drift")
+    require(procurement_identity.get("exact_orderables") ==
+            ["0451008.MRL", "SMBJ18A", "43045-0213", "43030-0038"],
+            "procurement-identity exact orderable set drift")
     require(baseline["status"] == "CAPTURE_BASELINE_NOT_FOR_MANUFACTURE",
             "power baseline lost NOT FOR MANUFACTURE interlock")
     baseline_input = baseline.get("input_protection_qualification", {})
     require(baseline_input.get("status") ==
-            "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_AND_PHYSICAL_QUALIFICATION_PENDING" and
+            "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_COMPLETE_PHYSICAL_QUALIFICATION_PENDING" and
             baseline_input.get("fuse", {}).get("native_value_eco_applied") is True and
             baseline_input.get("fuse", {}).get(
-                "repeat_erc_pdf_human_hierarchy_review_complete") is False,
-            "power baseline does not expose the post-ECO repeat-evidence gate")
+                "repeat_erc_pdf_human_hierarchy_review_complete") is True,
+            "power baseline does not expose the completed post-ECO repeat-evidence gate")
     require(capture_status["manufacturing_release"] is False,
             "PCB-PWR capture status released manufacture")
 
@@ -142,13 +233,14 @@ def main() -> int:
     require(frozen["MPN"] == fuse["target_evt_mpn"], "freeze/contract fuse MPN mismatch")
     require("CANDIDATE_SELECTED_FOR_EVT_QUALIFICATION" in frozen["Status"],
             "freeze does not identify selected qualification candidate")
-    require("NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_PENDING" in frozen["Status"],
-            "freeze lost post-ECO repeat-evidence interlock")
+    require("NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_PASS_PHYSICAL_QUALIFICATION_PENDING"
+            in frozen["Status"],
+            "freeze lost post-ECO repeat-evidence/physical-qualification interlock")
 
     bom_fuse = bom["PWR-FUSE-01"]
     require(bom_fuse["MPN"] == fuse["target_evt_mpn"], "engineering BOM fuse MPN mismatch")
-    require(bom_fuse["BOM_disposition"] == "BLOCKED_ENGINEERING_SELECTION",
-            "engineering BOM prematurely released F1")
+    require(bom_fuse["BOM_disposition"] == "CONTROLLED_PENDING_VERIFICATION",
+            "engineering BOM lost the controlled F1 verification interlock")
     procurement_fuse = [
         row for row in procurement
         if "PWR-FUSE-01" in row.get("Item_IDs", "").split("|")
@@ -156,8 +248,8 @@ def main() -> int:
     require(len(procurement_fuse) == 1, "procurement rollup must have one F1 row")
     require(procurement_fuse[0]["MPN"] == fuse["target_evt_mpn"],
             "procurement rollup fuse MPN mismatch")
-    require(procurement_fuse[0]["BOM_disposition"] == "BLOCKED_ENGINEERING_SELECTION",
-            "procurement rollup prematurely released F1")
+    require(procurement_fuse[0]["BOM_disposition"] == "CONTROLLED_PENDING_VERIFICATION",
+            "procurement rollup lost the controlled F1 verification interlock")
 
     native_eco = contract["native_value_eco"]
     require(native_eco == {
@@ -180,7 +272,7 @@ def main() -> int:
         "repeat_pdf_evidence_required": True,
         "repeat_pdf_evidence_complete": True,
         "repeat_independent_human_hierarchy_review_required": True,
-        "repeat_independent_human_hierarchy_review_complete": False,
+        "repeat_independent_human_hierarchy_review_complete": True,
         "pcba_procurement_authorized": False,
         "manufacturing_release": False,
     }, "native value ECO control drift")
@@ -204,7 +296,7 @@ def main() -> int:
 
     status_eco = capture_status.get("input_protection_candidate_eco", {})
     require(status_eco.get("state") ==
-            "TARGET_8A_NATIVE_VALUE_ECO_APPLIED_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
+            "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_EVIDENCE_HUMAN_ACCEPTED_PHYSICAL_QUALIFICATION_PENDING",
             "PCB-PWR capture status does not expose the post-ECO review gate")
     require(status_eco.get("target_fuse_mpn") == fuse["target_evt_mpn"],
             "PCB-PWR capture status target fuse mismatch")
@@ -218,10 +310,33 @@ def main() -> int:
             status_eco.get("pin_net_semantic_sha256_after") ==
             native_eco["post_eco_pin_net_semantic_sha256"],
             "PCB-PWR capture status ECO semantic proof drift")
-    require(status_eco.get("repeat_native_kicad_9_erc_complete") is True and
-            status_eco.get("repeat_pdf_evidence_complete") is True and
-            status_eco.get("repeat_independent_human_hierarchy_review_complete") is False,
+    active_hierarchy_evidence = capture_status.get("human_readable_hierarchy", {}).get(
+        "current_evidence", {})
+    active_evidence_complete = active_hierarchy_evidence.get("status") == \
+        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
+    require(status_eco.get("repeat_native_kicad_9_erc_complete") is active_evidence_complete and
+            status_eco.get("repeat_pdf_evidence_complete") is active_evidence_complete and
+            status_eco.get("repeat_independent_human_hierarchy_review_complete") is active_evidence_complete,
             "PCB-PWR capture status repeat-evidence boundary drift")
+    require(status_eco.get("source_control_complete") is True and
+            status_eco.get("source_control_record") == source_control["record"] and
+            status_eco.get("source_control_machine_record") == source_control["machine_record"] and
+            status_eco.get("source_control_audit") == source_control["independent_audit"] and
+            status_eco.get("source_control_evidence_sha256") == source_evidence_sha256,
+            "PCB-PWR capture status source-control binding drift")
+    require(status_eco.get("prepurchase_identity_complete") is True and
+            status_eco.get("standalone_engineering_sample_purchase_required") is False and
+            status_eco.get("documentary_procurement_identity_complete") is True and
+            status_eco.get("receiving_identity_hold_required") is False and
+            status_eco.get("procurement_identity_record") ==
+            procurement_identity["record"] and
+            status_eco.get("procurement_identity_machine_record") ==
+            procurement_identity["machine_record"] and
+            status_eco.get("procurement_identity_audit") ==
+            procurement_identity["independent_audit"] and
+            status_eco.get("procurement_identity_evidence_sha256") ==
+            procurement_identity_sha256,
+            "PCB-PWR capture status procurement-identity binding drift")
     require(status_eco.get("pcba_procurement_authorized") is False,
             "PCB-PWR capture status prematurely authorizes procurement")
     require(status_eco.get("manufacturing_release") is False,
@@ -247,6 +362,27 @@ def main() -> int:
                     f"{row['Test_ID']}: PASS lacks attributable evidence")
 
     matrix_by_id = {row["Test_ID"]: row for row in matrix}
+    require(matrix_by_id["PWR-IPQ-001"]["Status"] == "PASS" and
+            matrix_by_id["PWR-IPQ-001"]["Result"] ==
+            "Official Littelfuse/Molex payloads hash-bound; exact 0451008.MRL SMBJ18A 43045-0213 and 43030-0038 identities and controlled ratings match" and
+            matrix_by_id["PWR-IPQ-001"]["Operator"] ==
+            "Codex primary-source archive audit" and
+            matrix_by_id["PWR-IPQ-001"]["Date"] == "2026-09-17" and
+            matrix_by_id["PWR-IPQ-001"]["Artifact_SHA256"] ==
+            source_evidence_sha256,
+            "PWR-IPQ-001 primary-source evidence drift")
+    require(matrix_by_id["PWR-IPQ-002"]["Gate"] ==
+            "DOCUMENTARY_PROCUREMENT_IDENTITY" and
+            matrix_by_id["PWR-IPQ-002"]["Status"] == "PASS" and
+            "Current official manufacturer data" in
+            matrix_by_id["PWR-IPQ-002"]["Required_Input"] and
+            "no sample-only order" in
+            matrix_by_id["PWR-IPQ-002"]["Pass_Criteria"] and
+            "receiving quarantine" in
+            matrix_by_id["PWR-IPQ-002"]["Pass_Criteria"] and
+            matrix_by_id["PWR-IPQ-002"]["Artifact_SHA256"] ==
+            procurement_identity_sha256,
+            "PWR-IPQ-002 documentary procurement control drift")
     require(matrix_by_id["PWR-IPQ-003"]["Status"] == "PASS" and
             matrix_by_id["PWR-IPQ-003"]["Result"] ==
             "F1=0451008.MRL in all active sources; pin/net and board semantic digests retained; post-ECO ERC/PDF artifact archived" and
@@ -256,8 +392,15 @@ def main() -> int:
             matrix_by_id["PWR-IPQ-003"]["Artifact_SHA256"] ==
             "bf80f07c9b20d93d610c3e8c124887becb4209f8d688f085fe68bac53e0ad0b9",
             "PWR-IPQ-003 native-value ECO evidence drift")
-    require(matrix_by_id["PWR-IPQ-004"]["Status"] == "PENDING_EVIDENCE",
-            "PWR-IPQ-004 must remain pending until independent human hierarchy review")
+    require(matrix_by_id["PWR-IPQ-004"]["Status"] == "PASS" and
+            matrix_by_id["PWR-IPQ-004"]["Result"] ==
+            "Source e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a and PDF 7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130 accepted hierarchy-only" and
+            matrix_by_id["PWR-IPQ-004"]["Operator"] ==
+            "GitHub Actions run 35217048575 + reviewer Скиф" and
+            matrix_by_id["PWR-IPQ-004"]["Date"] == "2026-09-17" and
+            matrix_by_id["PWR-IPQ-004"]["Artifact_SHA256"] ==
+            "f29dfa4e0be9c25f8023e7d5218a97a28db70b0a1059eaca0141f699f46e64d3",
+            "PWR-IPQ-004 repeat hierarchy evidence drift")
 
     accepted_rows = sum(row["Status"] == "PASS" for row in matrix)
     failed_rows = [row["Test_ID"] for row in matrix if row["Status"] == "FAIL"]
@@ -270,9 +413,9 @@ def main() -> int:
                 and repeat_gate_complete)
     require(contract["test_matrix"]["required_rows"] == 20,
             "contract qualification row count drift")
-    require(contract["test_matrix"]["accepted_rows"] == 1,
-            "contract accepted-row count does not match post-ECO evidence")
-    require(status_eco.get("accepted_test_rows") == accepted_rows == 1,
+    require(contract["test_matrix"]["accepted_rows"] == 4,
+            "contract accepted-row count does not match controlled evidence")
+    require(status_eco.get("accepted_test_rows") == accepted_rows == 4,
             "capture-status qualification accepted-row count drift")
     require(contract["test_matrix"]["complete"] is False,
             "contract claims physical qualification complete")
@@ -306,6 +449,14 @@ def main() -> int:
         "pin_net_semantic_sha256": native_eco["post_eco_pin_net_semantic_sha256"],
         "board_semantic_sha256": native_eco["post_eco_board_semantic_sha256"],
         "repeat_erc_pdf_human_review_complete": repeat_gate_complete,
+        "source_control_complete": source_control["complete"],
+        "source_control_evidence_sha256": source_evidence_sha256,
+        "prepurchase_documentary_identity_complete": procurement_identity[
+            "prepurchase_documentary_identity_complete"
+        ],
+        "standalone_engineering_sample_purchase_required": False,
+        "procurement_identity_evidence_sha256": procurement_identity_sha256,
+        "receiving_identity_hold_required": False,
         "accepted_rows": accepted_rows,
         "required_rows": 20,
         "failed_rows": failed_rows,
@@ -326,6 +477,7 @@ def main() -> int:
         f"Native value ECO applied={native_eco['applied']}; "
         f"qualification evidence={accepted_rows}/20 PASS"
     )
+    print("Documentary procurement identity PASS; no sample-only order or receiving identity hold")
     print("PCBA procurement and manufacturing release remain BLOCKED")
     print(args.output)
 

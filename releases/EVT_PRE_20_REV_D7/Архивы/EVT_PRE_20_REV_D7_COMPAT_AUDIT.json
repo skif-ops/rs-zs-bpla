@@ -1,0 +1,39 @@
+{
+  "release": "EVT-PRE-20 REV_D7",
+  "purpose": "Windows Explorer compatible distribution archives",
+  "archives": [
+    {
+      "file": "EVT_PRE_20_REV_D7_FULL.zip",
+      "sha256": "2969FEA202D6331439CC1D88B99D207FF94EF19EB9BFD0C34A4A3C8977E30ED2",
+      "bytes": 28836473,
+      "files": 755,
+      "directories": 95,
+      "max_internal_path_chars": 116,
+      "crc": "PASS",
+      "compression": "ZIP_DEFLATED",
+      "root": "EVT_D7"
+    },
+    {
+      "file": "EVT_PRE_20_REV_D7_ALTIUM.zip",
+      "sha256": "4F27201B84BB163FC7344FE69853B1A8A82A15C3B6171B092D4CEF255F68A380",
+      "bytes": 12499626,
+      "files": 314,
+      "directories": 49,
+      "max_internal_path_chars": 134,
+      "crc": "PASS",
+      "compression": "ZIP_DEFLATED",
+      "root": "EVT_D7_ALTIUM"
+    },
+    {
+      "file": "EVT_PRE_20_REV_D7_TESTS.zip",
+      "sha256": "C7C6C46E067CCE43498099868096DC2E6A9DD4BBC9A61DC9EDF8312B77A9AD3C",
+      "bytes": 2748257,
+      "files": 303,
+      "directories": 35,
+      "max_internal_path_chars": 110,
+      "crc": "PASS",
+      "compression": "ZIP_DEFLATED",
+      "root": "EVT_D7_TESTS"
+    }
+  ]
+}

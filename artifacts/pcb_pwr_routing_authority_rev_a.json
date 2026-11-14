@@ -1,0 +1,58 @@
+{
+  "authority": {
+    "path": "hardware\\PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
+    "row_count": 31,
+    "sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1"
+  },
+  "board": {
+    "copper_layers": 4,
+    "copper_zones": 33,
+    "net_count": 31,
+    "path": "hardware\\kicad\\native\\PCB-PWR\\PCB-PWR.kicad_pcb",
+    "semantic_sha256": "4c835eae78eaf1e43116642bc5d5ceafed0c156abfc1a7906293f94636e8d1e2",
+    "sha256": "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7",
+    "trace_items": 842
+  },
+  "class_counts": {
+    "ANALOG_TIMING": 3,
+    "BOOTSTRAP_LOOP": 2,
+    "FEEDBACK_SENSE": 1,
+    "GATE_DRIVE": 1,
+    "I2C_OPEN_DRAIN": 2,
+    "KELVIN_SENSE": 2,
+    "LOW_SPEED_CONTROL": 2,
+    "MODE_CONTROL": 2,
+    "OPEN_DRAIN_STATUS": 3,
+    "POWER_INPUT_HIGH_CURRENT": 4,
+    "POWER_OUTPUT_HIGH_CURRENT": 1,
+    "POWER_RAIL": 2,
+    "POWER_RETURN_PLANE": 1,
+    "SEPARATE_HARNESS_RETURN": 3,
+    "SWITCH_NODE": 2
+  },
+  "current_basis": {
+    "buck_3v3_rated_a": 4.0,
+    "buck_3v8_rated_a": 4.0,
+    "mic_ldo_rated_a": 0.3,
+    "modem_bb_plus_rf_peak_a": 3.3,
+    "system_expected_max_a": 5.0
+  },
+  "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
+  "i2c_initial_hz": 100000,
+  "manufacturing_release": false,
+  "numeric_power_geometry": "EVT_PUBLIC_STACKUP_AND_CALCULATED_CURRENT_GEOMETRY_ACCEPTED_PHYSICAL_FAULT_THERMAL_VALIDATION_OPEN",
+  "reference_domain_counts": {
+    "CROSS_GND_DIGITAL_GND_PWR_VIA_NT2": 6,
+    "GND_PWR": 18,
+    "GND_PWR_TO_GND_DIGITAL_AT_NT2": 1,
+    "GND_PWR_TO_GND_MIC_AT_NT3": 1,
+    "GND_PWR_TO_GND_MODEM_AT_NT1": 1,
+    "SELF_GND_PWR": 1,
+    "SELF_TO_GND_PWR_ONLY_AT_NT1": 1,
+    "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
+    "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
+  },
+  "routing_complete": false,
+  "schema": "dioneya-pcb-pwr-routing-authority-audit-v1",
+  "status": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
+}

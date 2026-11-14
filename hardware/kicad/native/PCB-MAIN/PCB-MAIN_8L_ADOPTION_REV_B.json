@@ -1,0 +1,48 @@
+{
+  "schema": "dioneya-pcb-main-8l-adoption-v1",
+  "date": "2026-10-16",
+  "board": "PCB-MAIN",
+  "configuration": "EVT-PRE-20",
+  "decision": "ADOPT_8L_COMPLETE_105_REV_B_AS_PRIMARY",
+  "previous_primary": "6L Rev.A",
+  "previous_source_preserved_at": "hardware/kicad/retired/PCB-MAIN-6L-REV-A-2026-10-16",
+  "source_candidate": "hardware/kicad/candidates/PCB-MAIN-8L-COMPLETE-105",
+  "primary_native_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+  "primary_native_project": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro",
+  "native_board_sha256": "47b1c8dd391aabd6339c878ac4baff4f8fdf4f82d6ab588c13f7437552ea1f77",
+  "native_project_sha256": "bcc87d3601f84fc123100f1f3761a7d604ace48b30da7b1097583944ec6f4f41",
+  "source_board_sha256_rev_d6_raw_crlf": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "source_board_sha256_git_lf": "47b1c8dd391aabd6339c878ac4baff4f8fdf4f82d6ab588c13f7437552ea1f77",
+  "source_summary_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "copper_layers": 8,
+  "layer_order": [
+    "F.Cu",
+    "In1.Cu",
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu",
+    "B.Cu"
+  ],
+  "stack_candidate": "JLC08161H-3313",
+  "finished_thickness_mm": 1.6,
+  "surface_finish": "ENIG",
+  "outer_copper_oz": 1.0,
+  "inner_copper_oz": 0.5,
+  "kicad_validation": {
+    "version": "10.0.6",
+    "drc_errors": 0,
+    "unconnected": 0,
+    "drc_warnings": 30,
+    "erc_violations": 0
+  },
+  "open_release_gates": [
+    "fabricator selected-stack and dielectric confirmation",
+    "controlled impedance review against the selected order stack",
+    "POFV coordinate and process confirmation",
+    "Altium three Net Antennae warnings disposition",
+    "independent Review B and first article assembly checks"
+  ],
+  "manufacturing_authorized": false
+}

@@ -1,0 +1,53 @@
+PCB-PWR Altium validation evidence
+Date: 2026-10-15
+Tool: Altium Designer 26.10.1 Trial through the local eda-agent bridge
+Project: hardware/altium/netlabel-reimport-diagnostic/PCB-PWR/PCB-PWR.PrjPcb
+
+Project setting checked:
+- Net Identifier Scope: Hierarchical (stored as HierarchyMode=2)
+- Port net names: enabled
+- Sheet-entry net names: enabled
+- Output and log paths: relative to the project
+
+Compile result:
+- project.compile: success
+- errors visible in Messages: 0
+- warnings visible in Messages: 31
+
+Warning groups returned by project.get_messages:
+- Nets with possible connection problems: 14
+- Nets with no driving source: 12
+- Missing component models: 3
+- Nets containing floating input pins: 1
+- Unconnected objects in net: 1
+
+The Messages panel showed yellow Warning entries only. The previous Duplicate Net
+Names, multiple-name, and single-pin errors are absent.
+
+Compiled connectivity comparison against KiCad XML:
+- physical pins: KiCad 161, Altium 161
+- multi-pin nets: KiCad 31, Altium 31
+- single-pin nets: KiCad 1, Altium 1
+- physical pin mismatches: 0
+- multi-pin net mismatches: 0
+- virtual off-board ERC flags excluded: #FLG01, #FLG02, #FLG03
+- generated single-pin alias: U5-4 is unconnected-(U5-NC-Pad4) in KiCad and
+  NetU5_4 in Altium
+
+Related evidence:
+- PCB-PWR-KiCad-Altium-connectivity-2026-10-15.json
+- PCB-PWR-KiCad-ERC-2026-10-15.json
+- PCB-PWR-KiCad-DRC-2026-10-15.json
+- PCB-PWR-KiCad-current.xml
+- PCB-PWR-Altium-DRC-2026-10-15.drc
+- PCB-PWR-Altium-DRC-2026-10-15.html
+
+Limits:
+- KiCad ERC: 0 violations.
+- KiCad PCB DRC: 0 unconnected items and 7 silk_over_copper warnings.
+- Altium PCB DRC: saved result is 0 warnings and 0 violations after the NetTie
+  repair.
+- Remaining schematic warnings are retained and not suppressed.
+- The result verifies compiled electrical connectivity, not complete pad/mask,
+  stackup, power-integrity, thermal, mechanical, CAM, or fabrication equivalence.
+- Status remains NOT FOR MANUFACTURE.

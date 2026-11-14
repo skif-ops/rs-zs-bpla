@@ -22,7 +22,9 @@ typedef enum {
 
 typedef enum {
   ZS_COMMISSIONING_OPERATION_INITIAL = 0,
-  ZS_COMMISSIONING_OPERATION_RECOMMISSION = 1
+  ZS_COMMISSIONING_OPERATION_RECOMMISSION = 1,
+  ZS_COMMISSIONING_OPERATION_SECRETS_WRITE = 2,   /* v0.3 station_secrets characteristic (audit only) */
+  ZS_COMMISSIONING_OPERATION_SECRETS_CLEAR = 3
 } zs_commissioning_operation_t;
 
 typedef enum {

@@ -131,7 +131,8 @@ typedef struct {
 } zs_single_station_estimate_t;
 
 typedef struct {
-  int16_t azimuth_cdeg, elevation_cdeg;
+  uint16_t azimuth_cdeg;      /* 0..35999, clockwise from north */
+  int16_t elevation_cdeg;
   uint16_t sigma_cdeg;
   bool valid;
 } zs_doa_t;
@@ -178,8 +179,36 @@ typedef struct {
   bool settings_valid;
 } zs_cellular_telemetry_t;
 
+/* Heartbeat schema 2, key 13: health of the station detector (zs_station_pipeline) since boot. */
 typedef struct {
-  uint8_t schema_ver;
+  uint32_t boot_id;            /* NOR boot counter (zs_boot_counter); event_id = boot_id << 32 | seq_no */
+  uint32_t uptime_s;
+  uint32_t windows;            /* 1 s windows analysed */
+  uint32_t windows_dropped;    /* hops skipped: the analysis lagged the ring */
+  uint32_t confirmed_windows;  /* level 1 CONFIRMED */
+  uint32_t suspect_windows;    /* level 1 SUSPECT */
+  uint32_t engine_windows;     /* level 1 ENGINE_UNCONFIRMED */
+  uint32_t events_emitted;
+  uint32_t events_refused;     /* outbox full / storage error */
+  uint32_t outbox_pending;     /* detection events still waiting for the server receipt */
+  uint16_t window_max_ms;      /* longest analysis of one window since boot */
+  uint8_t presence_level;      /* current level 1 (zs_presence_level_t) */
+  uint8_t reset_cause;         /* key 12: why this boot started (zs_reset_cause_t: 1 power/BOR, 2 pin, 3 software, 4 IWDG, 5 WWDG, 6 low-power, 7 option bytes) */
+  uint16_t watchdog_missed;    /* key 13: task-watch mask that let the IWDG fire before this boot (0 = none) */
+  uint32_t params_version;     /* key 14: version of the runtime parameter set in force (CMD_SET_PARAMS; 0 = defaults) */
+  uint16_t selftest_failed;    /* key 15: self-tests whose last run failed (bit = zs_selftest_id_t, zs_selftest_failed_mask; 0 = none) */
+  uint64_t command_key_id;     /* key 16: id of the current command key (zs_command_key_id_u64; 0 = none provisioned) */
+  uint64_t command_next_key_id; /* key 17: id of the next key while a rotation is in flight (addendum E; 0 = none) */
+  uint32_t fw_version;         /* key 18: .fw_info version of the running image (addendum F; 0 = unknown) */
+  uint8_t fw_state;            /* key 19: 0 idle, 1 downloading, 2 install pending, 3 trial, 4 rolled back */
+  uint32_t fw_other_version;   /* key 20: version of the image in the other bank (0 = none) */
+  uint32_t net_config_version; /* key 21: version of the network configuration in use (addendum G; the trial's while on trial) */
+  uint8_t net_state;           /* key 22: 0 stable, 1 accepted (switch after this session), 2 trial, 3 rolled back */
+  uint32_t net_failed_version; /* key 23: version of the last configuration that failed its trial (0 = none) */
+} zs_detector_health_t;
+
+typedef struct {
+  uint8_t schema_ver;          /* 1: without the detector map; 2: with it when detector_present */
   uint32_t station_id;
   int64_t time_us;
   zs_position_t station;
@@ -191,6 +220,8 @@ typedef struct {
   char model_ver[ZS_VERSION_CAPACITY];
   char hardware_rev[ZS_VERSION_CAPACITY];
   bool self_test_ok;
+  zs_detector_health_t detector;
+  bool detector_present;
 } zs_heartbeat_t;
 
 typedef struct {

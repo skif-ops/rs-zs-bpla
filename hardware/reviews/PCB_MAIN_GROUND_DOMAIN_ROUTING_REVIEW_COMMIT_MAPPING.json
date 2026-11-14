@@ -1,0 +1,28 @@
+{
+  "schema_version": "dioneya.pcb-main-ground-domain-routing-review-commit-mapping.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-001",
+  "reviewed_github_commit_sha": "830139e8875e4e67738cf88b938a8d0ff91e2798",
+  "reviewed_tree_sha": "7670dea776097a70381792ad4efadc349d6537df",
+  "proposal_path": "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.json",
+  "proposal_blob_sha": "406857fb53f4ea0f46f6a91cba3b0ee27b4e2433",
+  "proposal_sha256": "6ad0446ea98a44863cef91be137da3e5dcff92303ac9e395e260773e8cebc314",
+  "proposal_record_path": "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.md",
+  "proposal_record_blob_sha": "093e023575b6ab45b20b674d0e3405edda6a36ae",
+  "proposal_record_sha256": "12f5ffafaa90cf3d796e08f17c333ac7701d0b17f286af487c31b8410673cb19",
+  "candidate_board_path": "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb",
+  "candidate_board_blob_sha": "ab8e886297b1f611be6f20225d600556af97555f",
+  "candidate_board_sha256": "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e",
+  "audit_path": "tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py",
+  "audit_blob_sha": "4cbeca9dbb3194643c7d2652827b91b2165086d3",
+  "machine_gate": {
+    "pcb_native_run_id": 35439569309,
+    "pcb_native_conclusion": "success",
+    "ci_run_id": 35439569334,
+    "ci_conclusion": "success"
+  },
+  "equivalence": "EXACT_REVIEWED_TREE_AND_BLOBS",
+  "transport": "GITHUB_APP_GIT_DATABASE_API",
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

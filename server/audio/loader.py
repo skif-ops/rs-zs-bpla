@@ -39,6 +39,8 @@ class AudioLoader:
         data, sample_rate, read_warnings = self._read_audio(path)
         channels = int(data.shape[1])
         mono = np.mean(data, axis=1)
+        mono, sample_rate, resample_warnings = self.resample_to_analysis_rate(mono, sample_rate)
+        read_warnings = read_warnings + resample_warnings
         signal, warnings = self.preprocessor.prepare(mono, sample_rate)
         warnings = read_warnings + warnings
         duration = len(signal) / float(sample_rate)
@@ -50,6 +52,20 @@ class AudioLoader:
             duration_seconds=duration,
             warnings=warnings,
         )
+
+    @staticmethod
+    def resample_to_analysis_rate(mono: np.ndarray, sample_rate: int) -> tuple[np.ndarray, int, list[str]]:
+        """Bring a recording to settings.target_analysis_sample_rate_hz (the station's 32 kHz) before analysis."""
+
+        target = settings.target_analysis_sample_rate_hz
+        if not target or int(sample_rate) == int(target) or mono.size == 0:
+            return mono, int(sample_rate), []
+        resampled = librosa.resample(
+            np.asarray(mono, dtype=np.float32), orig_sr=int(sample_rate), target_sr=int(target), res_type="soxr_hq"
+        )
+        return np.asarray(resampled, dtype=np.float32), int(target), [
+            f"Sample rate {int(sample_rate)} Hz was resampled to the analysis rate {int(target)} Hz (station rate)."
+        ]
 
     def load_wav(self, path: Path) -> LoadedAudio:
         """Backward-compatible wrapper for older WAV-oriented call sites."""

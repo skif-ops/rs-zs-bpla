@@ -2,8 +2,8 @@
 """QG-2 independent technical completeness audit of the Rev.A BOM.
 
 Default mode records blockers without failing engineering CI. --strict is the actual
-production-BOM release gate and must remain non-zero until the schematic-derived BOM,
-exact system SKUs and verification evidence are complete.
+formal production-BOM release gate and must remain non-zero until the
+schematic-derived BOM, exact system SKUs and verification evidence are complete.
 """
 from __future__ import annotations
 
@@ -11,18 +11,88 @@ import argparse
 import csv
 import hashlib
 import json
+import subprocess
+import sys
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 PROCUREMENT_BOM = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+BASELINE = ROOT / "config/EVT_PRE_20_BASELINE.yaml"
+HANDOFF_RECORD = ROOT / "docs/EVT_PRE_20_CUSTOMER_PROCUREMENT_HANDOFF_2026-10-05.md"
 LOT_SIZES = (4, 10, 20)
 
 
 def read(path: Path) -> list[dict[str, str]]:
     with path.open(encoding="utf-8-sig", newline="") as source:
         return list(csv.DictReader(source))
+
+
+def source_sha256(path: Path) -> str:
+    """Hash KiCad text with repository LF semantics on every host."""
+    data = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
+
+
+def run_json_audit(script_name: str) -> dict[str, object]:
+    with tempfile.TemporaryDirectory(prefix="evt-pre-20-bom-qg2-") as temp_dir:
+        output = Path(temp_dir) / "audit.json"
+        process = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / f"tools/{script_name}"),
+                "--output",
+                str(output),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if process.returncode != 0 or not output.is_file():
+            return {
+                "status": "ERROR",
+                "error": process.stderr.strip() or process.stdout.strip() or f"exit {process.returncode}",
+            }
+        return json.loads(output.read_text(encoding="utf-8"))
+
+
+def baseline_value(text: str, key: str) -> str:
+    prefix = f"{key}:"
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(prefix):
+            return stripped.split(":", 1)[1].strip().strip('"')
+    return ""
+
+
+def customer_procurement_handoff() -> dict[str, object]:
+    text = BASELINE.read_text(encoding="utf-8") if BASELINE.is_file() else ""
+    status = baseline_value(text, "customer_procurement_handoff_status")
+    revision = baseline_value(text, "customer_procurement_handoff_revision")
+    scope = baseline_value(text, "customer_procurement_handoff_scope")
+    policy = baseline_value(text, "customer_procurement_order_policy")
+    followup = baseline_value(text, "engineering_release_gate_after_customer_handoff")
+    sent = all(
+        (
+            status == "SENT_TO_CUSTOMER_FOR_ORDER",
+            revision == "EVT-PRE-20 Rev_D",
+            scope == "FULL_PROGRAM_2X20_PLUS_1",
+            policy == "ORDER_ALL_AT_ONCE_NO_FIRST_ARTICLE_PAUSE",
+            followup == "TRACK_OPEN_ITEMS_AS_FOLLOWUP_NOT_PROCUREMENT_BLOCKERS",
+            HANDOFF_RECORD.is_file(),
+        )
+    )
+    return {
+        "sent": sent,
+        "status": status or "MISSING",
+        "revision": revision or "MISSING",
+        "scope": scope or "MISSING",
+        "order_policy": policy or "MISSING",
+        "handoff_record": str(HANDOFF_RECORD.relative_to(ROOT)),
+    }
 
 
 def main() -> int:
@@ -113,6 +183,107 @@ def main() -> int:
         "BOM 4/10/20 lot or procurement-rollup mismatch: " + ", ".join(lot_errors)
         if lot_errors
         else "engineering and procurement BOM quantities independently reconcile for 4, 10 and 20 stations",
+    )
+
+    program_path = ROOT / "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv"
+    program_errors: list[str] = []
+    program_rows = read(program_path) if program_path.is_file() else []
+    procurement_by_id = {row.get("Procurement_ID", ""): row for row in procurement_rows}
+    program_by_id = {row.get("Procurement_ID", ""): row for row in program_rows}
+    if len(program_rows) != len(procurement_rows) or set(program_by_id) != set(procurement_by_id):
+        program_errors.append("row_or_procurement_id_coverage")
+    else:
+        for procurement_id, source in procurement_by_id.items():
+            aggregate = program_by_id[procurement_id]
+            try:
+                quantity_20 = int(source["Qty_20"])
+                if quantity_20 % 20:
+                    program_errors.append(f"{procurement_id}:qty20_not_divisible")
+                    continue
+                per_station = quantity_20 // 20
+                base = per_station * 41
+                spares = int(source["Spares_20"]) * 2
+                if (
+                    aggregate.get("Qty_per_station") != str(per_station)
+                    or aggregate.get("Production_lots_20") != "2"
+                    or aggregate.get("Bench_stations") != "1"
+                    or aggregate.get("Total_stations") != "41"
+                    or aggregate.get("Base_qty_2x20_plus_1") != str(base)
+                    or aggregate.get("Spare_qty_two_evt20_lots") != str(spares)
+                    or aggregate.get("Procure_qty_2x20_plus_1") != str(base + spares)
+                    or "no third reserve pool for bench" not in aggregate.get("Program_scope", "")
+                ):
+                    program_errors.append(f"{procurement_id}:2x20_plus_1_arithmetic")
+            except (KeyError, ValueError):
+                program_errors.append(f"{procurement_id}:invalid_program_quantity")
+    program_key_totals = {
+        row.get("Item_IDs", ""): row.get("Procure_qty_2x20_plus_1", "")
+        for row in program_rows
+    }
+    expected_program_key_totals = {
+        "ASM-MAIN": "45", "ASM-PWR": "45", "ASM-MIC": "168",
+        "PCB-MAIN": "45", "PCB-PWR": "45", "PCB-MIC": "168",
+        "HARNESS": "45",
+    }
+    if any(program_key_totals.get(item) != value
+           for item, value in expected_program_key_totals.items()):
+        program_errors.append("key_scope_totals")
+    check(
+        "program_procurement_2x20_plus_1",
+        not program_errors,
+        "2x20+1 program procurement mismatch: " + ", ".join(program_errors)
+        if program_errors
+        else "41-station program demand reconciles as two EVT-20 lots plus one bench with two reserve pools",
+    )
+
+    program_21_path = ROOT / "hardware/EVT_PROGRAM_1X20_PLUS_1_PROCUREMENT_REV_A.csv"
+    program_21_errors: list[str] = []
+    program_21_rows = read(program_21_path) if program_21_path.is_file() else []
+    program_21_by_id = {row.get("Procurement_ID", ""): row for row in program_21_rows}
+    if len(program_21_rows) != len(procurement_rows) or set(program_21_by_id) != set(procurement_by_id):
+        program_21_errors.append("row_or_procurement_id_coverage")
+    else:
+        for procurement_id, source in procurement_by_id.items():
+            aggregate = program_21_by_id[procurement_id]
+            try:
+                quantity_20 = int(source["Qty_20"])
+                if quantity_20 % 20:
+                    program_21_errors.append(f"{procurement_id}:qty20_not_divisible")
+                    continue
+                per_station = quantity_20 // 20
+                base = per_station * 21
+                spares = int(source["Spares_20"])
+                if (
+                    aggregate.get("Qty_per_station") != str(per_station)
+                    or aggregate.get("Production_lots_20") != "1"
+                    or aggregate.get("Bench_stations") != "1"
+                    or aggregate.get("Total_stations") != "21"
+                    or aggregate.get("Base_qty_1x20_plus_1") != str(base)
+                    or aggregate.get("Spare_qty_one_evt20_lot") != str(spares)
+                    or aggregate.get("Procure_qty_1x20_plus_1") != str(base + spares)
+                    or "no separate reserve pool for bench" not in aggregate.get("Program_scope", "")
+                ):
+                    program_21_errors.append(f"{procurement_id}:1x20_plus_1_arithmetic")
+            except (KeyError, ValueError):
+                program_21_errors.append(f"{procurement_id}:invalid_program_quantity")
+    program_21_key_totals = {
+        row.get("Item_IDs", ""): row.get("Procure_qty_1x20_plus_1", "")
+        for row in program_21_rows
+    }
+    expected_program_21_key_totals = {
+        "ASM-MAIN": "23", "ASM-PWR": "23", "ASM-MIC": "86",
+        "PCB-MAIN": "23", "PCB-PWR": "23", "PCB-MIC": "86",
+        "HARNESS": "23",
+    }
+    if any(program_21_key_totals.get(item) != value
+           for item, value in expected_program_21_key_totals.items()):
+        program_21_errors.append("key_scope_totals")
+    check(
+        "program_procurement_1x20_plus_1",
+        not program_21_errors,
+        "1x20+1 procurement mismatch: " + ", ".join(program_21_errors)
+        if program_21_errors
+        else "21-station procurement option reconciles as one EVT-20 lot plus one bench with one reserve pool",
     )
 
     main_freeze = read(ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv")
@@ -209,12 +380,12 @@ def main() -> int:
     )
     check(
         "power_passive_authority_bom",
-        len(pwr_passive_authority) == 47 and len(pwr_passive_groups) == 17
+        len(pwr_passive_authority) == 49 and len(pwr_passive_groups) == 17
         and not pwr_passive_mismatch and not leaked_dft,
         "PCB-PWR passive authority/BOM mismatch: "
         + ", ".join(pwr_passive_mismatch + leaked_dft)
         if pwr_passive_mismatch or leaked_dft
-        else "all 37 BOM passives/net-ties match authority; 10 DFT pads remain non-procured",
+        else "all 39 BOM passives/net-ties match authority; 10 DFT pads remain non-procured",
     )
 
     mic_expected = {
@@ -253,6 +424,64 @@ def main() -> int:
     check("fitted_line_exact_fields", not exact_fields_missing,
           "fitted lines missing exact production fields: " + ", ".join(exact_fields_missing) if exact_fields_missing else "all fitted lines have exact identity/package/rating")
 
+    build_to_print_expected = {
+        "ASM-MAIN": ("DIO-ASM-MAIN-REV-B", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "PCB-MAIN": ("DIO-PCB-MAIN-REV-B", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "ASM-PWR": ("DIO-ASM-PWR-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "PCB-PWR": ("DIO-PCB-PWR-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "ASM-MIC": ("DIO-ASM-MIC-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "PCB-MIC": ("DIO-PCB-MIC-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "HARNESS": ("DIO-HARNESS-SET-REV-A", "CONTROLLED_BUILD_TO_PRINT_IDENTITY"),
+        "HSG-VC": ("DIO-HSG-VC-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+    }
+    build_to_print_errors = []
+    for item_id, (mpn, disposition) in build_to_print_expected.items():
+        row = by_id.get(item_id)
+        if (
+            row is None
+            or row["Manufacturer"] != "Dioneya controlled design"
+            or row["MPN"] != mpn
+            or row["BOM_disposition"] != disposition
+            or not row["Status"].startswith("CONTROLLED_INTERNAL_ARTICLE_")
+            or not row["Package"]
+        ):
+            build_to_print_errors.append(item_id)
+
+    rfq_expected = {
+        "ASM-MAIN": ("Customer-selected standard PCBA service", "DIO-PCBA-MAIN-EVT-B_JLC08161H-3313"),
+        "PCB-MAIN": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-MAIN-EVT-B_JLC08161H-3313"),
+        "ASM-PWR": ("Customer-selected standard PCBA service", "DIO-PCBA-PWR-EVT-A"),
+        "PCB-PWR": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-PWR-EVT-A_JLC04161H-3313A"),
+        "ASM-MIC": ("Customer-selected standard PCBA service", "DIO-PCBA-MIC-EVT-A"),
+        "PCB-MIC": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-MIC-EVT-A"),
+        "HARNESS": ("Project engineering under customer EVT authority", "DIO-HARNESS-SET-EVT-A"),
+        "HSG-VC": ("Dioneya controlled design", "DIO-HSG-VC-REV-A"),
+    }
+    rfq_rows = read(ROOT / "hardware/CHINA_PROCUREMENT_RFQ.csv")
+    rfq_by_item = {row["BOM_Item_IDs"]: row for row in rfq_rows}
+    for item_id, (manufacturer, article) in rfq_expected.items():
+        row = rfq_by_item.get(item_id)
+        if (
+            row is None
+            or row["Manufacturer"] != manufacturer
+            or article not in row["MPN_or_spec"]
+            or row["Status"] != "RFQ_REQUIRED"
+            or row["Supplier"]
+            or row["Quote_date"]
+        ):
+            build_to_print_errors.append(f"{item_id}:RFQ_BOUNDARY")
+    check(
+        "build_to_print_internal_article_identity",
+        not build_to_print_errors,
+        "build-to-print identity or customer-supplier boundary mismatch: "
+        + ", ".join(build_to_print_errors)
+        if build_to_print_errors
+        else (
+            "eight internal BOM identities and EVT order specifications are controlled "
+            "while customer-selected supplier and quote fields remain open"
+        ),
+    )
+
     passive_value_missing = [
         row["Item_ID"] for row in rows
         if row["Population"] in {"FITTED", "DNP"}
@@ -264,13 +493,14 @@ def main() -> int:
 
     blocked_rows = [row["Item_ID"] for row in rows if row["BOM_disposition"].startswith("BLOCKED")]
     check("bom_dispositions_released", not blocked_rows,
-          "BOM selections or supplier releases still blocked: " + ", ".join(blocked_rows) if blocked_rows else "all BOM dispositions released")
+          "BOM identities or controlled procurement scopes still blocked: " + ", ".join(blocked_rows)
+          if blocked_rows else "all BOM identities and customer-owned procurement scopes are controlled")
 
     # This independent list comes from the native PCB-PWR generator. Every physical
     # fitted/DNP designator must be represented before a factory BOM can be released.
     required_pwr_passives = {
         "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13",
-        "C14", "C15", "C16", "C17", "C18", "C19",
+        "C14", "C15", "C16", "C17", "C18", "C19", "C20", "C21",
         "L1", "L2", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12",
         "R13", "R14", "R15", "NT1", "NT2", "NT3",
     }
@@ -345,7 +575,7 @@ def main() -> int:
             path = main_native.parent / relative
             if not path.is_file():
                 raise ValueError(f"missing hierarchy source: {relative}")
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            digest = source_sha256(path)
             if digest != source.get("sha256"):
                 raise ValueError(f"hierarchy source hash drift: {relative}")
             native_sources.append(path)
@@ -446,28 +676,69 @@ def main() -> int:
     check("main_review_a_complete", review_a_ok,
           "PCB-MAIN Review A is not complete with signed identity, commit and all required evidence" if not review_a_ok else "PCB-MAIN Review A complete with required evidence")
 
+    system_ots_identity = run_json_audit(
+        "audit_evt_system_ots_procurement_identity_rev_a.py"
+    )
+    system_ots_identity_ok = (
+        system_ots_identity.get("status")
+        == "PASS_DOCUMENTARY_PURCHASE_IDENTITY_PHYSICAL_VALIDATION_DURING_ASSEMBLY_EOL_EVT"
+        and system_ots_identity.get("documentary_purchase_identity_complete") is True
+        and system_ots_identity.get("controlled_item_count") == 8
+        and system_ots_identity.get("standalone_preorder_qualification_unit_required") is False
+        and system_ots_identity.get("receiving_hold_required") is False
+        and system_ots_identity.get("physical_qualification_complete") is False
+        and system_ots_identity.get("manufacturing_release") is False
+    )
+    check(
+        "system_ots_documentary_procurement_identity",
+        system_ots_identity_ok,
+        "system OTS documentary purchase identity is missing or inconsistent: "
+        + str(system_ots_identity.get("error", system_ots_identity.get("status", "MISSING")))
+        if not system_ots_identity_ok
+        else "eight exact system OTS MPNs have documentary purchase control; physical assembly/EOL/EVT validation remains open",
+    )
+
+    released_system_dispositions = {
+        "CONTROLLED",
+        "CONTROLLED_BUILD_TO_PRINT_IDENTITY",
+        "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+    }
     system_open = [
         row["Item_ID"] for row in rows
         if row["Line_class"] in {"SYSTEM_ITEM", "MECHANICAL_OPTION"}
         and int(row["Qty_per_station"]) > 0
-        and row["BOM_disposition"] != "CONTROLLED"
+        and row["BOM_disposition"] not in released_system_dispositions
     ]
     check("system_sku_release", not system_open,
-          "system/mechanical SKUs not released: " + ", ".join(system_open) if system_open else "system SKUs released")
+          "system/mechanical article identities not controlled: " + ", ".join(system_open)
+          if system_open else "system SKUs and build-to-print article identities are controlled")
 
+    handoff = customer_procurement_handoff()
+    status = (
+        "PASS" if not blockers
+        else "CUSTOMER_PROCUREMENT_HANDOFF_SENT_OPEN_FOLLOWUP" if handoff["sent"]
+        else "BLOCKED"
+    )
     result = {
         "gate": "QG-2",
-        "status": "PASS" if not blockers else "BLOCKED",
+        "status": status,
         "production_bom_complete": not blockers,
+        "formal_production_bom_complete": not blockers,
+        "customer_procurement_handoff": handoff,
         "checks": checks,
         "blockers": blockers,
+        "open_followup_items": blockers if handoff["sent"] and blockers else [],
+        "system_ots_procurement_identity": system_ots_identity,
     }
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     print(f"EVT-PRE-20 production BOM QG-2 technical gate: {result['status']}")
+    if handoff["sent"] and blockers:
+        print(f"customer procurement handoff: {handoff['status']} ({handoff['revision']})")
+    label = "open follow-up" if handoff["sent"] and blockers else "blocker"
     for blocker in blockers:
-        print(f"- {blocker}")
+        print(f"- {label}: {blocker}")
     print(f"report: {output.relative_to(ROOT) if output.is_relative_to(ROOT) else output}")
     return 1 if args.strict and blockers else 0
 

@@ -12,33 +12,51 @@ from fastapi.templating import Jinja2Templates
 
 from config import settings
 from models.schemas import RecordingMetadata, UploadedFileInfo
+from utils.build_info import current as current_build
 from utils.file_utils import (
     analysis_output_dir,
     analysis_upload_dir,
     ensure_runtime_directories,
     is_supported_audio_filename,
     new_analysis_id,
-    resolve_artifact,
-    resolve_dataset_file,
+    resolve_dataset_image,
     save_upload,
 )
 from utils.logging_utils import logger
 from utils.media import extract_audio_to_wav, is_supported_video_filename
 from utils.validation import load_microphone_config
+from station import analysis_access, retention, rollout, router as station_router_module
 from station.router import router as station_router
+from station.access_api import router as access_router
+from station.admin_api import router as admin_router
+from station.health_api import router as health_router
+from station.operator_auth import OperatorAuthMiddleware, build_router as build_auth_router
 
 
 ensure_runtime_directories()
+build = current_build(settings.app_version)      # the release version and the packaged commit: page footers, /api/v1/health
 
+# retention of the event store (docs/SERVER_RETENTION_2026-10-03.md) and the firmware rollouts
+# (docs/SERVER_OTA_ROLLOUT_2026-10-03.md) run with the application
+retention_runner = retention.RetentionRunner(retention.RetentionSettings.from_env())
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     description="Offline WAV/MP3/M4A drone acoustic analysis, classification and TDOA localization.",
+    lifespan=rollout.combine(retention.lifespan(retention_runner, lambda: station_router_module.store),
+                             rollout.lifespan(station_router_module.rollout_runner, lambda: station_router_module.store,
+                                              station_router_module.firmware_repository)),
 )
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 
 templates = Jinja2Templates(directory=settings.template_dir)
 app.include_router(station_router)
+app.include_router(access_router)      # who sees which stations: set by the security admin and engineers
+app.include_router(admin_router)       # administration: accounts, the audit log and its switch (/admin)
+app.include_router(health_router)      # the monitoring page's data: every station's state (/stations)
+# release audit item 1: every page, API route and the event stream need an operator (station/operator_auth.py)
+app.include_router(build_auth_router(templates))
+app.add_middleware(OperatorAuthMiddleware)
 
 
 def artifact_url(path: str) -> str:
@@ -71,6 +89,7 @@ def _attach_image_urls(summary):
 templates.env.globals["artifact_url"] = artifact_url
 templates.env.globals["download_url"] = download_url
 templates.env.globals["dataset_image_url"] = dataset_image_url
+templates.env.globals["build"] = build
 
 single_service = None
 localization_service = None
@@ -82,6 +101,34 @@ async def index(request: Request) -> HTMLResponse:
     """Render the main page."""
 
     return templates.TemplateResponse(request, "index.html")
+
+
+@app.get("/stations", response_class=HTMLResponse)
+async def stations_page(request: Request) -> HTMLResponse:
+    """Monitoring: every station's state from its last heartbeat (station/health.py), sortable and filterable."""
+
+    return templates.TemplateResponse(request, "stations.html")
+
+
+@app.get("/replay", response_class=HTMLResponse)
+async def replay_page(request: Request) -> HTMLResponse:
+    """Replay of a target's movement without a map: stations, bearing rays and the fused track on a metric plane."""
+
+    return templates.TemplateResponse(request, "replay.html")
+
+
+@app.get("/journal", response_class=HTMLResponse)
+async def journal_page(request: Request) -> HTMLResponse:
+    """Operator journal: one row per alert episode and an immutable history of operator decisions."""
+
+    return templates.TemplateResponse(request, "journal.html")
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_page(request: Request) -> HTMLResponse:
+    """Administration: accounts, station visibility, the audit log (each part for the permissions it needs)."""
+
+    return templates.TemplateResponse(request, "admin.html")
 
 
 @app.get("/single", response_class=HTMLResponse)
@@ -162,6 +209,9 @@ async def add_dataset_audio(
     is_drone: bool = Form(False),
     distance_min_m: str | None = Form(None),
     distance_max_m: str | None = Form(None),
+    altitude_min_m: str | None = Form(None),
+    altitude_max_m: str | None = Form(None),
+    source_group: str | None = Form(None),
     background: str | None = Form(None),
     flight_mode: str | None = Form(None),
     notes: str | None = Form(None),
@@ -191,16 +241,33 @@ async def add_dataset_audio(
                 "либо явно отметьте, что БПЛА присутствует всю запись. "
                 "Полная запись больше не размечается как БПЛА автоматически."
             )
-        dataset_role = "research" if clean_label in settings.ml_provisional_labels else "training"
+        if clean_label in settings.ml_weak_labels:
+            dataset_role = "training_provisional_weak"
+            label_confidence = "weak"
+            label_confidence_score = 0.4
+        elif clean_label in settings.ml_provisional_labels:
+            dataset_role = "training_provisional"
+            label_confidence = "confirmed"
+            label_confidence_score = 1.0
+        else:
+            dataset_role = "training"
+            label_confidence = "confirmed"
+            label_confidence_score = 1.0
         metadata = RecordingMetadata(
             category=category,
             is_drone=bool(is_drone) or category == "drone",
             distance_min_m=_form_float(distance_min_m),
             distance_max_m=_form_float(distance_max_m),
+            altitude_min_m=_form_float(altitude_min_m),
+            altitude_max_m=_form_float(altitude_max_m),
+            source_group=_clean_text(source_group),
             background=_clean_text(background),
             flight_mode=_clean_text(flight_mode),
             notes=_clean_text(notes),
             dataset_role=dataset_role,
+            label_confidence=label_confidence,
+            label_confidence_score=label_confidence_score,
+            validation_eligible=False,
         )
 
         results = []
@@ -303,9 +370,12 @@ async def delete_dataset_entry(
 
 @app.get("/dataset/image", name="dataset_image")
 async def dataset_image(path: str) -> FileResponse:
-    """Serve a class reference image stored inside the dataset directory."""
+    """Serve a class reference image stored inside the dataset directory (an image, never a recording)."""
 
-    return FileResponse(resolve_dataset_file(path))
+    try:
+        return FileResponse(resolve_dataset_image(path))
+    except (ValueError, OSError) as exc:
+        raise HTTPException(status_code=404, detail="image not found") from exc
 
 
 @app.post("/single/analyze", response_class=HTMLResponse)
@@ -313,7 +383,7 @@ async def analyze_single(request: Request, wav_file: UploadFile = File(...)) -> 
     """Handle single audio upload and render analysis result."""
 
     try:
-        report = await _run_single_analysis(wav_file)
+        report = await _run_single_analysis(wav_file, analysis_access.operator_of(request))
     except Exception as exc:
         logger.exception("Single-file analysis failed")
         return _error_response(request, exc)
@@ -325,11 +395,11 @@ async def analyze_single(request: Request, wav_file: UploadFile = File(...)) -> 
 
 
 @app.post("/api/analyze-single")
-async def analyze_single_api(wav_file: UploadFile = File(...)) -> JSONResponse:
+async def analyze_single_api(request: Request, wav_file: UploadFile = File(...)) -> JSONResponse:
     """REST endpoint for single audio analysis."""
 
     try:
-        report = await _run_single_analysis(wav_file)
+        report = await _run_single_analysis(wav_file, analysis_access.operator_of(request))
     except Exception as exc:
         logger.exception("Single-file API analysis failed")
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -369,7 +439,7 @@ async def analyze_localization(
     """Handle multi-microphone upload and render localization result."""
 
     try:
-        report = await _run_localization_analysis(wav_files, mics_json)
+        report = await _run_localization_analysis(wav_files, mics_json, analysis_access.operator_of(request))
     except Exception as exc:
         logger.exception("Localization analysis failed")
         return _error_response(request, exc)
@@ -382,32 +452,41 @@ async def analyze_localization(
 
 @app.post("/api/localize")
 async def analyze_localization_api(
+    request: Request,
     wav_files: list[UploadFile] = File(...),
     mics_json: UploadFile = File(...),
 ) -> JSONResponse:
     """REST endpoint for multi-microphone localization."""
 
     try:
-        report = await _run_localization_analysis(wav_files, mics_json)
+        report = await _run_localization_analysis(wav_files, mics_json, analysis_access.operator_of(request))
     except Exception as exc:
         logger.exception("Localization API analysis failed")
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return JSONResponse(report.model_dump())
 
 
+def _visible_artifact(request: Request, path: str) -> Path:
+    """An artifact of an analysis this account may see (station/analysis_access.py); anything else: 404."""
+
+    artifact_path = analysis_access.resolve_analysis_file(path, analysis_access.operator_of(request))
+    if artifact_path is None:
+        raise HTTPException(status_code=404, detail="artifact not found")
+    return artifact_path
+
+
 @app.get("/artifact", name="artifact")
-async def artifact(path: str) -> FileResponse:
+async def artifact(request: Request, path: str) -> FileResponse:
     """Return a generated artifact for inline display."""
 
-    artifact_path = resolve_artifact(path)
-    return FileResponse(artifact_path)
+    return FileResponse(_visible_artifact(request, path))
 
 
 @app.get("/download", name="download")
-async def download(path: str) -> FileResponse:
+async def download(request: Request, path: str) -> FileResponse:
     """Return a generated artifact as a download."""
 
-    artifact_path = resolve_artifact(path)
+    artifact_path = _visible_artifact(request, path)
     return FileResponse(
         artifact_path,
         media_type="application/octet-stream",
@@ -415,8 +494,8 @@ async def download(path: str) -> FileResponse:
     )
 
 
-async def _run_single_analysis(wav_file: UploadFile):
-    """Save a single audio upload and run the analysis service."""
+async def _run_single_analysis(wav_file: UploadFile, operator: dict | None = None):
+    """Save a single audio upload and run the analysis service for the account ``operator``."""
 
     global single_service
 
@@ -431,6 +510,7 @@ async def _run_single_analysis(wav_file: UploadFile):
     analysis_id = new_analysis_id()
     upload_dir = analysis_upload_dir(analysis_id)
     output_dir = analysis_output_dir(analysis_id)
+    analysis_access.record_owner(output_dir, operator)
     saved = await save_upload(wav_file, upload_dir)
     return single_service.analyze(analysis_id, saved, output_dir)
 
@@ -438,8 +518,9 @@ async def _run_single_analysis(wav_file: UploadFile):
 async def _run_localization_analysis(
     wav_files: list[UploadFile],
     mics_json: UploadFile,
+    operator: dict | None = None,
 ):
-    """Save localization uploads and run the localization service."""
+    """Save localization uploads and run the localization service for the account ``operator``."""
 
     global localization_service
 
@@ -456,6 +537,7 @@ async def _run_localization_analysis(
     analysis_id = new_analysis_id()
     upload_dir = analysis_upload_dir(analysis_id)
     output_dir = analysis_output_dir(analysis_id)
+    analysis_access.record_owner(output_dir, operator)
 
     saved_wavs = []
     for upload in wav_files:

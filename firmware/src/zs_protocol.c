@@ -121,7 +121,7 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   if (full) {
     zs_cbor_uint(&c, 11);
     zs_cbor_map(&c, 4);
-    kvi(&c, 0, m->doa.azimuth_cdeg);
+    kvu(&c, 0, m->doa.azimuth_cdeg);
     kvi(&c, 1, m->doa.elevation_cdeg);
     kvu(&c, 2, m->doa.sigma_cdeg);
     kvb(&c, 3, m->doa.valid);
@@ -170,7 +170,8 @@ size_t zs_protocol_encode_detection_summary(const zs_detection_t *m, uint8_t *ou
 size_t zs_protocol_encode_heartbeat(const zs_heartbeat_t *m, uint8_t *out, size_t cap) {
   zs_cbor_t c;
   const zs_cellular_telemetry_t *cell;
-  if (!m || !out || cap == 0u || m->schema_ver != 1u) return 0u;
+  const bool with_detector = m && m->schema_ver == 2u && m->detector_present;
+  if (!m || !out || cap == 0u || (m->schema_ver != 1u && m->schema_ver != 2u)) return 0u;
   cell = &m->cellular;
   if (!cell->settings_valid ||
       !valid_digits(cell->imsi, sizeof(cell->imsi), 14u, 16u) ||
@@ -188,7 +189,7 @@ size_t zs_protocol_encode_heartbeat(const zs_heartbeat_t *m, uint8_t *out, size_
       !valid_text(m->hardware_rev, sizeof(m->hardware_rev), false)) return 0u;
 
   zs_cbor_init(&c, out, cap);
-  zs_cbor_map(&c, 13u);
+  zs_cbor_map(&c, with_detector ? 14u : 13u);
   kvu(&c, 0u, m->schema_ver);
   kvu(&c, 1u, 3u);
   kvu(&c, 2u, m->station_id);
@@ -258,6 +259,36 @@ size_t zs_protocol_encode_heartbeat(const zs_heartbeat_t *m, uint8_t *out, size_
   kvu(&c, 9u, cell->access_technology);
   kvu(&c, 10u, cell->apn_source);
   kvb(&c, 11u, cell->settings_valid);
+
+  if (with_detector) {
+    const zs_detector_health_t *d = &m->detector;
+    zs_cbor_uint(&c, 13u);
+    zs_cbor_map(&c, 24u);
+    kvu(&c, 0u, d->boot_id);
+    kvu(&c, 1u, d->uptime_s);
+    kvu(&c, 2u, d->windows);
+    kvu(&c, 3u, d->windows_dropped);
+    kvu(&c, 4u, d->confirmed_windows);
+    kvu(&c, 5u, d->suspect_windows);
+    kvu(&c, 6u, d->engine_windows);
+    kvu(&c, 7u, d->events_emitted);
+    kvu(&c, 8u, d->events_refused);
+    kvu(&c, 9u, d->outbox_pending);
+    kvu(&c, 10u, d->window_max_ms);
+    kvu(&c, 11u, d->presence_level);
+    kvu(&c, 12u, d->reset_cause);
+    kvu(&c, 13u, d->watchdog_missed);
+    kvu(&c, 14u, d->params_version);
+    kvu(&c, 15u, d->selftest_failed);
+    kvu(&c, 16u, d->command_key_id);
+    kvu(&c, 17u, d->command_next_key_id);
+    kvu(&c, 18u, d->fw_version);
+    kvu(&c, 19u, d->fw_state);
+    kvu(&c, 20u, d->fw_other_version);
+    kvu(&c, 21u, d->net_config_version);
+    kvu(&c, 22u, d->net_state);
+    kvu(&c, 23u, d->net_failed_version);
+  }
 
   return c.error ? 0u : c.len;
 }

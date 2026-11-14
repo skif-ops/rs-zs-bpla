@@ -3,7 +3,7 @@ name: PCB Native Gate
 on:
   workflow_dispatch:
   push:
-    branches: [main, develop, evt-pre-20, "integration/**"]
+    branches: [evt-pre-20]
     paths:
       - ".github/workflows/ci.yml"
       - ".github/workflows/pcb-native.yml"
@@ -65,12 +65,17 @@ on:
       - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md"
       - "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md"
+      - "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
+      - "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
+      - "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md"
       - "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
       - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
       - "hardware/POWER_DESIGN_CALC_REV_A.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
+      - "mechanics/pcb_pwr/**"
+      - "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step"
       - "tools/kicad_native_gate.py"
       - "tools/audit_pcb_main_capture_authority_rev_a.py"
       - "tools/verify_pcb_main_mcu_pin_authority_rev_a.py"
@@ -98,8 +103,103 @@ on:
       - "tools/generate_pcb_main_routing_authority_rev_a.py"
       - "tools/audit_pcb_main_routing_authority_rev_a.py"
       - "tools/audit_pcb_main_stackup_impedance_request_rev_a.py"
+      - "tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py"
+      - "tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py"
+      - "tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py"
+      - "tools/materialize_pcb_main_stts22h_footprint_eco_004_rev_a.py"
+      - "tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py"
+      - "tools/audit_pcb_main_octospi_routing_candidate_rev_a.py"
+      - "tools/audit_pcb_main_octospi_r8_eco_candidate_rev_a.py"
+      - "tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py"
+      - "tools/generate_pcb_main_rf_p0_candidate_rev_a.py"
+      - "tools/audit_pcb_main_rf_p0_candidate_rev_a.py"
+      - "tools/audit_pcb_main_rf_p0_application_rev_a.py"
+      - "tools/generate_pcb_main_rf_return_001_candidate_rev_a.py"
+      - "tools/audit_pcb_main_rf_return_001_candidate_rev_a.py"
+      - "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py"
+      - "tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py"
+      - "tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py"
+      - "tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py"
+      - "tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py"
+      - "tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py"
+      - "tools/generate_pcb_main_usb_source_routing_candidate_rev_a.py"
+      - "tools/audit_pcb_main_usb_source_routing_candidate_rev_a.py"
+      - "tools/generate_pcb_main_usb_source_routing_001_application_rev_a.py"
+      - "tools/audit_pcb_main_usb_source_routing_001_application_rev_a.py"
+      - "tools/generate_pcb_main_usb_cell_modem_routing_candidate_rev_a.py"
+      - "tools/audit_pcb_main_usb_cell_modem_routing_candidate_rev_a.py"
+      - "tools/generate_pcb_main_usb_cell_modem_routing_001_application_rev_a.py"
+      - "tools/audit_pcb_main_usb_cell_modem_routing_001_application_rev_a.py"
+      - "tools/generate_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py"
+      - "tools/audit_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py"
+      - "tools/generate_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py"
+      - "tools/audit_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py"
+      - "tools/pcb_main_lineage_rev_a.py"
+      - "tools/audit_pcb_main_inner_reroute_003_application_rev_a.py"
+      - "tools/generate_pcb_main_rf_remediation_application_rev_a.py"
+      - "tools/audit_pcb_main_rf_remediation_application_rev_a.py"
+      - "tools/route_pcb_release_candidate_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
+      - "tools/audit_pcb_main_mech_eco_002_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_placement_eco_001_application_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_placement_eco_001_application_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_warning_remediation_001_application_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_warning_remediation_001_application_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py"
+      - "tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py"
+      - "tools/audit_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py"
+      - "tools/generate_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_vbat_raw_routing_003_application_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_raw_routing_003_application_rev_a.py"
+      - "tools/generate_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_rev_gate_routing_004_application_rev_a.py"
+      - "tools/audit_pcb_pwr_rev_gate_routing_004_application_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py"
+      - "tools/run_pcb_pwr_hot_loop_006_historical_candidate_audit.py"
+      - "tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py"
+      - "tools/pcb_pwr_hot_loop_006_board.py"
+      - "tools/run_pcb_pwr_historical_generation_check.py"
+      - "tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py"
+      - "tools/run_pcb_pwr_shunt_bulk_007_historical_audit.py"
+      - "tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py"
+      - "tools/run_pcb_pwr_c13_c12_008_historical_audit.py"
+      - "tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py"
+      - "tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py"
+      - "tools/run_pcb_pwr_c13_c11_009_historical_audit.py"
+      - "tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py"
+      - "tools/run_pcb_pwr_c13_c11_009_historical_application_audit.py"
+      - "tools/generate_pcb_pwr_3v8_output_bulk_routing_010_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_3v8_output_bulk_routing_010_candidate_rev_a.py"
+      - "tools/run_pcb_pwr_3v8_output_bulk_010_historical_audit.py"
+      - "tools/generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py"
+      - "tools/audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_layer_count_authority_rev_a.py"
       - "tools/audit_harness_manufacturing_rev_a.py"
@@ -113,9 +213,14 @@ on:
       - "tools/audit_pcb_pwr_placement_clearance_rev_a.py"
       - "tools/generate_pcb_pwr_routing_authority_rev_a.py"
       - "tools/audit_pcb_pwr_routing_authority_rev_a.py"
+      - "tools/generate_pcb_pwr_evt_route_rules_rev_a.py"
+      - "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
       - "tools/audit_pcb_pwr_dim_003_request_rev_a.py"
+      - "tools/generate_pcb_pwr_evt_mechanical_step_rev_a.py"
       - "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py"
       - "tools/audit_pcb_pwr_input_protection_rev_a.py"
+      - "tools/audit_pcb_pwr_input_protection_sources_rev_a.py"
+      - "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
       - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
       - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
@@ -145,7 +250,7 @@ on:
       - "tools/audit_pcb_mic_molex_rev_a.py"
       - ".github/workflows/pcb-native.yml"
   pull_request:
-    branches: [main, develop, evt-pre-20]
+    branches: [evt-pre-20]
     paths:
       - "hardware/kicad/**"
       - "hardware/reviews/**"
@@ -171,6 +276,8 @@ on:
       - "hardware/POWER_*.json"
       - "hardware/POWER_*.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
+      - "mechanics/pcb_pwr/**"
+      - "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step"
       - "tools/*pcb*_rev_a.py"
       - "tools/materialize_pcb_main_hierarchy_rev_a.py"
       - "tools/pcb_main_schematic_hierarchy.py"
@@ -186,13 +293,26 @@ jobs:
   native-kicad:
     name: Native KiCad per-board ERC DRC and fabrication export
     runs-on: ubuntu-latest
+    container:
+      # Official KiCad CI image: https://www.kicad.org/download/docker/
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: Trust container checkout for commit-bound audits
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install Python audit dependencies
+        run: |
+          apt-get -o APT::Update::Error-Mode=any update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            python3-pip python-is-python3
+          python3 -m pip install --break-system-packages --disable-pip-version-check \
+            easyeda2kicad 'kiutils==1.4.8' 'numpy==2.0.2'
       - name: Engineering preflight
         run: python tools/kicad_native_gate.py
       - name: Independent PCB layer-count authority audit
@@ -255,37 +375,24 @@ jobs:
             --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
           python tools/audit_pcb_pwr_capture_authority_rev_a.py
           python tools/audit_pcb_pwr_dft_authority_rev_a.py
+          python tools/audit_pcb_pwr_input_protection_sources_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/input_protection_primary_source_audit.json
+          python tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/input_protection_procurement_identity_audit.json
           python tools/audit_pcb_pwr_input_protection_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/input_protection_qualification_audit.json
-      - name: Install official KiCad 9 stable toolchain
-        shell: bash
+      - name: Verify official KiCad 9.0.9 container toolchain
         run: |
           set -euo pipefail
-          retry() {
-            local max=3
-            local attempt=1
-            while true; do
-              if "$@"; then
-                return 0
-              fi
-              if [ "$attempt" -ge "$max" ]; then
-                echo "command failed after $attempt attempts: $*" >&2
-                return 1
-              fi
-              echo "transient package/repository failure; retry $attempt/$max for: $*" >&2
-              sleep $((attempt * 15))
-              attempt=$((attempt + 1))
-            done
-          }
-          while IFS= read -r chrome_source; do
-            sudo mv "$chrome_source" "${chrome_source}.disabled"
-          done < <(grep -Rsl 'dl.google.com/linux/chrome-stable' /etc/apt/sources.list.d || true)
-          retry sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
-          retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
-          retry sudo apt-get update
-          retry sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
-          kicad-cli version
+          kicad_version="$(kicad-cli version)"
+          echo "KiCad CLI version: $kicad_version"
+          case "$kicad_version" in
+            9.0.9*) ;;
+            *)
+              echo "Pinned KiCad 9.0.9 required; refusing installed version: $kicad_version" >&2
+              exit 1
+              ;;
+          esac
           kicad-cli pcb drc --help
           kicad-cli sch erc --help
           /usr/bin/python3 - <<'PY'
@@ -294,7 +401,6 @@ jobs:
           PY
       - name: Import PCB-MIC secondary reference CAD
         run: |
-          python -m pip install --disable-pip-version-check easyeda2kicad 'kiutils==1.4.8'
           mkdir -p artifacts/kicad-reference/PCB-MIC
           ROOT="$PWD/artifacts/kicad-reference/PCB-MIC"
           easyeda2kicad --full --lcsc_id=C7230692 --output "$ROOT/t5838_ref" --project-relative
@@ -350,6 +456,9 @@ jobs:
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/committed_routing_authority_audit.json
+          python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
+          python tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/committed_evt_routing_basis_audit.json
           python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/committed_dim_003_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
@@ -383,12 +492,63 @@ jobs:
             --output artifacts/kicad-native/PCB-MAIN/stackup_impedance_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
+          python tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/jlc06161h_3313_routing_basis_audit.json
+          python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/rf_routeability_eco_003_static_audit.json
+          python tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/stts22h_footprint_eco_004_static_audit.json
+          python tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/ground_domain_routing_candidate_static_audit.json
+          python tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/octospi_r8_eco_002_application_audit.json
+          python tools/audit_pcb_main_rf_p0_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/rf_p0_application_audit.json
+          python tools/audit_pcb_main_rf_return_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/rf_return_001_candidate_audit.json
+          python tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/gnss_rf_eco_001_candidate_audit.json
+          python tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_placement_eco_001_candidate_audit.json
+          python tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --check \
+            --output hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
+          python tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_placement_eco_001_application_audit.json
+          python tools/generate_pcb_main_usb_source_routing_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_source_routing_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_source_routing_001_static_audit.json
+          python tools/generate_pcb_main_usb_source_routing_001_application_rev_a.py \
+            --check \
+            --output hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb
+          python tools/audit_pcb_main_usb_source_routing_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_source_routing_001_application_audit.json
+          python tools/generate_pcb_main_usb_cell_modem_routing_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_cell_modem_routing_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_cell_modem_routing_001_static_audit.json
+          python tools/generate_pcb_main_usb_cell_modem_routing_001_application_rev_a.py --check
+          python tools/audit_pcb_main_usb_cell_modem_routing_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_cell_modem_routing_001_application_audit.json
+          python tools/generate_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_cell_fixture_routing_001_static_audit.json
+          python tools/generate_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py --check
+          python tools/audit_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_cell_fixture_routing_001_application_audit.json
+          python tools/audit_pcb_main_inner_reroute_003_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/inner_reroute_003_application_audit.json
+          python tools/generate_pcb_main_rf_remediation_application_rev_a.py --check
+          python tools/audit_pcb_main_rf_remediation_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/rf_remediation_application_audit.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/assembler_dfm_stencil_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
           python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/mechanical_eco_candidate_audit.json
+          python tools/audit_pcb_main_mech_eco_002_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/mechanical_eco_002_audit.json
           python tools/generate_pcb_main_schematic_rev_a.py --check
           python tools/audit_pcb_main_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \
@@ -431,6 +591,7 @@ jobs:
               "ST_ESDALC6V1-5P6_SOT666": 6,
               "Vishay_Si1016X_SC-89": 6,
               "ST_LIS2DW12_LGA-12L": 12,
+              "STTS22H_UDFN-6L": 7,
               "Raytac_MDBT50Q-P1MV2": 61,
               "Quectel_BG95-M3_LGA-102": 102,
               "GCT_MEM2052-00-195-00-A": 13,
@@ -444,6 +605,706 @@ jobs:
               assert footprint.GetPadCount() == pad_count, f"{name}: pad-count drift"
           print("PCB-MAIN KiCad 9 native parse: PASS")
           PY
+      - name: KiCad 9 comparative DRC for PCB-MAIN RF ECO-003 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/rf-routeability-eco-003
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          git show \
+            909fc1e86c8b3711c8b00358c9892a09609279e4:hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb \
+            > "$candidate_project/PCB-MAIN_RF_ECO_003_APPLIED_BASE.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_ECO_003.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_ECO_003_APPLIED_BASE.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_ECO_003.kicad_pcb"
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/baseline_drc.rpt" \
+            "$candidate_project/PCB-MAIN_RF_ECO_003_APPLIED_BASE.kicad_pcb"
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/candidate_drc.rpt" \
+            "$candidate_project/PCB-MAIN_RF_ECO_003.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py \
+            --kicad-connectivity \
+            --base-drc "$evidence/baseline_drc.rpt" \
+            --candidate-drc "$evidence/candidate_drc.rpt" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN STTS22H ECO-004 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/stts22h-footprint-eco-004
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_STTS22H_ECO_004_BASE.kicad_pro"
+          python tools/materialize_pcb_main_stts22h_footprint_eco_004_rev_a.py \
+            --baseline-output "$candidate_project/PCB-MAIN_STTS22H_ECO_004_BASE.kicad_pcb" \
+            --output "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb"
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --board "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb" \
+            --no-status-check \
+            --strict
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/baseline_drc.rpt" \
+            "$candidate_project/PCB-MAIN_STTS22H_ECO_004_BASE.kicad_pcb"
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/candidate_drc.rpt" \
+            "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py \
+            --kicad-connectivity \
+            --candidate-board "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb" \
+            --base-drc "$evidence/baseline_drc.rpt" \
+            --candidate-drc "$evidence/candidate_drc.rpt" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN ground-domain candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/ground-domain-routing-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_BASE.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_BASE.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          path = sys.argv[1]
+          board = pcbnew.LoadBoard(path)
+          pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+          pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN ground-domain candidate zone refill: PASS")
+          PY
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/baseline_drc.rpt" \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_BASE.kicad_pcb"
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/candidate_drc.rpt" \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py \
+            --kicad-connectivity \
+            --base-drc "$evidence/baseline_drc.rpt" \
+            --candidate-drc "$evidence/candidate_drc.rpt" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN hard signal nets candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/signal-hard-nets-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN signal hard-nets base/candidate zone refill: PASS")
+          PY
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/baseline_drc.rpt" \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/candidate_drc.rpt" \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_signal_hard_nets_candidate_rev_a.py \
+            --kicad-connectivity \
+            --connectivity-base "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb" \
+            --connectivity-candidate "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb" \
+            --base-drc "$evidence/baseline_drc.rpt" \
+            --candidate-drc "$evidence/candidate_drc.rpt" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN OctoSPI R8 ECO-002 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/octospi-r8-eco-002
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN OctoSPI R8 ECO-002 base/candidate zone refill: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_octospi_r8_eco_candidate_rev_a.py \
+            --connectivity-base "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb" \
+            --connectivity-candidate "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb" \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN P0 RF candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/rf-p0-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/generate_pcb_main_rf_p0_candidate_rev_a.py \
+            --output "$candidate_project/PCB-MAIN_RF_P0_REGENERATED_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          path = sys.argv[1]
+          board = pcbnew.LoadBoard(path)
+          pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN P0 RF expected candidate KiCad 9 normalization: PASS")
+          PY
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_RF_P0_REGENERATED_REV_A.kicad_pcb" <<'PY'
+          import sys
+          from collections import Counter
+
+          import pcbnew
+
+
+          def require(value: bool, message: str) -> None:
+              if not value:
+                  raise AssertionError(message)
+
+
+          def point(value: object) -> tuple[int, int]:
+              return int(value.x), int(value.y)
+
+
+          def optional_int(value: object) -> int | None:
+              return None if value is None else int(value)
+
+
+          def copper_signature(item: object) -> tuple[object, ...]:
+              is_via = isinstance(item, pcbnew.PCB_VIA)
+              common = (
+                  str(item.GetNetname()),
+                  int(item.GetNetCode()),
+                  int(item.GetFrontWidth()) if is_via else int(item.GetWidth()),
+                  bool(item.IsLocked()),
+                  optional_int(item.GetLocalClearance()),
+              )
+              if is_via:
+                  return (
+                      "via", *common, point(item.GetPosition()),
+                      int(item.GetDrillValue()), int(item.GetViaType()),
+                      int(item.TopLayer()), int(item.BottomLayer()),
+                      bool(item.GetIsFree()), bool(item.GetRemoveUnconnected()),
+                      bool(item.GetKeepStartEnd()),
+                      optional_int(item.GetFrontTentingMode()),
+                      optional_int(item.GetBackTentingMode()),
+                  )
+              endpoints = tuple(sorted((point(item.GetStart()), point(item.GetEnd()))))
+              return (
+                  "segment", *common, endpoints, int(item.GetLayer()),
+                  bool(item.HasSolderMask()),
+                  optional_int(item.GetLocalSolderMaskMargin()),
+              )
+
+
+          def copper_inventory(board: object, label: str) -> Counter[tuple[object, ...]]:
+              items = list(board.GetTracks())
+              uuids = [str(item.m_Uuid.AsString()) for item in items]
+              require(len(uuids) == len(set(uuids)),
+                      f"{label}: duplicate copper UUIDs")
+              require(len(items) == 976,
+                      f"{label}: expected 976 copper items, got {len(items)}")
+              return Counter(copper_signature(item) for item in items)
+
+
+          expected = pcbnew.LoadBoard(sys.argv[1])
+          regenerated = pcbnew.LoadBoard(sys.argv[2])
+          expected_copper = copper_inventory(expected, "expected candidate")
+          regenerated_copper = copper_inventory(regenerated, "regenerated candidate")
+          missing = list((expected_copper - regenerated_copper).elements())[:3]
+          added = list((regenerated_copper - expected_copper).elements())[:3]
+          require(not missing and not added,
+                  f"RF regeneration copper geometry drift: missing={missing}, added={added}")
+          print(
+              "PCB-MAIN P0 RF KiCad 9 semantic regeneration: PASS "
+              f"({sum(expected_copper.values())} copper items)"
+          )
+          PY
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN P0 RF base/candidate zone refill: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_rf_p0_candidate_rev_a.py \
+            --connectivity-base "$candidate_project/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb" \
+            --connectivity-candidate "$candidate_project/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb" \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN cellular L2 return candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/rf-return-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb"
+          python tools/generate_pcb_main_rf_return_001_candidate_rev_a.py \
+            --output "$candidate_project/PCB-MAIN_RF_RETURN_REGENERATED_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_RETURN_REGENERATED_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN cellular L2 return base/candidate zone refill: PASS")
+          PY
+          cp "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_rf_return_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --filled-candidate "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN GNSS RF ECO-001 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/gnss-rf-eco-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+          PYTHONPATH=tools python - \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          from pathlib import Path
+          import generate_pcb_main_gnss_rf_eco_001_candidate_rev_a as generator
+
+          base = Path(
+              "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/"
+              "PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb"
+          ).read_bytes()
+          Path(sys.argv[1]).write_bytes(base)
+          Path(sys.argv[2]).write_bytes(generator.candidate_bytes(base))
+          print("PCB-MAIN GNSS RF ECO-001 historical candidate regeneration: PASS")
+          PY
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --board "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb" \
+            --no-status-check --strict --output "$evidence/placement_clearance.json"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN GNSS RF ECO-001 base/candidate zone refill: PASS")
+          PY
+          cp "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --filled-candidate "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN USB placement ECO-001 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/usb-placement-eco-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+          python tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py \
+            --base-output "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb" \
+            --output "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --board "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb" \
+            --no-status-check --strict --output "$evidence/placement_clearance.json"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN USB placement ECO-001 base/candidate zone refill: PASS")
+          PY
+          cp "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN USB source routing 001
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/usb-source-routing-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pro"
+          python tools/generate_pcb_main_usb_source_routing_candidate_rev_a.py \
+            --base-output "$candidate_project/PCB-MAIN_USB_SOURCE_REGENERATED_BASE_REV_A.kicad_pcb" \
+            --output "$candidate_project/PCB-MAIN_USB_SOURCE_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/PCB-MAIN_USB_SOURCE_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_REGENERATED_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cp "$candidate_project/PCB-MAIN_USB_SOURCE_REGENERATED_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_BASE_REV_A.kicad_pcb"
+          cp "$candidate_project/PCB-MAIN_USB_SOURCE_REGENERATED_CANDIDATE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN USB source-routing base/candidate zone refill: PASS")
+          PY
+          cp "$candidate_project/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_source_routing_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_source_routing_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN cellular USB modem routing 001
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/usb-cell-modem-routing-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pro"
+          python tools/generate_pcb_main_usb_cell_modem_routing_candidate_rev_a.py \
+            --base-output "$candidate_project/PCB-MAIN_USB_CELL_MODEM_REGENERATED_BASE_REV_A.kicad_pcb" \
+            --output "$candidate_project/PCB-MAIN_USB_CELL_MODEM_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-CELL-MODEM-ROUTING-001/PCB-MAIN_USB_CELL_MODEM_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_REGENERATED_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-CELL-MODEM-ROUTING-001/PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cp "$candidate_project/PCB-MAIN_USB_CELL_MODEM_REGENERATED_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_BASE_REV_A.kicad_pcb"
+          cp "$candidate_project/PCB-MAIN_USB_CELL_MODEM_REGENERATED_CANDIDATE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN cellular USB modem base/candidate zone refill: PASS")
+          PY
+          cp "$candidate_project/PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_cell_modem_routing_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_cell_modem_routing_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN cellular USB fixture routing 001
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/usb-cell-fixture-routing-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pro"
+          python tools/generate_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py \
+            --base-output "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_REGENERATED_BASE_REV_A.kicad_pcb" \
+            --output "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001/PCB-MAIN_USB_CELL_FIXTURE_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_REGENERATED_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001/PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cp "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_REGENERATED_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_BASE_REV_A.kicad_pcb"
+          cp "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_REGENERATED_CANDIDATE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN cellular USB fixture base/candidate zone refill: PASS")
+          PY
+          cp "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 combined gate for accepted PCB-MAIN RF remediations
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/rf-remediation-application-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+          python tools/generate_pcb_main_rf_remediation_application_rev_a.py \
+            --output "$candidate_project/PCB-MAIN_RF_REMEDIATION_REGENERATED_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_REGENERATED_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_REGENERATED_REV_A.kicad_pcb"
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --board "$candidate_project/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb" \
+            --no-status-check --strict --output "$evidence/placement_clearance.json"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN accepted RF-remediation base/composed zone refill: PASS")
+          PY
+          cp "$candidate_project/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_rf_remediation_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --filled-candidate "$candidate_project/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb" \
+            --output "$evidence/comparative_audit.json"
       - name: Materialize native PCB-PWR schematic
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \
@@ -476,14 +1337,99 @@ jobs:
           python tools/audit_pcb_pwr_footprints_rev_a.py
           python tools/audit_pcb_pwr_passive_authority_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          committed_pcb_pwr="$(mktemp --suffix=.kicad_pcb)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb "$committed_pcb_pwr"
+          restore_committed_pcb_pwr() {
+            cp "$committed_pcb_pwr" hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
+          }
+          trap restore_committed_pcb_pwr EXIT
           /usr/bin/python3 tools/generate_pcb_pwr_layout_candidate_rev_a.py
+          python tools/audit_pcb_pwr_layout_candidate_rev_a.py
+          python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/regenerated_placement_clearance_audit.json \
+            --no-status-check \
+            --strict
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb \
+            artifacts/kicad-native/PCB-PWR/PCB-PWR_KICAD9_REGENERATED_REV_A.kicad_pcb
+          restore_committed_pcb_pwr
+          trap - EXIT
+          git diff --exit-code -- hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
           python tools/audit_pcb_pwr_layout_candidate_rev_a.py
           python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/placement_clearance_audit.json \
             --strict
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+            --check
+          python tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_placement_eco_001_static_audit.json
+          python tools/audit_pcb_pwr_buck_placement_eco_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_placement_eco_001_application_audit.json
+          python tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_warning_remediation_001_static_audit.json
+          python tools/generate_pcb_pwr_buck_warning_remediation_001_application_rev_a.py \
+            --output hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb --check
+          python tools/audit_pcb_pwr_buck_warning_remediation_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_warning_remediation_001_application_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py \
+            --check
+          python tools/audit_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_bootstrap_routing_001_static_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_bootstrap_routing_001_application_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/lm74700_vcap_routing_002_static_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py --check
+          python tools/audit_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/lm74700_vcap_routing_002_application_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/vbat_raw_routing_003_static_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_vbat_raw_routing_003_application_rev_a.py --check
+          python tools/audit_pcb_pwr_vbat_raw_routing_003_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/vbat_raw_routing_003_application_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/rev_gate_routing_004_static_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_rev_gate_routing_004_application_rev_a.py --check
+          python tools/audit_pcb_pwr_rev_gate_routing_004_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/rev_gate_routing_004_application_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_switch_node_routing_005_static_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py --check
+          python tools/run_pcb_pwr_hot_loop_006_historical_candidate_audit.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_input_hot_loop_routing_006_static_audit.json
+          python tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_input_hot_loop_routing_006_application_audit.json
+          python tools/run_pcb_pwr_shunt_bulk_007_historical_audit.py \
+            --output artifacts/kicad-native/PCB-PWR/vbat_sys_shunt_bulk_routing_007_static_audit.json
+          python tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py --check
+          python tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/vbat_sys_shunt_bulk_routing_007_application_audit.json
+          python tools/run_pcb_pwr_c13_c11_009_historical_audit.py \
+            --output artifacts/kicad-native/PCB-PWR/vbat_sys_c13_c11_routing_009_static_audit.json
+          python tools/run_pcb_pwr_c13_c11_009_historical_application_audit.py \
+            --output artifacts/kicad-native/PCB-PWR/vbat_sys_c13_c11_routing_009_application_audit.json
+          python tools/run_pcb_pwr_3v8_output_bulk_010_historical_audit.py \
+            --output artifacts/kicad-native/PCB-PWR/3v8_output_bulk_routing_010_static_audit.json
+          python tools/generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py --check
+          python tools/audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/3v8_output_bulk_routing_010_application_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_power_stage_eco_002_static_audit.json
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_power_stage_eco_002_application_audit.json
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
+          python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
+          python tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/evt_routing_basis_audit.json
           python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/dim_003_request_audit.json
           python tools/audit_pcb_pwr_stackup_copper_request_rev_a.py \
@@ -501,6 +1447,7 @@ jobs:
               "Vishay_WSK2512_4T_T1.19mm": 4,
               "Coilcraft_XAL7030_472": 2,
               "TestPoint_DFT_1.7mm_NoPaste": 1,
+              "MountingHole_M3_3.4_EVT": 1,
           }
           for name, pad_count in expected.items():
               footprint = pcbnew.FootprintLoad(root, name)
@@ -512,12 +1459,637 @@ jobs:
           assert footprint.GetPadCount() == 5, "shared TI_DBV0005A_SOT23-5 pad-count drift"
           board = pcbnew.LoadBoard("hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
           assert board is not None, "KiCad failed to parse PCB-PWR placement candidate"
-          assert len(board.GetFootprints()) == 60, "unexpected PCB-PWR footprint count"
-          assert board.GetCopperLayerCount() == 4, "unexpected provisional PCB-PWR layer count"
-          assert len(list(board.GetTracks())) == 0, "PCB-PWR placement candidate contains routing"
-          assert len(list(board.Zones())) == 0, "PCB-PWR placement candidate contains zones"
+          assert len(board.GetFootprints()) == 66, "unexpected PCB-PWR electrical-plus-mounting footprint count"
+          assert board.GetCopperLayerCount() == 4, "unexpected PCB-PWR layer count"
+          assert len(list(board.GetTracks())) == 842, "PCB-PWR exact ECO-005 application (successor of autoroute 011) missing or out of scope"
+          assert len(list(board.Zones())) == 33, "PCB-PWR autoroute 011 zones (planes, pours, thickening, keepouts) missing or out of scope"
           print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY
+      - name: KiCad 9 comparative DRC for PCB-PWR buck placement ECO-001
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/buck-placement-eco-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pro"
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+            --base-output "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb" \
+            --output "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cp "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb"
+          cp "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              assert board is not None, f"KiCad failed to parse {path}"
+              assert len(board.GetFootprints()) == 66, f"unexpected footprint count: {path}"
+              assert len(list(board.GetTracks())) == 0, f"placement ECO contains routing: {path}"
+              assert len(list(board.Zones())) == 0, f"placement ECO contains zones: {path}"
+          print("PCB-PWR buck placement ECO-001 base/candidate KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_placement_eco_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR buck warning remediation 001
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/buck-warning-remediation-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pro"
+          cp \
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb"
+          cp \
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              assert board is not None, f"KiCad failed to parse {path}"
+              assert len(board.GetFootprints()) == 66, f"unexpected footprint count: {path}"
+              assert len(list(board.GetTracks())) == 0, f"warning remediation contains routing: {path}"
+              assert len(list(board.Zones())) == 0, f"warning remediation contains zones: {path}"
+          print("PCB-PWR buck warning-remediation base/candidate KiCad 9 parse: PASS")
+          PY
+          python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
+            --board "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb" \
+            --no-status-check \
+            --strict \
+            --output "$evidence/placement_clearance.json"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_warning_remediation_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR buck bootstrap routing 001
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/buck-bootstrap-routing-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          base = pcbnew.LoadBoard(sys.argv[1])
+          candidate = pcbnew.LoadBoard(sys.argv[2])
+          assert base is not None and candidate is not None
+          assert len(base.GetFootprints()) == len(candidate.GetFootprints()) == 66
+          assert len(list(base.GetTracks())) == 0
+          assert len(list(candidate.GetTracks())) == 2
+          assert len(list(base.Zones())) == len(list(candidate.Zones())) == 0
+          print("PCB-PWR buck bootstrap routing base/candidate KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR LM74700 VCAP routing 002
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/lm74700-vcap-routing-002
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          base = pcbnew.LoadBoard(sys.argv[1])
+          candidate = pcbnew.LoadBoard(sys.argv[2])
+          assert base is not None and candidate is not None
+          assert len(base.GetFootprints()) == len(candidate.GetFootprints()) == 66
+          assert len(list(base.GetTracks())) == 2
+          assert len(list(candidate.GetTracks())) == 3
+          assert len(list(base.Zones())) == len(list(candidate.Zones())) == 0
+          print("PCB-PWR LM74700 VCAP routing 002 KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR VBAT_RAW routing 003
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/vbat-raw-routing-003
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          base = pcbnew.LoadBoard(sys.argv[1])
+          candidate = pcbnew.LoadBoard(sys.argv[2])
+          assert base is not None and candidate is not None
+          assert len(base.GetFootprints()) == len(candidate.GetFootprints()) == 66
+          assert len(list(base.GetTracks())) == 3
+          assert len(list(candidate.GetTracks())) == 4
+          assert len(list(base.Zones())) == len(list(candidate.Zones())) == 0
+          print("PCB-PWR VBAT_RAW routing 003 KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_vbat_raw_routing_003_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR REV_GATE routing 004
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/rev-gate-routing-004
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          base = pcbnew.LoadBoard(sys.argv[1])
+          candidate = pcbnew.LoadBoard(sys.argv[2])
+          assert base is not None and candidate is not None
+          assert len(base.GetFootprints()) == len(candidate.GetFootprints()) == 66
+          assert len(list(base.GetTracks())) == 4
+          assert len(list(candidate.GetTracks())) == 8
+          assert len(list(base.Zones())) == len(list(candidate.Zones())) == 0
+          print("PCB-PWR REV_GATE routing 004 KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_rev_gate_routing_004_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR buck switch-node routing 005
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/buck-switch-node-routing-005
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          base = pcbnew.LoadBoard(sys.argv[1])
+          candidate = pcbnew.LoadBoard(sys.argv[2])
+          assert base is not None and candidate is not None
+          assert len(base.GetFootprints()) == len(candidate.GetFootprints()) == 66
+          assert len(list(base.GetTracks())) == 8
+          assert len(list(candidate.GetTracks())) == 22
+          assert len(list(base.Zones())) == len(list(candidate.Zones())) == 0
+          print("PCB-PWR buck switch-node routing 005 KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR buck input hot-loop routing 006
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/buck-input-hot-loop-routing-006
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          base = pcbnew.LoadBoard(sys.argv[1])
+          candidate = pcbnew.LoadBoard(sys.argv[2])
+          assert base is not None and candidate is not None
+          assert len(base.GetFootprints()) == len(candidate.GetFootprints()) == 66
+          assert len(list(base.GetTracks())) == 14
+          assert len(list(candidate.GetTracks())) == 35
+          assert len(list(base.Zones())) == 0
+          assert len(list(candidate.Zones())) == 2
+          pcbnew.ZONE_FILLER(candidate).Fill(candidate.Zones())
+          candidate.Save(sys.argv[2])
+          print("PCB-PWR buck input hot-loop routing 006 KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/run_pcb_pwr_hot_loop_006_historical_candidate_audit.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          python tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py --check
+          /usr/bin/python3 tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR shunt-to-bulk candidate 007
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/vbat-sys-shunt-bulk-routing-007
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          for kind in BASE CANDIDATE; do
+            cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+              "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_${kind}_REV_A.kicad_pro"
+            cp "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_${kind}_REV_A.kicad_pcb" \
+              "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_${kind}_REV_A.kicad_pcb"
+          done
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path, expected_tracks in zip(sys.argv[1:], (35, 37)):
+              board = pcbnew.LoadBoard(path)
+              assert board is not None
+              assert len(board.GetFootprints()) == 66
+              assert len(list(board.GetTracks())) == expected_tracks
+              assert len(list(board.Zones())) == 2
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              board.Save(path)
+          print("PCB-PWR shunt-to-bulk 007 KiCad 9 parse and fill: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/run_pcb_pwr_shunt_bulk_007_historical_audit.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          python tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py --check
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR C13-to-C12 routing 008
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/vbat-sys-c13-c12-routing-008
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          for kind in BASE CANDIDATE; do
+            cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+              "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_${kind}_REV_A.kicad_pro"
+            cp "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_${kind}_REV_A.kicad_pcb" \
+              "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_${kind}_REV_A.kicad_pcb"
+          done
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path, expected_tracks in zip(sys.argv[1:], (37, 39)):
+              board = pcbnew.LoadBoard(path)
+              assert board is not None
+              assert len(board.GetFootprints()) == 66
+              assert len(list(board.GetTracks())) == expected_tracks
+              assert len(list(board.Zones())) == 2
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              board.Save(path)
+          print("PCB-PWR C13-to-C12 008 KiCad 9 parse and fill: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/run_pcb_pwr_c13_c12_008_historical_audit.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          python tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py --check
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR C13-to-C11 routing 009
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/vbat-sys-c13-c11-routing-009
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          for kind in BASE CANDIDATE; do
+            cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+              "$candidate_project/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_${kind}_REV_A.kicad_pro"
+            cp "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C11-ROUTING-009/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_${kind}_REV_A.kicad_pcb" \
+              "$candidate_project/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_${kind}_REV_A.kicad_pcb"
+          done
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path, expected_tracks in zip(sys.argv[1:], (39, 43)):
+              board = pcbnew.LoadBoard(path)
+              assert board is not None
+              assert len(board.GetFootprints()) == 66
+              assert len(list(board.GetTracks())) == expected_tracks
+              assert len(list(board.Zones())) == 2
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              board.Save(path)
+          print("PCB-PWR C13-to-C11 009 KiCad 9 parse and fill: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/run_pcb_pwr_c13_c11_009_historical_audit.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/run_pcb_pwr_c13_c11_009_historical_application_audit.py \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR 3V8 output bulk routing 010
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/3v8-output-bulk-routing-010
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          for kind in BASE CANDIDATE; do
+            cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+              "$candidate_project/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_${kind}_REV_A.kicad_pro"
+            cp "hardware/kicad/candidates/PCB-PWR-3V8-OUTPUT-BULK-ROUTING-010/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_${kind}_REV_A.kicad_pcb" \
+              "$candidate_project/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_${kind}_REV_A.kicad_pcb"
+          done
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path, expected_tracks in zip(sys.argv[1:], (43, 53)):
+              board = pcbnew.LoadBoard(path)
+              assert board is not None
+              assert len(board.GetFootprints()) == 66
+              assert len(list(board.GetTracks())) == expected_tracks
+              assert len(list(board.Zones())) == 2
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              board.Save(path)
+          print("PCB-PWR 3V8 output bulk 010 KiCad 9 parse and fill: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/run_pcb_pwr_3v8_output_bulk_010_historical_audit.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          python tools/generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py --check
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py \
+            --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR buck power-stage ECO-002
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/buck-power-stage-eco-002
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          base = pcbnew.LoadBoard(sys.argv[1])
+          candidate = pcbnew.LoadBoard(sys.argv[2])
+          assert base is not None and candidate is not None
+          assert len(base.GetFootprints()) == len(candidate.GetFootprints()) == 66
+          assert len(list(base.GetTracks())) == 8
+          assert len(list(candidate.GetTracks())) == 14
+          assert len(list(base.Zones())) == len(list(candidate.Zones())) == 0
+          print("PCB-PWR buck power-stage ECO-002 KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
         run: |
@@ -624,17 +2196,101 @@ jobs:
             hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md
+            hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv
+            hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json
+            hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json
+            hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.md
+            mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md
             hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPLICATION_REV_A.json
+            hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPLICATION_REV_A.json
+            hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md
             hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
@@ -654,9 +2310,93 @@ jobs:
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json
+            hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_OCTOSPI_ROUTING_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_ROUTING_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_RF_P0_ROUTING_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_P0_ROUTING_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.md
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.json
+            hardware/reviews/PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/PCB-MAIN_USB_SOURCE_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-USB-CELL-MODEM-ROUTING-001/PCB-MAIN_USB_CELL_MODEM_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-USB-CELL-MODEM-ROUTING-001/PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.md
             hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
             hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md

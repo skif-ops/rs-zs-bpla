@@ -1,0 +1,73 @@
+{
+  "schema": "dioneya-evt-board-cam-candidate-v2",
+  "date": "2026-10-16",
+  "board": "PCB-MAIN",
+  "revision": "COMPLETE-105_REV_B",
+  "release": "EVT_8L_BUILD_AUTHORIZED_CUSTOMER_CHECKOUT_REQUIRED",
+  "manufacturing_authorized": true,
+  "primary_layer_count": 8,
+  "copper_layers": [
+    "F.Cu",
+    "In1.Cu",
+    "In2.Cu",
+    "In3.Cu",
+    "In4.Cu",
+    "In5.Cu",
+    "In6.Cu",
+    "B.Cu"
+  ],
+  "preferred_order_stack": "JLC08161H-3313",
+  "source": {
+    "native_path": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "native_sha256": "47b1c8dd391aabd6339c878ac4baff4f8fdf4f82d6ab588c13f7437552ea1f77",
+    "rev_d6_packaged_board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+    "rev_d6_archive": "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_20261013_REV_D6.zip",
+    "rev_d6_extracted_file_count": 98
+  },
+  "kicad_checks_2026_10_16": {
+    "erc_errors": 0,
+    "drc_errors": 0,
+    "drc_warnings": 30,
+    "warning_categories": {
+      "via_dangling": 7,
+      "silk_over_copper": 23
+    },
+    "unconnected_items": 0,
+    "schematic_parity_findings": 613
+  },
+  "rev_d6_order_controls": {
+    "gerber_copper_layers": 8,
+    "via_fill_cap_order_count": 76,
+    "native_board_count": 74,
+    "cam_override_count": 2,
+    "ipc_d_356": true,
+    "bom_and_positions": true,
+    "kicad_sources_preserved": true
+  },
+  "altium": {
+    "project_path": "hardware/altium/production-candidate/PCB-MAIN-8L-COMPLETE-105",
+    "compile_errors": 0,
+    "compile_warnings": 146,
+    "drc_violations": 3,
+    "drc_category": "Net Antennae"
+  },
+  "review_b": "ACCEPTED",
+  "open_gates": [],
+  "desktop_release_basis": "hardware/reviews/EVT_FACTORY_PUBLIC_CAPABILITY_BASELINE_REV_B.json",
+  "specific_factory_job_confirmed": false,
+  "specific_factory_job_confirmation_owner": "CUSTOMER",
+  "customer_checkout_controls": [
+    "Upload the controlled archive without renaming or editing CAM layers.",
+    "Select the stated layer count, thickness, copper, finish and stackup for each board.",
+    "For PCB-MAIN, select epoxy resin via filling and copper capping for all 76 controlled locations and include the controlled CSV/order remark.",
+    "Resolve every upload-parser or DFM error before payment; do not approve an automatic geometry repair that changes copper, drills, outline, POFV or polarity.",
+    "Download and compare the job-specific production files with the controlled Gerber, drill, outline and special-process notes, then confirm them in the factory portal.",
+    "Record order number, selected options, production-file checksum and any factory engineering message in the order record."
+  ],
+  "post_build_evt_validation": [
+    "PCB-MAIN RF and GNSS/cellular/LoRa installed VSWR, sensitivity and coexistence",
+    "PCB-PWR rail drop, inrush, transient, thermal, cold start, protection and EMI",
+    "PCB-MIC acoustic-port inspection, phase, gain, noise and delay calibration",
+    "First-article SPI/AOI/X-ray disposition and functional test before releasing the remaining lot"
+  ]
+}

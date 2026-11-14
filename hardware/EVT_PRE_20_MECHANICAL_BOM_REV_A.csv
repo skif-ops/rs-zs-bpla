@@ -1,0 +1,10 @@
+Category,Item_ID,Manufacturer_or_authority,MPN_or_drawing,Qty_per_station,Notes
+HOUSING_PART,HSG-VC,Dioneya controlled design,DIO-HSG-VC-REV-A,1 set,Vacuum-cast outdoor upper electronics/acoustic and lower power enclosure set; source package release remains tracked separately
+CABLE_GLAND,CGLAND-SET,Dioneya controlled specification,DIO-CGLAND-SCHEDULE-REV-A,1 set,IP68 metric glands: M20x1.5 for 7-13 mm power/solar bundle and M16x1.5 for 5-10 mm signal bundle; supplier equivalence accepted only within these dimensions
+ACOUSTIC_MEMBRANE,MIC-MEM-SET,Dioneya controlled specification,DIO-ACOUSTIC-MEMBRANE-PTFE-REV-A,4,Hydrophobic ePTFE acoustic membrane cartridge; lot is released only after first-article gain/phase/noise verification
+SEAL,SEAL-SET,Dioneya controlled design,DIO-SEAL-EPDM70-REV-A,1 set,Closed-cell EPDM 70 Shore A service-cover and module seals; 20 percent nominal compression; IP test during EVT
+FASTENER,FASTENER-SET,Dioneya controlled design,DIO-FASTENER-A4-M3-M4-REV-A,1 set,A4 stainless M3 electronics and M4 enclosure fasteners with captive washers and stated assembly torques
+THREADED_INSERT,INSERT-SET,Dioneya controlled design,DIO-INSERT-BRASS-M3-M4-REV-A,1 set,M3/M4 knurled brass inserts sized to controlled bosses; pull-out checked on first article
+INTER_MODULE_FUSE,FUSE-BAT,Littelfuse,0451008.MRL,1,8 A battery-side fuse coordinated with PCB-PWR input-protection EVT candidate; physical fault/thermal validation remains
+POWER_CABLE,PWR-CABLE,Dioneya controlled design,DIO-PWR-CABLE-AWG18-REV-A,1 set,"TE 55A0111-18 conductors, controlled M8/Micro-Fit terminations, 330 mm battery and 440 mm inter-module cut lengths"
+MOUNT,MAST-MOUNT,Dioneya controlled design,DIO-MAST-BAND-MOUNT-100_350-REV-A,1 set,A4 stainless adjustable band-clamp mount for customer poles OD 100-350 mm; proof load and installed wind check during EVT

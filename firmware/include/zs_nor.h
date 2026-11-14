@@ -52,6 +52,13 @@ typedef struct {
   zs_nor_geometry_t geometry;
   uint32_t program_timeout_ms;
   uint32_t erase_timeout_ms;
+  /* Optional bus lock (zs_nor_set_lock): several tasks share one NOR (event outbox, command journal, records, the
+     audio prehistory ring), and a NOR operation is a command sequence (write enable, program/erase, status poll)
+     that must not interleave with another task's.  Held per page program, per erase block and per read, so a long
+     erase never blocks a short write for more than one block. */
+  void (*lock)(void *ctx);
+  void (*unlock)(void *ctx);
+  void *lock_ctx;
 } zs_nor_t;
 
 typedef enum {
@@ -95,6 +102,9 @@ bool zs_nor_write_enable(zs_nor_t *nor);
  */
 zs_nor_probe_result_t zs_nor_probe_w25q512jv(
     zs_nor_t *nor, zs_nor_probe_info_t *out_info);
+
+/* Installs the bus lock used by zs_nor_read/program/erase (NULL callbacks = no locking, the default). */
+void zs_nor_set_lock(zs_nor_t *nor, void (*lock)(void *ctx), void (*unlock)(void *ctx), void *ctx);
 
 bool zs_nor_read(zs_nor_t *nor, uint32_t address, uint8_t *data, size_t len);
 bool zs_nor_program(zs_nor_t *nor, uint32_t address, const uint8_t *data, size_t len);

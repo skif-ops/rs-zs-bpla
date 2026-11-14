@@ -1,0 +1,33 @@
+{
+  "schema_version": "dioneya.pcb-main-signal-hard-nets-routing-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-SIGNAL-HARD-NETS-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-19",
+  "decision": "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE",
+  "decision_input": "Утверждаю PCB-MAIN-SIGNAL-HARD-NETS-001 по commit 4f3e5b18a49ebe2d11a33fcb833e57e18c56e34d и candidate SHA-256 7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3. Решение ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE. Разрешаю оформить подпись, применить кандидат к authoritative PCB-MAIN и выполнить push в evt-pre-20.",
+  "reviewed_github_commit_sha": "4f3e5b18a49ebe2d11a33fcb833e57e18c56e34d",
+  "reviewed_tree_sha": "45add456a5fae77b8010b270b35492819b153268",
+  "review_mapping": "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "c388c273d279dcee0017d19b018ce5a9f59b43526797cd096421d5a4d3d76001",
+  "reviewed_proposal_record_sha256": "fc1677d29c8fd5b8ff9f66a7ba9861eb1897d11e38bad581efd80542f386b774",
+  "reviewed_candidate_board_sha256": "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3",
+  "machine_gate": {
+    "pcb_native_run_id": 35446985180,
+    "pcb_native_conclusion": "success",
+    "kiCad_9_comparative_drc_step": "success",
+    "ci_run_id": 35446985202,
+    "ci_conclusion": "success"
+  },
+  "authorization": {
+    "apply_exact_hash_bound_signal_routes": true,
+    "continue_remaining_signal_and_power_routing_engineering": true,
+    "alter_reviewed_signal_geometry_without_new_controlled_review": false,
+    "routing_complete": false,
+    "return_path_review_complete": false,
+    "si_review_complete": false,
+    "pi_review_complete": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}

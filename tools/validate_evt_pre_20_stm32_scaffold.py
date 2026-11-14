@@ -87,11 +87,29 @@ def main() -> None:
     require(gates["qg1_completeness"] == "tools/validate_evt_pre_20_stm32_scaffold.py", "QG-1 path mismatch")
     require(gates["qg2_technical"] == "tools/audit_evt_pre_20_stm32_scaffold_technical.py", "QG-2 path mismatch")
     require(manifest["release_gate"]["status"] == "BLOCKED", "incomplete STM32 target must remain blocked")
-    require(len(manifest["release_gate"]["remaining_blockers"]) == 8, "remaining blocker list is incomplete")
+    require(len(manifest["release_gate"]["remaining_blockers"]) == 7, "remaining blocker list is incomplete")
+    build = manifest["engineering_build"]
+    require(build["status"] == "PASS_UNSIGNED_LOCAL_NOT_FOR_DEVICE_RELEASE", "engineering target build evidence missing")
+    evidence = ROOT / build["evidence"]
+    require(evidence.is_file(), "engineering target build evidence file missing")
+    evidence_data = load_json(evidence)
+    require(evidence_data["source_commit"] == build["source_commit"], "engineering build source commit mismatch")
+    require(evidence_data["release_authorized"] is False, "unsigned engineering build was released")
+    require(evidence_data["stack_usage"]["status"] == "PASS", "target stack-usage gate not passed")
 
     status = (TARGET / "target_status.yaml").read_text(encoding="utf-8")
-    require("status: TARGET_PORT_REQUIRED" in status, "target prematurely claims completion")
-    require("do_not_release: true" in status, "target release block missing")
+    require(
+        "status: TARGET_PORT_REQUIRED" in status
+        or "status: BENCH_RELEASE_BUILT_HARDWARE_VALIDATION_PENDING" in status
+        or "status: RELEASE_CANDIDATE_BUILT_HARDWARE_QUALIFICATION_PENDING" in status,
+        "target status is neither an open port nor a hardware-gated bench release",
+    )
+    require("do_not_release_as_production: true" in status or "do_not_release: true" in status, "target production-release block missing")
+    if "status: BENCH_RELEASE_BUILT_HARDWARE_VALIDATION_PENDING" in status:
+        require(
+            "hardware_validation: REQUIRED" in status,
+            "bench build is missing its hardware-validation gate",
+        )
     require("stm32_scaffold_manifest.json" in status, "target status does not reference STM32 scaffold")
 
     print("EVT-PRE-20 STM32 scaffold QG-1 completeness/provenance: PASS")

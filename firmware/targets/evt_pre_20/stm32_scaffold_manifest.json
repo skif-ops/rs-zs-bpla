@@ -64,6 +64,11 @@
     "qg1_completeness": "tools/validate_evt_pre_20_stm32_scaffold.py",
     "qg2_technical": "tools/audit_evt_pre_20_stm32_scaffold_technical.py"
   },
+  "engineering_build": {
+    "status": "PASS_UNSIGNED_LOCAL_NOT_FOR_DEVICE_RELEASE",
+    "evidence": "firmware/targets/evt_pre_20/engineering_build_evidence.json",
+    "source_commit": "5a6429aac7040736be0019589a834ae0bba8c219"
+  },
   "release_gate": {
     "status": "BLOCKED",
     "remaining_blockers": [
@@ -73,7 +78,6 @@
       "RUNTIME_CLOCK_PROFILES_NOT_MEASURED",
       "SECURE_BOOT_PARTITION_NOT_DEFINED",
       "OTA_AB_PARTITIONS_NOT_DEFINED",
-      "ARM_TARGET_BUILD_NOT_RUN",
       "TARGET_HARDWARE_VALIDATION_NOT_RUN"
     ]
   }

@@ -3,13 +3,20 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#if defined(_WIN32)
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 int main(void) {
+#if defined(_WIN32)
+  if (_setmode(_fileno(stdout), _O_BINARY) == -1) return 2;
+#endif
   zs_heartbeat_t message = {0};
   uint8_t encoded[1024];
   size_t size;
 
-  message.schema_ver = 1u;
+  message.schema_ver = 2u;   /* with the detector map (key 13); schema 1 = the same without it */
   message.station_id = 424242u;
   message.time_us = INT64_C(1780000000000000);
   message.station.lat_e7 = 557550800;
@@ -51,7 +58,30 @@ int main(void) {
   strcpy(message.firmware_ver, "evt-pre-20-test");
   strcpy(message.model_ver, "model-test");
   strcpy(message.hardware_rev, "EVT-PRE-20-Rev.A");
-  message.self_test_ok = true;
+  message.self_test_ok = false;               /* a required self-test failed: see detector key 15 */
+  message.detector_present = true;
+  message.detector.boot_id = 7u;
+  message.detector.uptime_s = 3600u;
+  message.detector.windows = 7190u;
+  message.detector.windows_dropped = 2u;
+  message.detector.confirmed_windows = 120u;
+  message.detector.suspect_windows = 45u;
+  message.detector.engine_windows = 300u;
+  message.detector.events_emitted = 13u;
+  message.detector.events_refused = 0u;
+  message.detector.outbox_pending = 1u;
+  message.detector.window_max_ms = 187u;
+  message.detector.presence_level = 3u;
+  message.detector.reset_cause = 4u;          /* IWDG: the previous boot ended by the hardware watchdog */
+  message.detector.watchdog_missed = 0x0020u;  /* task 5 had stopped checking in */
+  message.detector.params_version = 3u;        /* runtime parameter set v3 (CMD_SET_PARAMS) */
+  message.detector.selftest_failed = 0x0010u;  /* mic_capture (id 4) failed */
+  message.detector.command_key_id = UINT64_C(0xa1b2c3d4e5f60718);       /* addendum E: rotation in flight */
+  message.detector.command_next_key_id = UINT64_C(0x0102030405060708);
+  message.detector.fw_version = 7u; message.detector.fw_state = 3u;       /* addendum F: v7 on trial, */
+  message.detector.fw_other_version = 6u;                                 /* v6 in the other bank */
+  message.detector.net_config_version = 4u; message.detector.net_state = 3u;   /* addendum G: v4 in use, */
+  message.detector.net_failed_version = 5u;                               /* v5 failed its trial and was rolled back */
 
   size = zs_protocol_encode_heartbeat(&message, encoded, sizeof(encoded));
   if (size == 0u || fwrite(encoded, 1u, size, stdout) != size) return 1;

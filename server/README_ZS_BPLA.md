@@ -42,7 +42,8 @@
 - known UAV families retain an explicit unknown-type branch:
   `UNKNOWN_PROP_PISTON_UAV`, `UNKNOWN_TURBINE_JET_UAV` or
   `UNKNOWN_ROTOR_ELECTRIC_UAV`;
-- 365-day retention cleanup hook.
+- retention: 90 days for events, bearings and tracks, 30 for the alert outbox and the
+  audio of events, cleaned daily by the server (docs/SERVER_RETENTION_2026-10-03.md).
 
 ## Run
 
@@ -93,7 +94,66 @@ python -m station.mqtt_bridge --host mqtt.example --port 8883 --tenant pilot \
 
 The command signing key is an owner-only (`0600`) Ed25519 PKCS#8 PEM. Without
 it the bridge remains telemetry-only and will not downgrade to unsigned
-commands. Command delivery uses QoS 1, retain false and durable retries until a
+commands. To rotate it without a site visit (MQTT ICD addendum E), start the
+bridge with `--command-next-signing-key <new pem>` as well, queue
+`POST /api/v1/stations/{id}/command-key-rotation` with the new public key it
+prints, and switch `--command-signing-key` to the new key once every station
+reports it as current (`detector.command_key_id` in `/api/v1/stations`).
+
+Station firmware goes over MQTT as well (ICD addendum F). Offline, create the
+release key once (`python -m pki.cli fw-release-key --out release.pem`, its
+public key is built into the firmware with `-DZS_FW_RELEASE_PUBLIC_KEYS=`) and
+sign every application image into the release repository
+(`python -m pki.cli fw-sign --key release.pem --image dioneya_evt_pre_20.bin
+--out data/firmware`; target and version come from the image's `.fw_info`).
+The bridge serves the chunks from that directory (`--firmware-dir`,
+`ZS_FIRMWARE_DIR`, default `data/firmware`); `GET /api/v1/firmware/releases`
+lists it and `POST /api/v1/stations/{id}/firmware-update {"version": N}`
+queues CMD_UPDATE_FIRMWARE. Progress is in the heartbeat
+(`detector.fw_version / fw_state / fw_other_version`). A release goes to a
+group of stations as a rollout (`docs/SERVER_OTA_ROLLOUT_2026-10-03.md`):
+`POST /api/v1/firmware/rollouts {"version": N, "stations": [...], "canary": [...]}`
+commands the canary stations first and the rest only after they confirmed the
+release, at most `max_in_flight` at a time; a failed ACK or a station's own
+rollback pauses it after `max_failures`; `pause`, `resume`, `cancel`, `skip` a
+station, and `revert` (a station refuses a version that is not newer, so the
+revert is the earlier image signed as a higher version); every step is in the
+rollout's journal, the requests in the audit log of accounts.
+
+A retrained station model goes out the same way without a firmware release (MQTT ICD addendum I): export it as a
+package (`python tools/export_station_model.py --package m7.diom --version 7`), sign it offline with the same release
+key (`python -m pki.cli model-sign --key release.pem --model m7.diom --out data/models`), and queue it with
+`POST /api/v1/stations/{id}/model-update {"version": 7}` (`GET /api/v1/models/releases` lists the packages; the bridge
+serves them from `--model-dir` / `ZS_MODEL_DIR`, default `data/models`). The station loads it after the OK ACK without
+a reset; the heartbeat model text changes from `c46` (built-in) to `m7`.
+
+Acceptance metrics of a trial (decision 5, `docs/ACCEPTANCE_METRICS.md`): with the ground truth of what flew
+(`dioneya.trial/1`: stations, passes with the target's GNSS log, quiet periods, exclusions, reference SPL),
+`python tools/acceptance_metrics.py report --db data/zs_bpla.sqlite3 --trial trial.json --json r.json --md r.md`
+gives Pd per class with its 95 % interval, detection ranges, classification, false alarms per station-hour, the
+elevation sector, bearing and track point accuracy, received levels and the geometry of the layout. Blind zones of
+the station geometry: `GET /api/v1/geometry/coverage?station_ids=…&range_m=…`, and the «Слепые зоны расстановки»
+layer of the «Сопровождение» page (`/replay`).
+
+The load of the pilot field (`docs/SERVER_LOAD_FIELD_2026-10-03.md`): `python tools/load_field.py --out /tmp/load
+--hours 24 --check` drives 41 synthetic stations (heartbeats, detections, bearings, audio) with the faults of a real
+link (QoS 1 redeliveries, reconnects, outages with a burst of backlog, bridge restarts) through the bridge path from
+one process per tenant into one database and checks that everything is stored once, nothing stays unacknowledged
+and the readers never block; `tests/test_load_field.py` runs half an hour of it. A bridge that could not process
+ten messages (they stay in flight unacknowledged; Mosquitto stops at twenty) exits with code 3 so that the container
+restarts it with a fresh session.
+
+A field of station twins (`docs/STATION_TWIN_FIELD_2026-10-01.md`): `python tools/twin_field.py --out /tmp/field
+--station 17:0,0 --station 18:1200,0 --station 19:600,1000:installed --target=-2500,2200,200,45,-10,0` runs one
+firmware twin per station against the same target, feeds their publishes through the bridge into a fresh database
+and ends with the acceptance report; `tools/test_twin_field_e2e.py` is the CI check of it.
+
+The network part of a station's configuration (server host, MQTT/HTTPS port, certificate pin, tenant, topic prefix,
+SIM, APNs; ICD addendum G) changes remotely as well: `POST /api/v1/stations/{id}/network-config` with the fields to
+change queues CMD_SET_NETWORK_CONFIG (the version defaults to the one the station reports + 1). The station tries the
+new record on its next bring-up and stores it only when a session comes online with it; otherwise it rolls back after
+three failed bring-ups or 30 minutes. The outcome is in the heartbeat (`detector.net_config_version / net_state /
+net_failed_version`); the CA reference stays a service-mode field. Command delivery uses QoS 1, retain false and durable retries until a
 station-bound application ACK or the 15-minute TTL. The checked-in ACL contains
 separate topic rights for station credentials 01 through 20.
 

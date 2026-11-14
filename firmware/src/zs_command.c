@@ -115,9 +115,11 @@ static bool read_nullable_uint32(command_reader_t *reader, uint32_t *output,
 
 static bool read_audio_payload(command_reader_t *reader,
                                zs_audio_request_command_t *audio) {
-  uint64_t event_id, segment;
+  uint64_t event_id, segment, event_time = 0u;
   bool start_present, duration_present;
-  if (!expect_map(reader, 4u) ||
+  /* four keys, or five with the optional event time (key 4, positive int64) */
+  const bool with_time = reader->offset < reader->size && reader->data[reader->offset] == 0xa5u;
+  if (!expect_map(reader, with_time ? 5u : 4u) ||
       !expect_uint(reader, 0u) || !read_uint(reader, &event_id) || event_id == 0u ||
       !expect_uint(reader, 1u) || !read_uint(reader, &segment) ||
       segment > ZS_AUDIO_SEGMENT_RANGE ||
@@ -125,6 +127,10 @@ static bool read_audio_payload(command_reader_t *reader,
       !read_nullable_int32(reader, &audio->start_offset_ms, &start_present) ||
       !expect_uint(reader, 3u) ||
       !read_nullable_uint32(reader, &audio->duration_ms, &duration_present)) return false;
+  if (with_time && (!expect_uint(reader, 4u) || !read_uint(reader, &event_time) ||
+                    event_time == 0u || event_time > (uint64_t)INT64_MAX)) return false;
+  audio->has_event_time = with_time;
+  audio->event_time_us = (int64_t)event_time;
   if (segment == ZS_AUDIO_SEGMENT_RANGE) {
     if (!start_present || !duration_present) return false;
     audio->has_range = true;
@@ -134,6 +140,80 @@ static bool read_audio_payload(command_reader_t *reader,
   }
   audio->event_id = event_id;
   audio->segment = (zs_audio_segment_t)segment;
+  return true;
+}
+
+static bool read_bool(command_reader_t *reader, bool *value) {
+  if (reader->offset >= reader->size) return false;
+  if (reader->data[reader->offset] == 0xf4u) *value = false;
+  else if (reader->data[reader->offset] == 0xf5u) *value = true;
+  else return false;
+  ++reader->offset;
+  return true;
+}
+
+static bool read_int32(command_reader_t *reader, int32_t *output) {
+  uint8_t major;
+  uint64_t value;
+  if (!read_argument(reader, &major, &value) || major > 1u || value > INT32_MAX) return false;
+  *output = major == 0u ? (int32_t)value : (int32_t)(-1 - (int64_t)value);
+  return true;
+}
+
+/* CMD_REBOOT: {0: delay_s <= ZS_COMMAND_REBOOT_MAX_DELAY_S} */
+static bool read_reboot_payload(command_reader_t *reader, zs_reboot_command_t *reboot) {
+  uint64_t delay;
+  if (!expect_map(reader, 1u) || !expect_uint(reader, 0u) || !read_uint(reader, &delay) ||
+      delay > ZS_COMMAND_REBOOT_MAX_DELAY_S) return false;
+  reboot->delay_s = (uint16_t)delay;
+  return true;
+}
+
+/* CMD_SET_PARAMS: {0: reset_to_defaults, 1: {id: int32, ...}} - ids 1..65535 strictly ascending (canonical order),
+   at most ZS_COMMAND_PARAMS_MAX, at least one unless the command resets to defaults. */
+static bool read_params_payload(command_reader_t *reader, zs_set_params_command_t *params) {
+  uint8_t major;
+  uint64_t count, id, previous = 0u;
+  if (!expect_map(reader, 2u) || !expect_uint(reader, 0u) || !read_bool(reader, &params->reset_to_defaults) ||
+      !expect_uint(reader, 1u) || !read_argument(reader, &major, &count) || major != 5u ||
+      count > ZS_COMMAND_PARAMS_MAX || (count == 0u && !params->reset_to_defaults)) return false;
+  for (uint64_t i = 0u; i < count; ++i) {
+    if (!read_uint(reader, &id) || id == 0u || id > UINT16_MAX || id <= previous ||
+        !read_int32(reader, &params->value[i])) return false;
+    params->id[i] = (uint16_t)id;
+    previous = id;
+  }
+  params->count = (uint8_t)count;
+  return true;
+}
+
+/* CMD_ROTATE_COMMAND_KEY: {0: bstr(32)} */
+static bool read_rotate_payload(command_reader_t *reader, zs_rotate_key_command_t *rotate) {
+  return expect_map(reader, 1u) && expect_uint(reader, 0u) && read_bytes(reader, rotate->public_key, sizeof(rotate->public_key));
+}
+
+/* CMD_UPDATE_FIRMWARE: {0: bstr(1..96), 1: bstr(8), 2: bstr(64)} */
+static bool read_firmware_payload(command_reader_t *reader, zs_update_firmware_command_t *fw) {
+  uint8_t major;
+  uint64_t size;
+  if (!expect_map(reader, 3u) || !expect_uint(reader, 0u) || !read_argument(reader, &major, &size) || major != 2u ||
+      size == 0u || size > ZS_COMMAND_FW_MANIFEST_MAX || reader->offset + size > reader->size) return false;
+  memcpy(fw->manifest, &reader->data[reader->offset], (size_t)size);
+  fw->manifest_size = (uint8_t)size;
+  reader->offset += (size_t)size;
+  return expect_uint(reader, 1u) && read_bytes(reader, fw->key_id, sizeof(fw->key_id)) &&
+         expect_uint(reader, 2u) && read_bytes(reader, fw->signature, sizeof(fw->signature));
+}
+
+/* CMD_SET_NETWORK_CONFIG: {0: bstr(1..240)} */
+static bool read_network_payload(command_reader_t *reader, zs_set_network_command_t *net) {
+  uint8_t major;
+  uint64_t size;
+  if (!expect_map(reader, 1u) || !expect_uint(reader, 0u) || !read_argument(reader, &major, &size) || major != 2u ||
+      size == 0u || size > ZS_COMMAND_NET_PATCH_MAX || reader->offset + size > reader->size) return false;
+  memcpy(net->patch, &reader->data[reader->offset], (size_t)size);
+  net->patch_size = (uint8_t)size;
+  reader->offset += (size_t)size;
   return true;
 }
 
@@ -164,10 +244,19 @@ static zs_command_status_t decode_envelope(
   if (now_us < command->created_time_us) return ZS_COMMAND_STATUS_NOT_YET_VALID;
   if (now_us >= command->expires_time_us) return ZS_COMMAND_STATUS_EXPIRED;
   if (!expect_uint(reader, 6u) || !read_uint(reader, &value) ||
-      value != ZS_COMMAND_REQUEST_AUDIO) return ZS_COMMAND_STATUS_UNSUPPORTED;
+      (value != ZS_COMMAND_REQUEST_AUDIO && value != ZS_COMMAND_REBOOT && value != ZS_COMMAND_SET_PARAMS &&
+       value != ZS_COMMAND_ROTATE_KEY && value != ZS_COMMAND_UPDATE_FIRMWARE && value != ZS_COMMAND_SET_NETWORK))
+    return ZS_COMMAND_STATUS_UNSUPPORTED;
   command->code = (zs_command_code_t)value;
-  if (!expect_uint(reader, 7u) || !read_audio_payload(reader, &command->audio) ||
-      !expect_uint(reader, 8u) ||
+  if (!expect_uint(reader, 7u)) return ZS_COMMAND_STATUS_INVALID_CBOR;
+  if ((command->code == ZS_COMMAND_REQUEST_AUDIO && !read_audio_payload(reader, &command->audio)) ||
+      (command->code == ZS_COMMAND_REBOOT && !read_reboot_payload(reader, &command->reboot)) ||
+      (command->code == ZS_COMMAND_SET_PARAMS && !read_params_payload(reader, &command->params)) ||
+      (command->code == ZS_COMMAND_ROTATE_KEY && !read_rotate_payload(reader, &command->rotate)) ||
+      (command->code == ZS_COMMAND_UPDATE_FIRMWARE && !read_firmware_payload(reader, &command->firmware)) ||
+      (command->code == ZS_COMMAND_SET_NETWORK && !read_network_payload(reader, &command->network)))
+    return ZS_COMMAND_STATUS_INVALID_CBOR;
+  if (!expect_uint(reader, 8u) ||
       !read_bytes(reader, command->key_id, ZS_COMMAND_KEY_ID_BYTES))
     return ZS_COMMAND_STATUS_INVALID_CBOR;
   *signed_size = reader->offset;

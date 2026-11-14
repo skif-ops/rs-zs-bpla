@@ -1402,7 +1402,7 @@ def main() -> None:
     holes = [row for row in mechanical_rows if row["Feature_Type"] == "MOUNTING_HOLE"]
     require(
         {(row["RefDes"], row["X_mm"], row["Y_mm"]) for row in holes}
-        == {("H1", "5.00", "5.00"), ("H2", "105.00", "5.00"),
+        == {("H1", "8.00", "5.00"), ("H2", "105.00", "5.00"),
             ("H3", "105.00", "70.00"), ("H4", "5.00", "70.00")},
         "PCB-MAIN mounting pattern mismatch",
     )
@@ -1697,6 +1697,24 @@ def main() -> None:
                     "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
                     "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
+                    "REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_"
+                    "APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1728,6 +1746,24 @@ def main() -> None:
                 "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
                 "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
+                "REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_"
+                "APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1735,11 +1771,110 @@ def main() -> None:
                 "mechanical_eco_candidate", "mechanical_eco_candidate_record",
                 "mechanical_eco_candidate_audit", "mechanical_eco_approval",
                 "mechanical_eco_approval_record", "mechanical_eco_review_commit_mapping",
+                "mechanical_eco_002_candidate", "mechanical_eco_002_approval",
+                "mechanical_eco_002_approval_record",
+                "mechanical_eco_002_review_commit_mapping",
+                "mechanical_eco_002_application", "mechanical_eco_002_audit",
+                "rf_routeability_eco_003_candidate",
+                "rf_routeability_eco_003_candidate_record",
+                "rf_routeability_eco_003_approval",
+                "rf_routeability_eco_003_approval_record",
+                "rf_routeability_eco_003_review_commit_mapping",
+                "rf_routeability_eco_003_application",
+                "rf_routeability_eco_003_audit",
+                "ground_domain_routing_candidate",
+                "ground_domain_routing_candidate_record",
+                "ground_domain_routing_approval",
+                "ground_domain_routing_approval_record",
+                "ground_domain_routing_review_commit_mapping",
+                "ground_domain_routing_application",
+                "ground_domain_routing_audit",
+                "ground_domain_routing_status",
+                "signal_hard_nets_routing_candidate",
+                "signal_hard_nets_routing_candidate_record",
+                "signal_hard_nets_routing_approval",
+                "signal_hard_nets_routing_approval_record",
+                "signal_hard_nets_routing_review_commit_mapping",
+                "signal_hard_nets_routing_application",
+                "signal_hard_nets_routing_audit",
+                "signal_hard_nets_routing_status",
+                "octospi_r8_eco_002_candidate",
+                "octospi_r8_eco_002_candidate_record",
+                "octospi_r8_eco_002_approval",
+                "octospi_r8_eco_002_approval_record",
+                "octospi_r8_eco_002_review_commit_mapping",
+                "octospi_r8_eco_002_application",
+                "octospi_r8_eco_002_audit",
+                "octospi_r8_eco_002_status",
+                "rf_p0_routing_candidate",
+                "rf_p0_routing_candidate_record",
+                "rf_p0_routing_approval",
+                "rf_p0_routing_approval_record",
+                "rf_p0_routing_review_commit_mapping",
+                "rf_p0_routing_application",
+                "rf_p0_routing_audit",
+                "rf_p0_routing_status",
+                "rf_si_return_path_review",
+                "rf_si_return_path_review_record",
+                "rf_si_return_path_repeat_review",
+                "rf_si_return_path_repeat_review_record",
+                "rf_si_return_path_review_audit",
+                "rf_si_return_path_status",
+                "rf_return_001_candidate",
+                "rf_return_001_candidate_record",
+                "rf_return_001_candidate_review",
+                "rf_return_001_approval",
+                "rf_return_001_approval_record",
+                "rf_return_001_review_commit_mapping",
+                "rf_return_001_application",
+                "rf_return_001_status",
+                "gnss_rf_eco_001_candidate",
+                "gnss_rf_eco_001_candidate_record",
+                "gnss_rf_eco_001_candidate_review",
+                "gnss_rf_eco_001_audit",
+                "gnss_rf_eco_001_approval",
+                "gnss_rf_eco_001_approval_record",
+                "gnss_rf_eco_001_review_commit_mapping",
+                "gnss_rf_eco_001_application",
+                "rf_remediation_composition_generator",
+                "rf_remediation_composed_board",
+                "rf_remediation_application_audit",
+                "gnss_rf_eco_001_status",
+                "usb_cell_fixture_routing_001_candidate",
+                "usb_cell_fixture_routing_001_candidate_record",
+                "usb_cell_fixture_routing_001_candidate_review",
+                "usb_cell_fixture_routing_001_approval",
+                "usb_cell_fixture_routing_001_approval_record",
+                "usb_cell_fixture_routing_001_review_commit_mapping",
+                "usb_cell_fixture_routing_001_application",
+                "usb_cell_fixture_routing_001_candidate_generator",
+                "usb_cell_fixture_routing_001_application_generator",
+                "usb_cell_fixture_routing_001_candidate_audit",
+                "usb_cell_fixture_routing_001_application_audit",
+                "usb_cell_fixture_routing_001_status",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
                     "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
+                    "REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_"
+                    "APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
             }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
@@ -1751,8 +1886,70 @@ def main() -> None:
                         "PCB-MAIN placement-repack release boundary drift")
             require(required_layout_evidence <= set(review_b["evidence"]),
                     "placement-candidate Review B evidence schema incomplete")
+            require(review_b["evidence"].get("rf_routeability_eco_003_status") ==
+                    "APPROVED_APPLIED_PLACEMENT_ONLY_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN RF routeability ECO-003 status drift")
+            require(review_b["evidence"].get("ground_domain_routing_status") ==
+                    "APPROVED_APPLIED_BOUNDED_GROUND_DOMAIN_SUBGATE_"
+                    "REMAINING_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN ground-domain routing status drift")
+            require(review_b["evidence"].get("signal_hard_nets_routing_status") ==
+                    "APPROVED_APPLIED_BOUNDED_SIGNAL_SUBGATE_"
+                    "REMAINING_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN signal hard-nets routing status drift")
+            require(review_b["evidence"].get("octospi_r8_eco_002_status") ==
+                    "APPROVED_APPLIED_BOUNDED_R8_PLACEMENT_AND_OCTOSPI_ROUTING_"
+                    "SUBGATE_REMAINING_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN OctoSPI R8 ECO-002 status drift")
+            require(review_b["evidence"].get("rf_p0_routing_status") ==
+                    "APPROVED_APPLIED_EXACT_SEVEN_NET_RF_ROUTING_SUBGATE_"
+                    "REMAINING_ROUTING_AND_REVIEWS_OPEN",
+                    "PCB-MAIN RF P0 routing status drift")
+            require(review_b["evidence"].get("rf_si_return_path_status") ==
+                    "PASS_BOUNDED_REMEDIATIONS_COMBINED_KICAD9_GATE_FINAL_SI_"
+                    "AND_REVIEW_B_OPEN",
+                    "PCB-MAIN RF/SI return-path status drift")
+            require(review_b["evidence"].get("rf_return_001_status") ==
+                    "APPROVED_APPLIED_EXACT_CELLULAR_L2_RETURN_ZONE_"
+                    "COMPOSED_WITH_GNSS_ECO",
+                    "PCB-MAIN RF-return-001 candidate status drift")
+            require(review_b["evidence"].get("gnss_rf_eco_001_status") ==
+                    "APPROVED_APPLIED_EXACT_REVIEWED_DELTA_WITH_CELLULAR_L2_"
+                    "ZONE_COMBINED_GATE_PASS",
+                    "PCB-MAIN GNSS RF ECO-001 candidate status drift")
+            require(review_b["evidence"].get(
+                        "usb_cell_fixture_routing_001_status"
+                    ) ==
+                    "APPROVED_APPLIED_EXACT_CELL_FIXTURE_PAIR_"
+                    "COMMIT_BOUND_GATE_PASS",
+                    "PCB-MAIN cellular USB fixture-routing status drift")
+            rf_evidence = review_b["evidence"].get(
+                "rf_remediation_commit_bound_evidence", {}
+            )
+            require(
+                rf_evidence.get("source_commit_sha") ==
+                "7ee9cfc9b4059dc7e487ca5513704b78c22da4e0"
+                and rf_evidence.get("source_tree_sha") ==
+                "fbffec8ca34f283b5c689818780a6ab10495f843"
+                and rf_evidence.get("artifact_digest") ==
+                "sha256:c392194b55903562ee0eb50255a0cce2b2816026338b3141c09ca3f6c8ab0aae"
+                and rf_evidence.get("return_path_remediation_review_complete") is True
+                and rf_evidence.get("final_si_review_complete") is False
+                and rf_evidence.get("remaining_routing_complete") is False
+                and rf_evidence.get("review_b_complete") is False
+                and rf_evidence.get("manufacturing_release") is False,
+                "PCB-MAIN commit-bound RF-remediation evidence or release boundary drift",
+            )
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
+                    "ground_domain_routing_status",
+                    "signal_hard_nets_routing_status",
+                    "octospi_r8_eco_002_status",
+                    "rf_p0_routing_status",
+                    "rf_si_return_path_status",
+                    "rf_return_001_status",
+                    "gnss_rf_eco_001_status",
+                    "usb_cell_fixture_routing_001_status",
             }:
                 evidence_path = ROOT / review_b["evidence"][evidence_name]
                 require(evidence_path.is_file() and evidence_path.stat().st_size > 0,
@@ -1817,6 +2014,397 @@ def main() -> None:
                     "EXACT_TREE_AND_CANDIDATE_BLOB" and
                     review_commit_mapping.get("manufacturing_release") is False,
                     "PCB-MAIN mechanical ECO review-commit mapping drift")
+            mechanical_eco_002_status = review_b["evidence"].get(
+                "mechanical_eco_002_status"
+            )
+            require(mechanical_eco_002_status ==
+                    "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
+                    "PCB-MAIN mechanical ECO-002 status drift")
+            eco_002_candidate_path = (
+                ROOT / review_b["evidence"]["mechanical_eco_002_candidate"]
+            )
+            eco_002_approval = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_002_approval"])
+                .read_text(encoding="utf-8")
+            )
+            require(eco_002_approval.get("proposal_id") ==
+                    "PCB-MAIN-MECH-ECO-002" and
+                    eco_002_approval.get("reviewer") == "Скиф" and
+                    eco_002_approval.get("date") == "2026-09-18" and
+                    eco_002_approval.get("decision") ==
+                    "ACCEPT_LIMITED_MECHANICAL_ECO" and
+                    eco_002_approval.get("scope") ==
+                    "LIMITED_MECH_007_MECH_012_TRANSLATION_ONLY" and
+                    eco_002_approval.get("approved_change_records") ==
+                    ["MECH-007", "MECH-012"] and
+                    eco_002_approval.get("implementation_authorized") is True and
+                    eco_002_approval.get("routing_authorized") is False and
+                    eco_002_approval.get("review_b_complete") is False and
+                    eco_002_approval.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO-002 approval binding drift")
+            require(hashlib.sha256(eco_002_candidate_path.read_bytes()).hexdigest() ==
+                    eco_002_approval.get("reviewed_candidate_sha256"),
+                    "approved PCB-MAIN mechanical ECO-002 candidate SHA-256 drift")
+            eco_002_mapping = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_002_review_commit_mapping"])
+                .read_text(encoding="utf-8")
+            )
+            require(eco_002_mapping.get("github_equivalent_commit_sha") ==
+                    "b3ab796bcdee727798a121d114605e7ba84d683a" and
+                    eco_002_mapping.get("reviewed_tree_sha") ==
+                    "b5c2892d795389eb07a216139dc50f725a13e849" and
+                    eco_002_mapping.get("candidate_blob_sha") ==
+                    "8706f629af1b42418f7a6d9046af6d6816b39480" and
+                    eco_002_mapping.get("candidate_sha256") ==
+                    eco_002_approval.get("reviewed_candidate_sha256") and
+                    eco_002_mapping.get("equivalence") ==
+                    "EXACT_TREE_AND_CANDIDATE_BLOB" and
+                    eco_002_mapping.get("routing_authorized") is False and
+                    eco_002_mapping.get("review_b_complete") is False and
+                    eco_002_mapping.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO-002 review mapping drift")
+            eco_002_application = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_002_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(eco_002_application.get("proposal_id") ==
+                    "PCB-MAIN-MECH-ECO-002" and
+                    eco_002_application.get("decision") ==
+                    "ACCEPT_LIMITED_MECHANICAL_ECO" and
+                    eco_002_application.get("status") ==
+                    "APPLIED_STRICT_2D_CLEARANCE_PASS_ROUTING_AND_3D_REVIEW_PENDING" and
+                    eco_002_application.get("routing_authorized") is False and
+                    eco_002_application.get("review_b_complete") is False and
+                    eco_002_application.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO-002 application interlock drift")
+            rf_eco_003_approval = json.loads(
+                (ROOT / review_b["evidence"]["rf_routeability_eco_003_approval"])
+                .read_text(encoding="utf-8")
+            )
+            require(rf_eco_003_approval.get("proposal_id") ==
+                    "PCB-MAIN-RF-ROUTEABILITY-ECO-003" and
+                    rf_eco_003_approval.get("reviewer") == "Скиф" and
+                    rf_eco_003_approval.get("date") == "2026-09-19" and
+                    rf_eco_003_approval.get("decision") ==
+                    "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
+                    rf_eco_003_approval.get("placement_implementation_authorized") is True and
+                    rf_eco_003_approval.get("routing_engineering_continuation_authorized") is True and
+                    rf_eco_003_approval.get("candidate_copper_final_authorized") is False and
+                    rf_eco_003_approval.get("routing_complete") is False and
+                    rf_eco_003_approval.get("review_b_complete") is False and
+                    rf_eco_003_approval.get("manufacturing_release") is False,
+                    "PCB-MAIN RF routeability ECO-003 approval interlock drift")
+            rf_eco_003_mapping = json.loads(
+                (ROOT / review_b["evidence"]["rf_routeability_eco_003_review_commit_mapping"])
+                .read_text(encoding="utf-8")
+            )
+            require(rf_eco_003_mapping.get("github_equivalent_commit_sha") ==
+                    "23d4195c15a380f4e12337094be0d09d022be065" and
+                    rf_eco_003_mapping.get("reviewed_tree_sha") ==
+                    "82467c29399fddec21458e169ed00c6d02a1e856" and
+                    rf_eco_003_mapping.get("equivalence") ==
+                    "EXACT_TREE_AND_REVIEWED_BLOBS" and
+                    rf_eco_003_mapping.get("candidate_copper_final_authorized") is False and
+                    rf_eco_003_mapping.get("review_b_complete") is False and
+                    rf_eco_003_mapping.get("manufacturing_release") is False,
+                    "PCB-MAIN RF routeability ECO-003 review mapping drift")
+            rf_eco_003_application = json.loads(
+                (ROOT / review_b["evidence"]["rf_routeability_eco_003_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(rf_eco_003_application.get("proposal_id") ==
+                    "PCB-MAIN-RF-ROUTEABILITY-ECO-003" and
+                    rf_eco_003_application.get("decision") ==
+                    "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
+                    rf_eco_003_application.get("status") ==
+                    "APPLIED_PLACEMENT_ONLY_STRICT_2D_CLEARANCE_PASS_ROUTING_ENGINEERING_CONTINUES" and
+                    rf_eco_003_application.get("placement_implementation_authorized") is True and
+                    rf_eco_003_application.get("routing_engineering_continuation_authorized") is True and
+                    rf_eco_003_application.get("candidate_copper_final_authorized") is False and
+                    rf_eco_003_application.get("routing_complete") is False and
+                    rf_eco_003_application.get("review_b_complete") is False and
+                    rf_eco_003_application.get("manufacturing_release") is False,
+                    "PCB-MAIN RF routeability ECO-003 application interlock drift")
+            require(review_b["evidence"].get("stts22h_footprint_eco_004_status") ==
+                    "APPROVED_APPLIED_BOUNDED_U4_CORRECTION_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN STTS22H footprint ECO-004 status drift")
+            stts22h_eco_004_approval = json.loads(
+                (ROOT / review_b["evidence"]["stts22h_footprint_eco_004_approval"])
+                .read_text(encoding="utf-8")
+            )
+            stts22h_authorization = stts22h_eco_004_approval.get("authorization", {})
+            require(stts22h_eco_004_approval.get("proposal_id") ==
+                    "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004" and
+                    stts22h_eco_004_approval.get("reviewer") == "Скиф" and
+                    stts22h_eco_004_approval.get("decision_date") == "2026-09-19" and
+                    stts22h_eco_004_approval.get("decision") ==
+                    "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+                    stts22h_eco_004_approval.get("reviewed_github_commit_sha") ==
+                    "059ecd0e2e35fc56a56f48d62cce4f72a93755c0" and
+                    stts22h_authorization.get(
+                        "apply_bounded_u4_land_pattern_correction"
+                    ) is True and
+                    stts22h_authorization.get(
+                        "continue_pcb_main_routing_engineering"
+                    ) is True and
+                    stts22h_authorization.get(
+                        "candidate_or_future_copper_final_authorized"
+                    ) is False and
+                    stts22h_authorization.get("review_b_complete") is False and
+                    stts22h_authorization.get(
+                        "cam_or_manufacturing_release"
+                    ) is False,
+                    "PCB-MAIN STTS22H footprint ECO-004 approval interlock drift")
+            stts22h_eco_004_mapping = json.loads(
+                (ROOT / review_b["evidence"][
+                    "stts22h_footprint_eco_004_review_commit_mapping"
+                ]).read_text(encoding="utf-8")
+            )
+            require(stts22h_eco_004_mapping.get("reviewed_github_commit_sha") ==
+                    "059ecd0e2e35fc56a56f48d62cce4f72a93755c0" and
+                    stts22h_eco_004_mapping.get("reviewed_tree_sha") ==
+                    "d6805c8f15ce319410a996f143132c6f8f58f35e" and
+                    stts22h_eco_004_mapping.get("equivalence") ==
+                    "EXACT_REVIEWED_TREE_AND_BLOBS" and
+                    stts22h_eco_004_mapping.get("review_b_complete") is False and
+                    stts22h_eco_004_mapping.get("manufacturing_release") is False,
+                    "PCB-MAIN STTS22H footprint ECO-004 review mapping drift")
+            stts22h_eco_004_application = json.loads(
+                (ROOT / review_b["evidence"]["stts22h_footprint_eco_004_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(stts22h_eco_004_application.get("proposal_id") ==
+                    "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004" and
+                    stts22h_eco_004_application.get("decision") ==
+                    "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+                    stts22h_eco_004_application.get("status") ==
+                    "APPLIED_BOUNDED_U4_CORRECTION_ROUTING_ENGINEERING_CONTINUES" and
+                    stts22h_eco_004_application.get(
+                        "routing_engineering_continuation_authorized"
+                    ) is True and
+                    stts22h_eco_004_application.get(
+                        "candidate_or_future_copper_final_authorized"
+                    ) is False and
+                    stts22h_eco_004_application.get("routing_complete") is False and
+                    stts22h_eco_004_application.get("review_b_complete") is False and
+                    stts22h_eco_004_application.get(
+                        "cam_or_manufacturing_release"
+                    ) is False,
+                    "PCB-MAIN STTS22H footprint ECO-004 application interlock drift")
+            ground_domain_application = json.loads(
+                (ROOT / review_b["evidence"]["ground_domain_routing_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(ground_domain_application.get("proposal_id") ==
+                    "PCB-MAIN-GROUND-DOMAIN-ROUTING-001" and
+                    ground_domain_application.get("decision") ==
+                    "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE" and
+                    ground_domain_application.get("status") ==
+                    "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+                    ground_domain_application.get(
+                        "signal_and_power_routing_continuation_authorized"
+                    ) is True and
+                    ground_domain_application.get("routing_complete") is False and
+                    ground_domain_application.get("return_path_review_complete") is False and
+                    ground_domain_application.get("si_review_complete") is False and
+                    ground_domain_application.get("pi_review_complete") is False and
+                    ground_domain_application.get("review_b_complete") is False and
+                    ground_domain_application.get(
+                        "cam_or_manufacturing_release"
+                    ) is False,
+                    "PCB-MAIN ground-domain application interlock drift")
+            signal_hard_nets_application = json.loads(
+                (ROOT / review_b["evidence"]["signal_hard_nets_routing_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(signal_hard_nets_application.get("proposal_id") ==
+                    "PCB-MAIN-SIGNAL-HARD-NETS-001" and
+                    signal_hard_nets_application.get("decision") ==
+                    "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
+                    signal_hard_nets_application.get("status") ==
+                    "APPLIED_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+                    signal_hard_nets_application.get("routing_complete") is False and
+                    signal_hard_nets_application.get("return_path_review_complete") is False and
+                    signal_hard_nets_application.get("si_review_complete") is False and
+                    signal_hard_nets_application.get("pi_review_complete") is False and
+                    signal_hard_nets_application.get("review_b_complete") is False and
+                    signal_hard_nets_application.get("cam_or_manufacturing_release") is False,
+                    "PCB-MAIN signal hard-nets application interlock drift")
+            octospi_r8_eco_002_application = json.loads(
+                (ROOT / review_b["evidence"]["octospi_r8_eco_002_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(octospi_r8_eco_002_application.get("proposal_id") ==
+                    "PCB-MAIN-OCTOSPI-R8-ECO-002" and
+                    octospi_r8_eco_002_application.get("decision") ==
+                    "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
+                    octospi_r8_eco_002_application.get("status") ==
+                    "APPLIED_ACCEPTED_OCTOSPI_R8_ECO_002_SUBGATE_"
+                    "ROUTING_ENGINEERING_CONTINUES" and
+                    octospi_r8_eco_002_application.get(
+                        "remaining_signal_and_power_routing_continuation_authorized"
+                    ) is True and
+                    octospi_r8_eco_002_application.get("routing_complete") is False and
+                    octospi_r8_eco_002_application.get(
+                        "return_path_review_complete"
+                    ) is False and
+                    octospi_r8_eco_002_application.get("si_review_complete") is False and
+                    octospi_r8_eco_002_application.get("pi_review_complete") is False and
+                    octospi_r8_eco_002_application.get("review_b_complete") is False and
+                    octospi_r8_eco_002_application.get(
+                        "cam_or_manufacturing_release"
+                    ) is False,
+                    "PCB-MAIN OctoSPI R8 ECO-002 application interlock drift")
+            rf_p0_application = json.loads(
+                (ROOT / review_b["evidence"]["rf_p0_routing_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(rf_p0_application.get("proposal_id") == "PCB-MAIN-RF-P0-001" and
+                    rf_p0_application.get("decision") ==
+                    "ACCEPT_RF_P0_ROUTING_SUBGATE" and
+                    rf_p0_application.get("status") ==
+                    "APPLIED_ACCEPTED_RF_P0_ROUTING_SUBGATE_"
+                    "REMAINING_ROUTING_AND_REVIEWS_OPEN" and
+                    rf_p0_application.get("routing_complete") is False and
+                    rf_p0_application.get("rf_return_path_review_complete") is False and
+                    rf_p0_application.get("si_review_complete") is False and
+                    rf_p0_application.get("pi_review_complete") is False and
+                    rf_p0_application.get("review_b_complete") is False and
+                    rf_p0_application.get("cam_or_manufacturing_release") is False,
+                    "PCB-MAIN RF P0 application interlock drift")
+            gnss_rf_application = json.loads(
+                (ROOT / review_b["evidence"]["gnss_rf_eco_001_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(
+                gnss_rf_application.get("proposal_id") ==
+                "PCB-MAIN-GNSS-RF-ECO-001"
+                and gnss_rf_application.get("decision") ==
+                "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+                and gnss_rf_application.get("applied", {}).get(
+                    "exact_composed_board_byte_identity"
+                ) is True
+                and gnss_rf_application.get("applied", {}).get(
+                    "exact_reviewed_gnss_delta_identity"
+                ) is True
+                and gnss_rf_application.get("routing_complete") is False
+                and gnss_rf_application.get("rf_si_review_complete") is False
+                and gnss_rf_application.get("review_b_complete") is False
+                and gnss_rf_application.get("cam_or_manufacturing_release") is False,
+                "PCB-MAIN GNSS RF application interlock drift",
+            )
+            usb_placement_application = json.loads(
+                (ROOT / review_b["evidence"]["usb_placement_eco_001_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(
+                usb_placement_application.get("proposal_id") ==
+                "PCB-MAIN-USB-PLACEMENT-ECO-001"
+                and usb_placement_application.get("decision") ==
+                "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
+                and usb_placement_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and usb_placement_application.get("applied", {}).get(
+                    "changed_references"
+                ) == ["R91", "R92"]
+                and usb_placement_application.get("applied", {}).get(
+                    "copper_changed"
+                ) is False
+                and usb_placement_application.get("usb_pair_routing_complete") is False
+                and usb_placement_application.get("review_b_complete") is False
+                and usb_placement_application.get(
+                    "cam_or_manufacturing_release"
+                ) is False,
+                "PCB-MAIN USB placement application interlock drift",
+            )
+            usb_source_application = json.loads(
+                (ROOT / review_b["evidence"]["usb_source_routing_001_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(
+                usb_source_application.get("proposal_id") ==
+                "PCB-MAIN-USB-SOURCE-ROUTING-001"
+                and usb_source_application.get("decision") ==
+                "ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE"
+                and usb_source_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and usb_source_application.get("applied", {}).get(
+                    "routed_nets"
+                ) == ["USB_DM_U1", "USB_DP_U1"]
+                and usb_source_application.get("applied", {}).get(
+                    "added_segments"
+                ) == 13
+                and usb_source_application.get("applied", {}).get(
+                    "added_signal_vias"
+                ) == 0
+                and usb_source_application.get("review_b_complete") is False
+                and usb_source_application.get("manufacturing_release") is False,
+                "PCB-MAIN USB source-routing application interlock drift",
+            )
+            usb_cell_modem_application = json.loads(
+                (ROOT / review_b["evidence"][
+                    "usb_cell_modem_routing_001_application"
+                ]).read_text(encoding="utf-8")
+            )
+            require(
+                usb_cell_modem_application.get("proposal_id") ==
+                "PCB-MAIN-USB-CELL-MODEM-ROUTING-001"
+                and usb_cell_modem_application.get("decision") ==
+                "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+                and usb_cell_modem_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and usb_cell_modem_application.get("applied", {}).get(
+                    "routed_nets"
+                ) == ["CELL_USB_DM_U8", "CELL_USB_DP_U8"]
+                and usb_cell_modem_application.get("applied", {}).get(
+                    "added_segments"
+                ) == 6
+                and usb_cell_modem_application.get("applied", {}).get(
+                    "added_signal_vias"
+                ) == 0
+                and usb_cell_modem_application.get("review_b_complete") is False
+                and usb_cell_modem_application.get(
+                    "manufacturing_release"
+                ) is False,
+                "PCB-MAIN cellular USB modem-routing application interlock drift",
+            )
+            usb_cell_fixture_application = json.loads(
+                (ROOT / review_b["evidence"][
+                    "usb_cell_fixture_routing_001_application"
+                ]).read_text(encoding="utf-8")
+            )
+            require(
+                usb_cell_fixture_application.get("proposal_id") ==
+                "PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001"
+                and usb_cell_fixture_application.get("decision") ==
+                "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+                and usb_cell_fixture_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and usb_cell_fixture_application.get("applied", {}).get(
+                    "routed_nets"
+                ) == ["CELL_USB_DM_TP", "CELL_USB_DP_TP"]
+                and usb_cell_fixture_application.get("applied", {}).get(
+                    "added_segments"
+                ) == 27
+                and usb_cell_fixture_application.get("applied", {}).get(
+                    "added_signal_vias"
+                ) == 2
+                and usb_cell_fixture_application.get("status") ==
+                "APPLIED_EXACT_ACCEPTED_USB_CELL_FIXTURE_ROUTING_"
+                "COMMIT_BOUND_KICAD9_GATE_PASS"
+                and usb_cell_fixture_application.get("machine_gate", {}).get(
+                    "status"
+                ) == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+                and usb_cell_fixture_application.get("review_b_complete") is False
+                and usb_cell_fixture_application.get(
+                    "manufacturing_release"
+                ) is False,
+                "PCB-MAIN cellular USB fixture-routing application interlock drift",
+            )
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -1932,9 +2520,92 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(mechanical_application.get("applied", {}).get("authority_sha256") ==
-                        placement_control["authority_sha256"],
-                        "PCB-MAIN repack authority differs from the accepted ECO authority")
+                require(usb_cell_fixture_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == placement_control["board_sha256"] and
+                        usb_cell_fixture_application.get("predecessor", {}).get(
+                            "board_sha256"
+                        ) == usb_cell_modem_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) and
+                        usb_cell_modem_application.get("predecessor", {}).get(
+                            "board_sha256"
+                        ) == usb_source_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) and
+                        usb_source_application.get("predecessor", {}).get(
+                            "board_sha256"
+                        ) == usb_placement_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) and
+                        usb_placement_application.get("predecessor", {}).get(
+                            "board_sha256"
+                        ) == gnss_rf_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) and
+                        gnss_rf_application.get("applied", {}).get(
+                            "exact_composed_board_byte_identity"
+                        ) is True and
+                        rf_p0_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == gnss_rf_application.get(
+                            "reviewed_baseline", {}
+                        ).get("board_sha256") and
+                        rf_p0_application.get("applied", {}).get(
+                            "exact_candidate_byte_identity"
+                        ) is True and
+                        octospi_r8_eco_002_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == rf_p0_application.get(
+                            "historical_baseline", {}
+                        ).get("board_sha256") and
+                        octospi_r8_eco_002_application.get("applied", {}).get(
+                            "exact_candidate_byte_identity"
+                        ) is True and
+                        signal_hard_nets_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == octospi_r8_eco_002_application.get(
+                            "historical_baseline", {}
+                        ).get("board_sha256") and
+                        signal_hard_nets_application.get("applied", {}).get(
+                            "exact_candidate_byte_identity"
+                        ) is True and
+                        ground_domain_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == signal_hard_nets_application.get(
+                            "historical_baseline", {}
+                        ).get("board_sha256") and
+                        ground_domain_application.get("applied", {}).get(
+                            "exact_candidate_byte_identity"
+                        ) is True and
+                        stts22h_eco_004_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) ==
+                        ground_domain_application.get("historical_baseline", {}).get(
+                            "board_sha256"
+                        ) and
+                        stts22h_eco_004_application.get("applied", {}).get(
+                            "changed_references"
+                        ) == ["U4"] and
+                        stts22h_eco_004_application.get("applied", {}).get(
+                            "track_segments"
+                        ) == 0 and
+                        stts22h_eco_004_application.get("applied", {}).get(
+                            "copper_zones"
+                        ) == 0 and
+                        rf_eco_003_application.get("applied", {}).get(
+                            "mechanical_authority_sha256"
+                        ) == placement_control["authority_sha256"] and
+                        rf_eco_003_application.get("applied", {}).get(
+                            "changed_references"
+                        ) == ["D4", "FL1", "L2"] and
+                        rf_eco_003_application.get("applied", {}).get(
+                            "track_segments"
+                        ) == 0 and
+                        rf_eco_003_application.get("applied", {}).get(
+                            "copper_zones"
+                        ) == 0,
+                        "PCB-MAIN active routing subgate or historical repack/ECO evidence differs")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")

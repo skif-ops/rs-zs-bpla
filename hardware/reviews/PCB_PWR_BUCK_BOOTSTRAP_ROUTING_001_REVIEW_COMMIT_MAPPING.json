@@ -1,0 +1,30 @@
+{
+  "schema": "dioneya-pcb-pwr-buck-bootstrap-routing-001-review-mapping-v1",
+  "proposal_id": "PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001",
+  "reviewed_commit_sha": "1c7c37044a5e8b76cadab6e7435142858546254a",
+  "reviewed_tree_sha": "8eae1a27e7687688274199833091c3e59617bf53",
+  "candidate_sha256": "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236",
+  "ci_run_number": 595,
+  "pcb_pwr_schematic_run_number": 73,
+  "pcb_native_run_number": 322,
+  "pcb_native_run_id": 35613479594,
+  "artifact_id": 10644644279,
+  "artifact_digest": "sha256:a7e339ee0ffa589b60958b5c94852af004027a3dc672e1b9b3c85be1d30e7019",
+  "comparative_drc": {
+    "status": "PASS_ZERO_NEW_DRC_EXACT_TWO_CONNECTION_REDUCTION",
+    "base_violations": 86,
+    "candidate_violations": 86,
+    "base_unconnected": 126,
+    "candidate_unconnected": 124,
+    "new_drc_fingerprints": 0,
+    "removed_drc_fingerprints": 0
+  },
+  "human_gate": {
+    "status": "PENDING",
+    "accept_value": "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE"
+  },
+  "authoritative_board_modified": false,
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}
