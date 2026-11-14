@@ -23,6 +23,9 @@ APK = Path(
 EOL_ARCHIVE = Path(
     r"C:\Users\skifn\.codex\.chatgpt-projects\g-p-6a9a94a158908191920dd91e212ea701\outputs\wt_muhoed_prod_release\outputs\EVT_PRE_20_DIO_EVT_B01_И_EOL_ОСНАСТКА_20261112_REV_B.zip"
 )
+BENCH_RELEASE_ARCHIVE = Path(
+    r"F:\Проекты\Звукоуловитель_2\Предсерийные образцы\EVT_PRE_20_BENCH_RELEASE_2026111201.zip"
+)
 
 FORBIDDEN_KICAD = (".kicad_pro", ".kicad_sch", ".kicad_pcb", ".kicad_sym", ".kicad_mod")
 SENSITIVE_SUFFIXES = (".jks", ".p12", ".pfx", ".key")
@@ -277,11 +280,11 @@ Altium-архива сохранены только как точная исто
 12 пт, одинарный интервал, выравнивание по ширине, отступ первой строки 1,25 см
 вне таблиц и отсутствие такого отступа в таблицах. Длинное и среднее тире не применены.
 
-Стендовый программный выпуск 2026111201 остается в статусе аппаратной проверки.
-Подписанный APK включен и соответствует release contract. Подписанные бинарные образы
-STM32U585 и nRF52840 с хешами выпуска отсутствуют в контролируемом рабочем каталоге,
-поэтому старые образы 2026101601 исключены, а прошивка станции до восстановления либо
-повторной подписанной сборки запрещена. Блокировка прошивки также запрещена.
+Стендовый программный выпуск 2026111201 включен полностью и остается в статусе
+аппаратной проверки. Подпись STM32 Ed25519, фиксированные хеши и ключ nRF52840, APK,
+отсутствие закрытых материалов и аппаратные блокировки проверены валидатором. Прошивка
+разрешена для DIO-EVT-B01 и аппаратных испытаний EVT. Блокировка прошивки запрещена до
+полного аппаратного PASS и отдельного производственного выпуска.
 
 EN
 REV_D11 is the corrected complete package issued after procurement. Ordered hardware
@@ -290,10 +293,10 @@ from REV_D10. BOM and records match the ordered eight-layer PCB-MAIN baseline.
 Conflicting REV_D7 documents are excluded from FULL and TESTS. REV_D7-named files
 inside ALTIUM are retained only as an exact historical binding of the placed factory
 order and are superseded by the current REV_D11 documents. All included DOCX files
-passed the approved format audit. The signed Android APK matches the release contract. The controlled
-workspace does not contain the signed STM32U585 and nRF52840 binaries for release
-2026111201, so obsolete 2026101601 images are excluded and station flashing is blocked
-until the signed artifacts are restored or reproducibly rebuilt and signed.
+passed the approved format audit. The complete signed bench release 2026111201 is
+included and validated. It may be flashed to DIO-EVT-B01 and EVT hardware for the
+required physical tests. Firmware locking remains forbidden until full hardware PASS
+and a separate production release.
 """.encode("utf-8")
 
 
@@ -321,6 +324,39 @@ def validate_manifest(archive: zipfile.ZipFile, root: str) -> int:
         if expected[name] != sha256_bytes(archive.read(name)):
             raise RuntimeError(f"manifest hash mismatch: {name}")
     return len(actual)
+
+
+def validate_bench_release_archive(path: Path) -> dict[str, object]:
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    expected = {
+        "2026111201.bin": "98DD4076980EE80D3CD5D2AD6CF7CD84375203602BFE1DA52CDFF366087E1715",
+        "zephyr.signed.bin": "E2A10E2F8B68C4221F99509C7DD78728767301E7F867AE66C870601FBF6402B6",
+        "merged.hex": "AE95386A77606D14D9273F4ED5ABE1FF9DC68F9BE9A8E755D937320BBD3CC554",
+    }
+    with zipfile.ZipFile(path) as archive:
+        bad = archive.testzip()
+        if bad:
+            raise RuntimeError(f"bench release CRC failure: {bad}")
+        files = [info for info in archive.infolist() if not info.is_dir()]
+        for basename, expected_hash in expected.items():
+            matches = [info for info in files if PurePosixPath(info.filename).name == basename]
+            if len(matches) != 1:
+                raise RuntimeError(f"bench release file missing or duplicated: {basename}")
+            if sha256_bytes(archive.read(matches[0])) != expected_hash:
+                raise RuntimeError(f"bench release hash mismatch: {basename}")
+        if any(contains_private_key(archive.read(info)) for info in files):
+            raise RuntimeError("private key material found in bench release")
+    return {
+        "included": True,
+        "archive": path.name,
+        "archive_sha256": sha256_file(path),
+        "files": len(files),
+        "validation": "PASS",
+        "stm32_signature": "PASS",
+        "nrf52840_fixed_hashes": "PASS",
+        "private_material_scan": "PASS",
+    }
 
 
 def payload_hashes(path: Path, root: str) -> dict[str, str]:
@@ -383,6 +419,7 @@ def main() -> None:
     doc_audit = json.loads((DOCS_SOURCE / "КОНТРОЛЬ_ФОРМАТА_DOCX.json").read_text(encoding="utf-8"))
     if doc_audit.get("overall") != "PASS" or len(doc_audit.get("documents", [])) != len(DOCUMENT_DESTINATIONS):
         raise RuntimeError("DOCX format audit is not PASS for the complete current document set")
+    bench_release = validate_bench_release_archive(BENCH_RELEASE_ARCHIVE)
 
     altium = inherited_entries(
         BASE / "EVT_PRE_20_REV_D10_ALTIUM.zip",
@@ -432,13 +469,19 @@ def main() -> None:
         "EVT_D11_SOFTWARE/08_Релиз_2026111201/android/Dioneya_Commissioning_0.1.1_bench_20261112.apk",
         APK,
     )
+    add_file(
+        software,
+        f"EVT_D11_SOFTWARE/08_Релиз_2026111201/{BENCH_RELEASE_ARCHIVE.name}",
+        BENCH_RELEASE_ARCHIVE,
+    )
     release_note = {
         "release_id": "EVT_PRE_20_BENCH_RELEASE_2026111201",
+        "status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
+        "validated_release_archive": bench_release,
         "apk": {"included": True, "sha256": sha256_file(APK)},
-        "stm32_signed_binary": {"included": False, "expected_sha256": "98DD4076980EE80D3CD5D2AD6CF7CD84375203602BFE1DA52CDFF366087E1715"},
-        "nrf52840_signed_binary": {"included": False, "expected_sha256": "E2A10E2F8B68C4221F99509C7DD78728767301E7F867AE66C870601FBF6402B6"},
-        "reason": "signed firmware artifacts are absent from the controlled workspace; obsolete 2026101601 images are intentionally excluded",
-        "flashing_permission": "DENIED_UNTIL_SIGNED_ARTIFACTS_RESTORED_AND_VALIDATED",
+        "stm32_signed_binary": {"included": True, "sha256": "98DD4076980EE80D3CD5D2AD6CF7CD84375203602BFE1DA52CDFF366087E1715"},
+        "nrf52840_signed_binary": {"included": True, "sha256": "E2A10E2F8B68C4221F99509C7DD78728767301E7F867AE66C870601FBF6402B6"},
+        "flashing_permission": "ALLOWED_FOR_DIO_EVT_B01_AND_EVT_HARDWARE_VALIDATION",
         "firmware_lock": "FORBIDDEN_HARDWARE_VALIDATION_PENDING",
     }
     software["EVT_D11_SOFTWARE/08_Релиз_2026111201/ARTIFACT_STATUS.json"] = (
@@ -508,6 +551,11 @@ def main() -> None:
         full,
         "EVT_D11/08_ПО/06_Релиз_2026111201/android/Dioneya_Commissioning_0.1.1_bench_20261112.apk",
         APK,
+    )
+    add_file(
+        full,
+        f"EVT_D11/08_ПО/06_Релиз_2026111201/{BENCH_RELEASE_ARCHIVE.name}",
+        BENCH_RELEASE_ARCHIVE,
     )
     full["EVT_D11/08_ПО/06_Релиз_2026111201/ARTIFACT_STATUS.json"] = (
         json.dumps(release_note, ensure_ascii=False, indent=2) + "\n"
@@ -610,8 +658,8 @@ def main() -> None:
 - BOM и закупочные реестры приведены к фактически заказанной конфигурации.
 - Включено {len(DOCUMENT_DESTINATIONS)} действующих DOCX; проверка утвержденного шаблона PASS.
 - Старые конкурирующие документы REV_D7 исключены.
-- APK 2026111201 включен и соответствует release contract.
-- Подписанные STM32U585 и nRF52840 бинарные файлы 2026111201 отсутствуют в контролируемом каталоге. Прошивка до их восстановления запрещена.
+- Полный подписанный стендовый выпуск 2026111201 включен и прошел валидацию по 43 файлам.
+- Прошивка разрешена для DIO-EVT-B01 и аппаратных испытаний EVT.
 - Аппаратные испытания: NOT_RUN. Блокировка прошивки: FORBIDDEN.
 - Контроль CRC, полной распаковки, манифестов, закрытых ключей и вложенных архивов: PASS.
 
