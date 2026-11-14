@@ -268,7 +268,10 @@ RU
 REV_D11 является исправленным полным комплектом после оформления закупки. Заказные
 параметры не изменены: PCB-MAIN 8L, PCB-PWR 4L, PCB-MIC 2L. Фабричный Altium/CAM
 пакет унаследован побайтно от REV_D10. BOM, реестры и документация приведены к
-фактически заказанной конфигурации. Старые конкурирующие документы REV_D7 исключены.
+фактически заказанной конфигурации. Старые конкурирующие документы REV_D7 исключены
+из основного и испытательного архивов. Несколько файлов с обозначением REV_D7 внутри
+Altium-архива сохранены только как точная историческая привязка уже оформленного заказа.
+Они не заменяют действующие документы REV_D11 из основного архива.
 
 Все включенные DOCX прошли проверку шаблона: Times New Roman 14 пт, в таблицах
 12 пт, одинарный интервал, выравнивание по ширине, отступ первой строки 1,25 см
@@ -284,8 +287,10 @@ EN
 REV_D11 is the corrected complete package issued after procurement. Ordered hardware
 parameters are unchanged. The Altium/CAM factory payload is inherited byte-for-byte
 from REV_D10. BOM and records match the ordered eight-layer PCB-MAIN baseline.
-Conflicting REV_D7 documents are excluded. All included DOCX files passed the approved
-format audit. The signed Android APK matches the release contract. The controlled
+Conflicting REV_D7 documents are excluded from FULL and TESTS. REV_D7-named files
+inside ALTIUM are retained only as an exact historical binding of the placed factory
+order and are superseded by the current REV_D11 documents. All included DOCX files
+passed the approved format audit. The signed Android APK matches the release contract. The controlled
 workspace does not contain the signed STM32U585 and nRF52840 binaries for release
 2026111201, so obsolete 2026101601 images are excluded and station flashing is blocked
 until the signed artifacts are restored or reproducibly rebuilt and signed.
