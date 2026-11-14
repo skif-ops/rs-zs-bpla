@@ -205,6 +205,16 @@ def base_exclusion(relative: str) -> bool:
     )
 
 
+def altium_exclusion(relative: str) -> bool:
+    name = PurePosixPath(relative).name
+    return (
+        name.startswith("MANIFEST_SHA256_")
+        or name.startswith("release_metadata_")
+        or name.startswith("excluded_test_fixtures_")
+        or name == "README_FIRST_RU_EN.txt"
+    )
+
+
 def full_exclusion(relative: str) -> bool:
     lower = relative.lower()
     name = PurePosixPath(relative).name
@@ -373,7 +383,7 @@ def main() -> None:
         BASE / "EVT_PRE_20_REV_D10_ALTIUM.zip",
         "EVT_D10_ALTIUM",
         "EVT_D11_ALTIUM",
-        base_exclusion,
+        altium_exclusion,
     )
     altium["EVT_D11_ALTIUM/README_FIRST_RU_EN.txt"] = readme("Altium PCB/PCBA factory package", commit)
     altium_meta = {
